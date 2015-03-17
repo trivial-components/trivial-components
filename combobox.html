@@ -85,6 +85,9 @@
                             }
                         })
                         .keydown(function (e) {
+                            if (e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92) {
+                                return; // modifier key was pressed...
+                            }
                             if (e.keyCode == 38 || e.keyCode == 40) { // up or down key
                                 if (!isDropDownOpen) {
                                     openDropDown();
@@ -101,6 +104,8 @@
                             } else if (isDropDownOpen && e.keyCode == 13) { // enter
                                 selectEntry(highlightedEntry);
                                 closeDropDown();
+                                hideEditor();
+                                $editor.select();
                             } else if (e.keyCode == 27) { // escape
                                 closeDropDown();
                                 hideEditor();
@@ -149,6 +154,8 @@
                                     console.log("$entry.mousedown");
                                     selectEntry(entry);
                                     closeDropDown();
+                                    hideEditor();
+                                    $editor.select();
                                 })
                                 .mouseover(function () {
                                     setHighlightedEntry(entry);
