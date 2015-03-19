@@ -1,8 +1,6 @@
-
-
 (function ($) {
-    $.expr[":"].containsIgnoreCase = $.expr.createPseudo(function(arg) {
-        return function( elem ) {
+    $.expr[":"].containsIgnoreCase = $.expr.createPseudo(function (arg) {
+        return function (elem) {
             return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
         };
     });
@@ -40,13 +38,32 @@
         '</div>';
 
     $.fn.trivialcombobox = function (options) {
-        var config = $.extend({
-            template: defaultTemplate,
-            entries: [],
-            emptyEntry: {}
-        }, options);
-
         this.each(function () {
+            var config = $.extend({
+                template: defaultTemplate,
+                entries: [],
+                emptyEntry: {},
+                queryFunction: (function () {
+                    var entries = options.entries;
+
+                    function filterElements() {
+                        var visibleEntries = [];
+                        for (var i = 0; i < entries.length; i++) {
+                            var entry = entries[i];
+                            var $entryElement = entry._trComboBoxEntryElement;
+                            if ($entryElement.is(':containsIgnoreCase(' + getNonSelectedEditorValue() + ')')) {
+                                visibleEntries.push(entry);
+                            }
+                        }
+                        return visibleEntries;
+                    }
+
+                    return function (queryString, resultCallback) {
+                        resultCallback(filterElements());
+                    }
+                })()
+            }, options);
+
             var isDropDownOpen = false;
             var selectedEntry = null;
             var highlightedEntry = null;
@@ -91,18 +108,12 @@
                         closeDropDown();
                         hideEditor();
                     } else {
+                        query();
                         showEditor();
                         openDropDown();
                     }
                 })
-                .keyup(function() {
-                    var visibleEntries = filterElements();
-                    if ((highlightedEntry == null || visibleEntries.indexOf(highlightedEntry) === -1) && visibleEntries.length > 0) {
-                        setHighlightedEntry(visibleEntries[0]);
-                    }
-                })
                 .mousedown(function () {
-                    filterElements();
                     openDropDown();
                 });
 
@@ -124,32 +135,13 @@
                 }
             });
 
-            for (var i = 0; i < config.entries.length; i++) {
-                var entry = config.entries[i];
-                var html = Mustache.render(config.template, entry);
-                var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
-                entry._trComboBoxEntryElement = $entry;
-                (function (entry) {
-                    $entry
-                        .mousedown(function () {
-                            console.log("$entry.mousedown");
-                            selectEntry(entry);
-                            closeDropDown();
-                            hideEditor();
-                            $editor.select();
-                        })
-                        .mouseover(function () {
-                            setHighlightedEntry(entry);
-                        });
-                })(entry);
-            }
+            updateDropDownEntries(config.entries);
 
             selectEntry(config.emptyEntry);
 
             $selectedEntryWrapper.click(function () {
                 console.log("$selectedEntryWrapper.click");
                 $editor.select();
-                filterElements();
                 openDropDown();
                 showEditor();
 //                    return false;
@@ -160,12 +152,50 @@
                     showEditor();
                 } else {
                     $editor.select();
-                    filterElements();
                     openDropDown();
                     showEditor();
-                    filterElements();
                 }
             });
+
+            function updateDropDownEntries(entries) {
+                config.entries = entries;
+
+                $dropDown.empty();
+                for (var i = 0; i < config.entries.length; i++) {
+                    var entry = config.entries[i];
+                    var html = Mustache.render(config.template, entry);
+                    var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
+                    entry._trComboBoxEntryElement = $entry;
+                    (function (entry) {
+                        $entry
+                            .mousedown(function () {
+                                console.log("$entry.mousedown");
+                                selectEntry(entry);
+                                closeDropDown();
+                                hideEditor();
+                                $editor.select();
+                            })
+                            .mouseover(function () {
+                                setHighlightedEntry(entry);
+                            });
+                    })(entry);
+                }
+            }
+
+            function query() {
+                // do asynchronously to be sure the input field has been updated before the result callback is (synchronously) called
+                setTimeout(function () {
+                    config.queryFunction($editor.val(), function (entries) {
+                        updateDropDownEntries(entries);
+
+                        if ((highlightedEntry == null || config.entries.indexOf(highlightedEntry) === -1) && config.entries.length > 0) {
+                            setHighlightedEntry(config.entries[0]);
+                        }
+
+                        highlightTextMatches();
+                    });
+                }, 0)
+            }
 
             function setHighlightedEntry(entry) {
                 highlightedEntry = entry;
@@ -238,14 +268,14 @@
                     newEditorValue = getNonSelectedEditorValue();
                 }
                 $editor.val(newEditorValue);
-                setTimeout(function() {
+                setTimeout(function () {
                     $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
                 }, 0);
             }
 
             function getAllVisibleEntries() {
                 var visibleEntries = [];
-                for (var i=0; i<config.entries.length; i++) {
+                for (var i = 0; i < config.entries.length; i++) {
                     var entry = config.entries[i];
                     if (entry._trComboBoxEntryElement.is(':visible')) {
                         visibleEntries.push(entry);
@@ -265,20 +295,11 @@
                 return visibleEntries[newHighlightedElementIndex];
             }
 
-            function filterElements() {
-                var visibleEntries = [];
-                for (var i=0; i<config.entries.length; i++) {
-                    var entry = config.entries[i];
-                    var $entryElement = entry._trComboBoxEntryElement;
-                    if ($entryElement.is(':containsIgnoreCase(' + getNonSelectedEditorValue() + ')')) {
-                        $entryElement.removeClass("tr-hidden");
-                        visibleEntries.push(entry);
-                    } else {
-                        $entryElement.addClass("tr-hidden");
-                    }
+            function highlightTextMatches() {
+                for (var i = 0; i < config.entries.length; i++) {
+                    var $entryElement = config.entries[i]._trComboBoxEntryElement;
                     $entryElement.add($entryElement.find('*')).highlight(getNonSelectedEditorValue(), "tr-search-highlighted");
                 }
-                return visibleEntries;
             }
 
         });

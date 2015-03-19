@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
     <link rel="stylesheet/less" type="text/css" href="bower_components/normalize.css/normalize.css"/>
+    <style type="text/less">
+        body {
+            padding: 20px;
+            background: url(
+            data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIUlEQVQYV2NkYGDgAWJ08AVdgHGIKMTiF0wPgjwz2BUCABanBUf+sXnrAAAAAElFTkSuQmCC) repeat;
+        }
+
+        h5 {
+            margin-bottom: 2px;
+        }
+    </style>
     <link rel="stylesheet/less" type="text/css" href="less/all.less"/>
     <script src="bower_components/less/dist/less.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -14,15 +25,43 @@
 <body>
 
 
-<div class="container">
-    <div id="placeholder"></div>
-</div>
+<h5>Default query implementation:</h5>
+<small>Configured entries are filtered locally.</small>
+<div id="defaultFilteringComboBox"></div>
+
+<h5>Custom filtering:</h5>
+<small>Filtering is done by custom code, e.g. on the server side.</small>
+<div id="customFilteringComboBox"></div>
 
 
 <script>
     $(function () {
 
-        $('#placeholder').trivialcombobox({
+        $('#defaultFilteringComboBox').trivialcombobox({
+            entries: [{
+                imgUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
+                displayValue: "Yann Massard",
+                additionalInfo: "Contributor trivial-components"
+            }, {
+                imgUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
+                displayValue: "Some Other Guy",
+                additionalInfo: "Actually don't know him..."
+            }, {
+                imgUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
+                displayValue: "Yet Another Person",
+                additionalInfo: "With two forenames"
+            }, {
+                imgUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
+                displayValue: "Maybe George",
+                additionalInfo: "Or another name"
+            }, {
+                imgUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
+                displayValue: "Number Five",
+                additionalInfo: "Ok, no idea"
+            }]
+        });
+
+        $('#customFilteringComboBox').trivialcombobox({
             entries: [{
                 imgUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
                 displayValue: "Yann Massard",
@@ -48,6 +87,19 @@
                 imgUrl: "-",
                 displayValue: "",
                 additionalInfo: ""
+            },
+            queryFunction: function (queryString, resultCallback) {
+                setTimeout(function () {
+                    resultCallback([{
+                        imgUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
+                        displayValue: "First Query Result",
+                        additionalInfo: "Actually don't know him..."
+                    }, {
+                        imgUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
+                        displayValue: "Second Query Result",
+                        additionalInfo: "With two forenames"
+                    }]);
+                }, 1000);
             }
         })
     });
