@@ -1,19 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet/less" type="text/css" href="bower_components/normalize.css/normalize.css"/>
-    <style type="text/less">
-        body {
-            padding: 20px;
-            background: url(
-            data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIUlEQVQYV2NkYGDgAWJ08AVdgHGIKMTiF0wPgjwz2BUCABanBUf+sXnrAAAAAElFTkSuQmCC) repeat;
-        }
-
-        h5 {
-            margin-bottom: 2px;
-        }
-    </style>
-    <link rel="stylesheet/less" type="text/css" href="less/all.less"/>
+    <link rel="stylesheet/less" type="text/css" href="less/demo.less"/>
     <script src="bower_components/less/dist/less.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/jquery-ui/ui/position.js"></script>
@@ -85,7 +73,7 @@
             }],
             emptyEntry: {
                 imgUrl: "-",
-                displayValue: "",
+                displayValue: "Please select...",
                 additionalInfo: ""
             },
             queryFunction: function (queryString, resultCallback) {
@@ -100,7 +88,8 @@
                         additionalInfo: "With two forenames"
                     }]);
                 }, 1000);
-            }
+            },
+            selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
         })
     });
 </script>

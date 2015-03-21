@@ -29,18 +29,31 @@
 }(jQuery));
 
 (function ($) {
-    var defaultTemplate = '<div class="combobox-entry">' +
+    var icon2LinesTemplate = '<div class="combobox-entry">' +
         '  <div class="img-wrapper" style="background-image: url({{imgUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
+    var singleLineTemplate = '<div class="combobox-entry">' +
+        '  <div class="content-wrapper editor-area"> ' +
+        '    <div>{{displayValue}}</div> ' +
+        '  </div>' +
+        '</div>';
+
+
+    var defaultTemplate = icon2LinesTemplate;
+    var defaultSpinnerTemplate = '<div class="tr-combobox-spinner"><div>Fetching data...</div></div>';
+    var defaultNoEntriesTemplate = '<div class="tr-combobox-no-data"><div>No matching entries...</div></div>';
 
     $.fn.trivialcombobox = function (options) {
         this.each(function () {
             var config = $.extend({
                 template: defaultTemplate,
+                selectedEntryTemplate: options.template || defaultTemplate,
+                spinnerTemplate: defaultSpinnerTemplate,
+                noEntriesTemplate: defaultNoEntriesTemplate,
                 entries: [],
                 emptyEntry: {},
                 queryFunction: (function () {
@@ -161,28 +174,35 @@
                 config.entries = entries;
 
                 $dropDown.empty();
-                for (var i = 0; i < config.entries.length; i++) {
-                    var entry = config.entries[i];
-                    var html = Mustache.render(config.template, entry);
-                    var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
-                    entry._trComboBoxEntryElement = $entry;
-                    (function (entry) {
-                        $entry
-                            .mousedown(function () {
-                                console.log("$entry.mousedown");
-                                selectEntry(entry);
-                                closeDropDown();
-                                hideEditor();
-                                $editor.select();
-                            })
-                            .mouseover(function () {
-                                setHighlightedEntry(entry);
-                            });
-                    })(entry);
+
+                if (config.entries.length > 0) {
+                    for (var i = 0; i < config.entries.length; i++) {
+                        var entry = config.entries[i];
+                        var html = Mustache.render(config.template, entry);
+                        var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
+                        entry._trComboBoxEntryElement = $entry;
+                        (function (entry) {
+                            $entry
+                                .mousedown(function () {
+                                    console.log("$entry.mousedown");
+                                    selectEntry(entry);
+                                    closeDropDown();
+                                    hideEditor();
+                                    $editor.select();
+                                })
+                                .mouseover(function () {
+                                    setHighlightedEntry(entry);
+                                });
+                        })(entry);
+                    }
+                } else {
+                    $dropDown.append(config.noEntriesTemplate);
                 }
             }
 
             function query() {
+                $dropDown.append(config.spinnerTemplate);
+
                 // do asynchronously to be sure the input field has been updated before the result callback is (synchronously) called
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (entries) {
@@ -207,7 +227,7 @@
 
             function selectEntry(entry) {
                 selectedEntry = entry;
-                var $selectedEntry = $(Mustache.render(config.template, entry))
+                var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, entry))
                     .addClass("tr-combobox-entry");
                 if (entry == config.emptyEntry) {
                     $selectedEntry.addClass("empty");
@@ -305,4 +325,6 @@
         });
         return this;
     };
+    $.fn.trivialcombobox.icon2LinesTemplate = icon2LinesTemplate;
+    $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
 }(jQuery));
