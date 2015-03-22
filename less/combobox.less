@@ -1,6 +1,10 @@
 @tr-border: 1px solid grey;
 @tr-border-radius: 4px;
 
+.tr-original-input {
+  tab-index: -1;
+  display: none;
+}
 
 .tr-combobox {
   display: -webkit-flex;
@@ -9,6 +13,11 @@
   background-color: white;
   border: @tr-border;
   border-radius: @tr-border-radius;
+  &.focus {
+    -webkit-box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
+    -moz-box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
+    box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
+  }
   &.open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -81,9 +90,9 @@
 .tr-search-highlighted {
   background-color: rgba(244, 195, 125, 0.7);
   border-radius: 3px;
-  -webkit-box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75);
-  box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.75);
 }
 
 .tr-hidden {

@@ -47,6 +47,15 @@
     var defaultSpinnerTemplate = '<div class="tr-combobox-spinner"><div>Fetching data...</div></div>';
     var defaultNoEntriesTemplate = '<div class="tr-combobox-no-data"><div>No matching entries...</div></div>';
 
+    $(function() {
+        var $textarea = $("<textarea></textarea>").appendTo(document.body).focus();
+        var computedStyle = window.getComputedStyle($textarea.get(0));
+        console.log(computedStyle.outlineColor);
+        console.log(computedStyle.outlineStyle);
+        console.log(computedStyle.outlineWidth);
+        console.log(computedStyle.outlineOffset);
+    });
+
     $.fn.trivialcombobox = function (options) {
         this.each(function () {
             var config = $.extend({
@@ -82,14 +91,18 @@
             var highlightedEntry = null;
             var blurCausedByClickInsideComponent = false;
 
-            var $this = $(this);
-            var $comboBox = $('<div class="tr-combobox"/>').appendTo($this);
+            var $this = $(this).addClass("tr-original-input");
+            var $comboBox = $('<div class="tr-combobox"/>').insertAfter($this).append($this);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
             var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
             var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
             var $editor = $('<input class="tr-combobox-edit-input" type="text"/>').appendTo("body")
+                .focus(function() {
+                    $comboBox.addClass('focus');
+                })
                 .blur(function () {
                     console.log("$editor.blur");
+                    $comboBox.removeClass('focus');
                     if (!blurCausedByClickInsideComponent) {
                         hideEditor();
                         closeDropDown();
