@@ -47,23 +47,16 @@
     var defaultSpinnerTemplate = '<div class="tr-combobox-spinner"><div>Fetching data...</div></div>';
     var defaultNoEntriesTemplate = '<div class="tr-combobox-no-data"><div>No matching entries...</div></div>';
 
-    $(function() {
-        var $textarea = $("<textarea></textarea>").appendTo(document.body).focus();
-        var computedStyle = window.getComputedStyle($textarea.get(0));
-        console.log(computedStyle.outlineColor);
-        console.log(computedStyle.outlineStyle);
-        console.log(computedStyle.outlineWidth);
-        console.log(computedStyle.outlineOffset);
-    });
-
     $.fn.trivialcombobox = function (options) {
         this.each(function () {
             var config = $.extend({
+                idProperty: 'id',
                 template: defaultTemplate,
                 selectedEntryTemplate: options.template || defaultTemplate,
                 spinnerTemplate: defaultSpinnerTemplate,
                 noEntriesTemplate: defaultNoEntriesTemplate,
                 entries: [],
+                selectedEntry: undefined,
                 emptyEntry: {},
                 queryFunction: (function () {
                     var entries = options.entries;
@@ -91,8 +84,8 @@
             var highlightedEntry = null;
             var blurCausedByClickInsideComponent = false;
 
-            var $this = $(this).addClass("tr-original-input");
-            var $comboBox = $('<div class="tr-combobox"/>').insertAfter($this).append($this);
+            var $originalInput = $(this).addClass("tr-original-input");
+            var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput).append($originalInput);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
             var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
             var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
@@ -163,7 +156,7 @@
 
             updateDropDownEntries(config.entries);
 
-            selectEntry(config.emptyEntry);
+            selectEntry(config.selectedEntry || config.emptyEntry);
 
             $selectedEntryWrapper.click(function () {
                 console.log("$selectedEntryWrapper.click");
@@ -239,6 +232,7 @@
             }
 
             function selectEntry(entry) {
+                $originalInput.val(entry[config.idProperty]);
                 selectedEntry = entry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, entry))
                     .addClass("tr-combobox-entry");
