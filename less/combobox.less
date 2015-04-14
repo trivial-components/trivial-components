@@ -1,5 +1,6 @@
-@tr-border: 1px solid grey;
+@tr-border: 1px solid #ccc;
 @tr-border-radius: 4px;
+@tr-input-border-focus: #66afe9;
 
 .tr-original-input {
   tab-index: -1;
@@ -13,14 +14,24 @@
   background-color: white;
   border: @tr-border;
   border-radius: @tr-border-radius;
-  &.focus {
-    -webkit-box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
-    -moz-box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
-    box-shadow: 0px 0px 0px 2px rgba(0, 120, 255, 0.4);
-  }
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  .tr-form-control-focus(@tr-input-border-focus);
   &.open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+  }
+  &, * {
+    box-sizing: border-box;
+  }
+}
+
+.tr-form-control-focus(@color: @tr-input-border-focus) {
+  @color-rgba: rgba(red(@color), green(@color), blue(@color), .6);
+  &.focus {
+    border-color: @color;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px ~"@{color-rgba}";
   }
 }
 

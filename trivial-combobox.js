@@ -7,20 +7,20 @@
 })(jQuery);
 
 (function ($) {
-    $.fn.highlight = function (str, className) {
-        var regex = new RegExp(str, "gi");
+    $.fn.highlight = function (searchString, highlightClassName) {
+        var regex = new RegExp(searchString, "gi");
         return this.each(function () {
             var $this = $(this);
 
-            $this.find('.' + className).contents().unwrap();
+            $this.find('.' + highlightClassName).contents().unwrap();
             this.normalize();
 
-            if (str && str !== '') {
+            if (searchString && searchString !== '') {
                 $this.contents().filter(function () {
                     return this.nodeType == 3 && regex.test(this.nodeValue);
                 }).replaceWith(function () {
                     return (this.nodeValue || "").replace(regex, function (match) {
-                        return "<span class=\"" + className + "\">" + match + "</span>";
+                        return "<span class=\"" + highlightClassName + "\">" + match + "</span>";
                     });
                 });
             }
@@ -48,6 +48,7 @@
     var defaultNoEntriesTemplate = '<div class="tr-combobox-no-data"><div>No matching entries...</div></div>';
 
     $.fn.trivialcombobox = function (options) {
+        options = options || {};
         this.each(function () {
             var config = $.extend({
                 idProperty: 'id',
@@ -248,7 +249,7 @@
                 var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor.css({
                     "width": $editorArea.width() + "px",
-                    "height": ($editorArea.height() + 1) + "px"
+                    "height": ($editorArea.height()) + "px"
                 })
                     .position({
                         my: "left top",
