@@ -7,9 +7,7 @@ var rename = require('gulp-rename');
 var pipe = require('multipipe');
 var uglify = require('gulp-uglify');
 
-gulp.task('default', function () {
-    // place code for your default task here
-});
+gulp.task('default', ['less', 'js', 'lib2dist']);
 
 gulp.task('less', function () {
     return gulp.src(['less/trivial-combobox.less'])
