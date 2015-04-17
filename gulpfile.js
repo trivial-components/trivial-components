@@ -32,7 +32,10 @@ gulp.task('copy-fonts', function() {
         .pipe(gulp.dest('fonts'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['bower'], function() {
     livereload.listen();
     gulp.watch('less/*.less', ['less']);
 });
+
+gulp.task('default', ['bower', 'less', 'copy-fonts']);
+

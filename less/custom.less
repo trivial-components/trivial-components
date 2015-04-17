@@ -4,7 +4,7 @@ body {
 
 .download-btn {
   display: inline-block;
-  margin-bottom: 1rem;
+  margin: 10px 10px;
   padding: 0.75rem 1rem;
   color: rgba(255, 255, 255, 0.7);
   background-color: rgba(255, 255, 255, 0.08);
@@ -12,13 +12,25 @@ body {
   border-style: solid;
   border-width: 1px;
   border-radius: 0.3rem;
-  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s, opacity 1.5s, margin .7s;
 
   &:hover {
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     background-color: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  &.initial {
+    opacity: 0;
+    margin: -10 -30px;
+  }
+
+  @media screen and (max-width: @screen-xs-max) {
+    display: block;
+    width: 300px;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 
@@ -29,21 +41,15 @@ body {
   background-image: linear-gradient(120deg, #155799, #159957);
 }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: @screen-md-min) {
   .page-header-box {
-    padding: 5rem 6rem 4rem 6rem;
+    padding: 40px 0 30px 0;
   }
 }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (max-width: @screen-sm-max) {
   .page-header-box {
     padding: 3rem 4rem 2rem 4rem;
-  }
-}
-
-@media screen and (max-width: 42em) {
-  .page-header-box {
-    padding: 2rem 1rem;
   }
 }
 
