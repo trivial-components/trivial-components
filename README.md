@@ -15,4 +15,4 @@ trivial-combobox comes with a sensible default config.
 
 #### Who uses Trivial Components?
 
-The [Butterfaces](http://www.butterfaces.org/) team is currently playing arround with trivial-combobox. Have a look at [the corresponding branch](https://bitbucket.org/butterfaces/butterfaces/branch/BUT-258-integrate-trivial-combobox-templ).  
+The [ButterFaces](http://www.butterfaces.org/) team is currently playing arround with trivial-combobox. Have a look at [the corresponding branch](https://bitbucket.org/butterfaces/butterfaces/branch/BUT-258-integrate-trivial-combobox-templ).  
