@@ -9,7 +9,7 @@
 (function ($) {
     $.fn.highlight = function (searchString, highlightClassName) {
         var regex = new RegExp(searchString, "gi");
-        return this.each(function () {
+        return this.find('*').each(function () {
             var $this = $(this);
 
             $this.find('.' + highlightClassName).contents().unwrap();
@@ -49,6 +49,7 @@
 
     $.fn.trivialcombobox = function (options) {
         options = options || {};
+        var $comboBoxes = [];
         this.each(function () {
             var config = $.extend({
                 idProperty: 'id',
@@ -326,12 +327,15 @@
             function highlightTextMatches() {
                 for (var i = 0; i < config.entries.length; i++) {
                     var $entryElement = config.entries[i]._trComboBoxEntryElement;
-                    $entryElement.add($entryElement.find('*')).highlight(getNonSelectedEditorValue(), "tr-search-highlighted");
+                    $entryElement.highlight(getNonSelectedEditorValue(), "tr-search-highlighted");
                 }
             }
 
+
+            $comboBox.api = {updateDropDownEntries: updateDropDownEntries};
+            $comboBoxes.push($comboBox.get(0));
         });
-        return this;
+        return $($comboBoxes);
     };
     $.fn.trivialcombobox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
