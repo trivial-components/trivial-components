@@ -10,7 +10,8 @@
     <script src="bower_components/Caret.js/dist/jquery.caret.js"></script>
     <script src="bower_components/mustache/mustache.js"></script>
 
-    <script src="trivial-combobox.js"></script>
+    <script src="js/trivial-highlight.js"></script>
+    <script src="js/trivial-combobox.js"></script>
 </head>
 <body>
 
@@ -27,7 +28,7 @@
 <script>
     $(function () {
 
-        $('#defaultFilteringComboBox').trivialcombobox({
+        window.combo1 = $('#defaultFilteringComboBox').TrivialCombobox({
             idProperty: "displayValue",
             entries: [{
                 imgUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
