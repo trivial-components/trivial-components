@@ -1,4 +1,21 @@
-(function ($) {
+(function (factory) {
+    "use strict";
+
+    if (typeof define === 'function' && define.amd) {
+        // Define as an AMD module if possible
+        define('trivial-combobox', ['jquery', 'mustache'], factory);
+    }
+    else if (typeof exports === 'object') {
+        // Node/CommonJS
+        module.exports = factory(require('jquery', 'mustache'));
+    }
+    else if (jQuery && !jQuery.fn.dataTable) {
+        // Define using browser globals otherwise
+        // Prevent multiple instantiations if the script is loaded twice
+        factory(jQuery, Mustache);
+    }
+}(function ($, Mustache) {
+
     var icon2LinesTemplate = '<div class="combobox-entry">' +
         '  <div class="img-wrapper" style="background-image: url({{imgUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
@@ -26,6 +43,7 @@
             }
             return visibleEntries;
         }
+
         return function (queryString, resultCallback) {
             resultCallback(filterElements(queryString));
         }
@@ -56,7 +74,7 @@
         var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
         var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
         var $editor = $('<input class="tr-combobox-edit-input" type="text"/>').appendTo("body")
-            .focus(function() {
+            .focus(function () {
                 $comboBox.addClass('focus');
             })
             .blur(function () {
@@ -320,4 +338,7 @@
     $.fn.TrivialCombobox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
     $.fn.TrivialCombobox.singleLineTemplate = singleLineTemplate;
-}(jQuery));
+
+    return $.fn.TrivialCombobox;
+})
+);
