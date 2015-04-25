@@ -100,6 +100,7 @@
                 if (e.keyCode == 38 || e.keyCode == 40) { // up or down key
                     if (!isDropDownOpen) {
                         openDropDown();
+                        showEditor();
                     }
                     if (e.keyCode == 38) { // up
                         var newHighlightedEntry = getNextHighlightableEntry(-1);
