@@ -17,7 +17,7 @@
 }(function ($, Mustache) {
 
     var icon2LinesTemplate = '<div class="combobox-entry">' +
-        '  <div class="img-wrapper" style="background-image: url({{imgUrl}})"></div>' +
+        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{additionalInfo}}</div>' +
@@ -53,6 +53,7 @@
         options = options || {};
         var config = $.extend({
             idProperty: 'id',
+            autoCompleteProperty: 'displayValue',
             template: defaultTemplate,
             selectedEntryTemplate: options.template || defaultTemplate,
             spinnerTemplate: defaultSpinnerTemplate,
@@ -60,13 +61,17 @@
             entries: [],
             selectedEntry: undefined,
             emptyEntry: {},
-            queryFunction: defaultQueryFunctionFactory(options.entries || [])
+            queryFunction: defaultQueryFunctionFactory(options.entries || []),
+            aggressiveAutoComplete: true,
+            autoCompleteDelay: 500
         }, options);
 
         var isDropDownOpen = false;
         var selectedEntry = null;
         var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
+        var autoCompleteTimeoutId = -1;
+        var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
         var $originalInput = $(originalInput).addClass("tr-original-input");
         var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput).append($originalInput);
@@ -88,7 +93,10 @@
             .keydown(function (e) {
                 if (e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92) {
                     return; // modifier key was pressed...
+                } else if (e.keyCode == 8) { // backspace
+                    doNoAutoCompleteBecauseBackspaceWasPressed = true;
                 }
+
                 if (e.keyCode == 38 || e.keyCode == 40) { // up or down key
                     if (!isDropDownOpen) {
                         openDropDown();
@@ -96,11 +104,13 @@
                     if (e.keyCode == 38) { // up
                         var newHighlightedEntry = getNextHighlightableEntry(-1);
                         setHighlightedEntry(newHighlightedEntry);
-                        setAutoCompleteTextIfPossible(newHighlightedEntry.displayValue);
+                        autoCompleteIfPossible(newHighlightedEntry.displayValue);
+                        e.preventDefault(); // some browsers move the caret to the beginning on up key
                     } else if (e.keyCode == 40) { // down
                         var newHighlightedEntry = getNextHighlightableEntry(1);
                         setHighlightedEntry(newHighlightedEntry);
-                        setAutoCompleteTextIfPossible(newHighlightedEntry.displayValue);
+                        autoCompleteIfPossible(newHighlightedEntry.displayValue);
+                        e.preventDefault(); // some browsers move the caret to the end on down key
                     }
                 } else if (isDropDownOpen && e.keyCode == 13) { // enter
                     selectEntry(highlightedEntry);
@@ -187,15 +197,21 @@
             }
         }
 
-        function setEntries(entries) {
+        function updateEntries(entries, showToUser) {
             config.entries = entries;
             updateDropDownEntryElements(entries);
 
             if (config.entries.length > 0) {
                 setHighlightedEntry(config.entries[0]);
-            }
+                highlightTextMatches();
 
-            highlightTextMatches();
+                if (showToUser) {
+                    openDropDown();
+                    if (config.aggressiveAutoComplete) {
+                        autoCompleteIfPossible(highlightedEntry[config.autoCompleteProperty], config.autoCompleteDelay);
+                    }
+                }
+            }
         }
 
         function query() {
@@ -203,7 +219,9 @@
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called
             setTimeout(function () {
-                config.queryFunction($editor.val(), setEntries);
+                config.queryFunction($editor.val(), function (entries) {
+                    updateEntries(entries, true);
+                });
             });
         }
 
@@ -266,22 +284,27 @@
         }
 
         function getNonSelectedEditorValue() {
-            return $editor.val().substring(0, $editor.caret('pos'));
+            return $editor.val().substring(0, $editor.caret());
         }
 
-        function setAutoCompleteTextIfPossible(value) {
-            console.log("setting val in setAutoCompleteTextIfPossible");
-            var oldEditorValue = getNonSelectedEditorValue();
-            var newEditorValue;
-            if (value.indexOf(oldEditorValue) === 0) {
-                newEditorValue = value;
-            } else {
-                newEditorValue = getNonSelectedEditorValue();
+        function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
+            clearTimeout(autoCompleteTimeoutId);
+            if (!doNoAutoCompleteBecauseBackspaceWasPressed) {
+                autoCompleteTimeoutId = setTimeout(function () {
+                    var oldEditorValue = getNonSelectedEditorValue();
+                    var newEditorValue;
+                    if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
+                        newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
+                    } else {
+                        newEditorValue = getNonSelectedEditorValue();
+                    }
+                    $editor.val(newEditorValue);
+                    setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                        $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                    }, 0);
+                }, delay || 0);
             }
-            $editor.val(newEditorValue);
-            setTimeout(function () {
-                $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
-            }, 0);
+            doNoAutoCompleteBecauseBackspaceWasPressed = false;
         }
 
         function getAllVisibleEntries() {
@@ -307,14 +330,15 @@
         }
 
         function highlightTextMatches() {
+            var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < config.entries.length; i++) {
                 var $entryElement = config.entries[i]._trComboBoxEntryElement;
-                $entryElement.highlight(getNonSelectedEditorValue(), "tr-search-highlighted");
+                $entryElement.highlight(nonSelectedEditorValue, "tr-search-highlighted");
             }
         }
 
         this.$ = $comboBox;
-        this.setEntries = setEntries;
+        this.updateEntries = updateEntries;
     }
 
     $.fn.trivialcombobox = function (options) {

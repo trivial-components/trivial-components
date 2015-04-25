@@ -7,7 +7,7 @@
     <script src="bower_components/less/dist/less.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/jquery-ui/ui/position.js"></script>
-    <script src="bower_components/Caret.js/dist/jquery.caret.js"></script>
+    <script src="bower_components/jquery.caret/dist/jquery.caret-1.5.0.js"></script>
     <script src="bower_components/mustache/mustache.js"></script>
 
     <script src="js/trivial-highlight.js"></script>
@@ -31,23 +31,23 @@
         window.combo1 = $('#defaultFilteringComboBox').TrivialCombobox({
             idProperty: "displayValue",
             entries: [{
-                imgUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
                 displayValue: "Gerd Müller",
                 additionalInfo: "Football player"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
                 displayValue: "John Wayne",
                 additionalInfo: "Actor, director, producer"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
                 displayValue: "James Brown",
                 additionalInfo: "Singer"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
                 displayValue: "Ernest Hemingway",
                 additionalInfo: "Author"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
                 displayValue: "Charles Chaplin",
                 additionalInfo: "Comic actor"
             }]
@@ -55,39 +55,39 @@
 
         $('#customFilteringComboBox').trivialcombobox({
             entries: [{
-                imgUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
                 displayValue: "Gerd Müller",
                 additionalInfo: "Football player"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
                 displayValue: "John Wayne",
                 additionalInfo: "Actor, director, producer"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
                 displayValue: "James Brown",
                 additionalInfo: "Singer"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
                 displayValue: "Ernest Hemingway",
                 additionalInfo: "Author"
             }, {
-                imgUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
+                imageUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
                 displayValue: "Charles Chaplin",
                 additionalInfo: "Comic actor"
             }],
             emptyEntry: {
-                imgUrl: "-",
+                imageUrl: "-",
                 displayValue: "Please select...",
                 additionalInfo: ""
             },
             queryFunction: function (queryString, resultCallback) {
                 setTimeout(function () {
                     resultCallback([{
-                        imgUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
+                        imageUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
                         displayValue: "First Query Result",
                         additionalInfo: "Actually don't know him..."
                     }, {
-                        imgUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
+                        imageUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
                         displayValue: "Second Query Result",
                         additionalInfo: "With two forenames"
                     }]);
