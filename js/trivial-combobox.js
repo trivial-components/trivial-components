@@ -9,7 +9,7 @@
         // Node/CommonJS
         module.exports = factory(require('jquery', 'mustache'));
     }
-    else if (jQuery && !jQuery.fn.dataTable) {
+    else if (jQuery && !jQuery.fn.trivialcombobox) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
         factory(jQuery, Mustache);
@@ -63,7 +63,7 @@
             emptyEntry: {},
             queryFunction: defaultQueryFunctionFactory(options.entries || []),
             aggressiveAutoComplete: true,
-            autoCompleteDelay: 500
+            autoCompleteDelay: 0
         }, options);
 
         var isDropDownOpen = false;
@@ -284,7 +284,7 @@
         }
 
         function getNonSelectedEditorValue() {
-            return $editor.val().substring(0, $editor.caret());
+            return $editor.val().substring(0, $editor[0].selectionStart);
         }
 
         function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
