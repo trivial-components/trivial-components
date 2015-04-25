@@ -230,6 +230,7 @@
             $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted');
             if (entry != null) {
                 entry._trComboBoxEntryElement.addClass('tr-highlighted');
+                $dropDown.minimallyScrollTo(entry._trComboBoxEntryElement);
             }
         }
 
@@ -320,11 +321,14 @@
 
         function getNextHighlightableEntry(direction) {
             var visibleEntries = getAllVisibleEntries();
-            if (highlightedEntry == null) {
-                var newHighlightedElementIndex = (visibleEntries.length + direction) % visibleEntries.length;
+            var newHighlightedElementIndex;
+            if (highlightedEntry == null && direction > 0) {
+                newHighlightedElementIndex = -1 + direction;
+            } else if (highlightedEntry == null && direction < 0) {
+                newHighlightedElementIndex = visibleEntries.length + direction;
             } else {
                 var currentHighlightedElementIndex = visibleEntries.indexOf(highlightedEntry);
-                var newHighlightedElementIndex = (currentHighlightedElementIndex + visibleEntries.length + direction) % visibleEntries.length;
+                newHighlightedElementIndex = (currentHighlightedElementIndex + visibleEntries.length + direction) % visibleEntries.length;
             }
             return visibleEntries[newHighlightedElementIndex];
         }
