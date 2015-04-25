@@ -49,6 +49,10 @@
         }
     };
 
+    function isTabOrModifierKey(e) {
+        return e.keyCode == 9 || e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92;
+    }
+
     function TrivialComboBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
@@ -90,10 +94,13 @@
                 }
             })
             .keydown(function (e) {
-                if (e.keyCode == 9 || e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92) {
+                if (isTabOrModifierKey(e)) {
                     return; // tab or modifier key was pressed...
+                } else if (e.keyCode == 37 || e.keyCode == 39) { // left or right
+                    showEditor();
+                    return; // let the user navigate freely...
                 } else if (e.keyCode == 8) { // backspace
-                    doNoAutoCompleteBecauseBackspaceWasPressed = true;
+                    doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                 }
 
                 if (e.keyCode == 38 || e.keyCode == 40) { // up or down key
@@ -109,7 +116,7 @@
                     } else if (e.keyCode == 40) { // down
                         var newHighlightedEntry = getNextHighlightableEntry(1);
                         setHighlightedEntry(newHighlightedEntry);
-                        autoCompleteIfPossible(config.inputTextProperty);
+                        autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
                         e.preventDefault(); // some browsers move the caret to the end on down key
                     }
                 } else if (isDropDownOpen && e.keyCode == 13) { // enter
@@ -127,7 +134,7 @@
                 }
             })
             .keyup(function (e) {
-                if (e.keyCode != 9 && e.keyCode != 13 && selectedEntry != null && getNonSelectedEditorValue() !== selectedEntry[config.inputTextProperty]) {
+                if (!isTabOrModifierKey(e) && e.keyCode != 13 && selectedEntry != null && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                     selectEntry(null);
                 }
             })
@@ -159,7 +166,6 @@
             $editor.select();
             openDropDown();
             showEditor();
-//                    return false;
         });
         $trigger.mousedown(function () {
             if (isDropDownOpen) {
