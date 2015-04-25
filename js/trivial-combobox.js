@@ -83,7 +83,6 @@
                 $comboBox.addClass('focus');
             })
             .blur(function () {
-                console.log("$editor.blur");
                 $comboBox.removeClass('focus');
                 if (!blurCausedByClickInsideComponent) {
                     hideEditor();
@@ -132,9 +131,7 @@
             });
 
         $comboBox.add($dropDown).mousedown(function () {
-//                    console.log("prevent handler");
             if ($editor.is(":focus")) {
-//                        console.log("will blur because of click inside this component...");
                 blurCausedByClickInsideComponent = true;
             }
         }).mouseup(function () {
@@ -154,7 +151,6 @@
         selectEntry(config.selectedEntry || config.emptyEntry);
 
         $selectedEntryWrapper.click(function () {
-            console.log("$selectedEntryWrapper.click");
             $editor.select();
             openDropDown();
             showEditor();
@@ -182,7 +178,6 @@
                     (function (entry) {
                         $entry
                             .mousedown(function () {
-                                console.log("$entry.mousedown");
                                 selectEntry(entry);
                                 closeDropDown();
                                 hideEditor();
@@ -244,7 +239,6 @@
                 $selectedEntry.addClass("empty");
             }
             $selectedEntryWrapper.empty().append($selectedEntry);
-            console.log("setting val in selectEntry");
             $editor.val(entry.displayValue);
         }
 
