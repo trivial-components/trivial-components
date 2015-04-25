@@ -28,9 +28,8 @@
 <script>
     $(function () {
 
-        window.combo1 = $('#defaultFilteringComboBox').TrivialCombobox({
-            idProperty: "displayValue",
-            entries: [{
+        function createEntries() {
+            return [{
                 "displayValue": "Aundrea Baldyga",
                 "imageUrl": "https://avatars1.githubusercontent.com/u/97949?v=3&s=25",
                 "additionalInfo": "Ipsum diam lorem",
@@ -630,31 +629,16 @@
                 "additionalInfo": "Ipsum diam sed",
                 "id": 101,
                 "type": "ComboBoxEntry"
-            }]
+            }];
+        }
+
+        window.combo1 = $('#defaultFilteringComboBox').TrivialCombobox({
+            idProperty: "displayValue",
+            entries: createEntries()
         });
 
         $('#customFilteringComboBox').trivialcombobox({
-            entries: [{
-                imageUrl: "https://avatars1.githubusercontent.com/u/275410?v=3&s=460",
-                displayValue: "Gerd Müller",
-                additionalInfo: "Football player"
-            }, {
-                imageUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
-                displayValue: "John Wayne",
-                additionalInfo: "Actor, director, producer"
-            }, {
-                imageUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
-                displayValue: "James Brown",
-                additionalInfo: "Singer"
-            }, {
-                imageUrl: "https://avatars1.githubusercontent.com/u/224910?v=3&s=460",
-                displayValue: "Ernest Hemingway",
-                additionalInfo: "Author"
-            }, {
-                imageUrl: "https://avatars1.githubusercontent.com/u/689118?v=3&s=460",
-                displayValue: "Charles Chaplin",
-                additionalInfo: "Comic actor"
-            }],
+            entries: createEntries(),
             emptyEntry: {
                 imageUrl: "-",
                 displayValue: "Please select...",
@@ -662,16 +646,10 @@
             },
             queryFunction: function (queryString, resultCallback) {
                 setTimeout(function () {
-                    resultCallback([{
-                        imageUrl: "https://avatars1.githubusercontent.com/u/14947?v=3&s=460",
-                        displayValue: "First Query Result",
-                        additionalInfo: "Actually don't know him..."
-                    }, {
-                        imageUrl: "https://avatars1.githubusercontent.com/u/319494?v=3&s=460",
-                        displayValue: "Second Query Result",
-                        additionalInfo: "With two forenames"
-                    }]);
-                }, 1000);
+                    resultCallback(createEntries().filter(function(entry) {
+                        return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
+                    }));
+                }, 500);
             },
             selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
         })

@@ -16,14 +16,14 @@
     }
 }(function ($, Mustache) {
 
-    var icon2LinesTemplate = '<div class="combobox-entry">' +
+    var icon2LinesTemplate = '<div class="combobox-entry combobox-entry-icon-2-lines">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
-    var singleLineTemplate = '<div class="combobox-entry">' +
+    var singleLineTemplate = '<div class="combobox-entry combobox-entry-single-line">' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div>{{displayValue}}</div> ' +
         '  </div>' +
@@ -53,7 +53,7 @@
         options = options || {};
         var config = $.extend({
             idProperty: 'id',
-            autoCompleteProperty: 'displayValue',
+            inputTextProperty: 'displayValue',
             template: defaultTemplate,
             selectedEntryTemplate: options.template || defaultTemplate,
             spinnerTemplate: defaultSpinnerTemplate,
@@ -90,8 +90,8 @@
                 }
             })
             .keydown(function (e) {
-                if (e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92) {
-                    return; // modifier key was pressed...
+                if (e.keyCode == 9 || e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92) {
+                    return; // tab or modifier key was pressed...
                 } else if (e.keyCode == 8) { // backspace
                     doNoAutoCompleteBecauseBackspaceWasPressed = true;
                 }
@@ -104,12 +104,12 @@
                     if (e.keyCode == 38) { // up
                         var newHighlightedEntry = getNextHighlightableEntry(-1);
                         setHighlightedEntry(newHighlightedEntry);
-                        autoCompleteIfPossible(newHighlightedEntry.displayValue);
+                        autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
                         e.preventDefault(); // some browsers move the caret to the beginning on up key
                     } else if (e.keyCode == 40) { // down
                         var newHighlightedEntry = getNextHighlightableEntry(1);
                         setHighlightedEntry(newHighlightedEntry);
-                        autoCompleteIfPossible(newHighlightedEntry.displayValue);
+                        autoCompleteIfPossible(config.inputTextProperty);
                         e.preventDefault(); // some browsers move the caret to the end on down key
                     }
                 } else if (isDropDownOpen && e.keyCode == 13) { // enter
@@ -124,6 +124,11 @@
                     query();
                     showEditor();
                     openDropDown();
+                }
+            })
+            .keyup(function (e) {
+                if (e.keyCode != 9 && e.keyCode != 13 && selectedEntry != null && getNonSelectedEditorValue() !== selectedEntry[config.inputTextProperty]) {
+                    selectEntry(null);
                 }
             })
             .mousedown(function () {
@@ -148,7 +153,7 @@
 
         updateDropDownEntryElements(config.entries);
 
-        selectEntry(config.selectedEntry || config.emptyEntry);
+        selectEntry(config.selectedEntry || null);
 
         $selectedEntryWrapper.click(function () {
             $editor.select();
@@ -204,7 +209,7 @@
                 if (showToUser) {
                     openDropDown();
                     if (config.aggressiveAutoComplete) {
-                        autoCompleteIfPossible(highlightedEntry[config.autoCompleteProperty], config.autoCompleteDelay);
+                        autoCompleteIfPossible(highlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
                     }
                 }
             }
@@ -213,7 +218,7 @@
         function query() {
             $dropDown.append(config.spinnerTemplate);
 
-            // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called
+            // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
                 config.queryFunction($editor.val(), function (entries) {
                     updateEntries(entries, true);
@@ -231,15 +236,21 @@
         }
 
         function selectEntry(entry) {
-            $originalInput.val(entry[config.idProperty]);
-            selectedEntry = entry;
-            var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, entry))
-                .addClass("tr-combobox-entry");
-            if (entry == config.emptyEntry) {
-                $selectedEntry.addClass("empty");
+            if (entry == null) {
+                $originalInput.val("");
+                selectedEntry = config.emptyEntry;
+                var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
+                    .addClass("tr-combobox-entry")
+                    .addClass("empty");
+                $selectedEntryWrapper.empty().append($selectedEntry);
+            } else {
+                $originalInput.val(entry[config.idProperty]);
+                selectedEntry = entry;
+                var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
+                    .addClass("tr-combobox-entry");
+                $selectedEntryWrapper.empty().append($selectedEntry);
+                $editor.val(selectedEntry[config.inputTextProperty]);
             }
-            $selectedEntryWrapper.empty().append($selectedEntry);
-            $editor.val(entry.displayValue);
         }
 
         function showEditor() {
