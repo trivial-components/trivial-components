@@ -3,8 +3,10 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet/less" type="text/css" href="less/demo.less"/>
-    <script src="bower_components/less/dist/less.js"></script>
+    <!--<link rel="stylesheet/less" type="text/css" href="less/demo.less"/>-->
+    <!--<script src="bower_components/less/dist/less.js"></script>-->
+    <link rel="stylesheet" href="dist/css/demo.css">
+
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/jquery-ui/ui/position.js"></script>
     <script src="bower_components/mustache/mustache.js"></script>
@@ -19,6 +21,9 @@
 <h5>Default query implementation:</h5>
 <small>Configured entries are filtered locally.</small>
 <input id="defaultFilteringComboBox">
+
+<h5>Icon single line template</h5>
+<input id="iconSingleLineComboBox">
 
 <h5>Custom filtering:</h5>
 <small>Filtering is done by custom code, e.g. on the server side.</small>
@@ -633,8 +638,18 @@
         }
 
         window.combo1 = $('#defaultFilteringComboBox').TrivialComboBox({
-            idProperty: "displayValue",
-            entries: createEntries()
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            }
+        });
+
+        window.combo1 = $('#iconSingleLineComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            template: $.fn.TrivialComboBox.iconSingleLineTemplate
         });
 
         $('#customFilteringComboBox').trivialcombobox({

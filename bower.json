@@ -15,12 +15,12 @@
     "tests"
   ],
   "dependencies": {
-    "less": "2.x",
     "jquery": "2.x",
     "jquery-ui": "1.x",
     "mustache": "1.x"
   },
   "devDependencies": {
+    "less": "2.x",
     "normalize.css": "latest"
   }
 }

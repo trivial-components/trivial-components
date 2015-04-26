@@ -23,6 +23,10 @@
         '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
+    var iconSingleLineTemplate = '<div class="combobox-entry combobox-entry-icon-single-line">' +
+        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
+        '  <div class="content-wrapper editor-area">{{displayValue}}</div>' +
+        '</div>';
     var singleLineTemplate = '<div class="combobox-entry combobox-entry-single-line">' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div>{{displayValue}}</div> ' +
@@ -376,6 +380,8 @@
 
     $.fn.trivialcombobox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.TrivialComboBox.icon2LinesTemplate = icon2LinesTemplate;
+    $.fn.TrivialComboBox.iconSingleLineTemplate = iconSingleLineTemplate;
+    $.fn.TrivialComboBox.iconSingleLineTemplate = iconSingleLineTemplate;
     $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
     $.fn.TrivialComboBox.singleLineTemplate = singleLineTemplate;
 

@@ -1,4 +1,4 @@
-.combobox-entry.combobox-entry-icon-2-lines {
+.combobox-entry.combobox-entry-icon-single-line {
   display: flex;
   align-items: stretch;
   padding: 1px;
@@ -10,9 +10,8 @@
   }
 
   .img-wrapper {
-    flex: 0 0 25px;
-    width: 25px;
-    height: 30px;
+    flex: 0 0 24px;
+    height: 24px;
     background-position: center;
     background-size: cover;
     border-radius: 3px;
@@ -23,19 +22,10 @@
     flex: 1 0 auto;
     margin-left: 5px;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 14px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    .main-line {
-      font-weight: 400;
-      line-height: 14px;
-    }
-    .additional-info {
-      font-size: 90%;
-      color: #333;
-      margin-bottom: -1px;
-      font-weight: 200;
-    }
+    align-items: center;
   }
 }
 
