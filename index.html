@@ -85,7 +85,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10">
+        <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
             <div id="carousel" class="carousel slide" data-ride="carousel">
                 <!-- Indicators -->
                 <ol class="carousel-indicators">
@@ -197,72 +197,74 @@ $('#singleLineTemplateComboBox').TrivialComboBox({
 
     <br/>
     <h2>Configuration<a class="anchor" id="configuration"></a></h2>
-    <table class="table table-condensed table-hover">
-        <thead>
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover">
+            <thead>
             <tr>
                 <th>Option</th>
                 <th>Description</th>
                 <th>Default</th>
             </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>inputTextProperty</td>
-            <td>Name of the property which will be used as editor value and for auto-completion.</td>
-            <td><code>'displayValue'</code></td>
-        </tr>
-        <tr>
-            <td>template</td>
-            <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
-            <td><code>defaultTemplate</code></td>
-        </tr>
-        <tr>
-            <td>selectedEntryTemplate</td>
-            <td>Mustacheustache template to be used for displaying the currently selected entry.</td>
-            <td><code>template</code></td>
-        </tr>
-        <tr>
-            <td>spinnerTemplate</td>
-            <td>Html code for the "loading..." indicator.</td>
-            <td><code>defaultSpinnerTemplate</code></td>
-        </tr>
-        <tr>
-            <td>noEntriesTemplate</td>
-            <td>Html code for indicating that there is no entry in the dropdown.</td>
-            <td><code>defaultNoEntriesTemplate</code></td>
-        </tr>
-        <tr>
-            <td>entries</td>
-            <td>The dropdown entries to be displayed initially.</td>
-            <td><code>[]</code></td>
-        </tr>
-        <tr>
-            <td>selectedEntry</td>
-            <td>The initially selected entry.</td>
-            <td><code>undefined</code></td>
-        </tr>
-        <tr>
-            <td>emptyEntry</td>
-            <td>Fake entry that should be displayed when no entry is selected.</td>
-            <td><code>{}</code></td>
-        </tr>
-        <tr>
-            <td>queryFunction</td>
-            <td>JavaScript function for retrieving entries depending on the user's input. Takes two parameters: <code>queryString</code> (user input) and <code>resultCallback</code> (should be called with the list retrieved entries). </td>
-            <td>Simple client-side implementation that filters the initially configured array of entries.</td>
-        </tr>
-        <tr>
-            <td>aggressiveAutoComplete</td>
-            <td>Auto-complete while the user types.</td>
-            <td><code>true</code></td>
-        </tr>
-        <tr>
-            <td>autoCompleteDelay</td>
-            <td>Delay for auto-completion.</td>
-            <td><code>0</code></td>
-        </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <tr>
+                <td>inputTextProperty</td>
+                <td>Name of the property which will be used as editor value and for auto-completion.</td>
+                <td><code>'displayValue'</code></td>
+            </tr>
+            <tr>
+                <td>template</td>
+                <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
+                <td><code>defaultTemplate</code></td>
+            </tr>
+            <tr>
+                <td>selectedEntryTemplate</td>
+                <td>Mustacheustache template to be used for displaying the currently selected entry.</td>
+                <td><code>template</code></td>
+            </tr>
+            <tr>
+                <td>spinnerTemplate</td>
+                <td>Html code for the "loading..." indicator.</td>
+                <td><code>defaultSpinnerTemplate</code></td>
+            </tr>
+            <tr>
+                <td>noEntriesTemplate</td>
+                <td>Html code for indicating that there is no entry in the dropdown.</td>
+                <td><code>defaultNoEntriesTemplate</code></td>
+            </tr>
+            <tr>
+                <td>entries</td>
+                <td>The dropdown entries to be displayed initially.</td>
+                <td><code>[]</code></td>
+            </tr>
+            <tr>
+                <td>selectedEntry</td>
+                <td>The initially selected entry.</td>
+                <td><code>undefined</code></td>
+            </tr>
+            <tr>
+                <td>emptyEntry</td>
+                <td>Fake entry that should be displayed when no entry is selected.</td>
+                <td><code>{}</code></td>
+            </tr>
+            <tr>
+                <td>queryFunction</td>
+                <td>JavaScript function for retrieving entries depending on the user's input. Takes two parameters: <code>queryString</code> (user input) and <code>resultCallback</code> (should be called with the list retrieved entries). </td>
+                <td>Simple client-side implementation that filters the initially configured array of entries.</td>
+            </tr>
+            <tr>
+                <td>aggressiveAutoComplete</td>
+                <td>Auto-complete while the user types.</td>
+                <td><code>true</code></td>
+            </tr>
+            <tr>
+                <td>autoCompleteDelay</td>
+                <td>Delay for auto-completion.</td>
+                <td><code>0</code></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/trivial-components/trivial-components">Trivial Components</a> is maintained by <a href="https://github.com/trivial-components">trivial-components</a>.</span>
