@@ -15,7 +15,7 @@ var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('bower', function () {
     return bower()
-        .pipe(gulp.dest('lib/'))
+        .pipe(gulp.dest('bower_components/'))
 });
 
 gulp.task('less', function () {

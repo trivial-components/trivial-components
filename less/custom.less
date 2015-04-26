@@ -1,6 +1,11 @@
-body {
-  padding-top: 50px;
-  //border: 5px solid red;
+html, body {
+  height: 100%;
+}
+
+a.anchor {
+  display: block;
+  position: relative;
+  top: -100px;
 }
 
 .navbar {
@@ -44,6 +49,7 @@ body {
 }
 
 .page-header-box {
+  margin-top: 50px;
   color: #fff;
   text-align: center;
   background-color: #159957;
@@ -241,8 +247,32 @@ body {
   }
 }
 
+.carousel-caption {
+  padding-bottom: 0;
+}
+
+.carousel-indicators {
+  bottom: 0;
+  margin-bottom: 3px;
+}
+
+.carousel-indicators .active {
+  margin: 1px;
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, .3);
+}
+
+div pre.prettyprint {
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  background-color: #f7f7f9;
+  border: 1px solid @panel-default-border;
+  border-radius: @border-radius-large;
+}
+
 .site-footer {
-  padding-top: 2rem;
-  margin-top: 2rem;
+  margin-top: 150px;
+  padding: 2rem 0;
   border-top: solid 1px #eff0f1;
 }

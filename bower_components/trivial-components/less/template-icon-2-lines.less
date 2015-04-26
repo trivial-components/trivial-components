@@ -1,0 +1,46 @@
+.combobox-entry.combobox-entry-icon-2-lines {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  padding: 1px;
+  font-size: 14px;
+  line-height: 15px;
+
+  &.empty {
+    color: gray;
+  }
+
+  .img-wrapper {
+    -webkit-flex: 0 0 25px;
+    -ms-flex: 0 0 25px;
+    flex: 0 0 25px;
+    width: 25px;
+    height: 30px;
+    background-position: center;
+    background-size: cover;
+    border-radius: 3px;
+    border: @tr-border;
+  }
+
+  .content-wrapper {
+    -webkit-flex: 1 0 auto;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    margin-left: 5px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    .main-line {
+      font-weight: 400;
+      line-height: 14px;
+      margin-top: 1px;
+    }
+    .additional-info {
+      font-size: 90%;
+      color: #333;
+      margin-bottom: -1px;
+      font-weight: 200;
+    }
+  }
+}
+

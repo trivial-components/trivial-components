@@ -15,7 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "latest"
+    "bootstrap": "latest",
+    "trivial-components": "https://github.com/trivial-components/trivial-components.git",
+    "prettify": "latest"
   },
   "devDependencies": {
 
