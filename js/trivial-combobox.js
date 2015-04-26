@@ -82,7 +82,7 @@
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
         var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
         var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
-        var $editor = $('<input class="tr-combobox-edit-input" type="text"/>').appendTo("body")
+        var $editor = $('<input class="tr-combobox-edit-input" type="text"/>').prependTo($comboBox)
             .focus(function () {
                 $comboBox.addClass('focus');
             })
@@ -365,7 +365,7 @@
         });
         return $($comboBoxes);
     };
-    $.fn.TrivialCombobox = function (options) {
+    $.fn.TrivialComboBox = function (options) {
         var comboBoxes = [];
         this.each(function () {
             var comboBox = new TrivialComboBox(this, options);
@@ -375,10 +375,10 @@
     };
 
     $.fn.trivialcombobox.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.TrivialCombobox.icon2LinesTemplate = icon2LinesTemplate;
+    $.fn.TrivialComboBox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
-    $.fn.TrivialCombobox.singleLineTemplate = singleLineTemplate;
+    $.fn.TrivialComboBox.singleLineTemplate = singleLineTemplate;
 
-    return $.fn.TrivialCombobox;
+    return $.fn.TrivialComboBox;
 })
 );
