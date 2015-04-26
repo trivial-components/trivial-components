@@ -12,13 +12,18 @@ var batch = require('gulp-batch');
 var plumber = require('gulp-plumber');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
+var del = require('del');
+
+gulp.task('clean', function () {
+    del(['bower_components', 'css']);
+});
 
 gulp.task('bower', function () {
     return bower()
         .pipe(gulp.dest('bower_components/'))
 });
 
-gulp.task('copyJsDependencies2lib', function () {
+gulp.task('copyJsDependencies2lib', ['bower'], function () {
     return gulp.src([
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/jquery/dist/jquery.min.js',
@@ -31,12 +36,12 @@ gulp.task('copyJsDependencies2lib', function () {
         .pipe(gulp.dest('lib/js'));
 });
 
-gulp.task('copyFonts2lib', function() {
+gulp.task('copyFonts2lib', ['bower'], function() {
     return gulp.src("bower_components/bootstrap/fonts/*")
         .pipe(gulp.dest('lib/fonts'));
 });
 
-gulp.task('less', function () {
+gulp.task('less', ['bower'], function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
         .pipe(less())
