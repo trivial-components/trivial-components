@@ -18,6 +18,24 @@ gulp.task('bower', function () {
         .pipe(gulp.dest('bower_components/'))
 });
 
+gulp.task('copyJsDependencies2lib', function () {
+    return gulp.src([
+        'bower_components/bootstrap/dist/js/bootstrap.min.js',
+        'bower_components/jquery/dist/jquery.min.js',
+        'bower_components/jquery/dist/jquery.min.js',
+        'bower_components/jquery-ui/ui/minified/position.min.js',
+        'bower_components/mustache/mustache.min.js',
+        'bower_components/prettify/index.js',
+        'bower_components/trivial-components/js/*.js'
+    ])
+        .pipe(gulp.dest('lib/js'));
+});
+
+gulp.task('copyFonts2lib', function() {
+    return gulp.src("bower_components/bootstrap/fonts/*")
+        .pipe(gulp.dest('lib/fonts'));
+});
+
 gulp.task('less', function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
@@ -27,15 +45,10 @@ gulp.task('less', function () {
         .pipe(livereload());
 });
 
-gulp.task('copy-fonts', function() {
-    return gulp.src("bower_components/bootstrap/fonts/*")
-        .pipe(gulp.dest('fonts'));
-});
-
 gulp.task('watch', ['bower'], function() {
     livereload.listen();
     gulp.watch('less/*.less', ['less']);
 });
 
-gulp.task('default', ['bower', 'less', 'copy-fonts']);
+gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib']);
 

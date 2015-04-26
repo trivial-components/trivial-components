@@ -1,4 +1,5 @@
 ### JavaScript stuff
+bower_components/
 node/
 node_modules/
 dist/

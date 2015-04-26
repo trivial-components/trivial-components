@@ -16,8 +16,7 @@
   ],
   "dependencies": {
     "bootstrap": "latest",
-    "trivial-components": "https://github.com/trivial-components/trivial-components.git",
-    "prettify": "latest"
+    "trivial-components": "https://github.com/trivial-components/trivial-components.git"
   },
   "devDependencies": {
 
