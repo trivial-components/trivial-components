@@ -115,23 +115,23 @@
 
     <h3>ComboBox</h3>
 
+    <h4>Zero Configuration</h4>
     <div class="row">
         <div class="col-md-6">
-            <h4>Zero Configuration</h4>
             <pre class="prettyprint lang-javascript">
 $('#zeroConfigComboBox').TrivialCombobox({
     entries: myEntriesArray
 });</pre>
         </div>
         <div class="col-md-6 result-display">
-            <h4>Result</h4>
             <input id="zeroConfigComboBox">
         </div>
     </div>
+
+    <h4>Custom filtering</h4>
+    <p>Filtering is done by custom code, e.g. on the server side.</p>
     <div class="row">
         <div class="col-md-6">
-            <h4>Custom filtering</h4>
-            <p>Filtering is done by custom code, e.g. on the server side.</p>
             <pre class="prettyprint lang-javascript">
 $('#customFilteringComboBox').TrivialComboBox({
     queryFunction: function (queryString, resultCallback) {
@@ -142,12 +142,58 @@ $('#customFilteringComboBox').TrivialComboBox({
 });</pre>
         </div>
         <div class="col-md-6 result-display">
-            <h4>Result</h4>
             <input id="customFilteringComboBox">
         </div>
     </div>
 
-    More coming soon...
+
+    <h4>Templates</h4>
+    <p>There are 3 of-the-shelf templates. <i>However, you can write any template you like yourself.</i></p>
+
+    <h5>Icon (25x30) with two lines of text</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <pre class="prettyprint lang-javascript">
+$('#icon2LinesTemplateComboBox').TrivialComboBox({
+    template: $.fn.TrivialComboBox.icon2LinesTemplate
+    ...
+});</pre>
+        </div>
+        <div class="col-md-6 result-display">
+            <input id="icon2LinesTemplateComboBox">
+        </div>
+    </div>
+
+    <h5>Icon (24x24) one line of text</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <pre class="prettyprint lang-javascript">
+$('#iconSingleLineTemplateComboBox').TrivialComboBox({
+    template: $.fn.TrivialComboBox.iconSingleLineTemplate
+    ...
+});</pre>
+        </div>
+        <div class="col-md-6 result-display">
+            <input id="iconSingleLineTemplateComboBox">
+        </div>
+    </div>
+
+    <h5>Single line of text</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <pre class="prettyprint lang-javascript">
+$('#singleLineTemplateComboBox').TrivialComboBox({
+    template: $.fn.TrivialComboBox.singleLineTemplate
+    ...
+});</pre>
+        </div>
+        <div class="col-md-6 result-display">
+            <input id="singleLineTemplateComboBox">
+        </div>
+    </div>
+
+
+
 
     <br/>
     <h2>Configuration<a class="anchor" id="configuration"></a></h2>
@@ -255,6 +301,21 @@ $('#customFilteringComboBox').TrivialComboBox({
                     }));
                 }, 500);
             }
+        });
+
+        $('#icon2LinesTemplateComboBox').TrivialComboBox({
+            template: $.fn.TrivialComboBox.icon2LinesTemplate,
+            entries: createEntries()
+        });
+
+        $('#iconSingleLineTemplateComboBox').TrivialComboBox({
+            template: $.fn.TrivialComboBox.iconSingleLineTemplate,
+            entries: createEntries()
+        });
+
+        $('#singleLineTemplateComboBox').TrivialComboBox({
+            template: $.fn.TrivialComboBox.singleLineTemplate,
+            entries: createEntries()
         });
     });
 </script>

@@ -13,6 +13,8 @@ var plumber = require('gulp-plumber');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
+var postcss      = require('gulp-postcss');
+var autoprefixer = require('autoprefixer-core');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css']);
@@ -45,6 +47,7 @@ gulp.task('less', ['bower'], function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
         .pipe(less())
+        .pipe(postcss([ autoprefixer({ browsers: ['ie >= 9, > 5%, last 2 version'] }) ]))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('css'))
         .pipe(livereload());
