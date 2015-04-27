@@ -60,7 +60,7 @@
     function TrivialComboBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
-            idProperty: 'id',
+            valueProperty: null,
             inputTextProperty: 'displayValue',
             template: defaultTemplate,
             selectedEntryTemplate: options.template || defaultTemplate,
@@ -81,12 +81,19 @@
         var autoCompleteTimeoutId = -1;
         var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
-        var $originalInput = $(originalInput).addClass("tr-original-input");
-        var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput).append($originalInput);
+        var $originalInput = $(originalInput);
+        var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
         var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
         var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
-        var $editor = $('<input class="tr-combobox-edit-input" type="text"/>').prependTo($comboBox)
+        var $editor;
+        if (config.valueProperty) {
+            $originalInput.addClass("tr-original-input");
+            $editor = $('<input type="text"/>');
+        } else {
+            $editor = $originalInput;
+        }
+        $editor.prependTo($comboBox).addClass("tr-combobox-edit-input")
             .focus(function () {
                 $comboBox.addClass('focus');
             })
@@ -247,14 +254,18 @@
 
         function selectEntry(entry) {
             if (entry == null) {
-                $originalInput.val("");
+                if (config.valueProperty)  {
+                    $originalInput.val("");
+                }
                 selectedEntry = config.emptyEntry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
                     .addClass("tr-combobox-entry")
                     .addClass("empty");
                 $selectedEntryWrapper.empty().append($selectedEntry);
             } else {
-                $originalInput.val(entry[config.idProperty]);
+                if (config.valueProperty) {
+                    $originalInput.val(entry[config.valueProperty]);
+                }
                 selectedEntry = entry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
                     .addClass("tr-combobox-entry");

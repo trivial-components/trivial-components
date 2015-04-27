@@ -29,6 +29,9 @@
 <small>Filtering is done by custom code, e.g. on the server side.</small>
 <input id="customFilteringComboBox">
 
+<h5>Separate original input</h5>
+<small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
+<input id="separateOriginalInputComboBox">
 
 <script>
     $(function () {
@@ -666,7 +669,15 @@
                 }, 500);
             },
             selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
-        })
+        });
+
+        window.combo1 = $('#separateOriginalInputComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            valueProperty: 'additionalInfo'
+        });
     });
 </script>
 
