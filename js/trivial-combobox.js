@@ -81,7 +81,7 @@
             selectedEntryTemplate: options.template || defaultTemplate,
             spinnerTemplate: defaultSpinnerTemplate,
             noEntriesTemplate: defaultNoEntriesTemplate,
-            entries: [],
+            entries: null,
             selectedEntry: undefined,
             emptyEntry: {},
             queryFunction: defaultQueryFunctionFactory(options.entries || []),
@@ -91,6 +91,7 @@
         }, options);
 
         var isDropDownOpen = false;
+        var entries = config.entries;
         var selectedEntry;
         var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
@@ -112,12 +113,16 @@
         $editor.prependTo($comboBox).addClass("tr-combobox-edit-input")
             .focus(function () {
                 $comboBox.addClass('focus');
+                if (entries == null) {
+                    query();
+                }
             })
             .blur(function () {
-                $comboBox.removeClass('focus');
                 if (!blurCausedByClickInsideComponent) {
-                    if (!config.allowFreeText && !isEntrySelected()) {
+                    $comboBox.removeClass('focus');
+                    if (!config.allowFreeText && !isEntrySelected() && $originalInput.val().length > 0) {
                         $originalInput.val(""); // delete the contents of the original input, because free text is not allowed!
+                        entries = null; // so we will query again when we combobox is re-focused
                     }
                     hideEditorIfAppropriate();
                     closeDropDown();
@@ -188,7 +193,9 @@
             }
         });
 
-        updateDropDownEntryElements(config.entries);
+        if (entries) { // if config.entries was set...
+            updateDropDownEntryElements(entries);
+        }
 
         selectEntry(config.selectedEntry || null);
 
@@ -210,9 +217,9 @@
 
         function updateDropDownEntryElements(entries) {
             $dropDown.empty();
-            if (config.entries.length > 0) {
-                for (var i = 0; i < config.entries.length; i++) {
-                    var entry = config.entries[i];
+            if (entries.length > 0) {
+                for (var i = 0; i < entries.length; i++) {
+                    var entry = entries[i];
                     var html = Mustache.render(config.template, entry);
                     var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
                     entry._trComboBoxEntryElement = $entry;
@@ -234,12 +241,12 @@
             }
         }
 
-        function updateEntries(entries, showToUser) {
-            config.entries = entries;
+        function updateEntries(newEntries, showToUser) {
+            entries = newEntries;
             updateDropDownEntryElements(entries);
 
-            if (config.entries.length > 0) {
-                setHighlightedEntry(config.entries[0]);
+            if (entries.length > 0) {
+                setHighlightedEntry(entries[0]);
                 highlightTextMatches();
 
                 if (showToUser) {
@@ -258,8 +265,8 @@
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
-                config.queryFunction($editor.val(), function (entries) {
-                    updateEntries(entries, true);
+                config.queryFunction($editor.val(), function (newEntries) {
+                    updateEntries(newEntries, true);
                 });
             });
         }
@@ -314,7 +321,7 @@
         }
 
         function hideEditorIfAppropriate() {
-            if (!config.allowFreeText || isEntrySelected()) {
+            if (!(config.allowFreeText && $editor.val().length > 0 && !isEntrySelected())) {
                 $editor.width(0).height(0);
             }
         }
@@ -364,8 +371,8 @@
 
         function getAllVisibleEntries() {
             var visibleEntries = [];
-            for (var i = 0; i < config.entries.length; i++) {
-                var entry = config.entries[i];
+            for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
                 if (entry._trComboBoxEntryElement.is(':visible')) {
                     visibleEntries.push(entry);
                 }
@@ -389,8 +396,8 @@
 
         function highlightTextMatches() {
             var nonSelectedEditorValue = getNonSelectedEditorValue();
-            for (var i = 0; i < config.entries.length; i++) {
-                var $entryElement = config.entries[i]._trComboBoxEntryElement;
+            for (var i = 0; i < entries.length; i++) {
+                var $entryElement = entries[i]._trComboBoxEntryElement;
                 $entryElement.highlight(nonSelectedEditorValue, "tr-search-highlighted");
             }
         }
