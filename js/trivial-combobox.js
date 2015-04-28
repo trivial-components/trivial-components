@@ -116,6 +116,9 @@
             .blur(function () {
                 $comboBox.removeClass('focus');
                 if (!blurCausedByClickInsideComponent) {
+                    if (!config.allowFreeText && !isEntrySelected()) {
+                        $originalInput.val(""); // delete the contents of the original input, because free text is not allowed!
+                    }
                     hideEditorIfAppropriate();
                     closeDropDown();
                 }
@@ -274,7 +277,7 @@
             if (entry == null) {
                 if (config.valueProperty)  {
                     $originalInput.val("");
-                }
+                } // else the $originalInput IS the $editor
                 selectedEntry = config.emptyEntry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
                     .addClass("tr-combobox-entry")
@@ -283,7 +286,7 @@
             } else {
                 if (config.valueProperty) {
                     $originalInput.val(entry[config.valueProperty]);
-                }
+                } // else the $originalInput IS the $editor
                 selectedEntry = entry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
                     .addClass("tr-combobox-entry");
