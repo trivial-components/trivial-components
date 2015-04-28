@@ -15,6 +15,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
 var postcss      = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
+var concat = require('gulp-concat');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css']);
@@ -58,8 +59,8 @@ gulp.task('less', ['bower'], function () {
         .pipe(livereload());
 });
 
-gulp.task('js', function () {
-    return gulp.src(['trivial-combobox.js'])
+gulp.task('js-single', function () {
+    return gulp.src(['js/*.js'])
         .pipe(mirror(
             pipe(
                 rename(function (path) {
@@ -68,7 +69,21 @@ gulp.task('js', function () {
                 uglify()
             )
         ))
-        .pipe(gulp.dest('./dist/js'));
+        .pipe(gulp.dest('./dist/js/single'));
+});
+
+gulp.task('js-bundle', function () {
+    return gulp.src(['js/*.js'])
+        .pipe(concat('trivial-components.js'))
+        .pipe(mirror(
+            pipe(
+                rename(function (path) {
+                    path.basename += ".min";
+                }),
+                uglify()
+            )
+        ))
+        .pipe(gulp.dest('./dist/js/bundle'));
 });
 
 gulp.task('watch', ['bower'], function() {
@@ -76,4 +91,4 @@ gulp.task('watch', ['bower'], function() {
     gulp.watch('less/*.less', ['less']);
 });
 
-gulp.task('default', ['bower', 'less', 'js', 'lib2dist']);
+gulp.task('default', ['bower', 'less', 'js-single', 'js-bundle', 'lib2dist']);
