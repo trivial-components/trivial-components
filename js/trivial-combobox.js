@@ -86,11 +86,12 @@
             emptyEntry: {},
             queryFunction: defaultQueryFunctionFactory(options.entries || []),
             aggressiveAutoComplete: true,
-            autoCompleteDelay: 0
+            autoCompleteDelay: 0,
+            allowFreeText: false
         }, options);
 
         var isDropDownOpen = false;
-        var selectedEntry = null;
+        var selectedEntry;
         var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
         var autoCompleteTimeoutId = -1;
@@ -115,7 +116,7 @@
             .blur(function () {
                 $comboBox.removeClass('focus');
                 if (!blurCausedByClickInsideComponent) {
-                    hideEditor();
+                    hideEditorIfAppropriate();
                     closeDropDown();
                 }
             })
@@ -148,11 +149,11 @@
                 } else if (isDropDownOpen && e.keyCode == 13) { // enter
                     selectEntry(highlightedEntry);
                     closeDropDown();
-                    hideEditor();
+                    hideEditorIfAppropriate();
                     $editor.select();
                 } else if (e.keyCode == 27) { // escape
                     closeDropDown();
-                    hideEditor();
+                    hideEditorIfAppropriate();
                 } else {
                     query();
                     showEditor();
@@ -160,7 +161,7 @@
                 }
             })
             .keyup(function (e) {
-                if (!isTabOrModifierKey(e) && e.keyCode != 13 && selectedEntry != null && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                if (!isTabOrModifierKey(e) && e.keyCode != 13 && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                     selectEntry(null);
                 }
             })
@@ -217,7 +218,7 @@
                             .mousedown(function () {
                                 selectEntry(entry);
                                 closeDropDown();
-                                hideEditor();
+                                hideEditorIfAppropriate();
                                 $editor.select();
                             })
                             .mouseover(function () {
@@ -244,6 +245,8 @@
                         autoCompleteIfPossible(highlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
                     }
                 }
+            } else {
+                setHighlightedEntry(null);
             }
         }
 
@@ -289,6 +292,10 @@
             }
         }
 
+        function isEntrySelected() {
+            return selectedEntry != null && selectedEntry !== config.emptyEntry;
+        }
+
         function showEditor() {
             var $editorArea = $selectedEntryWrapper.find(".editor-area");
             $editor.css({
@@ -303,8 +310,10 @@
                 .focus();
         }
 
-        function hideEditor() {
-            $editor.width(0).height(0);
+        function hideEditorIfAppropriate() {
+            if (!config.allowFreeText || isEntrySelected()) {
+                $editor.width(0).height(0);
+            }
         }
 
         function openDropDown() {
