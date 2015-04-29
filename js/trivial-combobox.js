@@ -403,22 +403,33 @@
         }
 
         this.$ = $comboBox;
+        $comboBox[0].trivialComboBox = this;
         this.updateEntries = updateEntries;
     }
 
     $.fn.trivialcombobox = function (options) {
         var $comboBoxes = [];
         this.each(function () {
-            var comboBox = new TrivialComboBox(this, options);
-            $comboBoxes.push(comboBox.$);
+            var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
+            if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
+                $comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox.$);
+            } else{
+                var comboBox = new TrivialComboBox(this, options);
+                $comboBoxes.push(comboBox.$);
+            }
         });
         return $($comboBoxes);
     };
     $.fn.TrivialComboBox = function (options) {
         var comboBoxes = [];
         this.each(function () {
-            var comboBox = new TrivialComboBox(this, options);
-            comboBoxes.push(comboBox);
+            var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
+            if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
+                comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox);
+            } else{
+                var comboBox = new TrivialComboBox(this, options);
+                comboBoxes.push(comboBox);
+            }
         });
         return comboBoxes.length == 1 ? comboBoxes[0] : comboBoxes;
     };
