@@ -31,6 +31,33 @@
     }
 }(function ($, Mustache) {
 
+    var keyCodes = {
+        backspace: 8,
+        tab: 9,
+        enter: 13,
+        shift: 16,
+        ctrl: 17,
+        alt: 18,
+        pause: 19,
+        caps_lock: 20,
+        escape: 27,
+        page_up: 33,
+        page_down: 34,
+        end: 35,
+        home: 36,
+        left_arrow: 37,
+        up_arrow: 38,
+        right_arrow: 39,
+        down_arrow: 40,
+        insert: 45,
+        delete: 46,
+        left_window_key: 91,
+        right_window_key: 92,
+        select_key: 93,
+        num_lock: 144,
+        scroll_lock: 145
+    };
+
     var icon2LinesTemplate = '<div class="combobox-entry combobox-entry-icon-2-lines">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
@@ -68,8 +95,9 @@
         }
     };
 
-    function isTabOrModifierKey(e) {
-        return e.keyCode == 9 || e.keyCode >= 16 && e.keyCode <= 20 || e.keyCode === 91 || e.keyCode == 92;
+    function isModifierKey(e) {
+        return [keyCodes.shift, keyCodes.caps_lock, keyCodes.alt, keyCodes.ctrl, keyCodes.left_window_key, keyCodes.right_window_key]
+                .indexOf(e.which) != -1;
     }
 
     function TrivialComboBox(originalInput, options) {
@@ -142,37 +170,37 @@
                 }
             })
             .keydown(function (e) {
-                if (isTabOrModifierKey(e)) {
+                if (e.which == keyCodes.tab || isModifierKey(e)) {
                     return; // tab or modifier key was pressed...
-                } else if (e.keyCode == 37 || e.keyCode == 39) { // left or right
+                } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     showEditor();
                     return; // let the user navigate freely...
-                } else if (e.keyCode == 8) { // backspace
+                } else if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                 }
 
-                if (e.keyCode == 38 || e.keyCode == 40) { // up or down key
+                if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     if (!isDropDownOpen) {
                         openDropDown();
                         showEditor();
                     }
-                    if (e.keyCode == 38) { // up
+                    if (e.which == keyCodes.up_arrow) {
                         var newHighlightedEntry = getNextHighlightableEntry(-1);
                         setHighlightedEntry(newHighlightedEntry);
                         autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
                         e.preventDefault(); // some browsers move the caret to the beginning on up key
-                    } else if (e.keyCode == 40) { // down
+                    } else if (e.which == keyCodes.down_arrow) {
                         var newHighlightedEntry = getNextHighlightableEntry(1);
                         setHighlightedEntry(newHighlightedEntry);
                         autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
                         e.preventDefault(); // some browsers move the caret to the end on down key
                     }
-                } else if (isDropDownOpen && e.keyCode == 13) { // enter
+                } else if (isDropDownOpen && e.which == keyCodes.enter) {
                     selectEntry(highlightedEntry);
                     closeDropDown();
                     hideEditorIfAppropriate();
                     $editor.select();
-                } else if (e.keyCode == 27) { // escape
+                } else if (e.which == keyCodes.escape) {
                     closeDropDown();
                     hideEditorIfAppropriate();
                 } else {
@@ -182,7 +210,7 @@
                 }
             })
             .keyup(function (e) {
-                if (!isTabOrModifierKey(e) && e.keyCode != 13 && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                if (!isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                     selectEntry(null);
                 }
             })
@@ -285,7 +313,7 @@
 
         function selectEntry(entry) {
             if (entry == null) {
-                if (config.valueProperty)  {
+                if (config.valueProperty) {
                     $originalInput.val("");
                 } // else the $originalInput IS the $editor
                 selectedEntry = config.emptyEntry;
@@ -416,7 +444,7 @@
             var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
             if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
                 $comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox.$);
-            } else{
+            } else {
                 var comboBox = new TrivialComboBox(this, options);
                 $comboBoxes.push(comboBox.$);
             }
@@ -429,7 +457,7 @@
             var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
             if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
                 comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox);
-            } else{
+            } else {
                 var comboBox = new TrivialComboBox(this, options);
                 comboBoxes.push(comboBox);
             }
