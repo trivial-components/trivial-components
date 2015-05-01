@@ -155,8 +155,9 @@
             .focus(function () {
                 $comboBox.addClass('focus');
                 if (entries == null) {
-                    query();
+                    query(false);
                 }
+                showEditor();
             })
             .blur(function () {
                 if (!blurCausedByClickInsideComponent) {
@@ -204,7 +205,7 @@
                     closeDropDown();
                     hideEditorIfAppropriate();
                 } else {
-                    query();
+                    query(true);
                     showEditor();
                     openDropDown();
                 }
@@ -277,10 +278,10 @@
             updateDropDownEntryElements(entries);
 
             if (entries.length > 0) {
-                setHighlightedEntry(entries[0]);
                 highlightTextMatches();
 
                 if (showToUser) {
+                    setHighlightedEntry(entries[0]);
                     openDropDown();
                     if (config.aggressiveAutoComplete) {
                         autoCompleteIfPossible(highlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
@@ -291,13 +292,13 @@
             }
         }
 
-        function query() {
+        function query(showResultsToUser) {
             $dropDown.append(config.spinnerTemplate);
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
                 config.queryFunction($editor.val(), function (newEntries) {
-                    updateEntries(newEntries, true);
+                    updateEntries(newEntries, showResultsToUser);
                 });
             });
         }
@@ -347,8 +348,10 @@
                     my: "left top",
                     at: "left top",
                     of: $editorArea
-                })
-                .focus();
+                });
+            if (!$comboBox.is('.focus')) { // combobox does already have the focus - prevents stack overflow, as the focus event handler calls showEditor again...
+                $editor.focus();
+            }
         }
 
         function hideEditorIfAppropriate() {
