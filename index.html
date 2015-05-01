@@ -229,8 +229,18 @@ $('#singleLineTemplateComboBox').TrivialComboBox({
             </thead>
             <tbody>
             <tr>
+                <td>valueProperty</td>
+                <td>Name of the property which should be submitted on form submit. If <code>null</code>, then the content of the text input will serve als value.</td>
+                <td><code>'displayValue'</code></td>
+            </tr>
+            <tr>
+                <td>allowFreeText</td>
+                <td>Allow free text entry. If <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. If <code>false</code>, the user input will be deleted if he does not select a suggested entry.</td>
+                <td><code>false</code></td>
+            </tr>
+            <tr>
                 <td>inputTextProperty</td>
-                <td>Name of the property which will be used as editor value and for auto-completion.</td>
+                <td>Name of the property which will be filled into the input field when the user selects an entry. This property is also used for auto-completion.</td>
                 <td><code>'displayValue'</code></td>
             </tr>
             <tr>

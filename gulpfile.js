@@ -21,7 +21,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('bower', function () {
-    return bower()
+    return bower({cmd: 'update'})
         .pipe(gulp.dest('bower_components/'))
 });
 
