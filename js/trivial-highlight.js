@@ -22,7 +22,7 @@
 })(jQuery);
 
 (function ($) {
-    $.fn.highlight = function (searchString, highlightClassName) {
+    $.fn.trivialHighlight = function (searchString, highlightClassName) {
         var regex = new RegExp(searchString, "gi");
         return this.find('*').each(function () {
             var $this = $(this);

@@ -398,7 +398,7 @@
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
                 var $entryElement = entries[i]._trComboBoxEntryElement;
-                $entryElement.highlight(nonSelectedEditorValue, "tr-search-highlighted");
+                $entryElement.trivialHighlight(nonSelectedEditorValue, "tr-search-highlighted");
             }
         }
 
