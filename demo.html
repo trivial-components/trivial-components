@@ -33,6 +33,9 @@
 <small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
 <input id="separateOriginalInputComboBox">
 
+<h5>No trigger</h5>
+<input id="noTriggerComboBox">
+
 <script>
     $(function () {
 
@@ -640,7 +643,7 @@
             }];
         }
 
-        window.combo1 = $('#defaultFilteringComboBox').TrivialComboBox({
+        $('#defaultFilteringComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
@@ -648,7 +651,7 @@
             allowFreeText: true
         });
 
-        window.combo1 = $('#iconSingleLineComboBox').TrivialComboBox({
+        $('#iconSingleLineComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
@@ -672,12 +675,17 @@
             selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
         });
 
-        window.combo1 = $('#separateOriginalInputComboBox').TrivialComboBox({
+        $('#separateOriginalInputComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
             valueProperty: 'additionalInfo'
+        });
+
+        $('#noTriggerComboBox').TrivialComboBox({
+            entries: createEntries(),
+            showTrigger: false
         });
     });
 </script>

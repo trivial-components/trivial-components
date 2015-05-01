@@ -87,7 +87,8 @@
             queryFunction: defaultQueryFunctionFactory(options.entries || []),
             aggressiveAutoComplete: true,
             autoCompleteDelay: 0,
-            allowFreeText: false
+            allowFreeText: false,
+            showTrigger: true
         }, options);
 
         var isDropDownOpen = false;
@@ -101,7 +102,19 @@
         var $originalInput = $(originalInput);
         var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
-        var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
+        if (config.showTrigger) {
+            var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
+            $trigger.mousedown(function () {
+                if (isDropDownOpen) {
+                    closeDropDown();
+                    showEditor();
+                } else {
+                    $editor.select();
+                    openDropDown();
+                    showEditor();
+                }
+            });
+        }
         var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
         var $editor;
         if (config.valueProperty) {
@@ -203,16 +216,6 @@
             $editor.select();
             openDropDown();
             showEditor();
-        });
-        $trigger.mousedown(function () {
-            if (isDropDownOpen) {
-                closeDropDown();
-                showEditor();
-            } else {
-                $editor.select();
-                openDropDown();
-                showEditor();
-            }
         });
 
         function updateDropDownEntryElements(entries) {
