@@ -16,8 +16,10 @@
   transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
   .tr-form-control-focus(@tr-input-border-focus);
   &.open {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: @tr-border-radius @tr-border-radius 0 0;
+  }
+  &.open.dropdown-flipped {
+    border-radius: 0 0 @tr-border-radius @tr-border-radius;
   }
   &, * {
     box-sizing: border-box;
@@ -87,6 +89,12 @@
   border-radius: 0 0 @tr-border-radius @tr-border-radius;
   min-height: 30px;
   z-index: 1;
+
+  &.flipped {
+    border-radius: @tr-border-radius @tr-border-radius 0 0;
+    border-top: @tr-border;
+    border-bottom: none;
+  }
 
   .tr-combobox-entry.tr-highlighted {
     background-color: rgba(0, 120, 255, 0.2);

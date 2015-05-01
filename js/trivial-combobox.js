@@ -367,7 +367,21 @@
                 .position({
                     my: "left top",
                     at: "left bottom",
-                    of: $comboBox
+                    of: $comboBox,
+                    collision: "flip",
+                    using: function (calculatedPosition, info) {
+                        if (info.vertical === "top") {
+                            $comboBox.removeClass("dropdown-flipped");
+                            $(this).removeClass("flipped");
+                        } else {
+                            $comboBox.addClass("dropdown-flipped");
+                            $(this).addClass("flipped");
+                        }
+                        $(this).css({
+                            left: calculatedPosition.left + 'px',
+                            top: calculatedPosition.top + 'px'
+                        });
+                    }
                 })
                 .width($comboBox.width());
             isDropDownOpen = true;
