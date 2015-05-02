@@ -113,7 +113,7 @@
             selectedEntry: undefined,
             emptyEntry: {},
             queryFunction: defaultQueryFunctionFactory(options.entries || []),
-            aggressiveAutoComplete: true,
+            autoComplete: true,
             autoCompleteDelay: 0,
             allowFreeText: false,
             showTrigger: true
@@ -134,12 +134,17 @@
             var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
             $trigger.mousedown(function () {
                 if (isDropDownOpen) {
+                    showEditor();
                     closeDropDown();
-                    showEditor();
                 } else {
-                    $editor.select();
-                    openDropDown();
-                    showEditor();
+                    setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
+                        showEditor();
+                        $editor.select();
+                        openDropDown();
+                        if (entries == null) {
+                            query();
+                        }
+                    });
                 }
             });
         }
@@ -151,22 +156,22 @@
         } else {
             $editor = $originalInput;
         }
+
         $editor.prependTo($comboBox).addClass("tr-combobox-edit-input")
             .focus(function () {
-                $comboBox.addClass('focus');
-                if (entries == null) {
-                    query(false);
+                if (blurCausedByClickInsideComponent) {
+                    // do nothing!
+                } else {
+                    $comboBox.addClass('focus');
                 }
-                showEditor();
             })
             .blur(function () {
-                if (!blurCausedByClickInsideComponent) {
+                if (blurCausedByClickInsideComponent) {
+                    $editor.focus();
+                } else {
                     $comboBox.removeClass('focus');
-                    if (!config.allowFreeText && !isEntrySelected() && $originalInput.val().length > 0) {
-                        $originalInput.val(""); // delete the contents of the original input, because free text is not allowed!
-                        entries = null; // so we will query again when we combobox is re-focused
-                    }
-                    hideEditorIfAppropriate();
+                    clearEditorIfNotContainsFreeText();
+                    hideEditorIfNotContainsFreeText();
                     closeDropDown();
                 }
             })
@@ -175,39 +180,36 @@
                     return; // tab or modifier key was pressed...
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     showEditor();
-                    return; // let the user navigate freely...
-                } else if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
+                    return; // let the user navigate freely left and right...
+                }
+
+                if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                 }
 
                 if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                    if (!isDropDownOpen) {
-                        openDropDown();
-                        showEditor();
-                    }
-                    if (e.which == keyCodes.up_arrow) {
-                        var newHighlightedEntry = getNextHighlightableEntry(-1);
-                        setHighlightedEntry(newHighlightedEntry);
-                        autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
+                    showEditor();
+                    openDropDown();
+                    var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                    if (entries != null) {
+                        highlightNextEntry(direction);
                         e.preventDefault(); // some browsers move the caret to the beginning on up key
-                    } else if (e.which == keyCodes.down_arrow) {
-                        var newHighlightedEntry = getNextHighlightableEntry(1);
-                        setHighlightedEntry(newHighlightedEntry);
-                        autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
-                        e.preventDefault(); // some browsers move the caret to the end on down key
+                    } else {
+                        query(direction);
                     }
                 } else if (isDropDownOpen && e.which == keyCodes.enter) {
                     selectEntry(highlightedEntry);
                     closeDropDown();
-                    hideEditorIfAppropriate();
+                    hideEditorIfNotContainsFreeText();
                     $editor.select();
                 } else if (e.which == keyCodes.escape) {
                     closeDropDown();
-                    hideEditorIfAppropriate();
+                    clearEditorIfNotContainsFreeText();
+                    hideEditorIfNotContainsFreeText();
                 } else {
-                    query(true);
                     showEditor();
                     openDropDown();
+                    query(1);
                 }
             })
             .keyup(function (e) {
@@ -217,6 +219,9 @@
             })
             .mousedown(function () {
                 openDropDown();
+                if (entries == null) {
+                    query();
+                }
             });
 
         $comboBox.add($dropDown).mousedown(function () {
@@ -242,9 +247,12 @@
         selectEntry(config.selectedEntry || null);
 
         $selectedEntryWrapper.click(function () {
+            showEditor();
             $editor.select();
             openDropDown();
-            showEditor();
+            if (entries == null) {
+                query();
+            }
         });
 
         function updateDropDownEntryElements(entries) {
@@ -258,10 +266,22 @@
                     (function (entry) {
                         $entry
                             .mousedown(function () {
+                                blurCausedByClickInsideComponent = true;
                                 selectEntry(entry);
-                                closeDropDown();
-                                hideEditorIfAppropriate();
                                 $editor.select();
+                                hideEditorIfNotContainsFreeText();
+                                closeDropDown();
+                            })
+                            .mouseup(function () {
+                                if (blurCausedByClickInsideComponent) {
+                                    $editor.focus();
+                                    blurCausedByClickInsideComponent = false;
+                                }
+                            }).mouseout(function () {
+                                if (blurCausedByClickInsideComponent) {
+                                    $editor.focus();
+                                    blurCausedByClickInsideComponent = false;
+                                }
                             })
                             .mouseover(function () {
                                 setHighlightedEntry(entry);
@@ -273,32 +293,31 @@
             }
         }
 
-        function updateEntries(newEntries, showToUser) {
+        function updateEntries(newEntries, highlightDirection) {
             entries = newEntries;
             updateDropDownEntryElements(entries);
 
             if (entries.length > 0) {
                 highlightTextMatches();
 
-                if (showToUser) {
-                    setHighlightedEntry(entries[0]);
-                    openDropDown();
-                    if (config.aggressiveAutoComplete) {
-                        autoCompleteIfPossible(highlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
-                    }
+                if (typeof highlightDirection != 'undefined') {
+                    highlightNextEntry(highlightDirection);
                 }
             } else {
                 setHighlightedEntry(null);
             }
         }
 
-        function query(showResultsToUser) {
+        function query(highlightDirection) {
             $dropDown.append(config.spinnerTemplate);
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
                 config.queryFunction($editor.val(), function (newEntries) {
-                    updateEntries(newEntries, showResultsToUser);
+                    updateEntries(newEntries, highlightDirection);
+                    if (isDropDownOpen) {
+                        openDropDown(); // only for repositioning!
+                    }
                 });
             });
         }
@@ -340,24 +359,34 @@
 
         function showEditor() {
             var $editorArea = $selectedEntryWrapper.find(".editor-area");
-            $editor.css({
-                "width": $editorArea.width() + "px",
-                "height": ($editorArea.height()) + "px"
-            })
+            $editor
+                .css({
+                    "width": $editorArea.width() + "px",
+                    "height": ($editorArea.height()) + "px"
+                })
                 .position({
                     my: "left top",
                     at: "left top",
                     of: $editorArea
                 });
-            if (!$comboBox.is('.focus')) { // combobox does already have the focus - prevents stack overflow, as the focus event handler calls showEditor again...
-                $editor.focus();
+        }
+
+        function clearEditorIfNotContainsFreeText() {
+            if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
+                $originalInput.val("");
+                $editor.val("");
+                entries = null; // so we will query again when we combobox is re-focused
             }
         }
 
-        function hideEditorIfAppropriate() {
+        function hideEditorIfNotContainsFreeText() {
             if (!(config.allowFreeText && $editor.val().length > 0 && !isEntrySelected())) {
-                $editor.width(0).height(0);
+                hideEditor();
             }
+        }
+
+        function hideEditor() {
+            $editor.width(0).height(0);
         }
 
         function openDropDown() {
@@ -417,29 +446,29 @@
             doNoAutoCompleteBecauseBackspaceWasPressed = false;
         }
 
-        function getAllVisibleEntries() {
-            var visibleEntries = [];
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                if (entry._trComboBoxEntryElement.is(':visible')) {
-                    visibleEntries.push(entry);
+        function highlightNextEntry(direction) {
+            var newHighlightedEntry = getNextHighlightableEntry(direction);
+            if (newHighlightedEntry != null) {
+                setHighlightedEntry(newHighlightedEntry);
+                if (config.autoComplete) {
+                    autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
                 }
             }
-            return visibleEntries;
         }
 
         function getNextHighlightableEntry(direction) {
-            var visibleEntries = getAllVisibleEntries();
             var newHighlightedElementIndex;
-            if (highlightedEntry == null && direction > 0) {
+            if (entries == null || entries.length == 0) {
+                return null;
+            } else if (highlightedEntry == null && direction > 0) {
                 newHighlightedElementIndex = -1 + direction;
             } else if (highlightedEntry == null && direction < 0) {
-                newHighlightedElementIndex = visibleEntries.length + direction;
+                newHighlightedElementIndex = entries.length + direction;
             } else {
-                var currentHighlightedElementIndex = visibleEntries.indexOf(highlightedEntry);
-                newHighlightedElementIndex = (currentHighlightedElementIndex + visibleEntries.length + direction) % visibleEntries.length;
+                var currentHighlightedElementIndex = entries.indexOf(highlightedEntry);
+                newHighlightedElementIndex = (currentHighlightedElementIndex + entries.length + direction) % entries.length;
             }
-            return visibleEntries[newHighlightedElementIndex];
+            return entries[newHighlightedElementIndex];
         }
 
         function highlightTextMatches() {
@@ -452,6 +481,7 @@
 
         this.$ = $comboBox;
         $comboBox[0].trivialComboBox = this;
+
         this.updateEntries = updateEntries;
     }
 

@@ -20,7 +20,6 @@
     "mustache": "1.x"
   },
   "devDependencies": {
-    "less": "2.x",
     "normalize.css": "latest"
   }
 }
