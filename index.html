@@ -27,7 +27,14 @@
 
     <title>Trivial Components</title>
 
-    <link rel="stylesheet" href="css/all.css">
+    <script>
+        if (location.href.indexOf("localhost") != -1) {
+            document.write('<link rel="stylesheet" href="css/all.with-source-maps.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="css/all.css">');
+        }
+    </script>
+
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -213,6 +220,35 @@ $('#singleLineTemplateComboBox').TrivialComboBox({
         </div>
     </div>
 
+    <h4>Other options</h4>
+    <h5>autoComplete: false</h5>
+    <div class="row">
+        <div class="col-md-8">
+            <pre class="prettyprint lang-javascript">
+$('#noAutoCompleteComboBox').TrivialComboBox({
+    autoComplete: false
+    ...
+});</pre>
+        </div>
+        <div class="col-md-4 result-display">
+            <input id="noAutoCompleteComboBox">
+        </div>
+    </div>
+
+    <h5>showTrigger: false</h5>
+    <div class="row">
+        <div class="col-md-8">
+            <pre class="prettyprint lang-javascript">
+$('#noTriggerComboBox').TrivialComboBox({
+    showTrigger: false
+    ...
+});</pre>
+        </div>
+        <div class="col-md-4 result-display">
+            <input id="noTriggerComboBox">
+        </div>
+    </div>
+
 
 
 
@@ -284,14 +320,19 @@ $('#singleLineTemplateComboBox').TrivialComboBox({
                 <td>Simple client-side implementation that filters the initially configured array of entries.</td>
             </tr>
             <tr>
-                <td>aggressiveAutoComplete</td>
-                <td>Auto-complete while the user types.</td>
+                <td>autoComplete</td>
+                <td>If true, the component user get auto-completion inside the text field.</td>
                 <td><code>true</code></td>
             </tr>
             <tr>
                 <td>autoCompleteDelay</td>
-                <td>Delay for auto-completion.</td>
-                <td><code>0</code></td>
+                <td>Delay for auto-completion. (This feature may be removed, as there is currently no reason for a delay in auto-completion.)</td>
+            <td><code>0</code></td>
+            </tr>
+            <tr>
+                <td>showTrigger</td>
+                <td>The trigger is the button-like handle on the side of the combobox. If false: no trigger is shown.</td>
+                <td><code>true</code></td>
             </tr>
             </tbody>
         </table>
@@ -348,6 +389,16 @@ $('#singleLineTemplateComboBox').TrivialComboBox({
 
         $('#singleLineTemplateComboBox').TrivialComboBox({
             template: $.fn.TrivialComboBox.singleLineTemplate,
+            entries: createEntries()
+        });
+
+        $('#noAutoCompleteComboBox').TrivialComboBox({
+            autoComplete: false,
+            entries: createEntries()
+        });
+
+        $('#noTriggerComboBox').TrivialComboBox({
+            showTrigger: false,
             entries: createEntries()
         });
     });

@@ -46,7 +46,7 @@
     "gulp-util": "^3.0.4",
     "gulp-watch": "latest",
     "gulp-watch-less": "^1.0.1",
-    "gulp-postcss": "5.1.3",
+    "gulp-postcss": "5.x",
     "multipipe": "^0.1.2"
   }
 }

@@ -15,12 +15,17 @@ var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
 var postcss      = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
+var csswring = require('csswring');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css']);
 });
 
 gulp.task('bower', function () {
+    return bower()
+        .pipe(gulp.dest('bower_components/'))
+});
+gulp.task('bower-update', function () {
     return bower({cmd: 'update'})
         .pipe(gulp.dest('bower_components/'))
 });
@@ -28,7 +33,6 @@ gulp.task('bower', function () {
 gulp.task('copyJsDependencies2lib', ['bower'], function () {
     return gulp.src([
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
-        'bower_components/jquery/dist/jquery.min.js',
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/jquery-ui/ui/minified/position.min.js',
         'bower_components/mustache/mustache.min.js',
@@ -47,8 +51,18 @@ gulp.task('less', ['bower'], function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
         .pipe(less())
-        .pipe(postcss([ autoprefixer({ browsers: ['ie >= 9, > 5%, last 2 version'] }) ]))
-        .pipe(sourcemaps.write())
+        .pipe(postcss([
+            autoprefixer({ browsers: ['> 2%'] }),
+            csswring
+        ]))
+        .pipe(mirror(
+            pipe(
+                rename(function (path) {
+                    path.basename += ".with-source-maps";
+                }),
+                sourcemaps.write()
+            )
+        ))
         .pipe(gulp.dest('css'))
         .pipe(livereload());
 });
