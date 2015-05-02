@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="../dist/css/demo.css">
+
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/jquery-ui/ui/position.js"></script>
+    <script src="../bower_components/mustache/mustache.js"></script>
+    <script src="../js/trivial-highlight.js"></script>
+    <script src="../js/trivial-minimallyScrollTo.js"></script>
+    <script src="../js/trivial-combobox.js"></script>
+    <script src="demo.js"></script>
+</head>
+<body>
+
+
+<h5>Default query implementation:</h5>
+<small>Configured entries are filtered locally.</small>
+<input id="defaultFilteringComboBox">
+<small>allowFreeText: true</small>
+<input id="freeTextComboBox">
+<small>autoComplete: false</small>
+<input id="noAutoCompleteComboBox">
+
+<h5>Icon single line template</h5>
+<input id="iconSingleLineComboBox">
+
+<h5>Custom filtering:</h5>
+<small>Filtering is done by custom code, e.g. on the server side.</small>
+<input id="customFilteringComboBox">
+
+<h5>Separate original input</h5>
+<small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
+<input id="separateOriginalInputComboBox">
+
+<h5>No trigger</h5>
+<input id="noTriggerComboBox">
+
+<script>
+    $(function () {
+
+        $('#defaultFilteringComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            }
+        });
+
+        $('#freeTextComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            allowFreeText: true
+        });
+
+        $('#noAutoCompleteComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            autoComplete: false
+        });
+
+        $('#iconSingleLineComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            template: $.fn.TrivialComboBox.iconSingleLineTemplate
+        });
+
+        $('#customFilteringComboBox').trivialcombobox({
+            entries: createEntries(),
+            emptyEntry: {
+                imageUrl: "-",
+                additionalInfo: ""
+            },
+            queryFunction: function (queryString, resultCallback) {
+                setTimeout(function () {
+                    resultCallback(createEntries().filter(function(entry) {
+                        return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
+                    }));
+                }, 500);
+            },
+            selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
+        });
+
+        $('#separateOriginalInputComboBox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            valueProperty: 'additionalInfo'
+        });
+
+        $('#noTriggerComboBox').TrivialComboBox({
+            entries: createEntries(),
+            showTrigger: false
+        });
+    });
+</script>
+
+
+</body>
+</html>
+
+

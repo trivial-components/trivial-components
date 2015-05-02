@@ -215,6 +215,8 @@
             .keyup(function (e) {
                 if (!isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                     selectEntry(null);
+                } else if (e.which == keyCodes.tab) {
+                    showEditor();
                 }
             })
             .mousedown(function () {
