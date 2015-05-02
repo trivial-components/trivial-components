@@ -294,6 +294,7 @@
         }
 
         function updateEntries(newEntries, highlightDirection) {
+            highlightedEntry = null;
             entries = newEntries;
             updateDropDownEntryElements(entries);
 
@@ -451,7 +452,7 @@
             if (newHighlightedEntry != null) {
                 setHighlightedEntry(newHighlightedEntry);
                 if (config.autoComplete) {
-                    autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty]);
+                    autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
                 }
             }
         }
