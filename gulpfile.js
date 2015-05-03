@@ -16,9 +16,12 @@ var del = require('del');
 var postcss      = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var concat = require('gulp-concat');
+var zip = require('gulp-zip');
+var tar = require('gulp-tar');
+var gzip = require('gulp-gzip');
 
 gulp.task('clean', function () {
-    del(['bower_components', 'css']);
+    del(['bower_components', 'dist']);
 });
 
 gulp.task('bower', function () {
@@ -48,7 +51,7 @@ gulp.task('copyLess2dist', function () {
                 path.basename = "jquery." + path.basename;
             }
         }))
-        .pipe(gulp.dest('./dist/lib'));
+        .pipe(gulp.dest('./dist/less'));
 });
 
 function compileLess(src, dest) {
@@ -107,4 +110,19 @@ gulp.task('watch', ['bower'], function() {
     gulp.watch('less/*.less', ['less']);
 });
 
-gulp.task('default', ['bower', 'less', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['bower', 'less', 'js-single', 'js-bundle', 'copyLibs2dist']);
+
+gulp.task('zip', ["prepare-dist"], function () {
+    return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
+        .pipe(zip('trivial-components.zip'))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('tar', ['prepare-dist'], function () {
+    return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
+        .pipe(tar('trivial-components.tar'))
+        .pipe(gzip())
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('default', ['prepare-dist', "zip", "tar"]);
