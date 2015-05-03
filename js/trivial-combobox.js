@@ -58,25 +58,25 @@
         scroll_lock: 145
     };
 
-    var icon2LinesTemplate = '<div class="combobox-entry combobox-entry-icon-2-lines">' +
+    var icon2LinesTemplate = '<div class="tr-template-icon-2-lines">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
-    var iconSingleLineTemplate = '<div class="combobox-entry combobox-entry-icon-single-line">' +
+    var iconSingleLineTemplate = '<div class="tr-template-icon-single-line">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area">{{displayValue}}</div>' +
         '</div>';
-    var singleLineTemplate = '<div class="combobox-entry combobox-entry-single-line">' +
+    var singleLineTemplate = '<div class="tr-template-single-line">' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div>{{displayValue}}</div> ' +
         '  </div>' +
         '</div>';
     var defaultTemplate = icon2LinesTemplate;
-    var defaultSpinnerTemplate = '<div class="tr-combobox-spinner"><div>Fetching data...</div></div>';
-    var defaultNoEntriesTemplate = '<div class="tr-combobox-no-data"><div>No matching entries...</div></div>';
+    var defaultSpinnerTemplate = '<div class="tr-default-spinner"><div>Fetching data...</div></div>';
+    var defaultNoEntriesTemplate = '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>';
     var defaultQueryFunctionFactory = function (entries) {
         function filterElements(queryString) {
             var visibleEntries = [];
@@ -327,9 +327,9 @@
 
         function setHighlightedEntry(entry) {
             highlightedEntry = entry;
-            $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted');
+            $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted-entry');
             if (entry != null) {
-                entry._trComboBoxEntryElement.addClass('tr-highlighted');
+                entry._trComboBoxEntryElement.addClass('tr-highlighted-entry');
                 $dropDown.minimallyScrollTo(entry._trComboBoxEntryElement);
             }
         }
@@ -486,6 +486,9 @@
         $comboBox[0].trivialComboBox = this;
 
         this.updateEntries = updateEntries;
+        this.getSelectedEntry = function() {
+            return selectedEntry;
+        }
     }
 
     $.fn.trivialcombobox = function (options) {

@@ -26,7 +26,7 @@ gulp.task('bower', function () {
         .pipe(gulp.dest('bower_components/'))
 });
 
-gulp.task('lib2dist', ['bower'], function () {
+gulp.task('copyLibs2dist', ['bower'], function () {
     return gulp.src([
         'bower_components/jquery/dist/jquery.js', 'bower_components/jquery/dist/jquery.min.js',
         'bower_components/Caret.js/dist/jquery.caret.js', 'bower_components/Caret.js/dist/jquery.caret.min.js',
@@ -41,11 +41,21 @@ gulp.task('lib2dist', ['bower'], function () {
         .pipe(gulp.dest('./dist/lib'));
 });
 
-gulp.task('less', ['bower'], function () {
-    return gulp.src(['less/demo.less', 'less/trivial-components.less'])
+gulp.task('copyLess2dist', function () {
+    return gulp.src(['less/*', "!less/demo.less"])
+        .pipe(rename(function (path) {
+            if (path.basename.indexOf('position') === 0) {
+                path.basename = "jquery." + path.basename;
+            }
+        }))
+        .pipe(gulp.dest('./dist/lib'));
+});
+
+function compileLess(src, dest) {
+    return gulp.src(src)
         .pipe(sourcemaps.init())
         .pipe(less())
-        .pipe(postcss([ autoprefixer({ browsers: ['> 2%'] }) ]))
+        .pipe(postcss([autoprefixer({browsers: ['> 2%']})]))
         .pipe(sourcemaps.write())
         .pipe(mirror(
             pipe(
@@ -55,9 +65,15 @@ gulp.task('less', ['bower'], function () {
                 minifyCSS()
             )
         ))
-        .pipe(gulp.dest('dist/css'))
+        .pipe(gulp.dest(dest))
         .pipe(livereload());
+}
+
+gulp.task('less', ['bower'], function () {
+    compileLess(['less/trivial-components.less'], 'dist/css');
+    compileLess(['demo/less/demo.less'], 'demo/css');
 });
+
 
 gulp.task('js-single', function () {
     return gulp.src(['js/*.js'])
@@ -91,4 +107,4 @@ gulp.task('watch', ['bower'], function() {
     gulp.watch('less/*.less', ['less']);
 });
 
-gulp.task('default', ['bower', 'less', 'js-single', 'js-bundle', 'lib2dist']);
+gulp.task('default', ['bower', 'less', 'js-single', 'js-bundle', 'copyLibs2dist']);

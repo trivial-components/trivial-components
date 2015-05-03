@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="../dist/css/demo.css">
+    <link rel="stylesheet" href="css/demo.css">
 
     <script src="../bower_components/jquery/dist/jquery.js"></script>
     <script src="../bower_components/jquery-ui/ui/position.js"></script>
@@ -12,6 +12,7 @@
     <script src="../js/trivial-minimallyScrollTo.js"></script>
     <script src="../js/trivial-combobox.js"></script>
     <script src="demo.js"></script>
+    <script src="../js/trivial-list.js"></script>
 </head>
 <body>
 
@@ -37,6 +38,11 @@
 
 <h5>No trigger</h5>
 <input id="noTriggerComboBox">
+
+<h4>Trivial List</h4>
+<div style="width: 300px; height: 400px">
+    <input id="zeroConfigList">
+</div>
 
 <script>
     $(function () {
@@ -99,6 +105,10 @@
         $('#noTriggerComboBox').TrivialComboBox({
             entries: createEntries(),
             showTrigger: false
+        });
+
+        $('#zeroConfigList').TrivialList({
+            entries: createEntries()
         });
     });
 </script>
