@@ -8,12 +8,11 @@ var rename = require('gulp-rename');
 var pipe = require('multipipe');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
-var batch = require('gulp-batch');
 var plumber = require('gulp-plumber');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
-var postcss      = require('gulp-postcss');
+var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var concat = require('gulp-concat');
 var zip = require('gulp-zip');
@@ -60,14 +59,6 @@ function compileLess(src, dest) {
         .pipe(less())
         .pipe(postcss([autoprefixer({browsers: ['> 2%']})]))
         .pipe(sourcemaps.write())
-        .pipe(mirror(
-            pipe(
-                rename(function (path) {
-                    path.basename += ".min";
-                }),
-                minifyCSS()
-            )
-        ))
         .pipe(gulp.dest(dest))
         .pipe(livereload());
 }
@@ -75,6 +66,15 @@ function compileLess(src, dest) {
 gulp.task('less', ['bower'], function () {
     compileLess(['less/trivial-components.less'], 'dist/css');
     compileLess(['demo/less/demo.less'], 'demo/css');
+});
+
+gulp.task('minifyCss', ['less'], function () {
+    return gulp.src(["dist/css/*.css", "!dist/css/*.min.css"])
+        .pipe(rename(function (path) {
+            path.basename += ".min"
+        }))
+        .pipe(minifyCSS())
+        .pipe(gulp.dest("dist/css"));
 });
 
 
@@ -105,12 +105,12 @@ gulp.task('js-bundle', function () {
         .pipe(gulp.dest('./dist/js/bundle'));
 });
 
-gulp.task('watch', ['bower'], function() {
+gulp.task('watch', ['bower'], function () {
     livereload.listen();
     gulp.watch('less/*.less', ['less']);
 });
 
-gulp.task('prepare-dist', ['bower', 'less', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['bower', 'less', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
