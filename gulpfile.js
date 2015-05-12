@@ -18,6 +18,7 @@ var concat = require('gulp-concat');
 var zip = require('gulp-zip');
 var tar = require('gulp-tar');
 var gzip = require('gulp-gzip');
+var stripDebug = require('gulp-strip-debug');
 
 gulp.task('clean', function () {
     del(['bower_components', 'dist']);
@@ -80,6 +81,7 @@ gulp.task('minifyCss', ['less'], function () {
 
 gulp.task('js-single', function () {
     return gulp.src(['js/*.js'])
+        .pipe(stripDebug())
         .pipe(mirror(
             pipe(
                 rename(function (path) {
@@ -93,6 +95,7 @@ gulp.task('js-single', function () {
 
 gulp.task('js-bundle', function () {
     return gulp.src(['js/*.js'])
+        .pipe(stripDebug())
         .pipe(concat('trivial-components.js'))
         .pipe(mirror(
             pipe(
@@ -102,12 +105,12 @@ gulp.task('js-bundle', function () {
                 uglify()
             )
         ))
-        .pipe(gulp.dest('./dist/js/bundle'));
+        .pipe(gulp.dest('./dist/js/bundle'))
 });
 
 gulp.task('watch', ['bower'], function () {
     livereload.listen();
-    gulp.watch('less/*.less', ['less']);
+    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less']);
 });
 
 gulp.task('prepare-dist', ['bower', 'less', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);

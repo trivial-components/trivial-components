@@ -11,37 +11,46 @@
     <script src="../js/trivial-highlight.js"></script>
     <script src="../js/trivial-minimallyScrollTo.js"></script>
     <script src="../js/trivial-combobox.js"></script>
-    <script src="demo.js"></script>
     <script src="../js/trivial-list.js"></script>
+    <script src="../js/trivial-tagbox.js"></script>
+    <script src="demo.js"></script>
 </head>
 <body>
 
+<div style="width: 400px">
+    <h5>Default query implementation:</h5>
+    <small>Configured entries are filtered locally.</small>
+    <input id="defaultFilteringComboBox">
+    <small>allowFreeText: true</small>
+    <input id="freeTextComboBox">
+    <small>autoComplete: false</small>
+    <input id="noAutoCompleteComboBox">
 
-<h5>Default query implementation:</h5>
-<small>Configured entries are filtered locally.</small>
-<input id="defaultFilteringComboBox">
-<small>allowFreeText: true</small>
-<input id="freeTextComboBox">
-<small>autoComplete: false</small>
-<input id="noAutoCompleteComboBox">
+    <h5>Icon single line template</h5>
+    <input id="iconSingleLineComboBox">
 
-<h5>Icon single line template</h5>
-<input id="iconSingleLineComboBox">
+    <h5>Custom filtering:</h5>
+    <small>Filtering is done by custom code, e.g. on the server side.</small>
+    <input id="customFilteringComboBox">
 
-<h5>Custom filtering:</h5>
-<small>Filtering is done by custom code, e.g. on the server side.</small>
-<input id="customFilteringComboBox">
+    <h5>Separate original input</h5>
+    <small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
+    <input id="separateOriginalInputComboBox">
 
-<h5>Separate original input</h5>
-<small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
-<input id="separateOriginalInputComboBox">
+    <h5>No trigger</h5>
+    <input id="noTriggerComboBox">
+</div>
 
-<h5>No trigger</h5>
-<input id="noTriggerComboBox">
+
 
 <h4>Trivial List</h4>
 <div style="width: 300px; height: 400px">
     <input id="zeroConfigList">
+</div>
+
+<h4>Trivial Tagbox</h4>
+<div style="width: 500px;">
+    <input id="zeroConfigTagBox">
 </div>
 
 <script>
@@ -108,6 +117,10 @@
         });
 
         $('#zeroConfigList').TrivialList({
+            entries: createEntries()
+        });
+
+        $('#zeroConfigTagBox').TrivialTagBox({
             entries: createEntries()
         });
     });

@@ -1,9 +1,9 @@
-.tr-original-input {
+.tr-original-input {   // TODO: prefix?? (also used in combobox)
   tab-index: -1;
   display: none;
 }
 
-.tr-combobox {
+.tr-tagbox {
   display: flex;
   background-color: white;
   border: @tr-border;
@@ -22,24 +22,56 @@
   }
 }
 
-.tr-combobox-selected-entry-wrapper {
+.tr-tagbox-tagarea {
   flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1px;
 }
 
-.tr-combobox-edit-input {
-  width: 0;
-  height: 0;
-  position: absolute;
-  border: none;
-  padding: 0 0;
+.tr-tagbox-tag {
+  flex: 0 0 auto;
+  border: @tr-border;
+  border-radius: 3px;
+  background-color: @tr-button-bg;
+  margin: 2px;
+
+  display: flex;
+  align-items: center;
+
+  .tr-tagbox-tag-content {
+    flex: 1 1 auto;
+  }
+
+  .tr-tagbox-tag-button {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAUklEQVQYV2NkgAAfBgaGLVA2MgUWZ4Qq2AyVAfFh4D+U4QsThAmAxE0YGBjOIClmxKYT2TqwPLIiYzQTQCaeRVeEbCXMNBSTCLoJ5E2ifIc3nADKqBCiWqOKtgAAAABJRU5ErkJggg==);
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    margin: 2px;
+
+    &:hover {
+      background-color: rgba(0,0,0,.06);
+    }
+  }
+}
+
+.tr-tagbox-editor {
+  flex: 1 0 auto;
+  min-width: 10px;
+  max-width: 100%;
   outline: none;
-  background-color: white;
-  z-index: 1;
+  margin: 2px;
   font-family: @tr-editor-font-family;
   font-size: @tr-editor-font-size;
 }
 
-.tr-combobox-trigger {
+.tr-tagbox-trigger {    // TODO this is common to different components...
   @tr-caret-width: 4px;
   order: 9999999;
   flex: 0 0 20px;
@@ -48,9 +80,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: @tr-button-bg;
 
-  .tr-combobox-trigger-icon {
+  .tr-tagbox-trigger-icon {
     display: inline-block;
     width: 0;
     height: 0;
@@ -60,12 +92,12 @@
     border-left: @tr-caret-width solid transparent;
   }
 
-  &:hover, .tr-combobox.open & {
+  &:hover, .tr-tagbox.open & {
     background-color: rgba(0, 0, 0, 0.1);
   }
 }
 
-.tr-combobox-dropdown {
+.tr-tagbox-dropdown {  // TODO common!!
   display: none;
   position: absolute;
   background-color: white;
@@ -84,18 +116,18 @@
     border-bottom: none;
   }
 
-  .tr-combobox-entry.tr-highlighted-entry {
+  .tr-tagbox-entry.tr-highlighted-entry {
     background-color: @tr-highlight-color;
   }
 }
 
-.tr-search-highlighted {
+.tr-search-highlighted {   // TODO common!!
   background-color: rgba(244, 195, 125, 0.7);
   border-radius: 3px;
   box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.75);
 }
 
-.tr-hidden {
+.tr-hidden {  // TODO common!!
   display: none !important;
 }
 
