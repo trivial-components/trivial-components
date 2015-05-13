@@ -334,10 +334,16 @@
             }
         }
 
+        function fireChangeEvents() {
+            $originalInput.trigger("change");
+            $comboBox.trigger("change");
+        }
+
         function selectEntry(entry) {
             if (entry == null) {
                 if (config.valueProperty) {
                     $originalInput.val("");
+                    fireChangeEvents();
                 } // else the $originalInput IS the $editor
                 selectedEntry = config.emptyEntry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
@@ -353,6 +359,7 @@
                     .addClass("tr-combobox-entry");
                 $selectedEntryWrapper.empty().append($selectedEntry);
                 $editor.val(selectedEntry[config.inputTextProperty]);
+                fireChangeEvents();
             }
         }
 
@@ -377,6 +384,7 @@
         function clearEditorIfNotContainsFreeText() {
             if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
                 $originalInput.val("");
+                fireChangeEvents();
                 $editor.val("");
                 entries = null; // so we will query again when we combobox is re-focused
             }
