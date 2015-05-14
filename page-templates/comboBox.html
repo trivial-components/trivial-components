@@ -131,7 +131,7 @@
                     <td>Allow free text entry. If
                         <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. If
                         <code>false</code>, the user input will be deleted if he does not select a suggested entry.
-                        However, to acutally <i>use</i> the free text input string, you need to set <code>valueProperty</code>
+                        However, to acutally <i>use</i> the free text input string, you need to set <code>valueProperty</code> to <code>null</code>, so the free text gets written into the original input. (We will probably change this and make <code>getSelectedEntry()</code> return a fake entry with the <code>inputTextProperty</code> set.)
                     </td>
                     <td><code>false</code></td>
                 </tr>
