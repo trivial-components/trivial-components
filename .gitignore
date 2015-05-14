@@ -4,6 +4,7 @@ node/
 node_modules/
 dist/
 tmp/
+*.with-source-maps.*
 
 ### NetBeans template
 nbproject/private/

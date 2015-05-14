@@ -16,7 +16,8 @@
   ],
   "dependencies": {
     "bootstrap": "latest",
-    "trivial-components": "https://github.com/trivial-components/trivial-components.git"
+    "google-code-prettify": "latest",
+    "trivial-components": "https://github.com/trivial-components/trivial-components.git#master"
   },
   "devDependencies": {
 

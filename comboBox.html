@@ -1,0 +1,400 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>TrivialComboBox - Trivial Components</title>
+
+    <script>
+        if (location.href.indexOf("localhost") != -1) {
+            document.write('<link rel="stylesheet" href="css/all.with-source-maps.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="css/all.css">');
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body data-spy="scroll" data-target="#navbar">
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">
+                <img class="navbar-logo" src="img/logo.png"/>Trivial Components
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="index.html">Home</a></li>
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Components <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="comboBox.html">TrivialComboBox</a></li>
+                    </ul>
+                </li>
+                <li><a href="https://github.com/trivial-components/trivial-components/releases">Download</a></li>
+                <li><a href="https://github.com/trivial-components/trivial-components">Github</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <section class="page-header-box">
+        <h1 class="project-name">TrivialComboBox</h1>
+    </section>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5">
+                <h3>Options</h3>
+                <form id="config">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="showTrigger" name="showTrigger" checked="checked"> showTrigger
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="autoComplete" name="autoComplete" checked> autoComplete
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
+                        <input class="form-control" id="autoCompleteDelay" name="autoCompleteDelay" type="number" value="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="valueProperty">valueProperty</label>
+                        <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTextProperty">inputTextProperty</label>
+                        <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="template">template</label>
+                        <input id="template" name="template"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="selectedEntryTemplate">selectedEntryTemplate</label>
+                        <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="spinnerTemplate">spinnerTemplate</label>
+                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner">
+    <div>Fetching data...</div>
+</div></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="noEntriesTemplate">noEntriesTemplate</label>
+                <textarea class="form-control code showcase-textarea" id="noEntriesTemplate" name="noEntriesTemplate"><div class="tr-default-no-data-display">
+    <div>No matching entries...</div>
+</div></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="entries">entries</label>
+                <textarea class="form-control code showcase-textarea" id="entries" name="entries">
+                </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="selectedEntry">selectedEntry</label>
+                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">{
+    "displayValue": "Ami Nemitz",
+    "imageUrl": "https://avatars1.githubusercontent.com/u/271349?v=3&s=25",
+    "additionalInfo": "Magna gubergren sit",
+    "id": 2
+}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="emptyEntry">emptyEntry</label>
+                <textarea class="form-control code showcase-textarea" id="emptyEntry" name="emptyEntry">{
+    "displayValue": "Please select...",
+    "imageUrl": "-",
+    "additionalInfo": ""
+}</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-7">
+                <h3>Result</h3>
+                <div id="comboBoxWrapper"></div>
+                <h4>Original input value</h4>
+                <code id="originalInputValue">asf</code>
+                <h4>Selected entry</h4>
+                <pre id="selectedEntryDisplay" class="prettyprint lang-js">asf</pre>
+                <h3>Configuration</h3>
+                <pre id="configDisplay" class="prettyprint lang-js"></pre>
+            </div>
+        </div>
+
+
+
+        <h3>Configuration Options<a class="anchor" id="configuration"></a></h3>
+        <div class="table-responsive">
+            <table class="table table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>Option</th>
+                    <th>Description</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>valueProperty</td>
+                    <td>Name of the property which should be submitted on form submit. If
+                        <code>null</code>, then the content of the text input will serve als value.
+                    </td>
+                    <td><code>'displayValue'</code></td>
+                </tr>
+                <tr>
+                    <td>allowFreeText</td>
+                    <td>Allow free text entry. If
+                        <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. If
+                        <code>false</code>, the user input will be deleted if he does not select a suggested entry.
+                        However, to acutally <i>use</i> the free text input string, you need to set <code>valueProperty</code>
+                    </td>
+                    <td><code>false</code></td>
+                </tr>
+                <tr>
+                    <td>inputTextProperty</td>
+                    <td>Name of the property which will be filled into the input field when the user selects an entry. This property is also used for auto-completion.</td>
+                    <td><code>'displayValue'</code></td>
+                </tr>
+                <tr>
+                    <td>template</td>
+                    <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
+                    <td><code>$.fn.TrivialComboBox.icon2LinesTemplate</code></td>
+                </tr>
+                <tr>
+                    <td>selectedEntryTemplate</td>
+                    <td>Mustacheustache template to be used for displaying the currently selected entry.</td>
+                    <td>Same as <code>template</code></td>
+                </tr>
+                <tr>
+                    <td>spinnerTemplate</td>
+                    <td>Html code for the "loading..." indicator.</td>
+                    <td><code>defaultSpinnerTemplate</code></td>
+                </tr>
+                <tr>
+                    <td>noEntriesTemplate</td>
+                    <td>Html code for indicating that there is no entry in the dropdown.</td>
+                    <td><code>defaultNoEntriesTemplate</code></td>
+                </tr>
+                <tr>
+                    <td>entries</td>
+                    <td>The dropdown entries to be displayed initially.</td>
+                    <td><code>[]</code></td>
+                </tr>
+                <tr>
+                    <td>selectedEntry</td>
+                    <td>The initially selected entry.</td>
+                    <td><code>undefined</code></td>
+                </tr>
+                <tr>
+                    <td>emptyEntry</td>
+                    <td>Fake entry that should be displayed when no entry is selected.</td>
+                    <td><code>{}</code></td>
+                </tr>
+                <tr>
+                    <td>queryFunction</td>
+                    <td>JavaScript function for retrieving entries depending on the user's input. Takes two parameters:
+                        <code>queryString</code> (user input) and
+                        <code>resultCallback</code> (should be called with the list retrieved entries).
+                    </td>
+                    <td>Simple client-side implementation that filters the initially configured array of entries.</td>
+                </tr>
+                <tr>
+                    <td>autoComplete</td>
+                    <td>If true, the component user get auto-completion inside the text field.</td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td>autoCompleteDelay</td>
+                    <td>Delay for auto-completion. (This feature may be removed, as there is currently no reason for a delay in auto-completion.)</td>
+                    <td><code>0</code></td>
+                </tr>
+                <tr>
+                    <td>showTrigger</td>
+                    <td>The trigger is the button-like handle on the side of the combobox. If false: no trigger is shown.</td>
+                    <td><code>true</code></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div> <!-- container -->
+</div>
+
+<div class="container">
+    <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/trivial-components/trivial-components">Trivial Components</a> is maintained by <a href="https://github.com/trivial-components">trivial-components</a>.</span>
+    </footer>
+</div>
+<script src="lib/js/jquery.min.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="lib/js/position.min.js"></script>
+<script src="lib/js/mustache.min.js"></script>
+<script src="lib/js/trivial-highlight.js"></script>
+<script src="lib/js/trivial-minimallyScrollTo.js"></script>
+<script src="lib/js/trivial-combobox.js"></script>
+<script src="js/demo.js"></script>
+<script src="bower_components/google-code-prettify/bin/prettify.min.js"></script>
+
+<script>
+    $(function () {
+
+        $('#entries').val(JSON.stringify(createEntries(5), null, 2));
+
+        $('#template, #selectedEntryTemplate').each(function() {
+            $(this).TrivialComboBox({
+                template: $.fn.TrivialComboBox.singleLineTemplate,
+                entries: [{
+                    displayValue: "Icon with two lines of text",
+                    value: $.fn.TrivialComboBox.icon2LinesTemplate
+                },{
+                    displayValue: "Icon with single line of text",
+                    value: $.fn.TrivialComboBox.iconSingleLineTemplate
+                },{
+                    displayValue: "Single line of text",
+                    value: $.fn.TrivialComboBox.singleLineTemplate
+                }],
+                selectedEntry: {
+                    displayValue: "Icon with two lines of text",
+                    value: $.fn.TrivialComboBox.icon2LinesTemplate
+                },
+                allowFreeText: false
+            })
+        });
+
+        var customQueryFunction = function (queryString, resultCallback) {
+            setTimeout(function () {
+                resultCallback(createEntries(100).filter(function (entry) {
+                    return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
+                }));
+            }, 1000);
+        };
+
+        var $comboBoxOriginalInput;
+
+        function createComboBox() {
+            $('#comboBoxWrapper').empty();
+            $comboBoxOriginalInput = $('<input id="combobox"/>').appendTo('#comboBoxWrapper');
+            $comboBoxOriginalInput.on('change', function() {
+                $('#originalInputValue').text($(this).val());
+            });
+            var config = {
+                showTrigger: $('#showTrigger').is(':checked'),
+                allowFreeText: $('#allowFreeText').is(':checked'),
+                autoComplete: $('#autoComplete').is(':checked'),
+                queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
+                autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
+                valueProperty: $('#valueProperty').val(),
+                inputTextProperty: $('#inputTextProperty').val(),
+                template: $('#template').TrivialComboBox().getSelectedEntry().value,
+                selectedEntryTemplate: $('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value,
+                spinnerTemplate: $('#spinnerTemplate').val(),
+                noEntriesTemplate: $('#noEntriesTemplate').val(),
+                selectedEntry: JSON.parse($('#selectedEntry').val()),
+                emptyEntry: JSON.parse($('#emptyEntry').val()),
+                entries: JSON.parse($('#entries').val())
+            };
+            $('#configDisplay').removeClass("prettyprinted")
+                    .text("$('#combobox').TrivialComboBox(" + JSON.stringify(config, function(key, value) {
+                        if (key === 'queryFunction' && config.queryFunction) {
+                            return "%queryFunction%";
+                        } else {
+                            return value;
+                        }
+                    }, 2).replace("\"%queryFunction%\"", customQueryFunction.toString()) + ");");
+            var trivialComboBox = $comboBoxOriginalInput.TrivialComboBox(config);
+
+            function updateSelectedEntryDisplay() {
+                $('#selectedEntryDisplay')
+                        .text(JSON.stringify(trivialComboBox.getSelectedEntry(), null, 2))
+                        .removeClass("prettyprinted");
+                prettyPrint();
+            }
+
+            updateSelectedEntryDisplay();
+            trivialComboBox.$.change(function() {
+                updateSelectedEntryDisplay.call(this);
+            });
+            prettyPrint();
+        }
+        createComboBox();
+
+        $('#config input, #config textarea').change(function() {
+            createComboBox();
+        });
+
+    });
+</script>
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-62201674-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+</body>
+</html>

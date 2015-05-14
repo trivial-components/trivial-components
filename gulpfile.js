@@ -16,6 +16,7 @@ var del = require('del');
 var postcss      = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var csswring = require('csswring');
+var fileinclude = require('gulp-file-include');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css']);
@@ -47,7 +48,7 @@ gulp.task('copyFonts2lib', ['bower'], function() {
         .pipe(gulp.dest('lib/fonts'));
 });
 
-gulp.task('less', ['bower'], function () {
+gulp.task('less', function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
         .pipe(less())
@@ -67,10 +68,20 @@ gulp.task('less', ['bower'], function () {
         .pipe(livereload());
 });
 
-gulp.task('watch', ['bower'], function() {
-    livereload.listen();
-    gulp.watch('less/*.less', ['less']);
+gulp.task('generate-html', function() {
+    gulp.src(['page-templates/comboBox.html', 'page-templates/index.html'])
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib']);
+gulp.task('watch', function() {
+    livereload.listen();
+    gulp.watch(['less/*.less', 'page-templates/**/*.html'], ['less', 'generate-html']);
+});
+
+gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib', 'generate-html']);
+
 
