@@ -343,7 +343,6 @@
             if (entry == null) {
                 if (config.valueProperty) {
                     $originalInput.val("");
-                    fireChangeEvents();
                 } // else the $originalInput IS the $editor
                 selectedEntry = config.emptyEntry;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
@@ -359,8 +358,8 @@
                     .addClass("tr-combobox-entry");
                 $selectedEntryWrapper.empty().append($selectedEntry);
                 $editor.val(selectedEntry[config.inputTextProperty]);
-                fireChangeEvents();
             }
+            fireChangeEvents();
         }
 
         function isEntrySelected() {
@@ -495,7 +494,13 @@
 
         this.updateEntries = updateEntries;
         this.getSelectedEntry = function() {
-            return selectedEntry;
+            if (selectedEntry === config.emptyEntry) {
+                return null;
+            } else {
+                var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
+                selectedEntryToReturn._trComboBoxEntryElement = undefined;
+                return selectedEntryToReturn;
+            }
         }
     }
 
