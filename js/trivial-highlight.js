@@ -62,7 +62,6 @@
 
         function findLevenshteinMatches(text, searchString) {
             var levenshtein = new Levenshtein(text, searchString);
-            console.log('distance between "' + text + '" and "' + searchString + '" is ' + levenshtein.distance);
             if (levenshtein.distance <= options.maxLevenshteinDistance) {
                 return [{
                     start: 0,
@@ -88,9 +87,8 @@
         } else if (options.matchingMode == 'levenshtein') {
             return findLevenshteinMatches(text, searchString);
         } else {
-            console.error("unknown matchingMode: " + options.matchingMode);
+            throw "unknown matchingMode: " + options.matchingMode;
         }
-        return matches;
     };
 }(jQuery));
 
@@ -119,7 +117,6 @@
                     var oldMatchEnd = 0;
                     for (var i = 0; i < matches.length; i++) {
                         var match = matches[i];
-                        console.log(match);
                         newNodeValue += this.nodeValue.substring(oldMatchEnd, match.start);
                         newNodeValue += "<span class=\"" + options.highlightClassName + "\">" + oldNodeValue.substr(match.start, match.length) + "</span>";
                         oldMatchEnd = match.start + match.length;
