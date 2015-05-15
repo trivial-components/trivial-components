@@ -64,6 +64,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Components <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="comboBox.html">TrivialComboBox</a></li>
+                        <li><a href="#">TrivialTagBox <span class="badge">TODO</span></a></li>
+                        <li><a href="#">TrivialList <span class="badge">TODO</span></a></li>
                     </ul>
                 </li>
                 <li><a href="https://github.com/trivial-components/trivial-components/releases">Download</a></li>
@@ -113,6 +115,7 @@
                     <ol class="carousel-indicators">
                         <li data-target="#carousel" data-slide-to="0" class="active"></li>
                         <li data-target="#carousel" data-slide-to="1"></li>
+                        <li data-target="#carousel" data-slide-to="2"></li>
                     </ol>
                     <!-- Wrapper for slides -->
                     <div class="carousel-inner" role="listbox">
@@ -121,6 +124,13 @@
 
                             <div class="carousel-caption">
                                 <h4>trivial-combobox</h4>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <img class="img-responsive img-retina" src="img/trivial-tagbox3.png">
+
+                            <div class="carousel-caption">
+                                <h4>trivial-tagbox</h4>
                             </div>
                         </div>
                         <div class="item">
@@ -134,127 +144,6 @@
                 </div>
             </div>
         </div>
-
-        <h2>Examples<a class="anchor" id="showcases"></a></h2>
-
-        <h3>ComboBox</h3>
-
-        <h4>Zero Configuration</h4>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#zeroConfigComboBox').TrivialCombobox({
-    entries: myEntriesArray
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="zeroConfigComboBox">
-            </div>
-        </div>
-
-        <h4>Custom filtering</h4>
-        <p>Filtering is done by custom code, e.g. on the server side.</p>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#customFilteringComboBox').TrivialComboBox({
-    queryFunction: function (queryString, resultCallback) {
-        // custom processing, maybe on the server side
-        ...
-        resultCallback(entriesFromServer);
-    }
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="customFilteringComboBox">
-            </div>
-        </div>
-
-
-        <h4>Templates</h4>
-        <p>There are 3 of-the-shelf templates. <i>However, you can write any template you like yourself.</i></p>
-
-        <h5>Icon (25x30) with two lines of text</h5>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#icon2LinesTemplateComboBox').TrivialComboBox({
-    template: $.fn.TrivialComboBox.icon2LinesTemplate
-    ...
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="icon2LinesTemplateComboBox">
-            </div>
-        </div>
-
-        <h5>Icon (24x24) one line of text</h5>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#iconSingleLineTemplateComboBox').TrivialComboBox({
-    template: $.fn.TrivialComboBox.iconSingleLineTemplate
-    ...
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="iconSingleLineTemplateComboBox">
-            </div>
-        </div>
-
-        <h5>Single line of text</h5>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#singleLineTemplateComboBox').TrivialComboBox({
-    template: $.fn.TrivialComboBox.singleLineTemplate
-    ...
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="singleLineTemplateComboBox">
-            </div>
-        </div>
-
-        <h4>Other options</h4>
-        <h5>autoComplete: false</h5>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#noAutoCompleteComboBox').TrivialComboBox({
-    autoComplete: false
-    ...
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="noAutoCompleteComboBox">
-            </div>
-        </div>
-
-        <h5>showTrigger: false</h5>
-
-        <div class="row">
-            <div class="col-md-8">
-            <pre class="prettyprint lang-javascript">
-$('#noTriggerComboBox').TrivialComboBox({
-    showTrigger: false
-    ...
-});</pre>
-            </div>
-            <div class="col-md-4 result-display">
-                <input id="noTriggerComboBox">
-            </div>
-        </div>
-
-
-        <br/>
-
     </div>
 </div>
 
