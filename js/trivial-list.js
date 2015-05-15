@@ -298,7 +298,7 @@
         function highlightTextMatches() {
             for (var i = 0; i < entries.length; i++) {
                 var $entryElement = entries[i]._trListEntryElement;
-                $entryElement.trivialHighlight($editor.val(), "tr-search-highlighted");
+                $entryElement.trivialHighlight($editor.val());
             }
         }
 

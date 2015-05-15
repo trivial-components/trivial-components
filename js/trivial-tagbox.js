@@ -465,7 +465,7 @@
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
                 var $entryElement = entries[i]._trTagBoxEntryElement;
-                $entryElement.trivialHighlight(nonSelectedEditorValue, "tr-search-highlighted");
+                $entryElement.trivialHighlight(nonSelectedEditorValue);
             }
         }
 

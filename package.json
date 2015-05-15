@@ -37,6 +37,7 @@
     "gulp-concat": "2.x",
     "gulp-filesize": "0.0.6",
     "gulp-gzip": "1.x",
+    "gulp-jasmine": "^2.x",
     "gulp-less": "3.x",
     "gulp-livereload": "3.x",
     "gulp-minify-css": "1.x",
@@ -51,6 +52,11 @@
     "gulp-util": "3.x",
     "gulp-watch": "latest",
     "gulp-zip": "3.x",
+    "karma": "^0.12.31",
+    "karma-chrome-launcher": "^0.1.12",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.1.4",
     "multipipe": "latest"
   }
 }

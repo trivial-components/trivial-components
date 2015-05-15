@@ -77,13 +77,13 @@
     var defaultTemplate = icon2LinesTemplate;
     var defaultSpinnerTemplate = '<div class="tr-default-spinner"><div>Fetching data...</div></div>';
     var defaultNoEntriesTemplate = '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>';
-    var defaultQueryFunctionFactory = function (entries) {
+    var defaultQueryFunctionFactory = function (entries, matchingOptions) {
         function filterElements(queryString) {
             var visibleEntries = [];
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
                 var $entryElement = entry._trComboBoxEntryElement;
-                if ($entryElement.is(':containsIgnoreCase(' + queryString + ')')) {
+                if (!queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0) {
                     visibleEntries.push(entry);
                 }
             }
@@ -112,12 +112,19 @@
             entries: null,
             selectedEntry: undefined,
             emptyEntry: {},
-            queryFunction: defaultQueryFunctionFactory(options.entries || []),
+            queryFunction: null, // defined below...
             autoComplete: true,
             autoCompleteDelay: 0,
             allowFreeText: false,
-            showTrigger: true
+            showTrigger: true,
+            matchingOptions: {
+                matchingMode: 'prefix-word',
+                ignoreCase: true,
+                maxLevenshteinDistance: 2
+            }
         }, options);
+
+        config.queryFunction = defaultQueryFunctionFactory(options.entries || [], config.matchingOptions);
 
         var isDropDownOpen = false;
         var entries = config.entries;
@@ -485,7 +492,7 @@
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
                 var $entryElement = entries[i]._trComboBoxEntryElement;
-                $entryElement.trivialHighlight(nonSelectedEditorValue, "tr-search-highlighted");
+                $entryElement.trivialHighlight(nonSelectedEditorValue, config.matchingOptions);
             }
         }
 
@@ -493,7 +500,7 @@
         $comboBox[0].trivialComboBox = this;
 
         this.updateEntries = updateEntries;
-        this.getSelectedEntry = function() {
+        this.getSelectedEntry = function () {
             if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
                 return null;
             } else if (selectedEntry == null && config.allowFreeText) {

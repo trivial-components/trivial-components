@@ -19,6 +19,7 @@ var zip = require('gulp-zip');
 var tar = require('gulp-tar');
 var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
+var karma = require('karma').server;
 
 gulp.task('clean', function () {
     del(['bower_components', 'dist']);
@@ -31,16 +32,26 @@ gulp.task('bower', function () {
 
 gulp.task('copyLibs2dist', ['bower'], function () {
     return gulp.src([
-        'bower_components/jquery/dist/jquery.js', 'bower_components/jquery/dist/jquery.min.js',
-        'bower_components/Caret.js/dist/jquery.caret.js', 'bower_components/Caret.js/dist/jquery.caret.min.js',
-        'bower_components/jquery-ui/ui/position.js', 'bower_components/jquery-ui/ui/minified/position.min.js',
-        'bower_components/mustache/mustache.js', 'bower_components/mustache/mustache.min.js'
+        'bower_components/jquery/dist/jquery.js',
+        'bower_components/Caret.js/dist/jquery.caret.js',
+        'bower_components/jquery-ui/ui/position.js',
+        'bower_components/mustache/mustache.js',
+        'bower_components/levenshtein/lib/levenshtein.js'
     ])
         .pipe(rename(function (path) {
+            // rename position to jquery.position...
             if (path.basename.indexOf('position') === 0) {
                 path.basename = "jquery." + path.basename;
             }
         }))
+        .pipe(mirror(
+            pipe(
+                rename(function (path) {
+                    path.basename += ".min";
+                }),
+                uglify()
+            )
+        ))
         .pipe(gulp.dest('./dist/lib'));
 });
 
@@ -108,12 +119,14 @@ gulp.task('js-bundle', function () {
         .pipe(gulp.dest('./dist/js/bundle'))
 });
 
-gulp.task('watch', ['bower'], function () {
-    livereload.listen();
-    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less']);
+gulp.task('test', ['bower'],  function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, done);
 });
 
-gulp.task('prepare-dist', ['bower', 'less', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['test', 'bower', 'less', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -129,3 +142,8 @@ gulp.task('tar', ['prepare-dist'], function () {
 });
 
 gulp.task('default', ['prepare-dist', "zip", "tar"]);
+
+gulp.task('watch', function () {
+    livereload.listen();
+    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less']);
+});
