@@ -102,8 +102,9 @@
 
         /*
         TODO
-         - possibility to specify multiple templates (depending on depth)
-         -
+         - filter/text-highlight sub-nodes
+         - expand current node if right key is pressed and at end of editor
+         - collapse current node if left key is pressed and at start of editor
          */
 
         options = options || {};
