@@ -19,12 +19,10 @@
     if (typeof define === 'function' && define.amd) {
         // Define as an AMD module if possible
         define('trivial-tagbox', ['jquery', 'mustache'], factory);
-    }
-    else if (typeof exports === 'object') {
+    } else if (typeof exports === 'object') {
         // Node/CommonJS
         module.exports = factory(require('jquery', 'mustache'));
-    }
-    else if (jQuery && !jQuery.fn.trivialtagbox) {
+    } else if (jQuery && !jQuery.fn.trivialtagbox) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
         factory(jQuery, Mustache);
@@ -82,7 +80,7 @@
             var visibleEntries = [];
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
-                var $entryElement = entry._trTagBoxEntryElement;
+                var $entryElement = entry._trEntryElement;
                 if ($entryElement.is(':containsIgnoreCase(' + queryString + ')')) {
                     visibleEntries.push(entry);
                 }
@@ -258,7 +256,7 @@
                     var entry = entries[i];
                     var html = Mustache.render(config.template, entry);
                     var $entry = $(html).addClass("tr-tagbox-entry filterable-item").appendTo($dropDown);
-                    entry._trTagBoxEntryElement = $entry;
+                    entry._trEntryElement = $entry;
                     (function (entry) {
                         $entry
                             .mousedown(function () {
@@ -309,7 +307,7 @@
             if (index > -1) {
                 selectedTags.splice(index, 1);
             }
-            tagToBeRemoved._trTagBoxEntryElement.remove();
+            tagToBeRemoved._trEntryElement.remove();
         }
 
         function query(highlightDirection) {
@@ -330,8 +328,8 @@
             highlightedEntry = entry;
             $dropDown.find('.tr-tagbox-entry').removeClass('tr-highlighted-entry');
             if (entry != null) {
-                entry._trTagBoxEntryElement.addClass('tr-highlighted-entry');
-                $dropDown.minimallyScrollTo(entry._trTagBoxEntryElement);
+                entry._trEntryElement.addClass('tr-highlighted-entry');
+                $dropDown.minimallyScrollTo(entry._trEntryElement);
             }
         }
 
@@ -357,7 +355,7 @@
             $tagWrapper.append($selectedEntry).append($tagRemoveButton);
             $tagWrapper.insertBefore($editor);
 
-            tag._trTagBoxEntryElement = $tagWrapper;
+            tag._trEntryElement = $tagWrapper;
 
             $editor.text("");
         }
@@ -370,30 +368,32 @@
             }
         }
 
+        function repositionDropdown() {
+            $dropDown.position({
+                my: "left top",
+                at: "left bottom",
+                of: $tagBox,
+                collision: "flip",
+                using: function (calculatedPosition, info) {
+                    if (info.vertical === "top") {
+                        $tagBox.removeClass("dropdown-flipped");
+                        $(this).removeClass("flipped");
+                    } else {
+                        $tagBox.addClass("dropdown-flipped");
+                        $(this).addClass("flipped");
+                    }
+                    $(this).css({
+                        left: calculatedPosition.left + 'px',
+                        top: calculatedPosition.top + 'px'
+                    });
+                }
+            }).width($tagBox.width());
+        }
+
         function openDropDown() {
             $tagBox.addClass("open");
-            $dropDown
-                .show()
-                .position({
-                    my: "left top",
-                    at: "left bottom",
-                    of: $tagBox,
-                    collision: "flip",
-                    using: function (calculatedPosition, info) {
-                        if (info.vertical === "top") {
-                            $tagBox.removeClass("dropdown-flipped");
-                            $(this).removeClass("flipped");
-                        } else {
-                            $tagBox.addClass("dropdown-flipped");
-                            $(this).addClass("flipped");
-                        }
-                        $(this).css({
-                            left: calculatedPosition.left + 'px',
-                            top: calculatedPosition.top + 'px'
-                        });
-                    }
-                })
-                .width($tagBox.width());
+            $dropDown.show();
+            repositionDropdown();
             isDropDownOpen = true;
         }
 
@@ -419,6 +419,7 @@
                     newEditorValue = getNonSelectedEditorValue();
                 }
                 $editor.text(newEditorValue);
+                repositionDropdown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
                 setTimeout(function () { // we need this to guarantee that the editor has been updated...
                     selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
                 }, 0);
@@ -464,7 +465,7 @@
         function highlightTextMatches() {
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
-                var $entryElement = entries[i]._trTagBoxEntryElement;
+                var $entryElement = entries[i]._trEntryElement;
                 $entryElement.trivialHighlight(nonSelectedEditorValue);
             }
         }
@@ -507,7 +508,7 @@
 
     $.fn.trivialtagbox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.TrivialTagBox.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.TrivialTagBox.iconSingleLineTemplate = iconSingleLineTemplate;
+    $.fn.trivialtagbox.iconSingleLineTemplate = iconSingleLineTemplate;
     $.fn.TrivialTagBox.iconSingleLineTemplate = iconSingleLineTemplate;
     $.fn.trivialtagbox.singleLineTemplate = singleLineTemplate;
     $.fn.TrivialTagBox.singleLineTemplate = singleLineTemplate;

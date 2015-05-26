@@ -38,7 +38,7 @@
         }
 
         var options = $.extend({
-            matchingMode: 'prefix-word',
+            matchingMode: 'contains',
             ignoreCase: true,
             maxLevenshteinDistance: 3
         }, options || null);
@@ -62,6 +62,7 @@
 
         function findLevenshteinMatches(text, searchString) {
             var levenshtein = new Levenshtein(text, searchString);
+            console.log('distance between "' + text + '" and "' + searchString + '" is ' + levenshtein.distance);
             if (levenshtein.distance <= options.maxLevenshteinDistance) {
                 return [{
                     start: 0,
@@ -96,7 +97,7 @@
     $.fn.trivialHighlight = function (searchString, options) {
         options = $.extend({
             highlightClassName: 'tr-highlighted-text',
-            matchingMode: 'prefix-word',
+            matchingMode: 'contains',
             ignoreCase: true,
             maxLevenshteinDistance: 3
         }, options);

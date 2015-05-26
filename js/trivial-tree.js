@@ -18,11 +18,11 @@
 
     if (typeof define === 'function' && define.amd) {
         // Define as an AMD module if possible
-        define('trivial-list', ['jquery', 'mustache'], factory);
+        define('trivial-tree', ['jquery', 'mustache'], factory);
     } else if (typeof exports === 'object') {
         // Node/CommonJS
         module.exports = factory(require('jquery', 'mustache'));
-    } else if (jQuery && !jQuery.fn.triviallist) {
+    } else if (jQuery && !jQuery.fn.trivialtree) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
         factory(jQuery, Mustache);
@@ -98,11 +98,18 @@
                 .indexOf(e.which) != -1;
     }
 
-    function TrivialList(originalInput, options) {
+    function TrivialTree(originalInput, options) {
+
+        /*
+        TODO
+         - possibility to specify multiple templates (depending on depth)
+         -
+         */
+
         options = options || {};
         var config = $.extend({
             valueProperty: null,
-            template: defaultTemplate,
+            templates: [defaultTemplate],
             spinnerTemplate: defaultSpinnerTemplate,
             noEntriesTemplate: defaultNoEntriesTemplate,
             entries: null,
@@ -116,12 +123,12 @@
         var blurCausedByClickInsideComponent = false;
 
         var $originalInput = $(originalInput).addClass("tr-original-input");
-        var $componentWrapper = $('<div class="tr-list"/>').insertAfter($originalInput);
-        var $entryList = $('<div class="tr-list-entryList"></div>').appendTo($componentWrapper);
-        var $editor = $('<input type="text" class="tr-list-edit-input"/>')
+        var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput);
+        var $entryTree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
+        var $editor = $('<input type="text" class="tr-tree-edit-input"/>')
             .prependTo($componentWrapper)
             .focus(function () {
-                    $componentWrapper.addClass('focus');
+                $componentWrapper.addClass('focus');
             })
             .blur(function () {
                 if (blurCausedByClickInsideComponent) {
@@ -163,7 +170,7 @@
                 }
             });
 
-        $componentWrapper.add($entryList).mousedown(function () {
+        $componentWrapper.add($entryTree).mousedown(function () {
             if ($editor.is(":focus")) {
                 blurCausedByClickInsideComponent = true;
             }
@@ -179,56 +186,78 @@
             }
         });
 
-        $entryList.mouseout(function() {
+        $entryTree.mouseout(function() {
             setHighlightedEntry(null);
         });
 
         if (entries) { // if config.entries was set...
-            updateListEntryElements(entries);
+            updateTreeEntryElements(entries);
         }
 
         selectEntry(config.selectedEntry || null);
 
-        function updateListEntryElements(entries) {
-            $entryList.empty();
+        function updateTreeEntryElements(entries) {
+            $entryTree.empty();
+
+            function createEntryElement(entry, $parentElement, depth) {
+                var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-'+ !!(entry.isLeaf) +'"></div>')
+                    .appendTo($parentElement);
+                var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
+                    .appendTo($outerEntryWrapper);
+                var $expander = $('<div class="tr-tree-expander"></div>')
+                    .appendTo($entryAndExpanderWrapper);
+                var html = Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry);
+                var $entry = $(html).addClass("tr-tree-entry filterable-item")
+                    .appendTo($entryAndExpanderWrapper);
+                entry._trEntryElement = $entry;
+                $entry
+                    .mousedown(function () {
+                        blurCausedByClickInsideComponent = true;
+                        selectEntry(entry);
+                        $editor.select();
+                    })
+                    .mouseup(function () {
+                        if (blurCausedByClickInsideComponent) {
+                            $editor.focus();
+                            blurCausedByClickInsideComponent = false;
+                        }
+                    }).mouseout(function () {
+                        if (blurCausedByClickInsideComponent) {
+                            $editor.focus();
+                            blurCausedByClickInsideComponent = false;
+                        }
+                    })
+                    .mouseover(function () {
+                        setHighlightedEntry(entry);
+                    });
+
+
+                if (entry.children && entry.children.length > 0) {
+                    var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
+                        .appendTo($outerEntryWrapper);
+                    $expander.click(function() {
+                        $childrenWrapper.slideToggle(100);
+                        $outerEntryWrapper.toggleClass("expanded");
+                    });
+                    for (var i = 0; i<entry.children.length; i++) {
+                        createEntryElement(entry.children[i], $childrenWrapper, depth + 1);
+                    }
+                }
+            }
+
             if (entries.length > 0) {
                 for (var i = 0; i < entries.length; i++) {
-                    var entry = entries[i];
-                    var html = Mustache.render(config.template, entry);
-                    var $entry = $(html).addClass("tr-list-entry filterable-item").appendTo($entryList);
-                    entry._trEntryElement = $entry;
-                    (function (entry) {
-                        $entry
-                            .mousedown(function () {
-                                blurCausedByClickInsideComponent = true;
-                                selectEntry(entry);
-                                $editor.select();
-                            })
-                            .mouseup(function () {
-                                if (blurCausedByClickInsideComponent) {
-                                    $editor.focus();
-                                    blurCausedByClickInsideComponent = false;
-                                }
-                            }).mouseout(function () {
-                                if (blurCausedByClickInsideComponent) {
-                                    $editor.focus();
-                                    blurCausedByClickInsideComponent = false;
-                                }
-                            })
-                            .mouseover(function () {
-                                setHighlightedEntry(entry);
-                            });
-                    })(entry);
+                    createEntryElement(entries[i], $entryTree, 0);
                 }
             } else {
-                $entryList.append(config.noEntriesTemplate);
+                $entryTree.append(config.noEntriesTemplate);
             }
         }
 
         function updateEntries(newEntries, highlightDirection) {
             highlightedEntry = null;
             entries = newEntries;
-            updateListEntryElements(entries);
+            updateTreeEntryElements(entries);
 
             if (entries.length > 0) {
                 highlightTextMatches();
@@ -242,7 +271,7 @@
         }
 
         function query(highlightDirection) {
-            $entryList.append(config.spinnerTemplate);
+            $entryTree.append(config.spinnerTemplate);
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
@@ -254,15 +283,15 @@
 
         function setHighlightedEntry(entry) {
             highlightedEntry = entry;
-            $entryList.find('.tr-list-entry').removeClass('tr-highlighted-entry');
+            $entryTree.find('.tr-tree-entry').removeClass('tr-highlighted-entry');
             if (entry != null) {
                 entry._trEntryElement.addClass('tr-highlighted-entry');
-                $entryList.minimallyScrollTo(entry._trEntryElement);
+                $entryTree.minimallyScrollTo(entry._trEntryElement);
             }
         }
 
         function selectEntry(entry) {
-            $entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
+            $entryTree.find(".tr-selected-entry").removeClass("tr-selected-entry");
             if (entry == null) {
                 $originalInput.val("");
             } else {
@@ -306,7 +335,7 @@
         }
 
         this.$ = $componentWrapper;
-        $componentWrapper[0].trivialList = this;
+        $componentWrapper[0].trivialTree = this;
 
         this.updateEntries = updateEntries;
         this.getSelectedEntry = function() {
@@ -314,40 +343,40 @@
         }
     }
 
-    $.fn.triviallist = function (options) {
-        var $lists = [];
+    $.fn.trivialtree = function (options) {
+        var $trees = [];
         this.each(function () {
-            var existingListWrapper = $(this).parents('.tr-list').addBack('.tr-list');
-            if (existingListWrapper.length > 0 && existingListWrapper[0].trivialList) {
-                $lists.push(existingListWrapper[0].trivialList.$);
+            var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
+            if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTree) {
+                $trees.push(existingTreeWrapper[0].trivialTree.$);
             } else {
-                var list = new TrivialList(this, options);
-                $lists.push(list.$);
+                var tree = new TrivialTree(this, options);
+                $trees.push(tree.$);
             }
         });
-        return $($lists);
+        return $($trees);
     };
-    $.fn.TrivialList = function (options) {
-        var lists = [];
+    $.fn.TrivialTree = function (options) {
+        var trees = [];
         this.each(function () {
-            var existingListWrapper = $(this).parents('.tr-list').addBack('.tr-list');
-            if (existingListWrapper.length > 0 && existingListWrapper[0].trivialList) {
-                lists.push(existingListWrapper[0].trivialList);
+            var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
+            if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTree) {
+                trees.push(existingTreeWrapper[0].trivialTree);
             } else {
-                var list = new TrivialList(this, options);
-                lists.push(list);
+                var tree = new TrivialTree(this, options);
+                trees.push(tree);
             }
         });
-        return lists.length == 1 ? lists[0] : lists;
+        return trees.length == 1 ? trees[0] : trees;
     };
 
-    $.fn.triviallist.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.TrivialList.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.triviallist.iconSingleLineTemplate = iconSingleLineTemplate;
-    $.fn.TrivialList.iconSingleLineTemplate = iconSingleLineTemplate;
-    $.fn.triviallist.singleLineTemplate = singleLineTemplate;
-    $.fn.TrivialList.singleLineTemplate = singleLineTemplate;
+    $.fn.trivialtree.icon2LinesTemplate = icon2LinesTemplate;
+    $.fn.TrivialTree.icon2LinesTemplate = icon2LinesTemplate;
+    $.fn.trivialtree.iconSingleLineTemplate = iconSingleLineTemplate;
+    $.fn.TrivialTree.iconSingleLineTemplate = iconSingleLineTemplate;
+    $.fn.trivialtree.singleLineTemplate = singleLineTemplate;
+    $.fn.TrivialTree.singleLineTemplate = singleLineTemplate;
 
-    return $.fn.TrivialList;
+    return $.fn.TrivialTree;
 })
 );

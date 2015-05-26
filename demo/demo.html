@@ -14,6 +14,7 @@
     <script src="../js/trivial-combobox.js"></script>
     <script src="../js/trivial-list.js"></script>
     <script src="../js/trivial-tagbox.js"></script>
+    <script src="../js/trivial-tree.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -52,6 +53,11 @@
 <h4>Trivial Tagbox</h4>
 <div style="width: 500px;">
     <input id="zeroConfigTagBox">
+</div>
+
+<h4>Trivial Tree</h4>
+<div style="width: 500px;">
+    <input id="zeroConfigTree">
 </div>
 
 <script>
@@ -123,6 +129,85 @@
 
         $('#zeroConfigTagBox').TrivialTagBox({
             entries: createEntries()
+        });
+
+        $('#zeroConfigTree').TrivialTree({
+            templates: [$.fn.TrivialComboBox.icon2LinesTemplate, $.fn.TrivialTree.iconSingleLineTemplate],
+            entries: [{
+                displayValue: "AAA",
+                additionalInfo: "Some additional info",
+                imageUrl: randomImageUrl(),
+                isLeaf: false,
+                children: [{
+                    displayValue: "AAA 1",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: true
+                }, {
+                    displayValue: "AAA 2",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: true
+                }, {
+                    displayValue: "AAA 3",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: false,
+                    children: [{
+                        displayValue: "AAA 3 1",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl() ,
+                        isLeaf: true
+                    }, {
+                        displayValue: "AAA 3 2",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl()   ,
+                        isLeaf: true
+                    }, {
+                        displayValue: "AAA 3 3",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl()   ,
+                        isLeaf: true
+                    }]
+                }]
+            }, {
+                displayValue: "BBB",
+                additionalInfo: "Some additional info",
+                imageUrl: randomImageUrl(),
+                isLeaf: false,
+                children: [{
+                    displayValue: "BBB 1",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: true
+                }, {
+                    displayValue: "BBB 2",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: true
+                }, {
+                    displayValue: "BBB 3",
+                    additionalInfo: "Some internal info",
+                    imageUrl: randomImageUrl(),
+                    isLeaf: false,
+                    children: [{
+                        displayValue: "BBB 3 1",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl(),
+                        isLeaf: true
+                    }, {
+                        displayValue: "BBB 3 2",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl(),
+                        isLeaf: true
+                    }, {
+                        displayValue: "BBB 3 3",
+                        additionalInfo: "Some internal info",
+                        imageUrl: randomImageUrl(),
+                        isLeaf: true
+                    }]
+                }]
+            }]
         });
     });
 </script>

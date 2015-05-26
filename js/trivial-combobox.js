@@ -19,12 +19,10 @@
     if (typeof define === 'function' && define.amd) {
         // Define as an AMD module if possible
         define('trivial-combobox', ['jquery', 'mustache'], factory);
-    }
-    else if (typeof exports === 'object') {
+    } else if (typeof exports === 'object') {
         // Node/CommonJS
         module.exports = factory(require('jquery', 'mustache'));
-    }
-    else if (jQuery && !jQuery.fn.trivialcombobox) {
+    } else if (jQuery && !jQuery.fn.trivialcombobox) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
         factory(jQuery, Mustache);
@@ -82,7 +80,7 @@
             var visibleEntries = [];
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
-                var $entryElement = entry._trComboBoxEntryElement;
+                var $entryElement = entry._trElement;
                 if (!queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0) {
                     visibleEntries.push(entry);
                 }
@@ -271,7 +269,7 @@
                     var entry = entries[i];
                     var html = Mustache.render(config.template, entry);
                     var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
-                    entry._trComboBoxEntryElement = $entry;
+                    entry._trElement = $entry;
                     (function (entry) {
                         $entry
                             .mousedown(function () {
@@ -336,8 +334,8 @@
             highlightedEntry = entry;
             $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted-entry');
             if (entry != null) {
-                entry._trComboBoxEntryElement.addClass('tr-highlighted-entry');
-                $dropDown.minimallyScrollTo(entry._trComboBoxEntryElement);
+                entry._trElement.addClass('tr-highlighted-entry');
+                $dropDown.minimallyScrollTo(entry._trElement);
             }
         }
 
@@ -491,7 +489,7 @@
         function highlightTextMatches() {
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
-                var $entryElement = entries[i]._trComboBoxEntryElement;
+                var $entryElement = entries[i]._trElement;
                 $entryElement.trivialHighlight(nonSelectedEditorValue, config.matchingOptions);
             }
         }
@@ -511,7 +509,7 @@
                 return fakeEntry;
             } else {
                 var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
-                selectedEntryToReturn._trComboBoxEntryElement = undefined;
+                selectedEntryToReturn._trElement = undefined;
                 return selectedEntryToReturn;
             }
         }
@@ -546,7 +544,7 @@
 
     $.fn.trivialcombobox.icon2LinesTemplate = icon2LinesTemplate;
     $.fn.TrivialComboBox.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.TrivialComboBox.iconSingleLineTemplate = iconSingleLineTemplate;
+    $.fn.trivialcombobox.iconSingleLineTemplate = iconSingleLineTemplate;
     $.fn.TrivialComboBox.iconSingleLineTemplate = iconSingleLineTemplate;
     $.fn.trivialcombobox.singleLineTemplate = singleLineTemplate;
     $.fn.TrivialComboBox.singleLineTemplate = singleLineTemplate;
