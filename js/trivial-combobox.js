@@ -80,7 +80,7 @@
             var visibleEntries = [];
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
-                var $entryElement = entry._trElement;
+                var $entryElement = entry._trEntryElement;
                 if (!queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0) {
                     visibleEntries.push(entry);
                 }
@@ -269,7 +269,7 @@
                     var entry = entries[i];
                     var html = Mustache.render(config.template, entry);
                     var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
-                    entry._trElement = $entry;
+                    entry._trEntryElement = $entry;
                     (function (entry) {
                         $entry
                             .mousedown(function () {
@@ -334,8 +334,8 @@
             highlightedEntry = entry;
             $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted-entry');
             if (entry != null) {
-                entry._trElement.addClass('tr-highlighted-entry');
-                $dropDown.minimallyScrollTo(entry._trElement);
+                entry._trEntryElement.addClass('tr-highlighted-entry');
+                $dropDown.minimallyScrollTo(entry._trEntryElement);
             }
         }
 
@@ -489,7 +489,7 @@
         function highlightTextMatches() {
             var nonSelectedEditorValue = getNonSelectedEditorValue();
             for (var i = 0; i < entries.length; i++) {
-                var $entryElement = entries[i]._trElement;
+                var $entryElement = entries[i]._trEntryElement;
                 $entryElement.trivialHighlight(nonSelectedEditorValue, config.matchingOptions);
             }
         }
@@ -509,7 +509,7 @@
                 return fakeEntry;
             } else {
                 var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
-                selectedEntryToReturn._trElement = undefined;
+                selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             }
         }

@@ -75,21 +75,52 @@
     var defaultTemplate = icon2LinesTemplate;
     var defaultSpinnerTemplate = '<div class="tr-default-spinner"><div>Fetching data...</div></div>';
     var defaultNoEntriesTemplate = '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>';
-    var defaultQueryFunctionFactory = function (entries) {
-        function filterElements(queryString) {
-            var visibleEntries = [];
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var $entryElement = entry._trEntryElement;
-                if ($entryElement.is(':containsIgnoreCase(' + queryString + ')')) {
-                    visibleEntries.push(entry);
-                }
-            }
-            return visibleEntries;
+    var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions) {
+
+        function createProxy(delegate) {
+            var proxyConstructor = function(){};
+            proxyConstructor.prototype = delegate;
+            return new proxyConstructor();
         }
 
+        function findMatchingEntriesAndTheirAncestors(entry, queryString) {
+            var entryProxy = createProxy(entry);
+            entryProxy.children = [];
+            entryProxy.expanded = false;
+            if (entry.children) {
+                for (var i = 0; i < entry.children.length; i++) {
+                    var child = entry.children[i];
+                    var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString);
+                    if (childProxy){
+                        entryProxy.children.push(childProxy);
+                        entryProxy.expanded = true;
+                    }
+                }
+            }
+            var matchesOrHasMatchingChild = entryMatches(entry, queryString) || entryProxy.children.length > 0;
+            return matchesOrHasMatchingChild ? entryProxy : null;
+        }
+
+        function entryMatches(entry, queryString) {
+            var $entryElement = entry._trEntryElement;
+            return !queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
+        }
+
+
         return function (queryString, resultCallback) {
-            resultCallback(filterElements(queryString));
+            if (!queryString) {
+                resultCallback(topLevelEntries);
+            } else {
+                var matchingEntries = [];
+                for (var i = 0; i < topLevelEntries.length; i++) {
+                    var topLevelEntry = topLevelEntries[i];
+                    var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString);
+                    if (entryProxy) {
+                        matchingEntries.push(entryProxy);
+                    }
+                }
+                resultCallback(matchingEntries);
+            }
         }
     };
 
@@ -115,6 +146,7 @@
             noEntriesTemplate: defaultNoEntriesTemplate,
             entries: null,
             selectedEntry: undefined,
+            expandedAttributeName: 'expanded',
             queryFunction: defaultQueryFunctionFactory(options.entries || [])
         }, options);
 
@@ -232,14 +264,17 @@
                         setHighlightedEntry(entry);
                     });
 
-
                 if (entry.children && entry.children.length > 0) {
                     var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
                         .appendTo($outerEntryWrapper);
-                    $expander.click(function() {
+                    var toggleExpansion = function () {
                         $childrenWrapper.slideToggle(100);
                         $outerEntryWrapper.toggleClass("expanded");
-                    });
+                    };
+                    if (entry[config.expandedAttributeName]) {
+                        $outerEntryWrapper.addClass("expanded");
+                    }
+                    $expander.click(toggleExpansion);
                     for (var i = 0; i<entry.children.length; i++) {
                         createEntryElement(entry.children[i], $childrenWrapper, depth + 1);
                     }
@@ -261,7 +296,7 @@
             updateTreeEntryElements(entries);
 
             if (entries.length > 0) {
-                highlightTextMatches();
+                highlightTextMatches(entries);
 
                 if (typeof highlightDirection != 'undefined') {
                     highlightNextEntry(highlightDirection);
@@ -328,10 +363,14 @@
             return entries[newHighlightedElementIndex];
         }
 
-        function highlightTextMatches() {
+        function highlightTextMatches(entries) {
             for (var i = 0; i < entries.length; i++) {
-                var $entryElement = entries[i]._trEntryElement;
+                var entry = entries[i];
+                var $entryElement = entry._trEntryElement;
                 $entryElement.trivialHighlight($editor.val());
+                if (entry.children) {
+                    highlightTextMatches(entry.children);
+                }
             }
         }
 
