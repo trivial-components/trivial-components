@@ -19,6 +19,7 @@ module.exports = function (config) {
             'bower_components/jquery-ui/ui/position.js',
             'bower_components/mustache/mustache.js',
             'bower_components/levenshtein/lib/levenshtein.js',
+            'js/trivial-core.js',
             'js/*.js',
             'test/*.js'
         ],

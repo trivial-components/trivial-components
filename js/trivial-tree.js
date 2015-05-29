@@ -18,63 +18,19 @@
 
     if (typeof define === 'function' && define.amd) {
         // Define as an AMD module if possible
-        define('trivial-tree', ['jquery', 'mustache'], factory);
+        define('trivial-tree', ['trivial-core', 'jquery', 'mustache'], factory);
     } else if (typeof exports === 'object') {
         // Node/CommonJS
-        module.exports = factory(require('jquery', 'mustache'));
+        module.exports = factory(require('trivial-core'), require('jquery'), require('mustache'));
     } else if (jQuery && !jQuery.fn.trivialtree) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
-        factory(jQuery, Mustache);
+        factory(TrivialComponents, jQuery, Mustache);
     }
-}(function ($, Mustache) {
+}(function (TrivialComponents, $, Mustache) {
 
-    var keyCodes = {
-        backspace: 8,
-        tab: 9,
-        enter: 13,
-        shift: 16,
-        ctrl: 17,
-        alt: 18,
-        pause: 19,
-        caps_lock: 20,
-        escape: 27,
-        page_up: 33,
-        page_down: 34,
-        end: 35,
-        home: 36,
-        left_arrow: 37,
-        up_arrow: 38,
-        right_arrow: 39,
-        down_arrow: 40,
-        insert: 45,
-        delete: 46,
-        left_window_key: 91,
-        right_window_key: 92,
-        select_key: 93,
-        num_lock: 144,
-        scroll_lock: 145
-    };
+    var keyCodes = TrivialComponents.keyCodes;
 
-    var icon2LinesTemplate = '<div class="tr-template-icon-2-lines">' +
-        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-        '  <div class="content-wrapper editor-area"> ' +
-        '    <div class="main-line">{{displayValue}}</div> ' +
-        '    <div class="additional-info">{{additionalInfo}}</div>' +
-        '  </div>' +
-        '</div>';
-    var iconSingleLineTemplate = '<div class="tr-template-icon-single-line">' +
-        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-        '  <div class="content-wrapper editor-area">{{displayValue}}</div>' +
-        '</div>';
-    var singleLineTemplate = '<div class="tr-template-single-line">' +
-        '  <div class="content-wrapper editor-area"> ' +
-        '    <div>{{displayValue}}</div> ' +
-        '  </div>' +
-        '</div>';
-    var defaultTemplate = icon2LinesTemplate;
-    var defaultSpinnerTemplate = '<div class="tr-default-spinner"><div>Fetching data...</div></div>';
-    var defaultNoEntriesTemplate = '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>';
     var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions) {
 
         function createProxy(delegate) {
@@ -133,7 +89,6 @@
 
         /*
         TODO
-         - filter/text-highlight sub-nodes
          - expand current node if right key is pressed and at end of editor
          - collapse current node if left key is pressed and at start of editor
          */
@@ -141,9 +96,9 @@
         options = options || {};
         var config = $.extend({
             valueProperty: null,
-            templates: [defaultTemplate],
-            spinnerTemplate: defaultSpinnerTemplate,
-            noEntriesTemplate: defaultNoEntriesTemplate,
+            templates: [TrivialComponents.iconSingleLineTemplate],
+            spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
+            noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,
             selectedEntry: undefined,
             expandedAttributeName: 'expanded',
@@ -409,13 +364,6 @@
         });
         return trees.length == 1 ? trees[0] : trees;
     };
-
-    $.fn.trivialtree.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.TrivialTree.icon2LinesTemplate = icon2LinesTemplate;
-    $.fn.trivialtree.iconSingleLineTemplate = iconSingleLineTemplate;
-    $.fn.TrivialTree.iconSingleLineTemplate = iconSingleLineTemplate;
-    $.fn.trivialtree.singleLineTemplate = singleLineTemplate;
-    $.fn.TrivialTree.singleLineTemplate = singleLineTemplate;
 
     return $.fn.TrivialTree;
 })

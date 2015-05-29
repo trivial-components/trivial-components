@@ -9,6 +9,7 @@
     <script src="../bower_components/jquery-ui/ui/position.js"></script>
     <script src="../bower_components/mustache/mustache.js"></script>
     <script src="../bower_components/levenshtein/lib/levenshtein.js"></script>
+    <script src="../js/trivial-core.js"></script>
     <script src="../js/trivial-highlight.js"></script>
     <script src="../js/trivial-minimallyScrollTo.js"></script>
     <script src="../js/trivial-combobox.js"></script>
@@ -99,7 +100,7 @@
             emptyEntry: {
                 displayValue: "Please select..."
             },
-            template: $.fn.TrivialComboBox.iconSingleLineTemplate
+            template: TrivialComponents.iconSingleLineTemplate
         });
 
         $('#customFilteringComboBox').trivialcombobox({
@@ -115,7 +116,7 @@
                     }));
                 }, 500);
             },
-            selectedEntryTemplate: $.fn.trivialcombobox.singleLineTemplate
+            selectedEntryTemplate: TrivialComponents.singleLineTemplate
         });
 
         $('#separateOriginalInputComboBox').TrivialComboBox({
@@ -141,26 +142,13 @@
 
         $('#customTemplateTagBox1').TrivialTagBox({
             entries: createEntries(),
-            template: '<div class="tr-template-round-icon-2-lines-color-bubble">' +
-            '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-            '  <div class="content-wrapper editor-area"> ' +
-            '    <div class="main-line">{{displayValue}}</div> ' +
-            '    <div class="additional-info"><span class="status-bubble" style="background-color: {{statusColor}}"></span>{{additionalInfo}}</div>' +
-            '  </div>' +
-            '</div>',
-            tagWrapperTemplate: '<div class="tr-tagbox-tag" style="border-color: {{statusColor}}; background-color: {{statusColor}};"><div class="tr-most-inner-tag-wrapper" style="background-color: rgba(255, 255, 255, .1)"></div></div>',
+            template: TrivialComponents.roundIcon2LinesColorBubbleTemplate,
             showTrigger: false
         });
 
         $('#customTemplateTagBox2').TrivialTagBox({
             entries: createEntries(),
-            template: '<div class="tr-template-round-icon-2-lines-color-bubble">' +
-            '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-            '  <div class="content-wrapper editor-area"> ' +
-            '    <div class="main-line">{{displayValue}}</div> ' +
-            '    <div class="additional-info"><span class="status-bubble" style="background-color: {{statusColor}}"></span>{{additionalInfo}}</div>' +
-            '  </div>' +
-            '</div>',
+            template: TrivialComponents.roundIcon2LinesColorBubbleTemplate,
             selectedEntryTemplate: '<div class="tr-tagbox-default-wrapper-template" style="background-color: {{statusColor}}; border: 1px solid {{statusColor}}">' +
             '<div class="tr-tagbox-tag-content">' +
             '   <div class="tr-template-round-icon-2-lines-color-bubble">' +
@@ -173,12 +161,11 @@
             '</div>' +
             '<div class="tr-tagbox-tag-remove-button"></div>' +
             '</div>',
-            tagWrapperTemplate: '<div class="tr-tagbox-tag" style="border-color: {{statusColor}}; background-color: {{statusColor}};"><div class="tr-most-inner-tag-wrapper" style="background-color: rgba(255, 255, 255, .1)"></div></div>',
             showTrigger: false
         });
 
         $('#zeroConfigTree').TrivialTree({
-            templates: [$.fn.TrivialComboBox.icon2LinesTemplate, $.fn.TrivialTree.iconSingleLineTemplate],
+            templates: [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate],
             entries: [{
                 displayValue: "First node",
                 additionalInfo: "Some additional info",

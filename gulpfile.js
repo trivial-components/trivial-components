@@ -105,7 +105,7 @@ gulp.task('js-single', function () {
 });
 
 gulp.task('js-bundle', function () {
-    return gulp.src(['js/*.js'])
+    return gulp.src(['js/trivial-core.js', 'js/*.js'])
         .pipe(stripDebug())
         .pipe(concat('trivial-components.js'))
         .pipe(mirror(
@@ -139,6 +139,12 @@ gulp.task('tar', ['prepare-dist'], function () {
         .pipe(tar('trivial-components.tar'))
         .pipe(gzip())
         .pipe(gulp.dest('dist'));
+});
+
+gulp.task('gz-bundle-distro', function () {
+    return gulp.src(['dist/js/bundle/trivial-components.min.js'])
+        .pipe(gzip())
+        .pipe(gulp.dest('dist/js/bundle'));
 });
 
 gulp.task('default', ['prepare-dist', "zip", "tar"]);
