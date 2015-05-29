@@ -112,7 +112,7 @@
             valueProperty: null,
             inputTextProperty: 'displayValue',
             template: defaultTemplate,
-            selectedEntryTemplate: wrapEntryTemplateWithDefaultWrapperTemplate(options.template) || wrapEntryTemplateWithDefaultWrapperTemplate(defaultTemplate),
+            selectedEntryTemplate: options.template ? wrapEntryTemplateWithDefaultWrapperTemplate(options.template) : wrapEntryTemplateWithDefaultWrapperTemplate(defaultTemplate),
             spinnerTemplate: defaultSpinnerTemplate,
             noEntriesTemplate: defaultNoEntriesTemplate,
             entries: null,
@@ -186,7 +186,7 @@
                     if ($editor.text() == "") {
                         console.log("EMPTY editor.");
                         if (selectedTags.length > 0) {
-                            var tagToBeRemoved = selectedTags[selectedTags.length-1];
+                            var tagToBeRemoved = selectedTags[selectedTags.length - 1];
                             removeTag(tagToBeRemoved);
                         }
                     }
