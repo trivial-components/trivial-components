@@ -72,6 +72,10 @@
         '    <div>{{displayValue}}</div> ' +
         '  </div>' +
         '</div>';
+    var defaultTagWrapperTemplate = '<div class="tr-tagbox-default-wrapper-template">' +
+        '<div class="tr-tagbox-tag-content">##entryTemplate##</div>' +
+        '<div class="tr-tagbox-tag-remove-button"></div>' +
+        '</div>';
     var defaultTemplate = icon2LinesTemplate;
     var defaultSpinnerTemplate = '<div class="tr-default-spinner"><div>Fetching data...</div></div>';
     var defaultNoEntriesTemplate = '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>';
@@ -98,13 +102,17 @@
                 .indexOf(e.which) != -1;
     }
 
+    function wrapEntryTemplateWithDefaultWrapperTemplate(entryTemplate) {
+        return defaultTagWrapperTemplate.replace("##entryTemplate##", entryTemplate);
+    }
+
     function TrivialTagBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
             valueProperty: null,
             inputTextProperty: 'displayValue',
             template: defaultTemplate,
-            selectedEntryTemplate: options.template || defaultTemplate,
+            selectedEntryTemplate: wrapEntryTemplateWithDefaultWrapperTemplate(options.template) || wrapEntryTemplateWithDefaultWrapperTemplate(defaultTemplate),
             spinnerTemplate: defaultSpinnerTemplate,
             noEntriesTemplate: defaultNoEntriesTemplate,
             entries: null,
@@ -344,17 +352,14 @@
             var tag = $.extend({}, entry);
             selectedTags.push(tag);
 
-            var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, tag))
-                .addClass("tr-tagbox-entry tr-tagbox-tag-content");
-            var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
-            var $tagRemoveButton = $('<div class="tr-tagbox-tag-button"></div>');
-            $tagRemoveButton.click(function (e) {
+            var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
+            $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
                 removeTag(tag);
                 return false;
             });
-            $tagWrapper.append($selectedEntry).append($tagRemoveButton);
-            $tagWrapper.insertBefore($editor);
 
+            var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
+            $tagWrapper.append($entry).insertBefore($editor);
             tag._trEntryElement = $tagWrapper;
 
             $editor.text("");
