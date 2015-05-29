@@ -65,6 +65,11 @@
         scroll_lock: 145
     };
 
+    function isModifierKey(e) {
+        return [keyCodes.shift, keyCodes.caps_lock, keyCodes.alt, keyCodes.ctrl, keyCodes.left_window_key, keyCodes.right_window_key]
+                .indexOf(e.which) != -1;
+    }
+
     var defaultQueryFunctionFactory = function (entries, matchingOptions) {
         function filterElements(queryString) {
             var visibleEntries = [];
@@ -91,7 +96,8 @@
         defaultSpinnerTemplate: '<div class="tr-default-spinner"><div>Fetching data...</div></div>',
         defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
         keyCodes: keyCodes,
-        defaultQueryFunctionFactory: defaultQueryFunctionFactory
+        defaultQueryFunctionFactory: defaultQueryFunctionFactory,
+        isModifierKey: isModifierKey
     };
     return TrivialComponents;
 })

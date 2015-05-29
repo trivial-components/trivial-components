@@ -31,11 +31,6 @@
 
     var keyCodes = TrivialComponents.keyCodes;
 
-    function isModifierKey(e) {
-        return [keyCodes.shift, keyCodes.caps_lock, keyCodes.alt, keyCodes.ctrl, keyCodes.left_window_key, keyCodes.right_window_key]
-                .indexOf(e.which) != -1;
-    }
-
     function TrivialList(originalInput, options) {
         options = options || {};
         var config = $.extend({
@@ -77,7 +72,7 @@
                 }
             })
             .keydown(function (e) {
-                if (e.which == keyCodes.tab || isModifierKey(e)) {
+                if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                     return; // tab or modifier key was pressed...
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     return; // let the user navigate freely left and right...

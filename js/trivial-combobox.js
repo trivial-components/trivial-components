@@ -31,11 +31,6 @@
 
     var keyCodes = TrivialComponents.keyCodes;
 
-    function isModifierKey(e) {
-        return [keyCodes.shift, keyCodes.caps_lock, keyCodes.alt, keyCodes.ctrl, keyCodes.left_window_key, keyCodes.right_window_key]
-                .indexOf(e.which) != -1;
-    }
-
     function TrivialComboBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
@@ -119,7 +114,7 @@
                 }
             })
             .keydown(function (e) {
-                if (e.which == keyCodes.tab || isModifierKey(e)) {
+                if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                     return; // tab or modifier key was pressed...
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     showEditor();
@@ -156,7 +151,7 @@
                 }
             })
             .keyup(function (e) {
-                if (!isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                     selectEntry(null);
                 } else if (e.which == keyCodes.tab) {
                     showEditor();
