@@ -1,10 +1,10 @@
 <html lang="en">
 
-@@include('head.html', {"title": "TrivialComboBox - Trivial Components"})
+@@include('includes/head.html', {"title": "TrivialComboBox - Trivial Components"})
 
 <body data-spy="scroll" data-target="#navbar">
 
-@@include('nav.html', {"activeNavLink": "showcase"})
+@@include('includes/nav.html', {"activeNavLink": "showcase"})
 
 <div class="page-content">
 
@@ -49,6 +49,15 @@
                     <div class="form-group">
                         <label for="inputTextProperty">inputTextProperty</label>
                         <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="matchingMode">matchingMode</label>
+                        <input id="matchingMode" name="matchingMode"/>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ignoreCase" name="ignoreCase" checked="checked"> ignoreCase
+                        </label>
                     </div>
                     <div class="form-group">
                         <label for="template">template</label>
@@ -98,9 +107,9 @@
                 <h3>Result</h3>
                 <div id="comboBoxWrapper"></div>
                 <h4>Original input value</h4>
-                <code id="originalInputValue">asf</code>
+                <code id="originalInputValue"></code>
                 <h4>Selected entry</h4>
-                <pre id="selectedEntryDisplay" class="prettyprint lang-js">asf</pre>
+                <pre id="selectedEntryDisplay" class="prettyprint lang-js"></pre>
                 <h3>Configuration</h3>
                 <pre id="configDisplay" class="prettyprint lang-js"></pre>
             </div>
@@ -124,7 +133,7 @@
                     <td>Name of the property which should be submitted on form submit. If
                         <code>null</code>, then the content of the text input will serve als value.
                     </td>
-                    <td><code>'displayValue'</code></td>
+                    <td><code>null</code></td>
                 </tr>
                 <tr>
                     <td>allowFreeText</td>
@@ -143,7 +152,7 @@
                 <tr>
                     <td>template</td>
                     <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
-                    <td><code>$.fn.TrivialComboBox.icon2LinesTemplate</code></td>
+                    <td><code>TrivialComponents.icon2LinesTemplate</code></td>
                 </tr>
                 <tr>
                     <td>selectedEntryTemplate</td>
@@ -198,16 +207,29 @@
                     <td>The trigger is the button-like handle on the side of the combobox. If false: no trigger is shown.</td>
                     <td><code>true</code></td>
                 </tr>
+                <tr>
+                    <td>matchingOptions</td>
+                    <td>An object that defines how the entries in the dropdown should be matched and highlighted. Properties are <code>matchingMode</code>, <code>ignoreCase</code> and <code>maxLevenshteinDistance</code>, <br>
+                        Possible values for <code>matchingMode</code>:
+                        <ul>
+                            <li><code>'contains'</code></li>
+                            <li><code>'prefix'</code></li>
+                            <li><code>'prefix-word'</code></li>
+                            <li><code>'prefix-levenshtein'</code> (<i>experimental</i>)</li>
+                            <li><code>'levenshtein'</code> (<i>experimental</i>)</li>
+                        </ul>
+                    </td>
+                    <td><code>{matchingMode: 'contains', ignoreCase: true, maxLevenshteinDistance: 2}</code></td>
+                </tr>
                 </tbody>
             </table>
         </div>
 
-
     </div> <!-- container -->
 </div>
 
-@@include('footer.html')
-@@include('scripts.html')
+@@include('includes/footer.html')
+@@include('includes/scripts.html')
 
 <script>
     $(function () {
@@ -216,23 +238,43 @@
 
         $('#template, #selectedEntryTemplate').each(function() {
             $(this).TrivialComboBox({
-                template: $.fn.TrivialComboBox.singleLineTemplate,
+                template: TrivialComponents.singleLineTemplate,
                 entries: [{
+                    displayValue: "Image with two lines of text",
+                    value: TrivialComponents.image2LinesTemplate
+                },{
+                    displayValue: "Round image with two lines of text and status buble",
+                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate
+                },{
                     displayValue: "Icon with two lines of text",
-                    value: $.fn.TrivialComboBox.icon2LinesTemplate
+                    value: TrivialComponents.icon2LinesTemplate
                 },{
                     displayValue: "Icon with single line of text",
-                    value: $.fn.TrivialComboBox.iconSingleLineTemplate
+                    value: TrivialComponents.iconSingleLineTemplate
                 },{
                     displayValue: "Single line of text",
-                    value: $.fn.TrivialComboBox.singleLineTemplate
+                    value: TrivialComponents.singleLineTemplate
                 }],
                 selectedEntry: {
-                    displayValue: "Icon with two lines of text",
-                    value: $.fn.TrivialComboBox.icon2LinesTemplate
+                    displayValue: "Image with two lines of text",
+                    value: TrivialComponents.icon2LinesTemplate
                 },
                 allowFreeText: false
             })
+        });
+        $('#matchingMode').TrivialComboBox({
+                template: TrivialComponents.singleLineTemplate,
+                entries: [{
+                    displayValue: "contains"
+                },{
+                    displayValue: "prefix"
+                },{
+                    displayValue: "prefix-word"
+                }],
+                selectedEntry: {
+                    displayValue: "contains"
+                },
+                allowFreeText: false
         });
 
         var customQueryFunction = function (queryString, resultCallback) {
@@ -259,6 +301,10 @@
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
                 valueProperty: $('#valueProperty').val(),
                 inputTextProperty: $('#inputTextProperty').val(),
+                matchingOptions: {
+                    matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
+                    ignoreCase: $('#ignoreCase').is(':checked')
+                },
                 template: $('#template').TrivialComboBox().getSelectedEntry().value,
                 selectedEntryTemplate: $('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value,
                 spinnerTemplate: $('#spinnerTemplate').val(),
@@ -299,7 +345,7 @@
     });
 </script>
 
-@@include('ga.html')
+@@include('includes/ga.html')
 
 </body>
 </html>

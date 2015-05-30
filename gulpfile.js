@@ -70,7 +70,7 @@ gulp.task('less', function () {
 });
 
 gulp.task('generate-html', function() {
-    gulp.src(['page-templates/comboBox.html', 'page-templates/index.html'])
+    gulp.src(['page-templates/comboBox.html', 'page-templates/tagBox.html', 'page-templates/index.html'])
         .pipe(fileinclude({
             prefix: '@@',
             basepath: '@file'

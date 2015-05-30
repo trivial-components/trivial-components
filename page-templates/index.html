@@ -1,10 +1,10 @@
 <html lang="en">
 
-@@include('head.html', {"title": "Trivial Components"})
+@@include('includes/head.html', {"title": "Trivial Components"})
 
 <body>
 
-@@include('nav.html', {"activeNavLink": "home"})
+@@include('includes/nav.html', {"activeNavLink": "home"})
 
 <div class="page-content">
     <a id="home" class="anchor"></a>
@@ -98,8 +98,8 @@
     </div>
 </div>
 
-@@include('footer.html')
-@@include('scripts.html')
+@@include('includes/footer.html')
+@@include('includes/scripts.html')
 
 <script>
     $(function () {
@@ -152,7 +152,7 @@
     });
 </script>
 
-@@include('ga.html')
+@@include('includes/ga.html')
 
 </body>
 </html>
