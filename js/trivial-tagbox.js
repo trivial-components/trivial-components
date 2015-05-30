@@ -110,7 +110,7 @@
                     entries = null;
                     closeDropDown();
                     if (config.allowFreeText && $editor.text().trim().length > 0) {
-                        var entry = {};
+                        var entry = {"_isFakeEntry": true};
                         entry[config.inputTextProperty] = $editor.text();
                         selectEntry(entry);
                     }
@@ -152,7 +152,7 @@
                     if (highlightedEntry != null) {
                         selectEntry(highlightedEntry);
                     } else if ($editor.text().trim().length > 0) {
-                        var entry = {};
+                        var entry = {"_isFakeEntry": true};
                         entry[config.inputTextProperty] = $editor.text();
                         $editor.text('');
                         selectEntry(entry);
@@ -467,7 +467,13 @@
 
         this.updateEntries = updateEntries;
         this.getSelectedEntries = function () {
-            return selectedEntries;
+            var selectedEntriesToReturn = [];
+            for (var i=0; i<selectedEntries.length; i++) {
+                var selectedEntryToReturn = jQuery.extend({}, selectedEntries[i]);
+                selectedEntryToReturn._trEntryElement = undefined;
+                selectedEntriesToReturn.push(selectedEntryToReturn);
+            }
+            return selectedEntriesToReturn;
         }
     }
 
