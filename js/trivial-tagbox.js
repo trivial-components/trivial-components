@@ -31,20 +31,13 @@
 
     var keyCodes = TrivialComponents.keyCodes;
 
-    function wrapEntryTemplateWithDefaultWrapperTemplate(entryTemplate) {
-        return ('<div class="tr-tagbox-default-wrapper-template">' +
-        '<div class="tr-tagbox-tag-content">##entryTemplate##</div>' +
-        '<div class="tr-tagbox-tag-remove-button"></div>' +
-        '</div>').replace("##entryTemplate##", entryTemplate);
-    }
-
     function TrivialTagBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
             valueProperty: null,
             inputTextProperty: 'displayValue',
             template: TrivialComponents.image2LinesTemplate,
-            selectedEntryTemplate: options.template ? wrapEntryTemplateWithDefaultWrapperTemplate(options.template) : wrapEntryTemplateWithDefaultWrapperTemplate(TrivialComponents.image2LinesTemplate),
+            selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
             spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
             noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,

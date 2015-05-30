@@ -45,6 +45,13 @@
         '  </div>' +
         '</div>';
 
+    function wrapEntryTemplateWithDefaultTagWrapperTemplate(entryTemplate) {
+        return ('<div class="tr-tagbox-default-wrapper-template">' +
+        '<div class="tr-tagbox-tag-content">##entryTemplate##</div>' +
+        '<div class="tr-tagbox-tag-remove-button"></div>' +
+        '</div>').replace("##entryTemplate##", entryTemplate);
+    }
+
     var keyCodes = {
         backspace: 8,
         tab: 9,
@@ -103,6 +110,7 @@
         singleLineTemplate: singleLineTemplate,
         defaultSpinnerTemplate: '<div class="tr-default-spinner"><div>Fetching data...</div></div>',
         defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
+        wrapEntryTemplateWithDefaultTagWrapperTemplate: wrapEntryTemplateWithDefaultTagWrapperTemplate,
         keyCodes: keyCodes,
         defaultQueryFunctionFactory: defaultQueryFunctionFactory,
         isModifierKey: isModifierKey
