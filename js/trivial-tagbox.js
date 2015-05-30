@@ -34,7 +34,8 @@
     function TrivialTagBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
-            valueProperty: null,
+            valueProperty: 'id',
+            valueSeparator: ',',
             inputTextProperty: 'displayValue',
             template: TrivialComponents.image2LinesTemplate,
             selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
@@ -193,7 +194,7 @@
             }
         });
 
-        for (var i = 0; i<config.selectedEntries.length; i++) {
+        for (var i = 0; i < config.selectedEntries.length; i++) {
             selectEntry(config.selectedEntries[i]);
         }
 
@@ -256,6 +257,8 @@
                 selectedEntries.splice(index, 1);
             }
             tagToBeRemoved._trEntryElement.remove();
+            $originalInput.val(calculateOriginalInputValue());
+            fireChangeEvents();
         }
 
         function query(highlightDirection) {
@@ -286,16 +289,26 @@
             $tagBox.trigger("change");
         }
 
+        function calculateOriginalInputValue() {
+            var value = "";
+            for (var i = 0; i < selectedEntries.length; i++) {
+                var selectedEntry = selectedEntries[i];
+                value += selectedEntry[config.valueProperty];
+                if (i < selectedEntries.length - 1) {
+                    value += config.valueSeparator;
+                }
+            }
+            return value;
+        }
+
         function selectEntry(entry) {
             if (entry == null) {
                 return; // do nothing
             }
-            if (config.valueProperty) {
-                $originalInput.val(entry[config.valueProperty]);
-            } // else the $originalInput IS the $editor
 
             var tag = $.extend({}, entry);
             selectedEntries.push(tag);
+            $originalInput.val(calculateOriginalInputValue());
 
             var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
             $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
@@ -313,12 +326,13 @@
         }
 
         function clearEditorIfNotContainsFreeText() {
-            if (!config.allowFreeText && ($originalInput.val().length > 0 || $editor.text().length > 0)) {
-                $originalInput.val("");
-                $editor.text("");
-                entries = null; // so we will query again when we tagbox is re-focused
-                fireChangeEvents();
-            }
+            // TODO
+            //if (!config.allowFreeText && ($originalInput.val().length > 0 || $editor.text().length > 0)) {
+            //    $originalInput.val("");
+            //    $editor.text("");
+            //    entries = null; // so we will query again when we tagbox is re-focused
+            //    fireChangeEvents();
+            //}
         }
 
         function repositionDropdown() {
