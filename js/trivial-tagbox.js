@@ -63,6 +63,7 @@
         var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
         var autoCompleteTimeoutId = -1;
+        var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
         var $originalInput = $(originalInput);
         var $tagBox = $('<div class="tr-tagbox"/>').insertAfter($originalInput);
@@ -117,11 +118,13 @@
 
                 if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     if ($editor.text() == "") {
-                        console.log("EMPTY editor.");
                         if (selectedEntries.length > 0) {
                             var tagToBeRemoved = selectedEntries[selectedEntries.length - 1];
                             removeTag(tagToBeRemoved);
                         }
+                    } else {
+                        doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
+                        query(1);
                     }
                     return; // do not open the dropdown.
                 }
@@ -278,6 +281,11 @@
             }
         }
 
+        function fireChangeEvents() {
+            $originalInput.trigger("change");
+            $tagBox.trigger("change");
+        }
+
         function selectEntry(entry) {
             if (entry == null) {
                 return; // do nothing
@@ -300,6 +308,8 @@
             tag._trEntryElement = $tagWrapper;
 
             $editor.text("");
+
+            fireChangeEvents();
         }
 
         function clearEditorIfNotContainsFreeText() {
@@ -307,6 +317,7 @@
                 $originalInput.val("");
                 $editor.text("");
                 entries = null; // so we will query again when we tagbox is re-focused
+                fireChangeEvents();
             }
         }
 
@@ -352,20 +363,23 @@
 
         function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
             clearTimeout(autoCompleteTimeoutId);
-            autoCompleteTimeoutId = setTimeout(function () {
-                var oldEditorValue = getNonSelectedEditorValue();
-                var newEditorValue;
-                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                    newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                } else {
-                    newEditorValue = getNonSelectedEditorValue();
-                }
-                $editor.text(newEditorValue);
-                repositionDropdown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
-                setTimeout(function () { // we need this to guarantee that the editor has been updated...
-                    selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
-                }, 0);
-            }, delay || 0);
+            if (!doNoAutoCompleteBecauseBackspaceWasPressed) {
+                autoCompleteTimeoutId = setTimeout(function () {
+                    var oldEditorValue = getNonSelectedEditorValue();
+                    var newEditorValue;
+                    if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
+                        newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
+                    } else {
+                        newEditorValue = getNonSelectedEditorValue();
+                    }
+                    $editor.text(newEditorValue);
+                    repositionDropdown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
+                    setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                        selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
+                    }, 0);
+                }, delay || 0);
+            }
+            doNoAutoCompleteBecauseBackspaceWasPressed = false;
         }
 
         function selectElementContents(el, start, end) {

@@ -321,9 +321,9 @@
         function clearEditorIfNotContainsFreeText() {
             if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
                 $originalInput.val("");
-                fireChangeEvents();
                 $editor.val("");
                 entries = null; // so we will query again when we combobox is re-focused
+                fireChangeEvents();
             }
         }
 
