@@ -23,11 +23,6 @@
                             <input type="checkbox" id="showTrigger" name="showTrigger"> showTrigger
                         </label>
                     </div>
-                    <!--<div class="checkbox">-->
-                        <!--<label>-->
-                            <!--<input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText-->
-                        <!--</label>-->
-                    <!--</div>-->
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="autoComplete" name="autoComplete" checked> autoComplete
@@ -37,6 +32,15 @@
                         <label>
                             <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
                         </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="allowFreeText" name="allowFreeText" checked="checked"> allowFreeText
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="freeTextSeparators">freeTextSeparators</label>
+                        <input class="form-control" id="freeTextSeparators" name="freeTextSeparators" type="text" value="[',', ';']"/>
                     </div>
                     <div class="form-group">
                         <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
@@ -129,15 +133,21 @@
                     </td>
                     <td><code>','</code></td>
                 </tr>
-                <!--<tr>-->
-                    <!--<td>allowFreeText</td>-->
-                    <!--<td>-->
-                        <!--Allow free text input.<br/>-->
-                        <!--If <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. In this case, <code>getSelectedEntry()</code> returns a fake entry with the <code>[inputTextProperty]</code> property set.<br/>-->
-                        <!--If <code>false</code>, the user input will be deleted if he does not select a suggested entry.<br/>-->
-                    <!--</td>-->
-                    <!--<td><code>false</code></td>-->
-                <!--</tr>-->
+                <tr>
+                    <td>allowFreeText</td>
+                    <td>
+                        Allow free text input.<br/>
+                        If <code>true</code>, the user is not forced to select one of the suggested entries but can enter any tags he wants. Fake entries will be generated with the <code>inputTextProperty</code> field set to the value entered by the user.<br/>
+                        If <code>false</code>, the user input will be deleted if he does not select a suggested entry.<br/>
+                    </td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td>freeTextSeparators</td>
+                    <td>Array of separator chars the user may enter to separate free text tags.
+                        <i>Only evaluated if <code>allowFreeText == true</code></i>.</td>
+                    <td><code>[',', ';']</code></td>
+                </tr>
                 <tr>
                     <td>inputTextProperty</td>
                     <td>Name of the property which will be filled into the input field when the user selects an entry. This property is also used for auto-completion.</td>
@@ -286,7 +296,8 @@
             });
             var config = {
                 showTrigger: $('#showTrigger').is(':checked'),
-//                allowFreeText: $('#allowFreeText').is(':checked'), TODO
+                allowFreeText: $('#allowFreeText').is(':checked'),
+                freeTextSeparators: eval($('#freeTextSeparators').val()),
                 autoComplete: $('#autoComplete').is(':checked'),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
