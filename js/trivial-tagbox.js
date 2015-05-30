@@ -41,6 +41,7 @@
             spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
             noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,
+            selectedEntries: [],
             emptyEntry: {},
             queryFunction: null, // defined below...
             autoComplete: true,
@@ -48,7 +49,7 @@
             allowFreeText: false,
             showTrigger: true,
             matchingOptions: {
-                matchingMode: 'prefix-word',
+                matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
             }
@@ -58,7 +59,7 @@
 
         var isDropDownOpen = false;
         var entries = config.entries;
-        var selectedTags = [];
+        var selectedEntries = [];
         var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
         var autoCompleteTimeoutId = -1;
@@ -117,8 +118,8 @@
                 if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     if ($editor.text() == "") {
                         console.log("EMPTY editor.");
-                        if (selectedTags.length > 0) {
-                            var tagToBeRemoved = selectedTags[selectedTags.length - 1];
+                        if (selectedEntries.length > 0) {
+                            var tagToBeRemoved = selectedEntries[selectedEntries.length - 1];
                             removeTag(tagToBeRemoved);
                         }
                     }
@@ -189,6 +190,10 @@
             }
         });
 
+        for (var i = 0; i<config.selectedEntries.length; i++) {
+            selectEntry(config.selectedEntries[i]);
+        }
+
         function updateDropDownEntryElements(entries) {
             $dropDown.empty();
             if (entries.length > 0) {
@@ -243,9 +248,9 @@
         }
 
         function removeTag(tagToBeRemoved) {
-            var index = selectedTags.indexOf(tagToBeRemoved);
+            var index = selectedEntries.indexOf(tagToBeRemoved);
             if (index > -1) {
-                selectedTags.splice(index, 1);
+                selectedEntries.splice(index, 1);
             }
             tagToBeRemoved._trEntryElement.remove();
         }
@@ -282,7 +287,7 @@
             } // else the $originalInput IS the $editor
 
             var tag = $.extend({}, entry);
-            selectedTags.push(tag);
+            selectedEntries.push(tag);
 
             var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
             $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
@@ -412,7 +417,7 @@
 
         this.updateEntries = updateEntries;
         this.getSelectedEntries = function () {
-            return selectedTags;
+            return selectedEntries;
         }
     }
 

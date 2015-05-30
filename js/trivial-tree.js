@@ -97,8 +97,14 @@
             entries: null,
             selectedEntry: undefined,
             expandedAttributeName: 'expanded',
-            queryFunction: defaultQueryFunctionFactory(options.entries || [])
+            matchingOptions: {
+                matchingMode: 'contains',
+                ignoreCase: true,
+                maxLevenshteinDistance: 2
+            }
         }, options);
+
+        config.queryFunction = config.queryFunction || TrivialComponents.defaultQueryFunctionFactory(config.entries || [], config.matchingOptions);
 
         var entries = config.entries;
         var selectedEntry;

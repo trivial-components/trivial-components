@@ -42,7 +42,7 @@
             selectedEntry: undefined,
             queryFunction: null, // defined below...
             matchingOptions: {
-                matchingMode: 'prefix-word',
+                matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
             }

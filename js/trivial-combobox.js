@@ -49,7 +49,7 @@
             allowFreeText: false,
             showTrigger: true,
             matchingOptions: {
-                matchingMode: 'prefix-word',
+                matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
             }
