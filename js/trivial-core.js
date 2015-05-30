@@ -14,18 +14,25 @@
     }
 }(function () {
 
-    var icon2LinesTemplate = '<div class="tr-template-icon-2-lines">' +
+    var image2LinesTemplate = '<div class="tr-template-image-2-lines">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
-    var roundIcon2LinesColorBubbleTemplate = '<div class="tr-template-round-icon-2-lines-color-bubble">' +
+    var roundImage2LinesColorBubbleTemplate = '<div class="tr-template-round-image-2-lines-color-bubble">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{#statusColor}}<span class="status-bubble" style="background-color: {{statusColor}}"></span>{{/statusColor}}{{additionalInfo}}</div>' +
+        '  </div>' +
+        '</div>';
+    var icon2LinesTemplate = '<div class="tr-template-icon-2-lines">' +
+        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
+        '  <div class="content-wrapper editor-area"> ' +
+        '    <div class="main-line">{{displayValue}}</div> ' +
+        '    <div class="additional-info">{{additionalInfo}}</div>' +
         '  </div>' +
         '</div>';
     var iconSingleLineTemplate = '<div class="tr-template-icon-single-line">' +
@@ -89,8 +96,9 @@
     };
 
     var TrivialComponents = {
+        image2LinesTemplate: image2LinesTemplate,
+        roundImage2LinesColorBubbleTemplate: roundImage2LinesColorBubbleTemplate,
         icon2LinesTemplate: icon2LinesTemplate,
-        roundIcon2LinesColorBubbleTemplate: roundIcon2LinesColorBubbleTemplate,
         iconSingleLineTemplate: iconSingleLineTemplate,
         singleLineTemplate: singleLineTemplate,
         defaultSpinnerTemplate: '<div class="tr-default-spinner"><div>Fetching data...</div></div>',

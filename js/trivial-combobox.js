@@ -36,8 +36,8 @@
         var config = $.extend({
             valueProperty: null,
             inputTextProperty: 'displayValue',
-            template: TrivialComponents.icon2LinesTemplate,
-            selectedEntryTemplate: options.template || TrivialComponents.icon2LinesTemplate,
+            template: TrivialComponents.image2LinesTemplate,
+            selectedEntryTemplate: options.template || TrivialComponents.image2LinesTemplate,
             spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
             noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,

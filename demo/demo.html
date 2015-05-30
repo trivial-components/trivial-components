@@ -45,27 +45,31 @@
 </div>
 
 
-
 <h4>Trivial List</h4>
-<div style="width: 300px; height: 400px">
+
+<div style="width: 300px; height: 350px">
     <input id="zeroConfigList">
 </div>
 
 <h4>Trivial Tagbox</h4>
+
 <div style="width: 600px;">
     <input id="zeroConfigTagBox">
 </div>
 <h5>Custom Template</h5>
+
 <div style="width: 600px;">
     <input id="customTemplateTagBox1">
 </div>
 <h5>Custom Tag Wrapper Template</h5>
+
 <div style="width: 600px;">
     <input id="customTemplateTagBox2">
 </div>
 
 <h4>Trivial Tree</h4>
-<div style="width: 500px;">
+
+<div style="width: 350px; height: 370px">
     <input id="zeroConfigTree">
 </div>
 
@@ -111,7 +115,7 @@
             },
             queryFunction: function (queryString, resultCallback) {
                 setTimeout(function () {
-                    resultCallback(createEntries().filter(function(entry) {
+                    resultCallback(createEntries().filter(function (entry) {
                         return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
                     }));
                 }, 500);
@@ -142,16 +146,16 @@
 
         $('#customTemplateTagBox1').TrivialTagBox({
             entries: createEntries(),
-            template: TrivialComponents.roundIcon2LinesColorBubbleTemplate,
+            template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             showTrigger: false
         });
 
         $('#customTemplateTagBox2').TrivialTagBox({
             entries: createEntries(),
-            template: TrivialComponents.roundIcon2LinesColorBubbleTemplate,
+            template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntryTemplate: '<div class="tr-tagbox-default-wrapper-template" style="background-color: {{statusColor}}; border: 1px solid {{statusColor}}">' +
             '<div class="tr-tagbox-tag-content">' +
-            '   <div class="tr-template-round-icon-2-lines-color-bubble">' +
+            '   <div class="tr-template-round-image-2-lines-color-bubble">' +
             '     <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
             '     <div class="content-wrapper editor-area"> ' +
             '       <div class="main-line">{{displayValue}}</div> ' +
@@ -165,83 +169,116 @@
         });
 
         $('#zeroConfigTree').TrivialTree({
-            templates: [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate],
+            templates: [TrivialComponents.icon2LinesTemplate],
             entries: [{
-                displayValue: "First node",
-                additionalInfo: "Some additional info",
-                imageUrl: randomImageUrl(),
+                displayValue: "Mail",
+                additionalInfo: "21 unread",
+                imageUrl: "img/mail.png",
                 isLeaf: false,
                 expanded: true,
                 children: [{
-                    displayValue: "1st node child 1",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
+                    displayValue: "Inbox",
+                    additionalInfo: "21 unread",
+                    imageUrl: "img/arrow-down.png",
                     isLeaf: true
                 }, {
-                    displayValue: "1st node child 3",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
+                    displayValue: "Drafts",
+                    additionalInfo: "5",
+                    imageUrl: "img/compose.png",
                     isLeaf: true
                 }, {
-                    displayValue: "1st node child 3",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
+                    displayValue: "Sent",
+                    additionalInfo: "529 sent, 1 sending",
+                    imageUrl: "img/arrow-up.png",
+                    isLeaf: true
+                }, {
+                    displayValue: "Tagged",
+                    additionalInfo: "9 unread",
+                    imageUrl: "img/shop.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "blah",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl() ,
+                        displayValue: "Important",
+                        additionalInfo: "5 unread",
+                        imageUrl: "img/shop.png",
                         isLeaf: true
-                    }, {
-                        displayValue: "blub",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl()   ,
+
+                    },{
+                        displayValue: "Private",
+                        additionalInfo: "4 unread",
+                        imageUrl: "img/shop.png",
                         isLeaf: true
-                    }, {
-                        displayValue: "oh yeah",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl()   ,
-                        isLeaf: true
+
                     }]
+                }, {
+                    displayValue: "Folders",
+                    additionalInfo: "22 unread",
+                    imageUrl: "img/folder.png",
+                    isLeaf: false,
+                    children: [{
+                        displayValue: "Project X",
+                        additionalInfo: "4 unread",
+                        imageUrl: "img/folder.png",
+                        isLeaf: true
+
+                    },{
+                        displayValue: "Bills",
+                        additionalInfo: "18 unread",
+                        imageUrl: "img/folder.png",
+                        isLeaf: true
+
+                    }]
+                }, {
+                    displayValue: "Trash",
+                    additionalInfo: "7293 kB",
+                    imageUrl: "img/recycle.png",
+                    isLeaf: true
                 }]
-            }, {
-                displayValue: "BBB",
-                additionalInfo: "Some additional info",
-                imageUrl: randomImageUrl(),
+            },{
+                displayValue: "Notes",
+                imageUrl: "img/booklet.png",
                 isLeaf: false,
                 children: [{
-                    displayValue: "BBB 1",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
-                    isLeaf: true
-                }, {
-                    displayValue: "BBB 2",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
-                    isLeaf: true
-                }, {
-                    displayValue: "BBB 3",
-                    additionalInfo: "Some internal info",
-                    imageUrl: randomImageUrl(),
+                    displayValue: "Product Management 2.0",
+                    imageUrl: "img/folder.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "BBB 3 1",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl(),
+                        displayValue: "Brainstorming",
+                        additionalInfo: "Yesterday",
+                        imageUrl: "img/document.png",
                         isLeaf: true
-                    }, {
-                        displayValue: "BBB 3 2",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl(),
+                    },{
+                        displayValue: "Presentation Notes",
+                        additionalInfo: "5 minutes ago",
+                        imageUrl: "img/document.png",
                         isLeaf: true
-                    }, {
-                        displayValue: "BBB 3 3",
-                        additionalInfo: "Some internal info",
-                        imageUrl: randomImageUrl(),
+                    },{
+                        displayValue: "Concept",
+                        additionalInfo: "2015-05-28",
+                        imageUrl: "img/document.png",
                         isLeaf: true
                     }]
+                }, {
+                    displayValue: "Marketing",
+                    imageUrl: "img/folder.png",
+                    isLeaf: false,
+                    children: [{
+                        displayValue: "Promotions 2015",
+                        additionalInfo: "2015-01-23",
+                        imageUrl: "img/document.png",
+                        isLeaf: true
+                    }]
+
                 }]
+            },{
+                displayValue: "Calendar",
+                imageUrl: "img/calendar.png",
+                isLeaf: true
+            },{
+                displayValue: "Contacts",
+                imageUrl: "img/contacts.png",
+                isLeaf: true
             }]
+
         });
     });
 </script>

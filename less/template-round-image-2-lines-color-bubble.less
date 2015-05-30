@@ -1,4 +1,4 @@
-.tr-template-icon-2-lines {
+.tr-template-round-image-2-lines-color-bubble {
   display: flex;
   align-items: stretch;
   padding: 1px;
@@ -14,17 +14,18 @@
   }
 
   .img-wrapper {
-    flex: 0 0 24px;
-    background: transparent none no-repeat center;
-    background-size: contain;
-    border: none;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    background-position: center;
+    background-size: cover;
+    border-radius: 15px;
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .2);
   }
 
   .content-wrapper {
     flex: 1 0 auto;
-    height: 30px;
     margin-left: 5px;
-    padding-top: 2px;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -38,6 +39,15 @@
       color: #333;
       margin-bottom: -1px;
       font-weight: 200;
+
+      .status-bubble {
+        display: inline-block;
+        min-width: 10px;
+        min-height: 10px;
+        border-radius: 5px;
+        margin-right: 4px;
+        background-color: grey;
+      }
     }
   }
 }

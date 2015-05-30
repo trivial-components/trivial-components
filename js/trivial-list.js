@@ -35,7 +35,7 @@
         options = options || {};
         var config = $.extend({
             valueProperty: null,
-            template: TrivialComponents.icon2LinesTemplate,
+            template: TrivialComponents.image2LinesTemplate,
             spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
             noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,
