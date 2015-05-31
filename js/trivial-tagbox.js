@@ -152,7 +152,7 @@
                 } else if (isDropDownOpen && e.which == keyCodes.enter) {
                     if (highlightedEntry != null) {
                         selectEntry(highlightedEntry);
-                    } else if ($editor.text().trim().length > 0) {
+                    } else if (config.allowFreeText && $editor.text().trim().length > 0) {
                         var entry = $.extend({}, config.fakeEntryValues);
                         entry[config.inputTextProperty] = $editor.text();
                         $editor.text('');
