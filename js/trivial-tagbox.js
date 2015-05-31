@@ -49,6 +49,7 @@
             autoCompleteDelay: 0,
             allowFreeText: true,
             freeTextSeparators: [',', ';'],
+            fakeEntryValues: {_isFakeEntry: true},
             showTrigger: true,
             matchingOptions: {
                 matchingMode: 'contains',
@@ -110,7 +111,7 @@
                     entries = null;
                     closeDropDown();
                     if (config.allowFreeText && $editor.text().trim().length > 0) {
-                        var entry = {"_isFakeEntry": true};
+                        var entry = config.fakeEntryValues;
                         entry[config.inputTextProperty] = $editor.text();
                         selectEntry(entry);
                     }
@@ -152,7 +153,7 @@
                     if (highlightedEntry != null) {
                         selectEntry(highlightedEntry);
                     } else if ($editor.text().trim().length > 0) {
-                        var entry = {"_isFakeEntry": true};
+                        var entry = config.fakeEntryValues;
                         entry[config.inputTextProperty] = $editor.text();
                         $editor.text('');
                         selectEntry(entry);

@@ -22,7 +22,7 @@
         '  </div>' +
         '</div>';
     var roundImage2LinesColorBubbleTemplate = '<div class="tr-template-round-image-2-lines-color-bubble">' +
-        '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
+        '  {{#imageUrl}}<div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>{{/imageUrl}}' +
         '  <div class="content-wrapper editor-area"> ' +
         '    <div class="main-line">{{displayValue}}</div> ' +
         '    <div class="additional-info">{{#statusColor}}<span class="status-bubble" style="background-color: {{statusColor}}"></span>{{/statusColor}}{{additionalInfo}}</div>' +
