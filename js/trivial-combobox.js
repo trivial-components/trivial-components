@@ -436,7 +436,7 @@
             if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
                 return null;
             } else if (selectedEntry == null && config.allowFreeText) {
-                var fakeEntry = config.fakeEntryValues;
+                var fakeEntry = $.extend({}, config.fakeEntryValues);
                 fakeEntry[config.inputTextProperty] = $editor.val();
                 return fakeEntry;
             } else {

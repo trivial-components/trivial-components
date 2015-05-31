@@ -111,7 +111,7 @@
                     entries = null;
                     closeDropDown();
                     if (config.allowFreeText && $editor.text().trim().length > 0) {
-                        var entry = config.fakeEntryValues;
+                        var entry = $.extend({}, config.fakeEntryValues);
                         entry[config.inputTextProperty] = $editor.text();
                         selectEntry(entry);
                     }
@@ -153,7 +153,7 @@
                     if (highlightedEntry != null) {
                         selectEntry(highlightedEntry);
                     } else if ($editor.text().trim().length > 0) {
-                        var entry = config.fakeEntryValues;
+                        var entry = $.extend({}, config.fakeEntryValues);
                         entry[config.inputTextProperty] = $editor.text();
                         $editor.text('');
                         selectEntry(entry);
