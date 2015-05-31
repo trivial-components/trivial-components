@@ -25,7 +25,7 @@
                     </div>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
+                            <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
                         </label>
                     </div>
                     <div class="checkbox">
@@ -33,14 +33,20 @@
                             <input type="checkbox" id="autoComplete" name="autoComplete" checked> autoComplete
                         </label>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
-                        </label>
-                    </div>
                     <div class="form-group">
                         <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
                         <input class="form-control" id="autoCompleteDelay" name="autoCompleteDelay" type="number" value="0"/>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="fakeEntryValues">fakeEntryValues</label>
+                        <textarea class="form-control code showcase-textarea" id="fakeEntryValues" name="fakeEntryValues">{
+    "_isFakeEntry": true
+}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="valueProperty">valueProperty</label>
@@ -296,6 +302,7 @@
             var config = {
                 showTrigger: $('#showTrigger').is(':checked'),
                 allowFreeText: $('#allowFreeText').is(':checked'),
+                fakeEntryValues: JSON.parse($('#fakeEntryValues').val()),
                 autoComplete: $('#autoComplete').is(':checked'),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
