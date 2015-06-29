@@ -140,7 +140,7 @@
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (entries != null) {
-                            highlightNextEntry(direction);
+                            selectNextEntry(direction);
                             e.preventDefault(); // some browsers move the caret to the beginning on up key
                         } else {
                             query(direction);
@@ -263,7 +263,7 @@
                     highlightTextMatches(entries);
 
                     if (typeof highlightDirection != 'undefined') {
-                        highlightNextEntry(highlightDirection);
+                        selectNextEntry(highlightDirection);
                     }
                 } else {
                     setHighlightedEntry(null);
@@ -326,8 +326,11 @@
 
                 var entry = findEntryById(entryId);
                 if (entry) {
-                    entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper').addClass("tr-selected-entry");
+                    var $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
+                    $entryWrapper.addClass("tr-selected-entry");
+                    $tree.minimallyScrollTo($entryWrapper);
                 }
+
 
                 fireChangeEvents();
             }
@@ -337,27 +340,28 @@
                 $componentWrapper.trigger("change");
             }
 
-            function highlightNextEntry(direction) {
-                var newHighlightedEntry = getNextHighlightableEntry(direction);
-                if (newHighlightedEntry != null) {
-                    setHighlightedEntry(newHighlightedEntry);
+            function selectNextEntry(direction) {
+                var nextVisibleEntry = getNextVisibleEntry(direction);
+                if (nextVisibleEntry != null) {
+                    selectEntry(nextVisibleEntry[config.idProperty]);
                 }
             }
 
-            function getNextHighlightableEntry(direction) {
-                var visibleEntriesAsList = findEntries(function(entry) {return entry._trEntryElement.is(':visible')});
-                var newHighlightedElementIndex;
+            function getNextVisibleEntry(direction) {
+                var newSelectedElementIndex;
+                var selectedEntry = getSelectedEntry();
+                var visibleEntriesAsList = findEntries(function(entry) {return entry._trEntryElement.is(':visible') || entry === selectedEntry});
                 if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
                     return null;
-                } else if (highlightedEntry == null && direction > 0) {
-                    newHighlightedElementIndex = -1 + direction;
-                } else if (highlightedEntry == null && direction < 0) {
-                    newHighlightedElementIndex = visibleEntriesAsList.length + direction;
+                } else if (selectedEntry == null && direction > 0) {
+                    newSelectedElementIndex = -1 + direction;
+                } else if (selectedEntry == null && direction < 0) {
+                    newSelectedElementIndex = visibleEntriesAsList.length + direction;
                 } else {
-                    var currentHighlightedElementIndex = visibleEntriesAsList.indexOf(highlightedEntry);
-                    newHighlightedElementIndex = (currentHighlightedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
+                    var currentSelectedElementIndex = visibleEntriesAsList.indexOf(selectedEntry);
+                    newSelectedElementIndex = (currentSelectedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
                 }
-                return visibleEntriesAsList[newHighlightedElementIndex];
+                return visibleEntriesAsList[newSelectedElementIndex];
             }
 
             function highlightTextMatches(entries) {
@@ -371,13 +375,15 @@
                 }
             }
 
+            function getSelectedEntry() {
+                return selectedEntryId ? findEntryById(selectedEntryId) : null;
+            }
+
             this.$ = $componentWrapper;
             $componentWrapper[0].trivialTree = this;
 
             this.updateEntries = updateEntries;
-            this.getSelectedEntry = function() {
-                return selectedEntryId ? findEntryById(selectedEntryId) : null;
-            }
+            this.getSelectedEntry = getSelectedEntry();
         }
 
         $.fn.trivialtree = function (options) {
