@@ -133,7 +133,19 @@
                 .keydown(function (e) {
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
-                    } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                    } else if (e.which == keyCodes.left_arrow) {
+                        if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor[0].selectionStart === 0) {
+                            // if the user is at the beginning of line and presses the left arrow key, collapse the currently selected node
+                            var selectedEntry = getSelectedEntry();
+                            selectedEntry && selectedEntry._trEntryElement.removeClass('expanded');
+                        }
+                        return; // let the user navigate freely left and right...
+                    } else if (e.which == keyCodes.right_arrow) {
+                        if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor.val().length === $editor[0].selectionStart) {
+                            // if the user is at the end of line and presses the right arrow key, expand the currently selected node
+                            var selectedEntry = getSelectedEntry();
+                            selectedEntry && selectedEntry._trEntryElement.addClass('expanded');
+                        }
                         return; // let the user navigate freely left and right...
                     }
 
