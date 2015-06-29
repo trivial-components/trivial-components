@@ -172,114 +172,115 @@
         $('#zeroConfigTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: [{
-                displayValue: "Mail",
-                additionalInfo: "21 unread",
+                id: 1, displayValue: "Mail",
+                additionalInfo: "43 unread",
                 imageUrl: "img/mail.png",
                 isLeaf: false,
                 expanded: true,
                 children: [{
-                    displayValue: "Inbox",
+                    id: 11, displayValue: "Inbox",
                     additionalInfo: "21 unread",
                     imageUrl: "img/arrow-down.png",
                     isLeaf: true
                 }, {
-                    displayValue: "Drafts",
+                    id: 12, displayValue: "Drafts",
                     additionalInfo: "5",
                     imageUrl: "img/compose.png",
                     isLeaf: true
                 }, {
-                    displayValue: "Sent",
+                    id: 13, displayValue: "Sent",
                     additionalInfo: "529 sent, 1 sending",
                     imageUrl: "img/arrow-up.png",
                     isLeaf: true
                 }, {
-                    displayValue: "Tagged",
+                    id: 14, displayValue: "Tagged",
                     additionalInfo: "9 unread",
                     imageUrl: "img/shop.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "Important",
+                        id: 141, displayValue: "Important",
                         additionalInfo: "5 unread",
                         imageUrl: "img/shop.png",
                         isLeaf: true
 
-                    },{
-                        displayValue: "Private",
+                    }, {
+                        id: 142, displayValue: "Private",
                         additionalInfo: "4 unread",
                         imageUrl: "img/shop.png",
                         isLeaf: true
 
                     }]
                 }, {
-                    displayValue: "Folders",
+                    id: 15, displayValue: "Folders",
                     additionalInfo: "22 unread",
                     imageUrl: "img/folder.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "Project X",
+                        id: 151, displayValue: "Project X",
                         additionalInfo: "4 unread",
                         imageUrl: "img/folder.png",
                         isLeaf: true
 
-                    },{
-                        displayValue: "Bills",
+                    }, {
+                        id: 152, displayValue: "Bills",
                         additionalInfo: "18 unread",
                         imageUrl: "img/folder.png",
                         isLeaf: true
 
                     }]
                 }, {
-                    displayValue: "Trash",
+                    id: 16, displayValue: "Trash",
                     additionalInfo: "7293 kB",
                     imageUrl: "img/recycle.png",
                     isLeaf: true
                 }]
-            },{
-                displayValue: "Notes",
+            }, {
+                id: 2, displayValue: "Notes",
                 imageUrl: "img/booklet.png",
                 isLeaf: false,
                 children: [{
-                    displayValue: "Product Management 2.0",
+                    id: 21, displayValue: "Product Management 2.0",
                     imageUrl: "img/folder.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "Brainstorming",
+                        id: 211, displayValue: "Brainstorming",
                         additionalInfo: "Yesterday",
                         imageUrl: "img/document.png",
                         isLeaf: true
-                    },{
-                        displayValue: "Presentation Notes",
+                    }, {
+                        id: 212, displayValue: "Presentation Notes",
                         additionalInfo: "5 minutes ago",
                         imageUrl: "img/document.png",
                         isLeaf: true
-                    },{
-                        displayValue: "Concept",
+                    }, {
+                        id: 213, displayValue: "Concept",
                         additionalInfo: "2015-05-28",
                         imageUrl: "img/document.png",
                         isLeaf: true
                     }]
                 }, {
-                    displayValue: "Marketing",
+                    id: 22, displayValue: "Marketing",
                     imageUrl: "img/folder.png",
                     isLeaf: false,
                     children: [{
-                        displayValue: "Promotions 2015",
+                        id: 221, displayValue: "Promotions 2015",
                         additionalInfo: "2015-01-23",
                         imageUrl: "img/document.png",
                         isLeaf: true
                     }]
 
                 }]
-            },{
-                displayValue: "Calendar",
+            }, {
+                id: 3, displayValue: "Calendar",
                 imageUrl: "img/calendar.png",
-                isLeaf: true
-            },{
-                displayValue: "Contacts",
+                isLeaf: true,
+                statusColor: "#ee4400",
+                additionalInfo: "2 overdue"
+            }, {
+                id: 4, displayValue: "Contacts",
                 imageUrl: "img/contacts.png",
                 isLeaf: true
             }]
-
         });
     });
 </script>

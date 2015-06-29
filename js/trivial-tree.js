@@ -293,14 +293,14 @@
 
             function findEntries(filterFunction) {
                 function findEntriesInSubTree(node, listOfFoundEntries) {
+                    if (filterFunction.call(this, node)) {
+                        listOfFoundEntries.push(node);
+                    }
                     if (node.children) {
                         for (var i = 0; i < node.children.length; i++) {
                             var child = node.children[i];
                             findEntriesInSubTree(child, listOfFoundEntries);
                         }
-                    }
-                    if (filterFunction.call(this, node)) {
-                        listOfFoundEntries.push(node);
                     }
                 }
 
@@ -345,18 +345,19 @@
             }
 
             function getNextHighlightableEntry(direction) {
+                var visibleEntriesAsList = findEntries(function(entry) {return entry._trEntryElement.is(':visible')});
                 var newHighlightedElementIndex;
-                if (entries == null || entries.length == 0) {
+                if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
                     return null;
                 } else if (highlightedEntry == null && direction > 0) {
                     newHighlightedElementIndex = -1 + direction;
                 } else if (highlightedEntry == null && direction < 0) {
-                    newHighlightedElementIndex = entries.length + direction;
+                    newHighlightedElementIndex = visibleEntriesAsList.length + direction;
                 } else {
-                    var currentHighlightedElementIndex = entries.indexOf(highlightedEntry);
-                    newHighlightedElementIndex = (currentHighlightedElementIndex + entries.length + direction) % entries.length;
+                    var currentHighlightedElementIndex = visibleEntriesAsList.indexOf(highlightedEntry);
+                    newHighlightedElementIndex = (currentHighlightedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
                 }
-                return entries[newHighlightedElementIndex];
+                return visibleEntriesAsList[newHighlightedElementIndex];
             }
 
             function highlightTextMatches(entries) {
