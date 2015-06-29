@@ -17,6 +17,7 @@ var postcss      = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var csswring = require('csswring');
 var fileinclude = require('gulp-file-include');
+var gzip = require('gulp-gzip');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css']);
@@ -76,6 +77,12 @@ gulp.task('generate-html', function() {
             basepath: '@file'
         }))
         .pipe(gulp.dest('./'));
+});
+
+gulp.task('gz-large-files', function () {
+    return gulp.src(['lib/**/*.js'])
+        .pipe(gzip())
+        .pipe(gulp.dest('dist/js/bundle'));
 });
 
 gulp.task('watch', function() {
