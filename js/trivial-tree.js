@@ -150,6 +150,8 @@
                         $editor.select();
                     } else if (e.which == keyCodes.escape) {
                         setHighlightedEntry(null);
+                        $editor.val("");
+                        query();
                     } else {
                         query(1);
                     }
