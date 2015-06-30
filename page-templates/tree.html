@@ -31,8 +31,16 @@
                         <input class="form-control" id="idProperty" name="idProperty" value="id"/>
                     </div>
                     <div class="form-group">
-                        <label for="inputTextProperty">inputTextProperty</label>
-                        <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
+                        <label for="valueProperty">valueProperty</label>
+                        <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="childrenProperty">childrenProperty</label>
+                        <input class="form-control" id="childrenProperty" name="childrenProperty" value="children"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="expandedProperty">expandedProperty</label>
+                        <input class="form-control" id="expandedProperty" name="expandedProperty" value="expanded"/>
                     </div>
                     <div class="form-group">
                         <label for="matchingMode">matchingMode</label>
@@ -65,8 +73,8 @@
                 </textarea>
                     </div>
                     <div class="form-group">
-                        <label for="selectedEntry">selectedEntry</label>
-                        <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry"></textarea>
+                        <label for="selectedEntryId">selectedEntryId</label>
+                        <input class="form-control" id="selectedEntryId" name="selectedEntryId" value="2"/>
                     </div>
                 </form>
             </div>
@@ -290,8 +298,10 @@
             });
             var config = {
                 idProperty: $('#idProperty').val(),
+                valueProperty: $('#valueProperty').val(),
+                childrenProperty: $('#childrenProperty').val(),
+                expandedProperty: $('#expandedProperty').val(),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
-                inputTextProperty: $('#inputTextProperty').val(),
                 matchingOptions: {
                     matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
                     ignoreCase: $('#ignoreCase').is(':checked')
@@ -301,7 +311,7 @@
                 }),
                 spinnerTemplate: $('#spinnerTemplate').val(),
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
-                selectedEntry: JSON.parse($('#selectedEntry').val()),
+                selectedEntryId: $('#selectedEntryId').val(),
                 entries: JSON.parse($('#entries').val())
             };
             $('#configDisplay').removeClass("prettyprinted")
