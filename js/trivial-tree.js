@@ -53,8 +53,13 @@
                         }
                     }
                 }
-                var matchesOrHasMatchingChild = entryMatches(entry, queryString) || entryProxy[childrenPropertyName].length > 0;
-                return matchesOrHasMatchingChild ? entryProxy : null;
+                var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
+                var matchesItself = entryMatches(entry, queryString);
+                if (matchesItself && !hasMatchingChildren) {
+                    // still make it expandable!
+                    entryProxy[childrenPropertyName] = entry[childrenPropertyName];
+                }
+                return matchesItself || hasMatchingChildren ? entryProxy : null;
             }
 
             function entryMatches(entry, queryString) {
@@ -94,7 +99,7 @@
                 valueProperty: options.idProperty || 'id',
                 idProperty: 'id',
                 childrenProperty: "children",
-                // TODO lazyChildrenFlagProperty: "hasLazyChildren",
+                lazyChildrenFlagProperty: "hasLazyChildren",
                 expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
@@ -204,7 +209,8 @@
                 $tree.empty();
 
                 function createEntryElement(entry, $parentElement, depth) {
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-'+ !!(entry.isLeaf) +'"></div>')
+                    var isLeaf = entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
+                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-'+ isLeaf +'"></div>')
                         .appendTo($parentElement);
                     var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                         .appendTo($outerEntryWrapper);
@@ -263,6 +269,8 @@
             function setNodeExpanded(node, expanded) {
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
+
+                //if (!node.children)
             }
 
             function updateEntries(newEntries, highlightDirection) {
