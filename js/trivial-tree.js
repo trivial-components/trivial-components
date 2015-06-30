@@ -339,7 +339,7 @@
 
             function findEntryById(id) {
                 return findEntries(function (entry) {
-                    return entry[config.idProperty] === id
+                    return entry[config.idProperty] == id
                 })[0];
             }
 
