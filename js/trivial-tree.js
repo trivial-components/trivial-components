@@ -31,7 +31,7 @@
 
         var keyCodes = TrivialComponents.keyCodes;
 
-        var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName) {
+        var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName, expandedPropertyName) {
 
             function createProxy(delegate) {
                 var proxyConstructor = function(){};
@@ -42,14 +42,14 @@
             function findMatchingEntriesAndTheirAncestors(entry, queryString) {
                 var entryProxy = createProxy(entry);
                 entryProxy[childrenPropertyName] = [];
-                entryProxy.expanded = false;
+                entryProxy[expandedPropertyName] = false;
                 if (entry[childrenPropertyName]) {
                     for (var i = 0; i < entry[childrenPropertyName].length; i++) {
                         var child = entry[childrenPropertyName][i];
                         var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString);
                         if (childProxy){
                             entryProxy[childrenPropertyName].push(childProxy);
-                            entryProxy.expanded = true;
+                            entryProxy[expandedPropertyName] = true;
                         }
                     }
                 }
@@ -109,7 +109,7 @@
             };
             var config = $.extend(defaultOptions, options);
 
-            config.queryFunction = config.queryFunction || defaultQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty);
+            config.queryFunction = config.queryFunction || defaultQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
 
             var entries = config.entries;
             var selectedEntryId;
