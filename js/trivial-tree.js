@@ -31,7 +31,7 @@
 
         var keyCodes = TrivialComponents.keyCodes;
 
-        var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions) {
+        var defaultQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName) {
 
             function createProxy(delegate) {
                 var proxyConstructor = function(){};
@@ -41,19 +41,19 @@
 
             function findMatchingEntriesAndTheirAncestors(entry, queryString) {
                 var entryProxy = createProxy(entry);
-                entryProxy.children = [];
+                entryProxy[childrenPropertyName] = [];
                 entryProxy.expanded = false;
-                if (entry.children) {
-                    for (var i = 0; i < entry.children.length; i++) {
-                        var child = entry.children[i];
+                if (entry[childrenPropertyName]) {
+                    for (var i = 0; i < entry[childrenPropertyName].length; i++) {
+                        var child = entry[childrenPropertyName][i];
                         var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString);
                         if (childProxy){
-                            entryProxy.children.push(childProxy);
+                            entryProxy[childrenPropertyName].push(childProxy);
                             entryProxy.expanded = true;
                         }
                     }
                 }
-                var matchesOrHasMatchingChild = entryMatches(entry, queryString) || entryProxy.children.length > 0;
+                var matchesOrHasMatchingChild = entryMatches(entry, queryString) || entryProxy[childrenPropertyName].length > 0;
                 return matchesOrHasMatchingChild ? entryProxy : null;
             }
 
@@ -90,24 +90,26 @@
              */
 
             options = options || {};
-            var config = $.extend({
-                valueProperty: null,
+            var defaultOptions = {
+                valueProperty: options.idProperty || 'id',
+                idProperty: 'id',
+                childrenProperty: "children",
+                // TODO lazyChildrenFlagProperty: "hasLazyChildren",
+                expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
-                idProperty: 'id',
                 selectedEntryId: undefined,
-                // TODO childrenProperty
-                expandedAttributeName: 'expanded',
                 matchingOptions: {
                     matchingMode: 'contains',
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
                 }
-            }, options);
+            };
+            var config = $.extend(defaultOptions, options);
 
-            config.queryFunction = config.queryFunction || defaultQueryFunctionFactory(config.entries || [], config.matchingOptions);
+            config.queryFunction = config.queryFunction || defaultQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty);
 
             var entries = config.entries;
             var selectedEntryId;
@@ -137,14 +139,14 @@
                         if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor[0].selectionStart === 0) {
                             // if the user is at the beginning of line and presses the left arrow key, collapse the currently selected node
                             var selectedEntry = getSelectedEntry();
-                            selectedEntry && selectedEntry._trEntryElement.removeClass('expanded');
+                            selectedEntry && setNodeExpanded(selectedEntry, false);
                         }
                         return; // let the user navigate freely left and right...
                     } else if (e.which == keyCodes.right_arrow) {
                         if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor.val().length === $editor[0].selectionStart) {
                             // if the user is at the end of line and presses the right arrow key, expand the currently selected node
                             var selectedEntry = getSelectedEntry();
-                            selectedEntry && selectedEntry._trEntryElement.addClass('expanded');
+                            selectedEntry && setNodeExpanded(selectedEntry, true);
                         }
                         return; // let the user navigate freely left and right...
                     }
@@ -154,18 +156,14 @@
                         if (entries != null) {
                             selectNextEntry(direction);
                             e.preventDefault(); // some browsers move the caret to the beginning on up key
-                        } else {
-                            query(direction);
                         }
                     } else if (e.which == keyCodes.enter) {
-                        selectEntry(highlightedEntry[config.idProperty]);
-                        $editor.select();
+                        // ignore
                     } else if (e.which == keyCodes.escape) {
-                        setHighlightedEntry(null);
                         $editor.val("");
                         query();
                     } else {
-                        query(1);
+                        query();
                     }
                 })
                 .keyup(function (e) {
@@ -200,7 +198,7 @@
                 updateTreeEntryElements(entries);
             }
 
-            selectEntry(config.selectedEntryId || null);
+            selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
 
             function updateTreeEntryElements(entries) {
                 $tree.empty();
@@ -222,7 +220,7 @@
                     $entry
                         .mousedown(function () {
                             blurCausedByClickInsideComponent = true;
-                            selectEntry(entry[config.idProperty]);
+                            selectEntry(entry);
                             $editor.select();
                         })
                         .mouseup(function () {
@@ -240,19 +238,15 @@
                             setHighlightedEntry(entry);
                         });
 
-                    if (entry.children && entry.children.length > 0) {
+                    if (entry[config.childrenProperty] && entry[config.childrenProperty].length > 0) {
                         var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
                             .appendTo($outerEntryWrapper);
-                        var toggleExpansion = function () {
-                            $childrenWrapper.slideToggle(100);
-                            $outerEntryWrapper.toggleClass("expanded");
-                        };
-                        if (entry[config.expandedAttributeName]) {
-                            $outerEntryWrapper.addClass("expanded");
-                        }
-                        $expander.click(toggleExpansion);
-                        for (var i = 0; i<entry.children.length; i++) {
-                            createEntryElement(entry.children[i], $childrenWrapper, depth + 1);
+                        setNodeExpanded(entry, entry[config.expandedProperty]);
+                        $expander.click(function () {
+                            setNodeExpanded(entry, !entry[config.expandedProperty]);
+                        });
+                        for (var i = 0; i<entry[config.childrenProperty].length; i++) {
+                            createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
                         }
                     }
                 }
@@ -264,6 +258,11 @@
                 } else {
                     $tree.append(config.noEntriesTemplate);
                 }
+            }
+
+            function setNodeExpanded(node, expanded) {
+                node[config.expandedProperty] = !!expanded;
+                node._trEntryElement.toggleClass("expanded", !!expanded);
             }
 
             function updateEntries(newEntries, highlightDirection) {
@@ -279,6 +278,12 @@
                     }
                 } else {
                     setHighlightedEntry(null);
+                }
+
+                var selectedEntry = findEntryById(selectedEntryId);
+                if (selectedEntry) {
+                    // selected entry in filtered tree? then mark it as selected!
+                    markSelectedEntry(selectedEntry);
                 }
             }
 
@@ -308,9 +313,9 @@
                     if (filterFunction.call(this, node)) {
                         listOfFoundEntries.push(node);
                     }
-                    if (node.children) {
-                        for (var i = 0; i < node.children.length; i++) {
-                            var child = node.children[i];
+                    if (node[config.childrenProperty]) {
+                        for (var i = 0; i < node[config.childrenProperty].length; i++) {
+                            var child = node[config.childrenProperty][i];
                             findEntriesInSubTree(child, listOfFoundEntries);
                         }
                     }
@@ -330,22 +335,22 @@
                 })[0];
             }
 
-            function selectEntry(entryId) {
-                selectedEntryId = entryId;
-                $originalInput.val(entryId);
+            function selectEntry(entry) {
+                selectedEntryId = entry ?  entry[config.idProperty] : null;
+                $originalInput.val(entry ? entry[config.valueProperty] : null);
 
+                markSelectedEntry(entry);
+                fireChangeEvents();
+            }
+
+            function markSelectedEntry(entry) {
                 $tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
-
-                var entry = findEntryById(entryId);
                 if (entry) {
                     var $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entryWrapper.addClass("tr-selected-entry");
                     $tree.minimallyScrollTo($entryWrapper);
                 }
-
-
-                fireChangeEvents();
-            }
+            };
 
             function fireChangeEvents() {
                 $originalInput.trigger("change");
@@ -355,7 +360,7 @@
             function selectNextEntry(direction) {
                 var nextVisibleEntry = getNextVisibleEntry(direction);
                 if (nextVisibleEntry != null) {
-                    selectEntry(nextVisibleEntry[config.idProperty]);
+                    selectEntry(nextVisibleEntry);
                 }
             }
 
@@ -381,8 +386,8 @@
                     var entry = entries[i];
                     var $entryElement = entry._trEntryElement.find('.tr-tree-entry');
                     $entryElement.trivialHighlight($editor.val());
-                    if (entry.children) {
-                        highlightTextMatches(entry.children);
+                    if (entry[config.childrenProperty]) {
+                        highlightTextMatches(entry[config.childrenProperty]);
                     }
                 }
             }
