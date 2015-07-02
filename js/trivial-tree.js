@@ -22,10 +22,10 @@
         } else if (typeof exports === 'object') {
             // Node/CommonJS
             module.exports = factory(require('trivial-core'), require('jquery'), require('mustache'));
-        } else if (jQuery && !jQuery.fn.trivialtree) {
+        } else if (jQuery && !jQuery.fn.Trivialtree) {
             // Define using browser globals otherwise
             // Prevent multiple instantiations if the script is loaded twice
-            factory(TrivialComponents, jQuery, Mustache);
+            window.TrivialTree = factory(TrivialComponents, jQuery, Mustache);
         }
     }(function (TrivialComponents, $, Mustache) {
 
