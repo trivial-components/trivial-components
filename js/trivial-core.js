@@ -84,7 +84,7 @@
                 .indexOf(e.which) != -1;
     }
 
-    var defaultQueryFunctionFactory = function (entries, matchingOptions) {
+    var defaultListQueryFunctionFactory = function (entries, matchingOptions) {
         function filterElements(queryString) {
             var visibleEntries = [];
             for (var i = 0; i < entries.length; i++) {
@@ -102,7 +102,62 @@
         }
     };
 
-    var TrivialComponents = {
+        var defaultTreeQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName, expandedPropertyName) {
+
+            function createProxy(delegate) {
+                var proxyConstructor = function(){};
+                proxyConstructor.prototype = delegate;
+                return new proxyConstructor();
+            }
+
+            function findMatchingEntriesAndTheirAncestors(entry, queryString) {
+                var entryProxy = createProxy(entry);
+                entryProxy[childrenPropertyName] = [];
+                entryProxy[expandedPropertyName] = false;
+                if (entry[childrenPropertyName]) {
+                    for (var i = 0; i < entry[childrenPropertyName].length; i++) {
+                        var child = entry[childrenPropertyName][i];
+                        var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString);
+                        if (childProxy){
+                            entryProxy[childrenPropertyName].push(childProxy);
+                            entryProxy[expandedPropertyName] = true;
+                        }
+                    }
+                }
+                var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
+                var matchesItself = entryMatches(entry, queryString);
+                if (matchesItself && !hasMatchingChildren) {
+                    // still make it expandable!
+                    entryProxy[childrenPropertyName] = entry[childrenPropertyName];
+                }
+                return matchesItself || hasMatchingChildren ? entryProxy : null;
+            }
+
+            function entryMatches(entry, queryString) {
+                var $entryElement = entry._trEntryElement;
+                return !queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
+            }
+
+
+            return function (queryString, resultCallback) {
+                if (!queryString) {
+                    resultCallback(topLevelEntries);
+                } else {
+                    var matchingEntries = [];
+                    for (var i = 0; i < topLevelEntries.length; i++) {
+                        var topLevelEntry = topLevelEntries[i];
+                        var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString);
+                        if (entryProxy) {
+                            matchingEntries.push(entryProxy);
+                        }
+                    }
+                    resultCallback(matchingEntries);
+                }
+            }
+        };
+
+
+        var TrivialComponents = {
         image2LinesTemplate: image2LinesTemplate,
         roundImage2LinesColorBubbleTemplate: roundImage2LinesColorBubbleTemplate,
         icon2LinesTemplate: icon2LinesTemplate,
@@ -112,7 +167,8 @@
         defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
         wrapEntryTemplateWithDefaultTagWrapperTemplate: wrapEntryTemplateWithDefaultTagWrapperTemplate,
         keyCodes: keyCodes,
-        defaultQueryFunctionFactory: defaultQueryFunctionFactory,
+        defaultListQueryFunctionFactory: defaultListQueryFunctionFactory,
+        defaultTreeQueryFunctionFactory: defaultTreeQueryFunctionFactory,
         isModifierKey: isModifierKey
     };
     return TrivialComponents;

@@ -18,11 +18,11 @@
 
     if (typeof define === 'function' && define.amd) {
         // Define as an AMD module if possible
-        define('trivial-combobox', ['trivial-core', 'jquery', 'mustache'], factory);
+        define('trivial-treecombobox', ['trivial-core', 'jquery', 'mustache'], factory);
     } else if (typeof exports === 'object') {
         // Node/CommonJS
         module.exports = factory(require('trivial-core'), require('jquery'), require('mustache'));
-    } else if (jQuery && !jQuery.fn.trivialcombobox) {
+    } else if (jQuery && !jQuery.fn.trivialtreecombobox) {
         // Define using browser globals otherwise
         // Prevent multiple instantiations if the script is loaded twice
         factory(TrivialComponents, jQuery, Mustache);
@@ -31,16 +31,12 @@
 
     var keyCodes = TrivialComponents.keyCodes;
 
-    function TrivialComboBox(originalInput, options) {
+    function TrivialTreeComboBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
-            valueProperty: null,
             inputTextProperty: 'displayValue',
             template: TrivialComponents.image2LinesTemplate,
-            selectedEntryTemplate: options.template || TrivialComponents.image2LinesTemplate,
-            spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
-            noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
-            entries: null,
+            selectedEntryTemplate: options.template || TrivialComponents.icon2LinesTemplate,
             selectedEntry: undefined,
             emptyEntry: {},
             queryFunction: null, // defined below...
@@ -53,24 +49,34 @@
                 matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
-            }
+            },
+            valueProperty: options.idProperty || 'id',
+            idProperty: 'id',
+            childrenProperty: "children",
+            lazyChildrenFlagProperty: "hasLazyChildren",
+            expandedProperty: 'expanded',
+            templates: [TrivialComponents.iconSingleLineTemplate],
+            spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
+            noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+            entries: null,
+            selectedEntryId: undefined
         }, options);
 
-        config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
+        config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
 
+        var treeBox;
         var isDropDownOpen = false;
         var entries = config.entries;
-        var selectedEntry = null;
-        var highlightedEntry = null;
         var blurCausedByClickInsideComponent = false;
         var autoCompleteTimeoutId = -1;
         var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+        var selectedEntry = null;
 
         var $originalInput = $(originalInput);
-        var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
-        var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
+        var $treeComboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
+        var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($treeComboBox);
         if (config.showTrigger) {
-            var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
+            var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($treeComboBox);
             $trigger.mousedown(function () {
                 if (isDropDownOpen) {
                     showEditor();
@@ -95,20 +101,21 @@
         } else {
             $editor = $originalInput;
         }
+        var $spinners = $();
 
-        $editor.prependTo($comboBox).addClass("tr-combobox-edit-input")
+        $editor.prependTo($treeComboBox).addClass("tr-combobox-edit-input")
             .focus(function () {
                 if (blurCausedByClickInsideComponent) {
                     // do nothing!
                 } else {
-                    $comboBox.addClass('focus');
+                    $treeComboBox.addClass('focus');
                 }
             })
             .blur(function () {
                 if (blurCausedByClickInsideComponent) {
                     $editor.focus();
                 } else {
-                    $comboBox.removeClass('focus');
+                    $treeComboBox.removeClass('focus');
                     clearEditorIfNotContainsFreeText();
                     hideEditorIfNotContainsFreeText();
                     closeDropDown();
@@ -131,13 +138,14 @@
                     openDropDown();
                     var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (entries != null) {
-                        highlightNextEntry(direction);
+                        treeBox.highlightNextEntry(direction);
+                        autoCompleteIfPossible(config.autoCompleteDelay);
                         e.preventDefault(); // some browsers move the caret to the beginning on up key
                     } else {
                         query(direction);
                     }
                 } else if (isDropDownOpen && e.which == keyCodes.enter) {
-                    selectEntry(highlightedEntry);
+                    selectEntry(treeBox.getHighlightedEntry());
                     closeDropDown();
                     hideEditorIfNotContainsFreeText();
                     $editor.select();
@@ -152,8 +160,8 @@
                 }
             })
             .keyup(function (e) {
-                if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
-                    selectEntry(null);
+                if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== treeBox.getSelectedEntry()[config.inputTextProperty]) {
+                    //selectEntry(null);
                 } else if (e.which == keyCodes.tab) {
                     showEditor();
                 }
@@ -165,7 +173,7 @@
                 }
             });
 
-        $comboBox.add($dropDown).mousedown(function () {
+        $treeComboBox.add($dropDown).mousedown(function () {
             if ($editor.is(":focus")) {
                 blurCausedByClickInsideComponent = true;
             }
@@ -181,9 +189,16 @@
             }
         });
 
-        if (entries) { // if config.entries was set...
-            updateDropDownEntryElements(entries);
-        }
+        treeBox = $dropDown.TrivialTreeBox(config);
+        treeBox.$.appendTo($dropDown);
+        treeBox.$.change(function() {
+            var selectedTreeBoxEntry = treeBox.getSelectedEntry();
+            if (selectedTreeBoxEntry) {
+                selectEntry(selectedTreeBoxEntry);
+                treeBox.selectEntry(null);
+                closeDropDown();
+            }
+        });
 
         selectEntry(config.selectedEntry || null);
 
@@ -196,67 +211,16 @@
             }
         });
 
-        function updateDropDownEntryElements(entries) {
-            $dropDown.empty();
-            if (entries.length > 0) {
-                for (var i = 0; i < entries.length; i++) {
-                    var entry = entries[i];
-                    var html = Mustache.render(config.template, entry);
-                    var $entry = $(html).addClass("tr-combobox-entry filterable-item").appendTo($dropDown);
-                    entry._trEntryElement = $entry;
-                    (function (entry) {
-                        $entry
-                            .mousedown(function () {
-                                blurCausedByClickInsideComponent = true;
-                                selectEntry(entry);
-                                $editor.select();
-                                hideEditorIfNotContainsFreeText();
-                                closeDropDown();
-                            })
-                            .mouseup(function () {
-                                if (blurCausedByClickInsideComponent) {
-                                    $editor.focus();
-                                    blurCausedByClickInsideComponent = false;
-                                }
-                            }).mouseout(function () {
-                                if (blurCausedByClickInsideComponent) {
-                                    $editor.focus();
-                                    blurCausedByClickInsideComponent = false;
-                                }
-                            })
-                            .mouseover(function () {
-                                setHighlightedEntry(entry);
-                            });
-                    })(entry);
-                }
-            } else {
-                $dropDown.append(config.noEntriesTemplate);
-            }
-        }
-
-        function updateEntries(newEntries, highlightDirection) {
-            highlightedEntry = null;
-            entries = newEntries;
-            updateDropDownEntryElements(entries);
-
-            if (entries.length > 0) {
-                highlightTextMatches();
-
-                if (typeof highlightDirection != 'undefined') {
-                    highlightNextEntry(highlightDirection);
-                }
-            } else {
-                setHighlightedEntry(null);
-            }
-        }
-
         function query(highlightDirection) {
-            $dropDown.append(config.spinnerTemplate);
+            var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
+            $spinners = $spinners.add($spinner);
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(function () {
                 config.queryFunction($editor.val(), function (newEntries) {
                     updateEntries(newEntries, highlightDirection);
+                    treeBox.highlightTextMatches(getNonSelectedEditorValue());
+
                     if (isDropDownOpen) {
                         openDropDown(); // only for repositioning!
                     }
@@ -264,18 +228,9 @@
             });
         }
 
-        function setHighlightedEntry(entry) {
-            highlightedEntry = entry;
-            $dropDown.find('.tr-combobox-entry').removeClass('tr-highlighted-entry');
-            if (entry != null) {
-                entry._trEntryElement.addClass('tr-highlighted-entry');
-                $dropDown.minimallyScrollTo(entry._trEntryElement);
-            }
-        }
-
         function fireChangeEvents() {
             $originalInput.trigger("change");
-            $comboBox.trigger("change");
+            $treeComboBox.trigger("change");
         }
 
         function selectEntry(entry) {
@@ -283,7 +238,6 @@
                 if (config.valueProperty) {
                     $originalInput.val("");
                 } // else the $originalInput IS the $editor
-                selectedEntry = null;
                 var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
                     .addClass("tr-combobox-entry")
                     .addClass("empty");
@@ -292,16 +246,17 @@
                 if (config.valueProperty) {
                     $originalInput.val(entry[config.valueProperty]);
                 } // else the $originalInput IS the $editor
-                selectedEntry = entry;
-                var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, selectedEntry))
+                var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, entry))
                     .addClass("tr-combobox-entry");
                 $selectedEntryWrapper.empty().append($selectedEntry);
-                $editor.val(selectedEntry[config.inputTextProperty]);
+                $editor.val(entry[config.inputTextProperty]);
             }
+            selectedEntry = entry;
             fireChangeEvents();
         }
 
         function isEntrySelected() {
+            var selectedEntry = treeBox.getSelectedEntry();
             return selectedEntry != null && selectedEntry !== config.emptyEntry;
         }
 
@@ -323,7 +278,7 @@
             if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
                 $originalInput.val("");
                 $editor.val("");
-                entries = null; // so we will query again when we combobox is re-focused
+                entries = null; // so we will query again when we treecombobox is re-focused
                 fireChangeEvents();
             }
         }
@@ -339,20 +294,20 @@
         }
 
         function openDropDown() {
-            $comboBox.addClass("open");
+            $treeComboBox.addClass("open");
             $dropDown
                 .show()
                 .position({
                     my: "left top",
                     at: "left bottom",
-                    of: $comboBox,
+                    of: $treeComboBox,
                     collision: "flip",
                     using: function (calculatedPosition, info) {
                         if (info.vertical === "top") {
-                            $comboBox.removeClass("dropdown-flipped");
+                            $treeComboBox.removeClass("dropdown-flipped");
                             $(this).removeClass("flipped");
                         } else {
-                            $comboBox.addClass("dropdown-flipped");
+                            $treeComboBox.addClass("dropdown-flipped");
                             $(this).addClass("flipped");
                         }
                         $(this).css({
@@ -361,12 +316,12 @@
                         });
                     }
                 })
-                .width($comboBox.width());
+                .width($treeComboBox.width());
             isDropDownOpen = true;
         }
 
         function closeDropDown() {
-            $comboBox.removeClass("open");
+            $treeComboBox.removeClass("open");
             $dropDown.hide();
             isDropDownOpen = false;
         }
@@ -375,9 +330,12 @@
             return $editor.val().substring(0, $editor[0].selectionStart);
         }
 
-        function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
+        function autoCompleteIfPossible(delay) {
             clearTimeout(autoCompleteTimeoutId);
-            if (!doNoAutoCompleteBecauseBackspaceWasPressed) {
+
+            var highlightedEntry = treeBox.getHighlightedEntry();
+            if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
+                var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
                 autoCompleteTimeoutId = setTimeout(function () {
                     var oldEditorValue = getNonSelectedEditorValue();
                     var newEditorValue;
@@ -392,88 +350,54 @@
                     }, 0);
                 }, delay || 0);
             }
+
             doNoAutoCompleteBecauseBackspaceWasPressed = false;
         }
 
-        function highlightNextEntry(direction) {
-            var newHighlightedEntry = getNextHighlightableEntry(direction);
-            if (newHighlightedEntry != null) {
-                setHighlightedEntry(newHighlightedEntry);
-                if (config.autoComplete) {
-                    autoCompleteIfPossible(newHighlightedEntry[config.inputTextProperty], config.autoCompleteDelay);
-                }
-            }
-        }
+        this.$ = $treeComboBox;
+        $treeComboBox[0].trivialTreeComboBox = this;
 
-        function getNextHighlightableEntry(direction) {
-            var newHighlightedElementIndex;
-            if (entries == null || entries.length == 0) {
-                return null;
-            } else if (highlightedEntry == null && direction > 0) {
-                newHighlightedElementIndex = -1 + direction;
-            } else if (highlightedEntry == null && direction < 0) {
-                newHighlightedElementIndex = entries.length + direction;
-            } else {
-                var currentHighlightedElementIndex = entries.indexOf(highlightedEntry);
-                newHighlightedElementIndex = (currentHighlightedElementIndex + entries.length + direction) % entries.length;
-            }
-            return entries[newHighlightedElementIndex];
+        function updateEntries(newEntries, highlightDirection) {
+            entries = newEntries;
+            $spinners.remove();
+            $spinners = $();
+            treeBox.updateEntries(newEntries, highlightDirection);
+            autoCompleteIfPossible(config.autoCompleteDelay);
         }
-
-        function highlightTextMatches() {
-            var nonSelectedEditorValue = getNonSelectedEditorValue();
-            for (var i = 0; i < entries.length; i++) {
-                var $entryElement = entries[i]._trEntryElement;
-                $entryElement.trivialHighlight(nonSelectedEditorValue, config.matchingOptions);
-            }
-        }
-
-        this.$ = $comboBox;
-        $comboBox[0].trivialComboBox = this;
 
         this.updateEntries = updateEntries;
         this.getSelectedEntry = function () {
-            if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
-                return null;
-            } else if (selectedEntry == null && config.allowFreeText) {
-                var fakeEntry = $.extend({}, config.fakeEntryValues);
-                fakeEntry[config.inputTextProperty] = $editor.val();
-                return fakeEntry;
-            } else {
-                var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
-                selectedEntryToReturn._trEntryElement = undefined;
-                return selectedEntryToReturn;
-            }
+            return selectedEntry;
         }
     }
 
-    $.fn.trivialcombobox = function (options) {
-        var $comboBoxes = [];
+    $.fn.trivialtreecombobox = function (options) {
+        var $treeComboBoxes = [];
         this.each(function () {
-            var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
-            if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
-                $comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox.$);
+            var existingTreeComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
+            if (existingTreeComboBoxWrapper.length > 0 && existingTreeComboBoxWrapper[0].trivialTreeComboBox) {
+                $treeComboBoxes.push(existingTreeComboBoxWrapper[0].trivialTreeComboBox.$);
             } else {
-                var comboBox = new TrivialComboBox(this, options);
-                $comboBoxes.push(comboBox.$);
+                var treeComboBox = new TrivialTreeComboBox(this, options);
+                $treeComboBoxes.push(treeComboBox.$);
             }
         });
-        return $($comboBoxes);
+        return $($treeComboBoxes);
     };
-    $.fn.TrivialComboBox = function (options) {
-        var comboBoxes = [];
+    $.fn.TrivialTreeComboBox = function (options) {
+        var treeComboBoxes = [];
         this.each(function () {
-            var existingComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
-            if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0].trivialComboBox) {
-                comboBoxes.push(existingComboBoxWrapper[0].trivialComboBox);
+            var existingTreeComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
+            if (existingTreeComboBoxWrapper.length > 0 && existingTreeComboBoxWrapper[0].trivialTreeComboBox) {
+                treeComboBoxes.push(existingTreeComboBoxWrapper[0].trivialTreeComboBox);
             } else {
-                var comboBox = new TrivialComboBox(this, options);
-                comboBoxes.push(comboBox);
+                var treeComboBox = new TrivialTreeComboBox(this, options);
+                treeComboBoxes.push(treeComboBox);
             }
         });
-        return comboBoxes.length == 1 ? comboBoxes[0] : comboBoxes;
+        return treeComboBoxes.length == 1 ? treeComboBoxes[0] : treeComboBoxes;
     };
 
-    return $.fn.TrivialComboBox;
+    return $.fn.TrivialTreeComboBox;
 })
 );

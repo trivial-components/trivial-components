@@ -48,7 +48,7 @@
             }
         }, options);
 
-        config.queryFunction = config.queryFunction || TrivialComponents.defaultQueryFunctionFactory(config.entries || [], config.matchingOptions);
+        config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
 
         var entries = config.entries;
         var selectedEntry;

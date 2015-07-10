@@ -16,6 +16,7 @@
     <script src="../js/trivial-list.js"></script>
     <script src="../js/trivial-tagbox.js"></script>
     <script src="../js/trivial-treebox.js"></script>
+    <script src="../js/trivial-treecombobox.js"></script>
     <script src="../js/trivial-tree.js"></script>
     <script src="demo.js"></script>
 </head>
@@ -71,8 +72,10 @@
 <h4>Trivial TreeBox</h4>
 <div id="treeBoxContainer"></div>
 
-<h4>Trivial Tree</h4>
+<h4>Trivial TreeComboBox</h4>
+<input id="treeComboBox">
 
+<h4>Trivial Tree</h4>
 <div style="width: 350px; height: 370px">
     <input id="zeroConfigTree">
 </div>
@@ -174,6 +177,11 @@
         });
 
         $('#treeBoxContainer').TrivialTreeBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes()
+        });
+
+        $('#treeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes()
         });
