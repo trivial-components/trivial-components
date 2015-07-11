@@ -146,8 +146,7 @@
         });
 
         $('#zeroConfigList').TrivialList({
-            entries: createEntries(),
-            selectedEntryId:
+            entries: createEntries()
         });
 
         $('#zeroConfigTagBox').TrivialTagBox({
@@ -192,7 +191,8 @@
 
         $('#zeroConfigTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
-            entries: createDemoTreeNodes()
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 2
         });
     });
 </script>
