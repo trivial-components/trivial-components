@@ -74,7 +74,7 @@
                     var $entry = $(html).addClass("tr-tree-entry filterable-item")
                         .appendTo($entryAndExpanderWrapper);
                     entry._trEntryElement = $outerEntryWrapper;
-                    $entry
+                    $entryAndExpanderWrapper
                         .mousedown(function (e) {
                             $componentWrapper.trigger("mousedown", e);
                             selectEntry(entry);
@@ -90,7 +90,9 @@
                         var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
                             .appendTo($outerEntryWrapper);
                         setNodeExpanded(entry, entry[config.expandedProperty]);
-                        $expander.click(function () {
+                        $expander.mousedown(function(e) {
+                            return false;
+                        }).click(function (e) {
                             setNodeExpanded(entry, !entry[config.expandedProperty]);
                         });
                         for (var i = 0; i < entry[config.childrenProperty].length; i++) {

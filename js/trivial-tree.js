@@ -105,7 +105,7 @@
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (entries != null) {
                             selectNextEntry(direction);
-                            e.preventDefault(); // some browsers move the caret to the beginning on up key
+                            return false; // some browsers move the caret to the beginning on up key
                         }
                     } else if (e.which == keyCodes.enter) {
                         // ignore
@@ -150,16 +150,20 @@
 
             selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
 
+            function isLeaf(entry) {
+                return entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
+            }
+
             function updateTreeEntryElements(entries) {
                 $tree.empty();
 
                 function createEntryElement(entry, $parentElement, depth) {
-                    var isLeaf = entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-'+ isLeaf +'"></div>')
+                    var leaf = isLeaf(entry);
+                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-' + leaf + '"></div>')
                         .appendTo($parentElement);
                     var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                         .appendTo($outerEntryWrapper);
-                    for (var k = 0; k<depth; k++) {
+                    for (var k = 0; k < depth; k++) {
                         $entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
                     }
                     var $expander = $('<div class="tr-tree-expander"></div>')
@@ -168,13 +172,12 @@
                     var $entry = $(html).addClass("tr-tree-entry filterable-item")
                         .appendTo($entryAndExpanderWrapper);
                     entry._trEntryElement = $outerEntryWrapper;
-                    $entry
+                    $entryAndExpanderWrapper
                         .mousedown(function () {
                             blurCausedByClickInsideComponent = true;
                             selectEntry(entry);
                             $editor.select();
-                        })
-                        .mouseup(function () {
+                        }).mouseup(function () {
                             if (blurCausedByClickInsideComponent) {
                                 $editor.focus();
                                 blurCausedByClickInsideComponent = false;
@@ -184,8 +187,7 @@
                                 $editor.focus();
                                 blurCausedByClickInsideComponent = false;
                             }
-                        })
-                        .mouseover(function () {
+                        }).mouseover(function () {
                             setHighlightedEntry(entry);
                         });
 
@@ -193,10 +195,12 @@
                         var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
                             .appendTo($outerEntryWrapper);
                         setNodeExpanded(entry, entry[config.expandedProperty]);
-                        $expander.click(function () {
+                        $expander.mousedown(function(e) {
+                            return false;
+                        }).click(function () {
                             setNodeExpanded(entry, !entry[config.expandedProperty]);
                         });
-                        for (var i = 0; i<entry[config.childrenProperty].length; i++) {
+                        for (var i = 0; i < entry[config.childrenProperty].length; i++) {
                             createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
                         }
                     }

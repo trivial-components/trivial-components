@@ -127,7 +127,6 @@
                             var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                             console.log(changedExpandedState);
                             if (changedExpandedState) {
-                                e.preventDefault();
                                 return false;
                             }
                         }
@@ -146,7 +145,7 @@
                         if (entries != null) {
                             treeBox.highlightNextEntry(direction);
                             autoCompleteIfPossible(config.autoCompleteDelay);
-                            e.preventDefault(); // some browsers move the caret to the beginning on up key
+                            return false; // some browsers move the caret to the beginning on up key
                         } else {
                             query(direction);
                         }
