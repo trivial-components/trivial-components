@@ -21,6 +21,11 @@
                 <h3>Options</h3>
 
                 <form id="config">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
+                        </label>
+                    </div>
                     <div class="form-group">
                         <label for="valueProperty">valueProperty</label>
                         <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
@@ -236,14 +241,6 @@
             allowFreeText: false
         });
 
-        var customQueryFunction = function (queryString, resultCallback) {
-            setTimeout(function () {
-                resultCallback(createEntries(100).filter(function (entry) {
-                    return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
-                }));
-            }, 1000);
-        };
-
         function reInitReadMore() {
             $('.prettyprint').readmore({
                 collapsedHeight: 500,
@@ -258,22 +255,31 @@
             $treeOriginalInput.on('change', function () {
                 $('#originalInputValue').text($(this).val());
             });
+
+            var entries = JSON.parse($('#entries').val());
+            var matchingOptions = {
+                matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
+                ignoreCase: $('#ignoreCase').is(':checked')
+            };
+
+            var defaultQueryFunction = TrivialComponents.defaultTreeQueryFunctionFactory(entries, matchingOptions, $('#childrenProperty').val(), $('#expandedProperty'));
+            var customQueryFunction = function (queryString, resultCallback) {
+                setTimeout(function() {defaultQueryFunction(queryString, resultCallback)}, 1000);
+            };
+
             var config = {
                 valueProperty: $('#valueProperty').val(),
                 childrenProperty: $('#childrenProperty').val(),
                 expandedProperty: $('#expandedProperty').val(),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
-                matchingOptions: {
-                    matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
-                    ignoreCase: $('#ignoreCase').is(':checked')
-                },
+                matchingOptions: matchingOptions,
                 templates: $('#templates').TrivialTagBox().getSelectedEntries().map(function (v) {
                     return v.value
                 }),
                 spinnerTemplate: $('#spinnerTemplate').val(),
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
                 selectedEntryId: $('#selectedEntryId').val(),
-                entries: JSON.parse($('#entries').val())
+                entries: entries
             };
             $('#configDisplay').removeClass("prettyprinted")
                     .text("$('#tree').TrivialTree(" + JSON.stringify(config, function (key, value) {

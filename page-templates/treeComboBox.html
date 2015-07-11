@@ -368,6 +368,18 @@
             $treeComboBoxOriginalInput.on('change', function() {
                 $('#originalInputValue').text($(this).val());
             });
+
+            var entries = JSON.parse($('#entries').val());
+            var matchingOptions = {
+                matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
+                ignoreCase: $('#ignoreCase').is(':checked')
+            };
+
+            var defaultQueryFunction = TrivialComponents.defaultTreeQueryFunctionFactory(entries, matchingOptions, $('#childrenProperty').val(), $('#expandedProperty'));
+            var customQueryFunction = function (queryString, resultCallback) {
+                setTimeout(function() {defaultQueryFunction(queryString, resultCallback)}, 1000);
+            };
+
             var config = {
                 showTrigger: $('#showTrigger').is(':checked'),
                 allowFreeText: $('#allowFreeText').is(':checked'),
@@ -391,7 +403,7 @@
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
                 selectedEntry: JSON.parse($('#selectedEntry').val()),
                 emptyEntry: JSON.parse($('#emptyEntry').val()),
-                entries: JSON.parse($('#entries').val())
+                entries: entries
             };
             $('#configDisplay').removeClass("prettyprinted")
                     .text("$('#treecombobox').TrivialTreeComboBox(" + JSON.stringify(config, function(key, value) {
