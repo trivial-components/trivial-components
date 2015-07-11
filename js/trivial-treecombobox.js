@@ -233,6 +233,7 @@
                         } else {
                             treeBox.highlightNextEntry(highlightDirection);
                         }
+                        autoCompleteIfPossible(config.autoCompleteDelay);
 
                         if (isDropDownOpen) {
                             openDropDown(); // only for repositioning!
@@ -375,7 +376,6 @@
                 $spinners.remove();
                 $spinners = $();
                 treeBox.updateEntries(newEntries);
-                autoCompleteIfPossible(config.autoCompleteDelay);
             }
 
             this.updateEntries = updateEntries;
