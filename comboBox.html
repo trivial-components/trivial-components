@@ -389,11 +389,17 @@
             }, 1000);
         };
 
-        var $comboBoxOriginalInput;
+        function reInitReadMore() {
+            $('.prettyprint').readmore({
+                collapsedHeight: 500,
+                moreLink: '<a href="#">Read more...</a>',
+                lessLink: '<a href="#">Read less...</a>'
+            });
+        }
 
         function createComboBox() {
             $('#comboBoxWrapper').empty();
-            $comboBoxOriginalInput = $('<input id="combobox"/>').appendTo('#comboBoxWrapper');
+            var $comboBoxOriginalInput = $('<input id="combobox"/>').appendTo('#comboBoxWrapper');
             $comboBoxOriginalInput.on('change', function() {
                 $('#originalInputValue').text($(this).val());
             });
@@ -438,8 +444,10 @@
             updateSelectedEntryDisplay();
             trivialComboBox.$.change(function() {
                 updateSelectedEntryDisplay.call(this);
+                reInitReadMore();
             });
             prettyPrint();
+            reInitReadMore();
         }
         createComboBox();
 

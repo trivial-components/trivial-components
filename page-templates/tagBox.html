@@ -294,11 +294,17 @@
             }, 1000);
         };
 
-        var $tagBoxOriginalInput;
+        function reInitReadMore() {
+            $('.prettyprint').readmore({
+                collapsedHeight: 500,
+                moreLink: '<a href="#">Read more...</a>',
+                lessLink: '<a href="#">Read less...</a>'
+            });
+        }
 
         function createTagBox() {
             $('#tagBoxWrapper').empty();
-            $tagBoxOriginalInput = $('<input id="tagbox"/>').appendTo('#tagBoxWrapper');
+            var $tagBoxOriginalInput = $('<input id="tagbox"/>').appendTo('#tagBoxWrapper');
             $tagBoxOriginalInput.on('change', function() {
                 $('#originalInputValue').text($(this).val());
             });
@@ -344,8 +350,10 @@
             updateSelectedEntryDisplay();
             trivialTagBox.$.change(function() {
                 updateSelectedEntryDisplay.call(this);
+                reInitReadMore();
             });
             prettyPrint();
+            reInitReadMore();
         }
         createTagBox();
 
