@@ -116,14 +116,6 @@
                 entries = newEntries;
                 updateTreeEntryElements(entries);
 
-                if (entries.length > 0) {
-                    if (typeof highlightDirection != 'undefined') {
-                        highlightNextEntry(highlightDirection);
-                    }
-                } else {
-                    setHighlightedEntry(null);
-                }
-
                 var selectedEntry = findEntryById(selectedEntryId);
                 if (selectedEntry) {
                     // selected entry in filtered tree? then mark it as selected!
@@ -201,10 +193,14 @@
                 }
             }
 
-            function getNextVisibleEntry(currentEntry, direction) {
+            function getNextVisibleEntry(currentEntry, direction, onlyEntriesWithTextMatches) {
                 var newSelectedElementIndex;
                 var visibleEntriesAsList = findEntries(function (entry) {
-                    return entry._trEntryElement.is(':visible') || entry === currentEntry
+                    if (onlyEntriesWithTextMatches) {
+                        return entry._trEntryElement.is(':visible') && entry._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
+                    } else {
+                        return entry._trEntryElement.is(':visible') || entry === currentEntry;
+                    }
                 });
                 if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
                     return null;
@@ -238,6 +234,12 @@
             this.getSelectedEntry = getSelectedEntry;
             this.selectEntry = selectEntry;
             this.highlightNextEntry = highlightNextEntry;
+            this.highlightNextMatchingEntry = function(direction) {
+                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
+                if (nextMatchingEntry != null) {
+                    setHighlightedEntry(nextMatchingEntry);
+                }
+            };
             this.getHighlightedEntry = function () {
                 return highlightedEntry
             };

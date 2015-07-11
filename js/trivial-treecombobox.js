@@ -217,7 +217,13 @@
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (newEntries) {
                         updateEntries(newEntries, highlightDirection);
-                        treeBox.highlightTextMatches(getNonSelectedEditorValue());
+                        var nonSelectedEditorValue = getNonSelectedEditorValue();
+                        if (nonSelectedEditorValue.length > 0) {
+                            treeBox.highlightTextMatches(nonSelectedEditorValue);
+                            treeBox.highlightNextMatchingEntry(highlightDirection);
+                        } else {
+                            treeBox.highlightNextEntry(highlightDirection);
+                        }
 
                         if (isDropDownOpen) {
                             openDropDown(); // only for repositioning!
@@ -359,7 +365,7 @@
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();
-                treeBox.updateEntries(newEntries, highlightDirection);
+                treeBox.updateEntries(newEntries);
                 autoCompleteIfPossible(config.autoCompleteDelay);
             }
 
