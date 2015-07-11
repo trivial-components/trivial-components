@@ -163,13 +163,31 @@
                     <td><code>false</code></td>
                 </tr>
                 <tr>
+                    <td>freeTextEntryValues</td>
+                    <td>If <code>allowFreeText == true</code> this property defines values that should be set on a fake entry (in addition to the <code>[inputTextProperty]</code> property). returned by <code>getSelectedEntry()</code> when the user enters some free text.</td>
+                    <td><code>{_isFreeTextEntry: true}</code></td>
+                </tr>
+                <tr>
                     <td>inputTextProperty</td>
                     <td>Name of the property which will be filled into the input field when the user selects an entry. This property is also used for auto-completion.</td>
                     <td><code>'displayValue'</code></td>
                 </tr>
                 <tr>
-                    <td>template</td>
-                    <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
+                    <td>childrenProperty</td>
+                    <td>Name of the property containing the children of a node.</td>
+                    <td><code>'children'</code></td>
+                </tr>
+                <tr>
+                    <td>expandedProperty</td>
+                    <td>Name of the property indicating whether or not the node is expanded.</td>
+                    <td><code>'expanded'</code></td>
+                </tr>
+                <tr>
+                    <td>templates</td>
+                    <td>
+                        Array of Mustache templates to be used for the entries. <code>templates[0]</code> corresponds to the first nesting level (root nodes). <code>templates[0]</code> correspond to the second nesting level, and so on.<br/>
+                        The last array entry (<code>templates[templates.length - 1]</code>) is used for all consecutive nesting levels.
+                    </td>
                     <td><code>TrivialComponents.icon2LinesTemplate</code></td>
                 </tr>
                 <tr>
@@ -208,7 +226,7 @@
                         <code>queryString</code> (user input) and
                         <code>resultCallback</code> (should be called with the list retrieved entries).
                     </td>
-                    <td>Simple client-side implementation that filters the initially configured array of entries.</td>
+                    <td>Simple client-side implementation that filters the initially configured <code>entries</code>.</td>
                 </tr>
                 <tr>
                     <td>autoComplete</td>
