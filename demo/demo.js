@@ -45,7 +45,8 @@ function createEntries(count) {
         entries.push({
             id: i,
             displayValue: firstName +  ' ' + lastName,
-            additionalInfo: firstName.toLowerCase() + '.' + lastName.toLowerCase() +'@' + randomOf(words) + '.' + randomOf(countryExtensions),
+            additionalInfo: randomWords(3),
+            additionalInfo2: firstName.toLowerCase() + '.' + lastName.toLowerCase() +'@' + randomOf(words) + '.' + randomOf(countryExtensions),
             imageUrl: randomImageUrl(),
             statusColor: randomColor()
         });

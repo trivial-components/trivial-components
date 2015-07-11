@@ -42,8 +42,7 @@
 
             options = options || {};
             var defaultOptions = {
-                valueProperty: options.idProperty || 'id',
-                idProperty: 'id',
+                valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 expandedProperty: 'expanded',
@@ -285,12 +284,12 @@
 
             function findEntryById(id) {
                 return findEntries(function (entry) {
-                    return entry[config.idProperty] == id
+                    return entry[config.valueProperty] == id
                 })[0];
             }
 
             function selectEntry(entry) {
-                selectedEntryId = entry ?  entry[config.idProperty] : null;
+                selectedEntryId = entry ?  entry[config.valueProperty] : null;
                 $originalInput.val(entry ? entry[config.valueProperty] : null);
 
                 markSelectedEntry(entry);

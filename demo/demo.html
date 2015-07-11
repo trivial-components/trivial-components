@@ -73,7 +73,9 @@
 <div id="treeBoxContainer"></div>
 
 <h4>Trivial TreeComboBox</h4>
-<input id="treeComboBox">
+<div style="width: 350px; height: 370px">
+    <input id="treeComboBox">
+</div>
 
 <h4>Trivial Tree</h4>
 <div style="width: 350px; height: 370px">
@@ -144,7 +146,8 @@
         });
 
         $('#zeroConfigList').TrivialList({
-            entries: createEntries()
+            entries: createEntries(),
+            selectedEntryId:
         });
 
         $('#zeroConfigTagBox').TrivialTagBox({
@@ -178,7 +181,8 @@
 
         $('#treeBoxContainer').TrivialTreeBox({
             templates: [TrivialComponents.icon2LinesTemplate],
-            entries: createDemoTreeNodes()
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 2
         });
 
         $('#treeComboBox').TrivialTreeComboBox({
