@@ -150,6 +150,8 @@
                     <td>valueProperty</td>
                     <td>Name of the property which should be submitted on form submit. If
                         <code>null</code>, then the content of the text input will serve als value.
+                        Additionally, this property serves to identify nodes in the tree, so it must be unique.
+                        <div class="alert alert-danger">TODO: This is not consistent. Separate valueProperty and idProperty!</div>
                     </td>
                     <td><code>null</code></td>
                 </tr>
@@ -207,7 +209,7 @@
                 </tr>
                 <tr>
                     <td>entries</td>
-                    <td>The dropdown entries to be displayed initially.</td>
+                    <td>Arrays containing the root nodes of the dropdown tree to be displayed initially.</td>
                     <td><code>[]</code></td>
                 </tr>
                 <tr>
