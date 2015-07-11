@@ -35,9 +35,10 @@
             options = options || {};
             var config = $.extend({
                 inputTextProperty: 'displayValue',
-                template: TrivialComponents.image2LinesTemplate,
-                selectedEntryTemplate: options.template || TrivialComponents.icon2LinesTemplate,
-                selectedEntry: undefined,
+                valueProperty: 'id',
+                selectedEntryTemplate: (options.templates && options.templates.length > 0 && options.templates[0]) || TrivialComponents.icon2LinesTemplate,
+                selectedEntry: null,
+                templates: [TrivialComponents.iconSingleLineTemplate],
                 emptyEntry: {},
                 queryFunction: null, // defined below...
                 autoComplete: true,
@@ -50,16 +51,12 @@
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
                 },
-                valueProperty: options.idProperty || 'id',
-                idProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 expandedProperty: 'expanded',
-                templates: [TrivialComponents.iconSingleLineTemplate],
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
-                entries: null,
-                selectedEntryId: undefined
+                entries: null
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
@@ -160,8 +157,8 @@
                     }
                 })
                 .keyup(function (e) {
-                    if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== treeBox.getSelectedEntry()[config.inputTextProperty]) {
-                        //selectEntry(null);
+                    if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                        selectEntry(null);
                     } else if (e.which == keyCodes.tab) {
                         showEditor();
                     }
@@ -198,6 +195,7 @@
                     treeBox.selectEntry(null);
                     closeDropDown();
                 }
+                hideEditorIfNotContainsFreeText();
             });
 
             selectEntry(config.selectedEntry || null);

@@ -18,8 +18,7 @@
 
             options = options || {};
             var defaultOptions = {
-                valueProperty: options.idProperty || 'id',
-                idProperty: 'id',
+                valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 expandedProperty: 'expanded',
@@ -27,7 +26,7 @@
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
-                selectedEntryId: undefined,
+                selectedEntryId: null,
                 matchingOptions: {
                     matchingMode: 'contains',
                     ignoreCase: true,
@@ -155,12 +154,12 @@
 
             function findEntryById(id) {
                 return findEntries(function (entry) {
-                    return entry[config.idProperty] == id
+                    return entry[config.valueProperty] == id
                 })[0];
             }
 
             function selectEntry(entry) {
-                selectedEntryId = entry ? entry[config.idProperty] : null;
+                selectedEntryId = entry ? entry[config.valueProperty] : null;
                 markSelectedEntry(entry);
                 fireChangeEvents();
             }
