@@ -43,7 +43,7 @@
                 autoComplete: true,
                 autoCompleteDelay: 0,
                 allowFreeText: false,
-                fakeEntryValues: {_isFakeEntry: true},
+                freeTextEntryValues: {_isFreeTextEntry: true},
                 showTrigger: true,
                 matchingOptions: {
                     matchingMode: 'contains',
@@ -370,7 +370,7 @@
                 if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
                     return null;
                 } else if (selectedEntry == null && config.allowFreeText) {
-                    var fakeEntry = $.extend({}, config.fakeEntryValues);
+                    var fakeEntry = $.extend({}, config.freeTextEntryValues);
                     fakeEntry[config.inputTextProperty] = $editor.val();
                     return fakeEntry;
                 } else {
