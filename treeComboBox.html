@@ -1,10 +1,82 @@
 <html lang="en">
 
-@@include('includes/head.html', {"title": "TrivialTreeComboBox - Trivial Components"})
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>TrivialTreeComboBox - Trivial Components</title>
+
+    <script>
+        if (location.href.indexOf("localhost") != -1) {
+            document.write('<link rel="stylesheet" href="css/all.with-source-maps.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="css/all.css">');
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
 
 <body data-spy="scroll" data-target="#navbar">
 
-@@include('includes/nav.html', {"activeNavLink": "showcase"})
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">
+                <img class="navbar-logo" src="img/logo.png"/>Trivial Components
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="index.html">Home</a></li>
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Components <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="comboBox.html">TrivialComboBox <span class="badge alert-info">beta</span></a></li>
+                        <li><a href="tagBox.html">TrivialTagBox <span class="badge alert-info">beta</span></a></li>
+                        <li><a href="tree.html">TrivialTree <span class="badge alert-danger">alpha</span></a></li>
+                        <li><a href="treeComboBox.html">TrivialTreeComboBox <span class="badge alert-danger">alpha</span></a></li>
+                        <li><a href="#"><span class="text-muted">TrivialList</span> <span class="badge">todo</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="https://github.com/trivial-components/trivial-components/releases">Download</a></li>
+                <li><a href="https://github.com/trivial-components/trivial-components">Github</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
 
 <div class="page-content">
 
@@ -14,9 +86,14 @@
 
     <div class="container">
 
-        @@include('includes/status-note.html', {"status": "alpha"})
+        
+<br>
 
-        <div class="row">
+<div class="alert alert-warning">
+    <strong><span class="glyphicon glyphicon-warning-sign"></span> Attention:</strong>
+    This component is <span class="badge alert-danger">alpha</span> and should be considered as work in progress. Any kind of API and usability changes may occur in future versions.
+</div>
+<div class="row">
             <div class="col-sm-5">
                 <h3>Options</h3>
                 <form id="config">
@@ -246,8 +323,27 @@
     </div> <!-- container -->
 </div>
 
-@@include('includes/footer.html')
-@@include('includes/scripts.html')
+<div class="container">
+    <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/trivial-components/trivial-components">Trivial Components</a> is maintained by <a href="https://github.com/trivial-components">trivial-components</a>.</span>
+    </footer>
+</div>
+<script src="lib/js/jquery.min.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="lib/js/position.min.js"></script>
+<script src="lib/js/mustache.min.js"></script>
+<script src="lib/js/trivial-core.js"></script>
+<script src="lib/js/trivial-highlight.js"></script>
+<script src="lib/js/trivial-minimallyScrollTo.js"></script>
+<script src="lib/js/trivial-combobox.js"></script>
+<script src="lib/js/trivial-list.js"></script>
+<script src="lib/js/trivial-tagbox.js"></script>
+<script src="lib/js/trivial-tree.js"></script>
+<script src="lib/js/trivial-treebox.js"></script>
+<script src="lib/js/trivial-treecombobox.js"></script>
+<script src="js/demo.js"></script>
+<script src="lib/js/prettify.min.js"></script>
+<script src="lib/js/readmore.min.js"></script>
 
 <script>
     $(function () {
@@ -406,7 +502,22 @@
     });
 </script>
 
-@@include('includes/ga.html')
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-62201674-1', 'auto');
+    ga('send', 'pageview');
+</script>
 
 </body>
 </html>

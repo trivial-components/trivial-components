@@ -1,0 +1,17 @@
+@@if (status) {
+<br>
+}
+
+@@if (status === 'alpha') {
+<div class="alert alert-warning">
+    <strong><span class="glyphicon glyphicon-warning-sign"></span> Attention:</strong>
+    This component is <span class="badge alert-danger">alpha</span> and should be considered as work in progress. Any kind of API and usability changes may occur in future versions.
+</div>
+}
+
+@@if (status === 'beta') {
+<div class="alert alert-info">
+    <strong><span class="glyphicon glyphicon-info-sign"></span> Note:</strong>
+    This component is <span class="badge alert-info">beta</span> and should be considered as work in progress. Small API and usability changes may occur in future versions.
+</div>
+}

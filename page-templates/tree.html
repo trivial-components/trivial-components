@@ -14,12 +14,7 @@
 
     <div class="container">
 
-        <br>
-
-        <div class="alert alert-warning">
-            <strong>Attention:</strong>
-            This component is work in progress.
-        </div>
+        @@include('includes/status-note.html', {"status": "alpha"})
 
         <div class="row">
             <div class="col-sm-5">
@@ -179,11 +174,17 @@
             }, 1000);
         };
 
-        var $treeOriginalInput;
+        function reInitReadMore() {
+            $('.prettyprint').readmore({
+                collapsedHeight: 500,
+                moreLink: '<a href="#">Read more...</a>',
+                lessLink: '<a href="#">Read less...</a>'
+            });
+        }
 
         function createTree() {
             $('#treeWrapper').empty();
-            $treeOriginalInput = $('<input id="tree"/>').appendTo('#treeWrapper');
+            var $treeOriginalInput = $('<input id="tree"/>').appendTo('#treeWrapper');
             $treeOriginalInput.on('change', function () {
                 $('#originalInputValue').text($(this).val());
             });
@@ -225,8 +226,10 @@
             updateSelectedEntryDisplay();
             trivialTree.$.change(function () {
                 updateSelectedEntryDisplay();
+                reInitReadMore();
             });
             prettyPrint();
+            reInitReadMore();
         }
 
         createTree();

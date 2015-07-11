@@ -66,6 +66,7 @@
                         <li><a href="comboBox.html">TrivialComboBox <span class="badge alert-info">beta</span></a></li>
                         <li><a href="tagBox.html">TrivialTagBox <span class="badge alert-info">beta</span></a></li>
                         <li><a href="tree.html">TrivialTree <span class="badge alert-danger">alpha</span></a></li>
+                        <li><a href="treeComboBox.html">TrivialTreeComboBox <span class="badge alert-danger">alpha</span></a></li>
                         <li><a href="#"><span class="text-muted">TrivialList</span> <span class="badge">todo</span></a></li>
                     </ul>
                 </li>
@@ -85,7 +86,14 @@
 
     <div class="container">
 
-        <div class="row">
+        
+<br>
+
+<div class="alert alert-info">
+    <strong><span class="glyphicon glyphicon-info-sign"></span> Note:</strong>
+    This component is <span class="badge alert-info">beta</span> and should be considered as work in progress. Small API and usability changes may occur in future versions.
+</div>
+<div class="row">
             <div class="col-sm-5">
                 <h3>Options</h3>
                 <form id="config">
@@ -114,9 +122,9 @@
                         </label>
                     </div>
                     <div class="form-group">
-                        <label for="fakeEntryValues">fakeEntryValues</label>
-                        <textarea class="form-control code showcase-textarea" id="fakeEntryValues" name="fakeEntryValues">{
-    "_isFakeEntry": true
+                        <label for="freeTextEntryValues">freeTextEntryValues</label>
+                        <textarea class="form-control code showcase-textarea" id="freeTextEntryValues" name="freeTextEntryValues">{
+    "_isFreeTextEntry": true
 }</textarea>
                     </div>
                     <div class="form-group">
@@ -318,12 +326,14 @@
 <script src="lib/js/trivial-highlight.js"></script>
 <script src="lib/js/trivial-minimallyScrollTo.js"></script>
 <script src="lib/js/trivial-combobox.js"></script>
+<script src="lib/js/trivial-list.js"></script>
 <script src="lib/js/trivial-tagbox.js"></script>
 <script src="lib/js/trivial-tree.js"></script>
 <script src="lib/js/trivial-treebox.js"></script>
 <script src="lib/js/trivial-treecombobox.js"></script>
 <script src="js/demo.js"></script>
 <script src="lib/js/prettify.min.js"></script>
+<script src="lib/js/readmore.min.js"></script>
 
 <script>
     $(function () {
@@ -390,7 +400,7 @@
             var config = {
                 showTrigger: $('#showTrigger').is(':checked'),
                 allowFreeText: $('#allowFreeText').is(':checked'),
-                fakeEntryValues: JSON.parse($('#fakeEntryValues').val()),
+                freeTextEntryValues: JSON.parse($('#freeTextEntryValues').val()),
                 autoComplete: $('#autoComplete').is(':checked'),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),

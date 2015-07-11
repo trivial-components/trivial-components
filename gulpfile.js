@@ -39,7 +39,8 @@ gulp.task('copyJsDependencies2lib', ['bower'], function () {
         'bower_components/mustache/mustache.min.js',
         'bower_components/prettify/index.js',
         'bower_components/trivial-components/js/*.js',
-        'bower_components/google-code-prettify/bin/prettify.min.js'
+        'bower_components/google-code-prettify/bin/prettify.min.js',
+        'bower_components/readmore/readmore.min.js'
     ])
         .pipe(gulp.dest('lib/js'));
 });

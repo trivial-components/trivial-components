@@ -1,6 +1,6 @@
 <html lang="en">
 
-@@include('includes/head.html', {"title": "TrivialTreeComboBox - Trivial Components"})
+@@include('includes/head.html', {"title": "TrivialList - Trivial Components"})
 
 <body data-spy="scroll" data-target="#navbar">
 
@@ -9,12 +9,12 @@
 <div class="page-content">
 
     <section class="page-header-box">
-        <h1 class="project-name">TrivialTreeComboBox</h1>
+        <h1 class="project-name">TrivialList</h1>
     </section>
 
     <div class="container">
 
-        @@include('includes/status-note.html', {"status": "alpha"})
+        @@include('includes/status-note.html', {"status": "beta"})
 
         <div class="row">
             <div class="col-sm-5">
@@ -59,14 +59,6 @@
                         <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
                     </div>
                     <div class="form-group">
-                        <label for="childrenProperty">childrenProperty</label>
-                        <input class="form-control" id="childrenProperty" name="childrenProperty" value="children"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="expandedProperty">expandedProperty</label>
-                        <input class="form-control" id="expandedProperty" name="expandedProperty" value="expanded"/>
-                    </div>
-                    <div class="form-group">
                         <label for="matchingMode">matchingMode</label>
                         <input id="matchingMode" name="matchingMode"/>
                     </div>
@@ -76,8 +68,8 @@
                         </label>
                     </div>
                     <div class="form-group">
-                        <label for="templates">templates</label>
-                        <input id="templates" name="templates"/>
+                        <label for="template">template</label>
+                        <input id="template" name="template"/>
                     </div>
                     <div class="form-group">
                         <label for="selectedEntryTemplate">selectedEntryTemplate</label>
@@ -102,13 +94,11 @@
                     </div>
                     <div class="form-group">
                         <label for="selectedEntry">selectedEntry</label>
-                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntryId">{
-    "id": 151,
-    "displayValue": "Project X",
-    "additionalInfo": "4 unread",
-    "imageUrl": "img/tree/folder.png",
-    "isLeaf": true
-
+                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">{
+    "displayValue": "Ami Nemitz",
+    "imageUrl": "https://avatars1.githubusercontent.com/u/271349?v=3&s=25",
+    "additionalInfo": "Magna gubergren sit",
+    "id": 2
 }</textarea>
                     </div>
                     <div class="form-group">
@@ -123,7 +113,7 @@
             </div>
             <div class="col-sm-7">
                 <h3>Result</h3>
-                <div id="treeComboBoxWrapper"></div>
+                <div id="listWrapper"></div>
                 <h4>Original input value</h4>
                 <code id="originalInputValue"></code>
                 <h4>Selected entry</h4>
@@ -252,9 +242,9 @@
 <script>
     $(function () {
 
-        $('#entries').val(JSON.stringify(createDemoTreeNodes(), null, 2));
+        $('#entries').val(JSON.stringify(createEntries(5), null, 2));
 
-        $('#selectedEntryTemplate').each(function() {
+        $('#template, #selectedEntryTemplate').each(function() {
             $(this).TrivialComboBox({
                 template: TrivialComponents.singleLineTemplate,
                 entries: [{
@@ -274,41 +264,11 @@
                     value: TrivialComponents.singleLineTemplate
                 }],
                 selectedEntry: {
-                    displayValue: "Icon with two lines of text",
-                    value: TrivialComponents.icon2LinesTemplate
+                    displayValue: "Image with two lines of text",
+                    value: TrivialComponents.image2LinesTemplate
                 },
                 allowFreeText: false
             })
-        });
-        $('#templates').TrivialTagBox({
-            template: TrivialComponents.singleLineTemplate,
-            entries: [{
-                displayValue: "Image with two lines of text",
-                value: TrivialComponents.image2LinesTemplate
-            }, {
-                displayValue: "Round image, 2 lines, color bubble",
-                value: TrivialComponents.roundImage2LinesColorBubbleTemplate
-            }, {
-                displayValue: "Icon with two lines of text",
-                value: TrivialComponents.icon2LinesTemplate
-            }, {
-                displayValue: "Icon with single line of text",
-                value: TrivialComponents.iconSingleLineTemplate
-            }, {
-                displayValue: "Single line of text",
-                value: TrivialComponents.singleLineTemplate
-            }],
-            selectedEntries: [{
-                displayValue: "Round image, 2 lines, color bubble",
-                value: TrivialComponents.roundImage2LinesColorBubbleTemplate
-            }, {
-                displayValue: "Icon with two lines of text",
-                value: TrivialComponents.icon2LinesTemplate
-            }, {
-                displayValue: "Icon with single line of text",
-                value: TrivialComponents.iconSingleLineTemplate
-            }],
-            allowFreeText: false
         });
         $('#matchingMode').TrivialComboBox({
                 template: TrivialComponents.singleLineTemplate,
@@ -333,19 +293,12 @@
             }, 1000);
         };
 
-        function reInitReadMore() {
-            $('.prettyprint').readmore({
-                collapsedHeight: 500,
-                moreLink: '<a href="#">Read more...</a>',
-                lessLink: '<a href="#">Read less...</a>'
-            });
-        }
+        var $listOriginalInput;
 
-
-        function createTreeComboBox() {
-            $('#treeComboBoxWrapper').empty();
-            var $treeComboBoxOriginalInput = $('<input id="treecombobox"/>').appendTo('#treeComboBoxWrapper');
-            $treeComboBoxOriginalInput.on('change', function() {
+        function createList() {
+            $('#listWrapper').empty();
+            $listOriginalInput = $('<input id="list"/>').appendTo('#listWrapper');
+            $listOriginalInput.on('change', function() {
                 $('#originalInputValue').text($(this).val());
             });
             var config = {
@@ -357,15 +310,11 @@
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
                 valueProperty: $('#valueProperty').val(),
                 inputTextProperty: $('#inputTextProperty').val(),
-                childrenProperty: $('#childrenProperty').val(),
-                expandedProperty: $('#expandedProperty').val(),
                 matchingOptions: {
                     matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
                     ignoreCase: $('#ignoreCase').is(':checked')
                 },
-                templates: $('#templates').TrivialTagBox().getSelectedEntries().map(function (v) {
-                    return v.value
-                }),
+                template: $('#template').TrivialComboBox().getSelectedEntry().value,
                 selectedEntryTemplate: $('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value,
                 spinnerTemplate: $('#spinnerTemplate').val(),
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
@@ -374,35 +323,34 @@
                 entries: JSON.parse($('#entries').val())
             };
             $('#configDisplay').removeClass("prettyprinted")
-                    .text("$('#treecombobox').TrivialTreeComboBox(" + JSON.stringify(config, function(key, value) {
+                    .text("$('#list').TrivialList(" + JSON.stringify(config, function(key, value) {
                         if (key === 'queryFunction' && config.queryFunction) {
                             return "%queryFunction%";
                         } else {
                             return value;
                         }
                     }, 2).replace("\"%queryFunction%\"", customQueryFunction.toString()) + ");");
-            var trivialTreeComboBox = $treeComboBoxOriginalInput.TrivialTreeComboBox(config);
+            var trivialList = $listOriginalInput.TrivialList(config);
 
             function updateSelectedEntryDisplay() {
                 $('#selectedEntryDisplay')
-                        .text(JSON.stringify(trivialTreeComboBox.getSelectedEntry(), null, 2))
+                        .text(JSON.stringify(trivialList.getSelectedEntry(), null, 2))
                         .removeClass("prettyprinted");
                 prettyPrint();
             }
 
             updateSelectedEntryDisplay();
-            trivialTreeComboBox.$.change(function() {
-                updateSelectedEntryDisplay();
-                reInitReadMore();
+            trivialList.$.change(function() {
+                updateSelectedEntryDisplay.call(this);
             });
             prettyPrint();
-            reInitReadMore();
         }
-        createTreeComboBox();
+        createList();
 
         $('#config input, #config textarea').change(function() {
-            createTreeComboBox();
+            createList();
         });
+
     });
 </script>
 

@@ -66,6 +66,7 @@
                         <li><a href="comboBox.html">TrivialComboBox <span class="badge alert-info">beta</span></a></li>
                         <li><a href="tagBox.html">TrivialTagBox <span class="badge alert-info">beta</span></a></li>
                         <li><a href="tree.html">TrivialTree <span class="badge alert-danger">alpha</span></a></li>
+                        <li><a href="treeComboBox.html">TrivialTreeComboBox <span class="badge alert-danger">alpha</span></a></li>
                         <li><a href="#"><span class="text-muted">TrivialList</span> <span class="badge">todo</span></a></li>
                     </ul>
                 </li>
@@ -85,14 +86,14 @@
 
     <div class="container">
 
-        <br>
+        
+<br>
 
-        <div class="alert alert-warning">
-            <strong>Attention:</strong>
-            This component is work in progress.
-        </div>
-
-        <div class="row">
+<div class="alert alert-warning">
+    <strong><span class="glyphicon glyphicon-warning-sign"></span> Attention:</strong>
+    This component is <span class="badge alert-danger">alpha</span> and should be considered as work in progress. Any kind of API and usability changes may occur in future versions.
+</div>
+<div class="row">
             <div class="col-sm-5">
                 <h3>Options</h3>
 
@@ -200,12 +201,14 @@
 <script src="lib/js/trivial-highlight.js"></script>
 <script src="lib/js/trivial-minimallyScrollTo.js"></script>
 <script src="lib/js/trivial-combobox.js"></script>
+<script src="lib/js/trivial-list.js"></script>
 <script src="lib/js/trivial-tagbox.js"></script>
 <script src="lib/js/trivial-tree.js"></script>
 <script src="lib/js/trivial-treebox.js"></script>
 <script src="lib/js/trivial-treecombobox.js"></script>
 <script src="js/demo.js"></script>
 <script src="lib/js/prettify.min.js"></script>
+<script src="lib/js/readmore.min.js"></script>
 
 <script>
     $(function () {
@@ -267,11 +270,17 @@
             }, 1000);
         };
 
-        var $treeOriginalInput;
+        function reInitReadMore() {
+            $('.prettyprint').readmore({
+                collapsedHeight: 500,
+                moreLink: '<a href="#">Read more...</a>',
+                lessLink: '<a href="#">Read less...</a>'
+            });
+        }
 
         function createTree() {
             $('#treeWrapper').empty();
-            $treeOriginalInput = $('<input id="tree"/>').appendTo('#treeWrapper');
+            var $treeOriginalInput = $('<input id="tree"/>').appendTo('#treeWrapper');
             $treeOriginalInput.on('change', function () {
                 $('#originalInputValue').text($(this).val());
             });
@@ -313,8 +322,10 @@
             updateSelectedEntryDisplay();
             trivialTree.$.change(function () {
                 updateSelectedEntryDisplay();
+                reInitReadMore();
             });
             prettyPrint();
+            reInitReadMore();
         }
 
         createTree();
