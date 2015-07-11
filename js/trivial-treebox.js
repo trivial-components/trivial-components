@@ -52,12 +52,16 @@
 
             selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
 
+            function isLeaf(entry) {
+                return entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
+            }
+
             function updateTreeEntryElements(entries) {
                 $tree.empty();
 
                 function createEntryElement(entry, $parentElement, depth) {
-                    var isLeaf = entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-' + isLeaf + '"></div>')
+                    var leaf = isLeaf(entry);
+                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-' + leaf + '"></div>')
                         .appendTo($parentElement);
                     var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                         .appendTo($outerEntryWrapper);
@@ -246,6 +250,15 @@
             this.highlightTextMatches = function(searchString) {
                 highlightTextMatches(entries, searchString);
             };
+            this.setHighlightedNodeExpanded = function (expanded) {
+                if (!highlightedEntry || isLeaf(highlightedEntry)) {
+                    return false;
+                } else {
+                    var wasExpanded = highlightedEntry[config.expandedProperty];
+                    setNodeExpanded(highlightedEntry, expanded);
+                    return !wasExpanded != !expanded;
+                }
+            }
         }
 
         $.fn.trivialtreebox = function (options) {

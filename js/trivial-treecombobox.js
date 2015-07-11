@@ -122,6 +122,15 @@
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                        if (isDropDownOpen) {
+                            // expand the currently highlighted node.
+                            var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
+                            console.log(changedExpandedState);
+                            if (changedExpandedState) {
+                                e.preventDefault();
+                                return false;
+                            }
+                        }
                         showEditor();
                         return; // let the user navigate freely left and right...
                     }
