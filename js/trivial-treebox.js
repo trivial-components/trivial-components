@@ -246,7 +246,7 @@
                 } else {
                     var selectedEntry = getSelectedEntry();
                     if (selectedEntry) {
-                        setHighlightedEntry(selectedEntry);
+                        highlightedEntry = selectedEntry;
                     }
                 }
             }
