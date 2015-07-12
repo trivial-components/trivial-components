@@ -138,7 +138,6 @@
                     return; // do not open the dropdown.
                 }
 
-                console.log(String.fromCharCode(e.which) + " - " + $editor.text());
                 if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     openDropDown();
                     var direction = e.which == keyCodes.up_arrow ? -1 : 1;

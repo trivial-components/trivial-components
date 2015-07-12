@@ -57,11 +57,13 @@
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
 
+            var treeBox;
             var entries = config.entries;
             var selectedEntryId;
             var highlightedEntry = null;
             var blurCausedByClickInsideComponent = false;
 
+            var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
             var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput);
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
@@ -75,52 +77,48 @@
                         $editor.focus();
                     } else {
                         $componentWrapper.removeClass('focus');
-                        setHighlightedEntry(null);
+                        treeBox.setHighlightedEntry(null);
                     }
                 })
                 .keydown(function (e) {
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
-                    } else if (e.which == keyCodes.left_arrow) {
-                        if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor[0].selectionStart === 0) {
-                            // if the user is at the beginning of line and presses the left arrow key, collapse the currently selected node
-                            var selectedEntry = getSelectedEntry();
-                            selectedEntry && setNodeExpanded(selectedEntry, false);
+                    } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                        // expand the currently highlighted node.
+                        var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
+                        if (changedExpandedState) {
+                            return false;
+                        } else {
+                            return; // let the user navigate freely left and right...
                         }
-                        return; // let the user navigate freely left and right...
-                    } else if (e.which == keyCodes.right_arrow) {
-                        if ($editor[0].selectionStart === $editor[0].selectionEnd && $editor.val().length === $editor[0].selectionStart) {
-                            // if the user is at the end of line and presses the right arrow key, expand the currently selected node
-                            var selectedEntry = getSelectedEntry();
-                            selectedEntry && setNodeExpanded(selectedEntry, true);
-                        }
-                        return; // let the user navigate freely left and right...
                     }
 
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (entries != null) {
-                            selectNextEntry(direction);
+                            treeBox.highlightNextEntry(direction);
                             return false; // some browsers move the caret to the beginning on up key
                         }
                     } else if (e.which == keyCodes.enter) {
-                        // ignore
+                        treeBox.selectEntry(treeBox.getHighlightedEntry());
+                        $editor.select();
                     } else if (e.which == keyCodes.escape) {
                         $editor.val("");
                         query();
                     } else {
-                        query();
-                    }
-                })
-                .keyup(function (e) {
-                })
-                .mousedown(function () {
-                    if (entries == null) {
-                        query();
+                        query(1);
                     }
                 });
 
-            $componentWrapper.add($tree).mousedown(function () {
+            treeBox = $tree.TrivialTreeBox(config);
+            treeBox.$.change(function () {
+                var selectedTreeBoxEntry = treeBox.getSelectedEntry();
+                if (selectedTreeBoxEntry) {
+                    selectEntry(selectedTreeBoxEntry);
+                }
+            });
+
+            $componentWrapper.mousedown(function () {
                 if ($editor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;
                 }
@@ -136,119 +134,37 @@
                 }
             });
 
-            $tree.mouseout(function() {
-                setHighlightedEntry(null);
+            $tree.mouseout(function () {
+                treeBox.setHighlightedEntry(null);
+            }).click(function() {
+                $editor.focus();
             });
-
-            if (entries) { // if config.entries was set...
-                updateTreeEntryElements(entries);
-            }
 
             selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
 
-            function isLeaf(entry) {
-                return entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
-            }
-
-            function updateTreeEntryElements(entries) {
-                $tree.empty();
-
-                function createEntryElement(entry, $parentElement, depth) {
-                    var leaf = isLeaf(entry);
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf?'':'has-children') + '"></div>')
-                        .appendTo($parentElement);
-                    var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
-                        .appendTo($outerEntryWrapper);
-                    for (var k = 0; k < depth; k++) {
-                        $entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
-                    }
-                    var $expander = $('<div class="tr-tree-expander"></div>')
-                        .appendTo($entryAndExpanderWrapper);
-                    var html = Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry);
-                    var $entry = $(html).addClass("tr-tree-entry filterable-item")
-                        .appendTo($entryAndExpanderWrapper);
-                    entry._trEntryElement = $outerEntryWrapper;
-                    $entryAndExpanderWrapper
-                        .mousedown(function () {
-                            blurCausedByClickInsideComponent = true;
-                            selectEntry(entry);
-                            $editor.select();
-                        }).mouseup(function () {
-                            if (blurCausedByClickInsideComponent) {
-                                $editor.focus();
-                                blurCausedByClickInsideComponent = false;
-                            }
-                        }).mouseout(function () {
-                            if (blurCausedByClickInsideComponent) {
-                                $editor.focus();
-                                blurCausedByClickInsideComponent = false;
-                            }
-                        }).mouseover(function () {
-                            setHighlightedEntry(entry);
-                        });
-
-                    if (entry[config.childrenProperty] && entry[config.childrenProperty].length > 0) {
-                        var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
-                            .appendTo($outerEntryWrapper);
-                        setNodeExpanded(entry, entry[config.expandedProperty]);
-                        $expander.mousedown(function(e) {
-                            return false;
-                        }).click(function () {
-                            setNodeExpanded(entry, !entry[config.expandedProperty]);
-                        });
-                        for (var i = 0; i < entry[config.childrenProperty].length; i++) {
-                            createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
-                        }
-                    }
-                }
-
-                if (entries.length > 0) {
-                    for (var i = 0; i < entries.length; i++) {
-                        createEntryElement(entries[i], $tree, 0);
-                    }
-                } else {
-                    $tree.append(config.noEntriesTemplate);
-                }
-            }
-
-            function setNodeExpanded(node, expanded) {
-                node[config.expandedProperty] = !!expanded;
-                node._trEntryElement.toggleClass("expanded", !!expanded);
-
-                //if (!node.children)
-            }
-
-            function updateEntries(newEntries, highlightDirection) {
-                highlightedEntry = null;
+            function updateEntries(newEntries) {
                 entries = newEntries;
-                updateTreeEntryElements(entries);
-
-                if (entries.length > 0) {
-                    highlightTextMatches(entries);
-
-                    if (typeof highlightDirection != 'undefined') {
-                        selectNextEntry(highlightDirection);
-                    }
-                } else {
-                    setHighlightedEntry(null);
-                }
-
-                var selectedEntry = findEntryById(selectedEntryId);
-                if (selectedEntry) {
-                    // selected entry in filtered tree? then mark it as selected!
-                    markSelectedEntry(selectedEntry);
-                }
+                $spinners.remove();
+                $spinners = $();
+                treeBox.updateEntries(newEntries);
             }
 
             function query(highlightDirection) {
-                $tree.append(config.spinnerTemplate);
+                var $spinner = $(config.spinnerTemplate).appendTo($tree);
+                $spinners = $spinners.add($spinner);
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (newEntries) {
-                        updateEntries(newEntries, highlightDirection);
+                        updateEntries(newEntries);
+                        if ($editor.val().length > 0) {
+                            treeBox.highlightTextMatches($editor.val());
+                            treeBox.highlightNextMatchingEntry(highlightDirection);
+                        } else {
+                            treeBox.highlightNextEntry(highlightDirection);
+                        }
                     });
-                });
+                }, 0);
             }
 
             function setHighlightedEntry(entry) {
@@ -289,71 +205,21 @@
             }
 
             function selectEntry(entry) {
-                selectedEntryId = entry ?  entry[config.valueProperty] : null;
+                selectedEntryId = entry ? entry[config.valueProperty] : null;
                 $originalInput.val(entry ? entry[config.valueProperty] : null);
-
-                markSelectedEntry(entry);
                 fireChangeEvents();
             }
-
-            function markSelectedEntry(entry) {
-                $tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
-                if (entry) {
-                    var $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
-                    $entryWrapper.addClass("tr-selected-entry");
-                    $tree.minimallyScrollTo($entryWrapper);
-                }
-            };
 
             function fireChangeEvents() {
                 $originalInput.trigger("change");
                 $componentWrapper.trigger("change");
             }
 
-            function selectNextEntry(direction) {
-                var nextVisibleEntry = getNextVisibleEntry(direction);
-                if (nextVisibleEntry != null) {
-                    selectEntry(nextVisibleEntry);
-                }
-            }
-
-            function getNextVisibleEntry(direction) {
-                var newSelectedElementIndex;
-                var selectedEntry = getSelectedEntry();
-                var visibleEntriesAsList = findEntries(function(entry) {return entry._trEntryElement.is(':visible') || entry === selectedEntry});
-                if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
-                    return null;
-                } else if (selectedEntry == null && direction > 0) {
-                    newSelectedElementIndex = -1 + direction;
-                } else if (selectedEntry == null && direction < 0) {
-                    newSelectedElementIndex = visibleEntriesAsList.length + direction;
-                } else {
-                    var currentSelectedElementIndex = visibleEntriesAsList.indexOf(selectedEntry);
-                    newSelectedElementIndex = (currentSelectedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
-                }
-                return visibleEntriesAsList[newSelectedElementIndex];
-            }
-
-            function highlightTextMatches(entries) {
-                for (var i = 0; i < entries.length; i++) {
-                    var entry = entries[i];
-                    var $entryElement = entry._trEntryElement.find('.tr-tree-entry');
-                    $entryElement.trivialHighlight($editor.val());
-                    if (entry[config.childrenProperty]) {
-                        highlightTextMatches(entry[config.childrenProperty]);
-                    }
-                }
-            }
-
-            function getSelectedEntry() {
-                return selectedEntryId ? findEntryById(selectedEntryId) : null;
-            }
-
             this.$ = $componentWrapper;
             $componentWrapper[0].trivialTree = this;
 
             this.updateEntries = updateEntries;
-            this.getSelectedEntry = getSelectedEntry;
+            this.getSelectedEntry = treeBox.getSelectedEntry;
         }
 
         $.fn.trivialtree = function (options) {

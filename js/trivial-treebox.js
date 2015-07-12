@@ -243,6 +243,11 @@
                     var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entry.addClass('tr-highlighted-entry');
                     minimallyScrollTo($entry);
+                } else {
+                    var selectedEntry = getSelectedEntry();
+                    if (selectedEntry) {
+                        setHighlightedEntry(selectedEntry);
+                    }
                 }
             }
 
@@ -293,6 +298,7 @@
             this.updateEntries = updateEntries;
             this.getSelectedEntry = getSelectedEntry;
             this.selectEntry = selectEntry;
+            this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
             this.highlightNextMatchingEntry = function (direction) {
                 var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);

@@ -69,6 +69,7 @@
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
+            var $spinners = $();
             var $originalInput = $(originalInput);
             var $treeComboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($treeComboBox);
@@ -98,7 +99,6 @@
             } else {
                 $editor = $originalInput;
             }
-            var $spinners = $();
 
             $editor.prependTo($treeComboBox).addClass("tr-combobox-edit-input")
                 .focus(function () {
@@ -125,7 +125,6 @@
                         if (isDropDownOpen) {
                             // expand the currently highlighted node.
                             var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
-                            console.log(changedExpandedState);
                             if (changedExpandedState) {
                                 return false;
                             }
@@ -195,7 +194,6 @@
             });
 
             treeBox = $dropDown.TrivialTreeBox(config);
-            treeBox.$.appendTo($dropDown);
             treeBox.$.change(function() {
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
@@ -224,7 +222,7 @@
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (newEntries) {
-                        updateEntries(newEntries, highlightDirection);
+                        updateEntries(newEntries);
                         var nonSelectedEditorValue = getNonSelectedEditorValue();
                         if (nonSelectedEditorValue.length > 0) {
                             treeBox.highlightTextMatches(nonSelectedEditorValue);
@@ -238,7 +236,7 @@
                             openDropDown(); // only for repositioning!
                         }
                     });
-                });
+                }, 0);
             }
 
             function fireChangeEvents() {
@@ -370,7 +368,7 @@
             this.$ = $treeComboBox;
             $treeComboBox[0].trivialTreeComboBox = this;
 
-            function updateEntries(newEntries, highlightDirection) {
+            function updateEntries(newEntries) {
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();

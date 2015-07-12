@@ -62,7 +62,7 @@
 
         function findLevenshteinMatches(text, searchString) {
             var levenshtein = new Levenshtein(text, searchString);
-            console.log('distance between "' + text + '" and "' + searchString + '" is ' + levenshtein.distance);
+            //console.log('distance between "' + text + '" and "' + searchString + '" is ' + levenshtein.distance);
             if (levenshtein.distance <= options.maxLevenshteinDistance) {
                 return [{
                     start: 0,
