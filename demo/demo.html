@@ -186,9 +186,10 @@
             entries: createDemoTreeNodes(),
             selectedEntryId: 2,
             lazyChildrenQueryFunction: function (node, callback) {
+                console.error("TODO set timeout back to something realistic!!");
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
-                }, 1000);
+                }, 100000000);
             }
         });
 
