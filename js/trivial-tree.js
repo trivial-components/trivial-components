@@ -33,24 +33,20 @@
 
         function TrivialTree(originalInput, options) {
 
-            /*
-             TODO
-             - up/down key support
-             - expand current node if right key is pressed and at end of editor
-             - collapse current node if left key is pressed and at start of editor
-             */
-
             options = options || {};
             var defaultOptions = {
                 valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
+                lazyChildrenQueryFunction: function (node, resultCallback) {
+                    resultCallback([])
+                },
                 expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
-                selectedEntryId: undefined,
+                selectedEntryId: null,
                 matchingOptions: {
                     matchingMode: 'contains',
                     ignoreCase: true,
@@ -159,7 +155,7 @@
 
                 function createEntryElement(entry, $parentElement, depth) {
                     var leaf = isLeaf(entry);
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-' + leaf + '"></div>')
+                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf?'':'has-children') + '"></div>')
                         .appendTo($parentElement);
                     var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                         .appendTo($outerEntryWrapper);

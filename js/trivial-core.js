@@ -163,7 +163,7 @@
         icon2LinesTemplate: icon2LinesTemplate,
         iconSingleLineTemplate: iconSingleLineTemplate,
         singleLineTemplate: singleLineTemplate,
-        defaultSpinnerTemplate: '<div class="tr-default-spinner"><div>Fetching data...</div></div>',
+        defaultSpinnerTemplate: '<div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div>',
         defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
         wrapEntryTemplateWithDefaultTagWrapperTemplate: wrapEntryTemplateWithDefaultTagWrapperTemplate,
         keyCodes: keyCodes,

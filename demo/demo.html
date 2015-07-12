@@ -70,14 +70,17 @@
 </div>
 
 <h4>Trivial TreeBox</h4>
-<div id="treeBoxContainer"></div>
+
+<div id="treeBoxContainer" style="border: 1px solid black;"></div>
 
 <h4>Trivial TreeComboBox</h4>
+
 <div style="width: 350px; height: 370px">
     <input id="treeComboBox">
 </div>
 
 <h4>Trivial Tree</h4>
+
 <div style="width: 350px; height: 370px">
     <input id="zeroConfigTree">
 </div>
@@ -181,12 +184,22 @@
         $('#treeBoxContainer').TrivialTreeBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 2
+            selectedEntryId: 2,
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            }
         });
 
         $('#treeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
-            entries: createDemoTreeNodes()
+            entries: createDemoTreeNodes(),
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            }
         });
 
         $('#zeroConfigTree').TrivialTree({

@@ -26,7 +26,7 @@ $.fn.minimallyScrollTo = function (target) {
         if (targetMinY < viewPortMinY) {
             $this.scrollTop(targetMinY);
         } else if (targetMaxY > viewPortMaxY) {
-            $this.scrollTop(targetMaxY - $this.innerHeight());
+            $this.scrollTop(Math.min(targetMinY, targetMaxY - $this.innerHeight()));
         }
     });
 };

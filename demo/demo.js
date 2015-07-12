@@ -163,6 +163,7 @@ function createDemoTreeNodes() {
     }, {
         id: 4, displayValue: "Contacts",
         imageUrl: "img/contacts.png",
-        isLeaf: true
+        isLeaf: true,
+        hasLazyChildren: true
     }]
 }

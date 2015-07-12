@@ -15,8 +15,29 @@
   align-items: center;
   justify-content: center;
 
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
   color: #999999;
   background-color: rgba(255, 255, 255, 0.7);
+
+  .spinner {
+    animation: tr-spin 1s infinite linear;
+    width: 10px;
+    height: 10px;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAN0lEQVQYV2NkQAXGDAwMPlChLQwMDGdh0oxoCuvR+I0UKyTaapBNMOvh1oIE0d1ItEKiraajrwH17w4LpvE5NgAAAABJRU5ErkJggg==);
+    margin-right: 5px;
+  }
+}
+
+@keyframes tr-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
 }
 
 .tr-component-focus() {

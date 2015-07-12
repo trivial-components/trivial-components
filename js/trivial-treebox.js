@@ -1,3 +1,18 @@
+/*
+ Copyright 2015 Yann Massard (Trivial Components)
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 (function (factory) {
         "use strict";
 
@@ -21,6 +36,9 @@
                 valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
+                lazyChildrenQueryFunction: function (node, resultCallback) {
+                    resultCallback([])
+                },
                 expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
@@ -53,53 +71,57 @@
             selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
 
             function isLeaf(entry) {
-                return entry[config.childrenProperty] == null && !entry[config.lazyChildrenFlagProperty];
+                return (entry[config.childrenProperty] == null || entry[config.childrenProperty].length == 0) && !entry[config.lazyChildrenFlagProperty];
+            }
+
+            function createEntryElement(entry, $parentElement, depth) {
+                var leaf = isLeaf(entry);
+                var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>')
+                    .appendTo($parentElement);
+                var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
+                    .appendTo($outerEntryWrapper);
+                for (var k = 0; k < depth; k++) {
+                    $entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
+                }
+                var $expander = $('<div class="tr-tree-expander"></div>')
+                    .appendTo($entryAndExpanderWrapper);
+                var html = Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry);
+                var $entry = $(html).addClass("tr-tree-entry filterable-item")
+                    .appendTo($entryAndExpanderWrapper);
+                entry._trEntryElement = $outerEntryWrapper;
+                $entryAndExpanderWrapper
+                    .mousedown(function (e) {
+                        $componentWrapper.trigger("mousedown", e);
+                        selectEntry(entry);
+                    }).mouseup(function (e) {
+                        $componentWrapper.trigger("mouseup", e);
+                    }).mouseout(function (e) {
+                        $componentWrapper.trigger("mouseout", e);
+                    }).mouseover(function () {
+                        setHighlightedEntry(entry);
+                    });
+
+                if (!leaf) {
+                    var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
+                        .appendTo($outerEntryWrapper);
+                    $expander.mousedown(function (e) {
+                        return false;
+                    }).click(function (e) {
+                        setNodeExpanded(entry, !entry[config.expandedProperty]);
+                    });
+                    if (entry[config.childrenProperty]) {
+                        for (var i = 0; i < entry[config.childrenProperty].length; i++) {
+                            createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
+                        }
+                    } else if (entry[config.lazyChildrenFlagProperty]) {
+                        $childrenWrapper.append(config.spinnerTemplate);
+                    }
+                    setNodeExpanded(entry, entry[config.expandedProperty]);
+                }
             }
 
             function updateTreeEntryElements(entries) {
                 $tree.empty();
-
-                function createEntryElement(entry, $parentElement, depth) {
-                    var leaf = isLeaf(entry);
-                    var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper isLeaf-' + leaf + '"></div>')
-                        .appendTo($parentElement);
-                    var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
-                        .appendTo($outerEntryWrapper);
-                    for (var k = 0; k < depth; k++) {
-                        $entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
-                    }
-                    var $expander = $('<div class="tr-tree-expander"></div>')
-                        .appendTo($entryAndExpanderWrapper);
-                    var html = Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry);
-                    var $entry = $(html).addClass("tr-tree-entry filterable-item")
-                        .appendTo($entryAndExpanderWrapper);
-                    entry._trEntryElement = $outerEntryWrapper;
-                    $entryAndExpanderWrapper
-                        .mousedown(function (e) {
-                            $componentWrapper.trigger("mousedown", e);
-                            selectEntry(entry);
-                        }).mouseup(function (e) {
-                            $componentWrapper.trigger("mouseup", e);
-                        }).mouseout(function (e) {
-                            $componentWrapper.trigger("mouseout", e);
-                        }).mouseover(function () {
-                            setHighlightedEntry(entry);
-                        });
-
-                    if (entry[config.childrenProperty] && entry[config.childrenProperty].length > 0) {
-                        var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
-                            .appendTo($outerEntryWrapper);
-                        setNodeExpanded(entry, entry[config.expandedProperty]);
-                        $expander.mousedown(function(e) {
-                            return false;
-                        }).click(function (e) {
-                            setNodeExpanded(entry, !entry[config.expandedProperty]);
-                        });
-                        for (var i = 0; i < entry[config.childrenProperty].length; i++) {
-                            createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
-                        }
-                    }
-                }
 
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
@@ -114,7 +136,35 @@
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
-                //if (!node.children)
+                if (expanded && node[config.lazyChildrenFlagProperty] && !node[config.childrenProperty]) {
+                    config.lazyChildrenQueryFunction(node, function (children) {
+                        setChildren(node, children);
+                    });
+                }
+                if (expanded) {
+                    minimallyScrollTo(node._trEntryElement);
+                }
+            }
+
+            function nodeDepth(node) {
+                return parseInt(node._trEntryElement.attr('data-depth'));
+            }
+
+            function setChildren(node, children) {
+                node[config.childrenProperty] = children;
+                node[config.lazyChildrenFlagProperty] = false;
+
+                var $childrenWrapper = node._trEntryElement.find('.tr-tree-entry-children-wrapper');
+                $childrenWrapper.empty();
+                if (children && children.length > 0) {
+                    var depth = nodeDepth(node);
+                    for (var i = 0; i < children.length; i++) {
+                        var child = children[i];
+                        createEntryElement(child, $childrenWrapper, depth + 1);
+                    }
+                } else {
+                    node._trEntryElement.removeClass('has-children expanded');
+                }
             }
 
             function updateEntries(newEntries, highlightDirection) {  // TODO remove hightlightDirection - no more needed!
@@ -162,12 +212,16 @@
                 fireChangeEvents();
             }
 
+            function minimallyScrollTo($entryWrapper) {
+                $componentWrapper.parent().minimallyScrollTo($entryWrapper);
+            };
+
             function markSelectedEntry(entry) {
                 $tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
                 if (entry) {
                     var $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entryWrapper.addClass("tr-selected-entry");
-                    $componentWrapper.parent().minimallyScrollTo($entryWrapper);
+                    minimallyScrollTo($entryWrapper);
                 }
             }
 
@@ -188,7 +242,7 @@
                 if (entry != null) {
                     var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entry.addClass('tr-highlighted-entry');
-                    $componentWrapper.parent().minimallyScrollTo($entry);
+                    minimallyScrollTo($entry);
                 }
             }
 
@@ -240,7 +294,7 @@
             this.getSelectedEntry = getSelectedEntry;
             this.selectEntry = selectEntry;
             this.highlightNextEntry = highlightNextEntry;
-            this.highlightNextMatchingEntry = function(direction) {
+            this.highlightNextMatchingEntry = function (direction) {
                 var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
                 if (nextMatchingEntry != null) {
                     setHighlightedEntry(nextMatchingEntry);
@@ -249,7 +303,7 @@
             this.getHighlightedEntry = function () {
                 return highlightedEntry
             };
-            this.highlightTextMatches = function(searchString) {
+            this.highlightTextMatches = function (searchString) {
                 highlightTextMatches(entries, searchString);
             };
             this.setHighlightedNodeExpanded = function (expanded) {
