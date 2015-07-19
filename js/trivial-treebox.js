@@ -136,18 +136,15 @@
                 }
             }
 
-            var retrieveChildren = function (node) {
-                config.lazyChildrenQueryFunction(node, function (children) {
-                    setChildren(node, children);
-                });
-            };
 
             function setNodeExpanded(node, expanded) {
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
                 if (expanded && node[config.lazyChildrenFlagProperty] && !node[config.childrenProperty]) {
-                    retrieveChildren(node);
+                    config.lazyChildrenQueryFunction(node, function (children) {
+                        setChildren(node, children);
+                    });
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
@@ -214,10 +211,9 @@
                 })[0];
             }
 
-            function findParentOfNode(childNodeId) {
-                var childNode = findEntryById(childNodeId);
+            function findParentNode(childNode) {
                 return findEntries(function (entry) {
-                    return entry[config.childrenProperty].indexOf(childNode) != -1;
+                    return entry[config.childrenProperty] && entry[config.childrenProperty].indexOf(childNode) != -1;
                 })[0];
             }
 
@@ -338,7 +334,11 @@
             };
             this.updateChildren =  function updateChildren (parentNodeId, children) {
                 var node = findEntryById(parentNodeId);
-                setChildren(node, children);
+                if (node) {
+                    setChildren(node, children);
+                } else {
+                    console.log("Could not set the children of unknown node with id " + parentNodeId);
+                }
             };
             this.updateNode = function(node) {
                 var oldNode = findEntryById(node.id);
@@ -349,6 +349,18 @@
                 createEntryDisplay(node, nodeDepth(oldNode)).appendTo($oldEntryDisplay);
 
                 setChildren(oldNode, oldNode.children);
+            };
+            this.removeNode = function(nodeId) {
+                var childNode = findEntryById(nodeId);
+                if (childNode) {
+                    var parentNode = findParentNode(childNode);
+                    if (parentNode) {
+                        parentNode[config.childrenProperty].splice(parentNode[config.childrenProperty].indexOf(childNode), 1);
+                    } else {
+                        entries.splice(entries.indexOf(childNode), 1);
+                    }
+                    childNode._trEntryElement.remove();
+                }
             }
         }
 

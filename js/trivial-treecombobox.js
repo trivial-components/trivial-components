@@ -391,6 +391,7 @@
             };
             this.updateChildren = treeBox.updateChildren;
             this.updateNode = treeBox.updateNode;
+            this.removeNode = treeBox.removeNode;
         }
 
         $.fn.trivialtreecombobox = function (options) {
