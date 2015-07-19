@@ -220,6 +220,8 @@
 
             this.updateEntries = updateEntries;
             this.getSelectedEntry = treeBox.getSelectedEntry;
+            this.updateChildren = treeBox.updateChildren;
+            this.updateNode = treeBox.updateNode;
         }
 
         $.fn.trivialtree = function (options) {

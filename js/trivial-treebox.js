@@ -37,7 +37,7 @@
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 lazyChildrenQueryFunction: function (node, resultCallback) {
-                    resultCallback([])
+                    resultCallback(node.children || []);
                 },
                 expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
@@ -74,10 +74,15 @@
                 return (entry[config.childrenProperty] == null || entry[config.childrenProperty].length == 0) && !entry[config.lazyChildrenFlagProperty];
             }
 
+            function createEntryDisplay(entry, depth) {
+                return $(Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry));
+            }
+
             function createEntryElement(entry, $parentElement, depth) {
                 var leaf = isLeaf(entry);
                 var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>')
                     .appendTo($parentElement);
+                entry._trEntryElement = $outerEntryWrapper;
                 var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                     .appendTo($outerEntryWrapper);
                 for (var k = 0; k < depth; k++) {
@@ -85,10 +90,9 @@
                 }
                 var $expander = $('<div class="tr-tree-expander"></div>')
                     .appendTo($entryAndExpanderWrapper);
-                var html = Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry);
-                var $entry = $(html).addClass("tr-tree-entry filterable-item")
-                    .appendTo($entryAndExpanderWrapper);
-                entry._trEntryElement = $outerEntryWrapper;
+                var $entry = createEntryDisplay(entry, depth);
+                $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
+
                 $entryAndExpanderWrapper
                     .mousedown(function (e) {
                         $componentWrapper.trigger("mousedown", e);
@@ -132,14 +136,18 @@
                 }
             }
 
+            var retrieveChildren = function (node) {
+                config.lazyChildrenQueryFunction(node, function (children) {
+                    setChildren(node, children);
+                });
+            };
+
             function setNodeExpanded(node, expanded) {
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
                 if (expanded && node[config.lazyChildrenFlagProperty] && !node[config.childrenProperty]) {
-                    config.lazyChildrenQueryFunction(node, function (children) {
-                        setChildren(node, children);
-                    });
+                    retrieveChildren(node);
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
@@ -206,6 +214,13 @@
                 })[0];
             }
 
+            function findParentOfNode(childNodeId) {
+                var childNode = findEntryById(childNodeId);
+                return findEntries(function (entry) {
+                    return entry[config.childrenProperty].indexOf(childNode) != -1;
+                })[0];
+            }
+
             function selectEntry(entry) {
                 selectedEntryId = entry ? entry[config.valueProperty] : null;
                 markSelectedEntry(entry);
@@ -214,7 +229,7 @@
 
             function minimallyScrollTo($entryWrapper) {
                 $componentWrapper.parent().minimallyScrollTo($entryWrapper);
-            };
+            }
 
             function markSelectedEntry(entry) {
                 $tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
@@ -320,6 +335,20 @@
                     setNodeExpanded(highlightedEntry, expanded);
                     return !wasExpanded != !expanded;
                 }
+            };
+            this.updateChildren =  function updateChildren (parentNodeId, children) {
+                var node = findEntryById(parentNodeId);
+                setChildren(node, children);
+            };
+            this.updateNode = function(node) {
+                var oldNode = findEntryById(node.id);
+                $.extend(oldNode, node);
+
+                var $oldEntryDisplay = oldNode._trEntryElement.find('> .tr-tree-entry-and-expander-wrapper > .tr-tree-entry');
+                $oldEntryDisplay.empty();
+                createEntryDisplay(node, nodeDepth(oldNode)).appendTo($oldEntryDisplay);
+
+                setChildren(oldNode, oldNode.children);
             }
         }
 
@@ -339,7 +368,7 @@
         $.fn.TrivialTreeBox = function (options) {
             var trees = [];
             this.each(function () {
-                var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
+                var existingTreeWrapper = $(this).parents('.tr-treebox').addBack('.tr-treebox');
                 if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTreeBox) {
                     trees.push(existingTreeWrapper[0].trivialTreeBox);
                 } else {

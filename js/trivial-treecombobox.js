@@ -388,7 +388,9 @@
                     selectedEntryToReturn._trEntryElement = undefined;
                     return selectedEntryToReturn;
                 }
-            }
+            };
+            this.updateChildren = treeBox.updateChildren;
+            this.updateNode = treeBox.updateNode;
         }
 
         $.fn.trivialtreecombobox = function (options) {
