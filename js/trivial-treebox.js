@@ -361,7 +361,10 @@
                     }
                     childNode._trEntryElement.remove();
                 }
-            }
+            };
+            //this.addNode = function(parentNodeId, node) {
+            // TODO
+            //}
         }
 
         $.fn.trivialtreebox = function (options) {

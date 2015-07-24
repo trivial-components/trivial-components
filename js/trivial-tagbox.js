@@ -51,6 +51,7 @@
             freeTextSeparators: [',', ';'],
             freeTextEntryValues: {_isFreeTextEntry: true},
             showTrigger: true,
+            distinct: true,
             matchingOptions: {
                 matchingMode: 'contains',
                 ignoreCase: true,
@@ -321,20 +322,17 @@
         }
 
         function calculateOriginalInputValue() {
-            var value = "";
-            for (var i = 0; i < selectedEntries.length; i++) {
-                var selectedEntry = selectedEntries[i];
-                value += selectedEntry[config.valueProperty];
-                if (i < selectedEntries.length - 1) {
-                    value += config.valueSeparator;
-                }
-            }
-            return value;
+            return selectedEntries
+                .map(function(entry) {return entry[config.valueProperty]})
+                .join(config.valueSeparator);
         }
 
         function selectEntry(entry) {
             if (entry == null) {
                 return; // do nothing
+            }
+            if (config.distinct && selectedEntries.map(function(entry) {return entry[config.valueProperty]}).indexOf(entry[config.valueProperty]) != -1) {
+                return; // entry already selected
             }
 
             var tag = $.extend({}, entry);
