@@ -154,7 +154,7 @@
             }
 
             function nodeDepth(node) {
-                return parseInt(node._trEntryElement.attr('data-depth'));
+                return node ? parseInt(node._trEntryElement.attr('data-depth')) : 0;
             }
 
             function setChildren(node, children) {
@@ -334,7 +334,7 @@
                     return !wasExpanded != !expanded;
                 }
             };
-            this.updateChildren =  function updateChildren (parentNodeId, children) {
+            this.updateChildren = function updateChildren(parentNodeId, children) {
                 var node = findEntryById(parentNodeId);
                 if (node) {
                     setChildren(node, children);
@@ -342,7 +342,7 @@
                     console.error("Could not set the children of unknown node with id " + parentNodeId);
                 }
             };
-            this.updateNode = function(node) {
+            this.updateNode = function (node) {
                 var oldNode = findEntryById(node.id);
                 var parent = findParentNode(oldNode);
                 if (parent) {
@@ -353,7 +353,7 @@
                 createEntryElement(node, nodeDepth(oldNode)).insertAfter(oldNode._trEntryElement);
                 oldNode._trEntryElement.remove();
             };
-            this.removeNode = function(nodeId) {
+            this.removeNode = function (nodeId) {
                 var childNode = findEntryById(nodeId);
                 if (childNode) {
                     var parentNode = findParentNode(childNode);
@@ -365,13 +365,13 @@
                     childNode._trEntryElement.remove();
                 }
             };
-            this.addNode = function(parentNodeId, node) {
+            this.addNode = function (parentNodeId, node) {
                 var parentNode = findEntryById(parentNodeId);
                 if (isLeaf(parentNode)) {
                     console.error('The parent node is a leaf node, so you cannot add children to it!');
                 }
                 if (!parentNode[config.childrenProperty]) {
-                 parentNode[config.childrenProperty] = [];
+                    parentNode[config.childrenProperty] = [];
                 }
                 parentNode[config.childrenProperty].push(node);
                 var entryElement = createEntryElement(node, nodeDepth(parentNode) + 1);
