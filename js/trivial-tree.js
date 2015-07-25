@@ -102,7 +102,7 @@
                             return false; // some browsers move the caret to the beginning on up key
                         }
                     } else if (e.which == keyCodes.enter) {
-                        treeBox.selectEntry(treeBox.getHighlightedEntry());
+                        treeBox.selectNode(treeBox.getHighlightedEntry()[config.valueProperty]);
                         $editor.select();
                     } else if (e.which == keyCodes.escape) {
                         $editor.val("");
