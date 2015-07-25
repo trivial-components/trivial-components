@@ -1,5 +1,7 @@
 /*
- Copyright 2015 Yann Massard (Trivial Components)
+ Trivial Components (https://github.com/trivial-components/trivial-components)
+
+ Copyright 2015 Yann Massard (https://github.com/yamass) and other contributors
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

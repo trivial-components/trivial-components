@@ -1,3 +1,6 @@
+var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others |" +
+    " Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
+
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var bower = require('gulp-bower');
@@ -20,6 +23,7 @@ var tar = require('gulp-tar');
 var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
 var karma = require('karma').server;
+var header = require('gulp-header');
 
 gulp.task('clean', function () {
     del(['bower_components', 'dist']);
@@ -98,7 +102,8 @@ gulp.task('js-single', function () {
                 rename(function (path) {
                     path.basename += ".min";
                 }),
-                uglify()
+                uglify(),
+                header(minCopyrightHeader)
             )
         ))
         .pipe(gulp.dest('./dist/js/single'));
@@ -113,13 +118,14 @@ gulp.task('js-bundle', function () {
                 rename(function (path) {
                     path.basename += ".min";
                 }),
-                uglify()
+                uglify(),
+                header(minCopyrightHeader)
             )
         ))
         .pipe(gulp.dest('./dist/js/bundle'))
 });
 
-gulp.task('test', ['bower'],  function (done) {
+gulp.task('test', ['bower'], function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true
