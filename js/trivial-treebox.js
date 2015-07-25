@@ -80,10 +80,9 @@
                 return $(Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry));
             }
 
-            function createEntryElement(entry, $parentElement, depth) {
+            function createEntryElement(entry, depth) {
                 var leaf = isLeaf(entry);
-                var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>')
-                    .appendTo($parentElement);
+                var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>');
                 entry._trEntryElement = $outerEntryWrapper;
                 var $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
                     .appendTo($outerEntryWrapper);
@@ -117,13 +116,14 @@
                     });
                     if (entry[config.childrenProperty]) {
                         for (var i = 0; i < entry[config.childrenProperty].length; i++) {
-                            createEntryElement(entry[config.childrenProperty][i], $childrenWrapper, depth + 1);
+                            createEntryElement(entry[config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
                         }
                     } else if (entry[config.lazyChildrenFlagProperty]) {
                         $childrenWrapper.append(config.spinnerTemplate);
                     }
                     setNodeExpanded(entry, entry[config.expandedProperty]);
                 }
+                return $outerEntryWrapper;
             }
 
             function updateTreeEntryElements(entries) {
@@ -131,7 +131,7 @@
 
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
-                        createEntryElement(entries[i], $tree, 0);
+                        createEntryElement(entries[i], 0).appendTo($tree);
                     }
                 } else {
                     $tree.append(config.noEntriesTemplate);
@@ -167,7 +167,7 @@
                     var depth = nodeDepth(node);
                     for (var i = 0; i < children.length; i++) {
                         var child = children[i];
-                        createEntryElement(child, $childrenWrapper, depth + 1);
+                        createEntryElement(child, depth + 1).appendTo($childrenWrapper);
                     }
                 } else {
                     node._trEntryElement.removeClass('has-children expanded');
@@ -364,9 +364,16 @@
                     childNode._trEntryElement.remove();
                 }
             };
-            //this.addNode = function(parentNodeId, node) {
-            // TODO
-            //}
+            this.addNode = function(parentNodeId, node) {
+                var parentNode = findEntryById(parentNodeId);
+                if (isLeaf(parentNode)) {
+                    console.error('The parent node is a leaf node, so you cannot add children to it!');
+                }
+                var entryElement = createEntryElement(node, nodeDepth(parentNode) + 1);
+                entryElement
+                    .appendTo(parentNode._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
+                parentNode._trEntryElement.addClass('has-children');
+            }
         }
 
         $.fn.trivialtreebox = function (options) {

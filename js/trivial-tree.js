@@ -225,6 +225,7 @@
             this.updateChildren = treeBox.updateChildren;
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;
+            this.addNode = treeBox.addNode;
         }
 
         $.fn.trivialtree = function (options) {
