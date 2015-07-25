@@ -47,6 +47,7 @@
     "gulp-postcss": "5.x",
     "gulp-rename": "1.x",
     "gulp-sourcemaps": "1.x",
+    "gulp-strip-css-comments": "^1.1.0",
     "gulp-strip-debug": "^1.0.2",
     "gulp-tar": "1.x",
     "gulp-uglify": "1.x",

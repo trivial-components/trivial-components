@@ -1,5 +1,4 @@
-var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others |" +
-    " Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
+var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -26,7 +25,7 @@ var karma = require('karma').server;
 var header = require('gulp-header');
 
 gulp.task('clean', function () {
-    del(['bower_components', 'dist']);
+    del(['dist']);
 });
 
 gulp.task('bower', function () {
@@ -74,22 +73,33 @@ function compileLess(src, dest) {
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(postcss([autoprefixer({browsers: ['> 2%']})]))
-        .pipe(sourcemaps.write())
+        .pipe(mirror(
+            pipe(
+                rename(function (path) {
+                    path.basename += ".sourcemaps";
+                }),
+                pipe(sourcemaps.write())
+            )
+        ))
         .pipe(gulp.dest(dest))
         .pipe(livereload());
 }
 
 gulp.task('less', ['bower'], function () {
-    compileLess(['less/trivial-components.less'], 'dist/css');
-    compileLess(['demo/less/demo.less'], 'demo/css');
+    return compileLess(['less/trivial-components.less'], 'dist/css');
+});
+
+gulp.task('less-demo', ['bower'], function () {
+    return compileLess(['demo/less/demo.less'], 'demo/css');
 });
 
 gulp.task('minifyCss', ['less'], function () {
-    return gulp.src(["dist/css/*.css", "!dist/css/*.min.css"])
+    return gulp.src(["dist/css/*.css", "!dist/css/*.min.css", "!dist/css/*.sourcemaps.css"])
         .pipe(rename(function (path) {
             path.basename += ".min"
         }))
         .pipe(minifyCSS())
+        .pipe(header(minCopyrightHeader))
         .pipe(gulp.dest("dist/css"));
 });
 
@@ -153,9 +163,9 @@ gulp.task('gz-bundle-distro', function () {
         .pipe(gulp.dest('dist/js/bundle'));
 });
 
-gulp.task('default', ['prepare-dist', "zip", "tar"]);
+gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo"]);
 
 gulp.task('watch', function () {
     livereload.listen();
-    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less']);
+    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
 });
