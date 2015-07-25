@@ -339,18 +339,19 @@
                 if (node) {
                     setChildren(node, children);
                 } else {
-                    console.log("Could not set the children of unknown node with id " + parentNodeId);
+                    console.error("Could not set the children of unknown node with id " + parentNodeId);
                 }
             };
             this.updateNode = function(node) {
                 var oldNode = findEntryById(node.id);
-                $.extend(oldNode, node);
-
-                var $oldEntryDisplay = oldNode._trEntryElement.find('> .tr-tree-entry-and-expander-wrapper > .tr-tree-entry');
-                $oldEntryDisplay.empty();
-                createEntryDisplay(node, nodeDepth(oldNode)).appendTo($oldEntryDisplay);
-
-                setChildren(oldNode, oldNode.children);
+                var parent = findParentNode(oldNode);
+                if (parent) {
+                    parent[config.childrenProperty][parent[config.childrenProperty].indexOf(oldNode)] = node;
+                } else {
+                    entries[entries.indexOf(oldNode)] = node;
+                }
+                createEntryElement(node, nodeDepth(oldNode)).insertAfter(oldNode._trEntryElement);
+                oldNode._trEntryElement.remove();
             };
             this.removeNode = function(nodeId) {
                 var childNode = findEntryById(nodeId);
@@ -369,6 +370,10 @@
                 if (isLeaf(parentNode)) {
                     console.error('The parent node is a leaf node, so you cannot add children to it!');
                 }
+                if (!parentNode[config.childrenProperty]) {
+                 parentNode[config.childrenProperty] = [];
+                }
+                parentNode[config.childrenProperty].push(node);
                 var entryElement = createEntryElement(node, nodeDepth(parentNode) + 1);
                 entryElement
                     .appendTo(parentNode._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
