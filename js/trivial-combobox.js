@@ -446,7 +446,8 @@
                 selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             }
-        }
+        };
+        this.selectEntry = selectEntry;
     }
 
     $.fn.trivialcombobox = function (options) {
