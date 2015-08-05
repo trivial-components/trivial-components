@@ -293,11 +293,11 @@
                 return visibleEntriesAsList[newSelectedElementIndex];
             }
 
-            function highlightTextMatches(entries, searchString) {
+            function highlightTextMatches(searchString) {
                 for (var i = 0; i < entries.length; i++) {
                     var entry = entries[i];
                     var $entryElement = entry._trEntryElement.find('.tr-tree-entry');
-                    $entryElement.trivialHighlight(searchString);
+                    $entryElement.trivialHighlight(searchString, config.matchingOptions);
                 }
             }
 
@@ -325,7 +325,7 @@
                 return highlightedEntry
             };
             this.highlightTextMatches = function (searchString) {
-                highlightTextMatches(entries, searchString);
+                highlightTextMatches(searchString);
             };
             this.setHighlightedNodeExpanded = function (expanded) {
                 if (!highlightedEntry || isLeaf(highlightedEntry)) {

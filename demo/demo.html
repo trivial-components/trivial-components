@@ -13,6 +13,7 @@
     <script src="../js/trivial-highlight.js"></script>
     <script src="../js/trivial-minimallyScrollTo.js"></script>
     <script src="../js/trivial-combobox.js"></script>
+    <script src="../js/trivial-listbox.js"></script>
     <script src="../js/trivial-list.js"></script>
     <script src="../js/trivial-tagbox.js"></script>
     <script src="../js/trivial-treebox.js"></script>
@@ -44,6 +45,13 @@
 
     <h5>No trigger</h5>
     <input id="noTriggerComboBox">
+</div>
+
+
+<h4>ListBox</h4>
+
+<div id="listBox">
+
 </div>
 
 
@@ -146,6 +154,10 @@
         $('#noTriggerComboBox').TrivialComboBox({
             entries: createEntries(),
             showTrigger: false
+        });
+
+        $('#listBox').TrivialListBox({
+            entries: createEntries(10)
         });
 
         $('#zeroConfigList').TrivialList({
