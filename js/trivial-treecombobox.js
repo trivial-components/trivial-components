@@ -36,11 +36,14 @@
         function TrivialTreeComboBox(originalInput, options) {
             options = options || {};
             var config = $.extend({
-                inputTextProperty: 'displayValue',
                 valueProperty: 'id',
+                inputTextProperty: 'displayValue',
+                templates: [TrivialComponents.iconSingleLineTemplate],
                 selectedEntryTemplate: (options.templates && options.templates.length > 0 && options.templates[0]) || TrivialComponents.icon2LinesTemplate,
                 selectedEntry: null,
-                templates: [TrivialComponents.iconSingleLineTemplate],
+                spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
+                noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+                entries: null,
                 emptyEntry: {},
                 queryFunction: null, // defined below...
                 autoComplete: true,
@@ -55,10 +58,7 @@
                 },
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
-                expandedProperty: 'expanded',
-                spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
-                entries: null
+                expandedProperty: 'expanded'
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
@@ -225,6 +225,7 @@
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (newEntries) {
                         updateEntries(newEntries);
+
                         var nonSelectedEditorValue = getNonSelectedEditorValue();
                         if (nonSelectedEditorValue.length > 0) {
                             treeBox.highlightTextMatches(nonSelectedEditorValue);
@@ -232,6 +233,7 @@
                         } else {
                             treeBox.highlightNextEntry(highlightDirection);
                         }
+
                         autoCompleteIfPossible(config.autoCompleteDelay);
 
                         if (isDropDownOpen) {
@@ -344,27 +346,28 @@
             }
 
             function autoCompleteIfPossible(delay) {
-                clearTimeout(autoCompleteTimeoutId);
+                if (config.autoComplete) {
+                    clearTimeout(autoCompleteTimeoutId);
 
-                var highlightedEntry = treeBox.getHighlightedEntry();
-                if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                    autoCompleteTimeoutId = setTimeout(function () {
-                        var oldEditorValue = getNonSelectedEditorValue();
-                        var newEditorValue;
-                        if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                            newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                        } else {
-                            newEditorValue = getNonSelectedEditorValue();
-                        }
-                        $editor.val(newEditorValue);
-                        setTimeout(function () { // we need this to guarantee that the editor has been updated...
-                            $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
-                        }, 0);
-                    }, delay || 0);
+                    var highlightedEntry = treeBox.getHighlightedEntry();
+                    if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
+                        var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
+                        autoCompleteTimeoutId = setTimeout(function () {
+                            var oldEditorValue = getNonSelectedEditorValue();
+                            var newEditorValue;
+                            if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
+                                newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
+                            } else {
+                                newEditorValue = getNonSelectedEditorValue();
+                            }
+                            $editor.val(newEditorValue);
+                            setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                                $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                            }, 0);
+                        }, delay || 0);
+                    }
+                    doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 }
-
-                doNoAutoCompleteBecauseBackspaceWasPressed = false;
             }
 
             this.$ = $treeComboBox;

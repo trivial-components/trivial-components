@@ -103,12 +103,16 @@
                 }
             }
 
+            function minimallyScrollTo($entryWrapper) {
+                $listBox.parent().minimallyScrollTo($entryWrapper);
+            }
+
             function setHighlightedEntry(entry) {
                 highlightedEntry = entry;
                 $entryList.find('.tr-listbox-entry').removeClass('tr-highlighted-entry');
                 if (entry != null) {
                     entry._trEntryElement.addClass('tr-highlighted-entry');
-                    $entryList.minimallyScrollTo(entry._trEntryElement);
+                    minimallyScrollTo(entry._trEntryElement);
                 }
             }
 
@@ -168,6 +172,17 @@
                 }
             };
             this.selectEntry = selectEntry;
+            this.highlightNextEntry = highlightNextEntry;
+            this.highlightNextMatchingEntry = function (direction) {
+                var nextMatchingEntry = getNextHighlightableEntry(direction);
+                if (nextMatchingEntry != null) {
+                    setHighlightedEntry(nextMatchingEntry);
+                }
+            };
+            this.getHighlightedEntry = function () {
+                return highlightedEntry
+            };
+            this.highlightTextMatches = highlightTextMatches;
         }
 
         $.fn.triviallistbox = function (options) {

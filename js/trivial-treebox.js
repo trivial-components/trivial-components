@@ -316,7 +316,7 @@
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
             this.highlightNextMatchingEntry = function (direction) {
-                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
+                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction);
                 if (nextMatchingEntry != null) {
                     setHighlightedEntry(nextMatchingEntry);
                 }
@@ -324,9 +324,7 @@
             this.getHighlightedEntry = function () {
                 return highlightedEntry
             };
-            this.highlightTextMatches = function (searchString) {
-                highlightTextMatches(searchString);
-            };
+            this.highlightTextMatches = highlightTextMatches;
             this.setHighlightedNodeExpanded = function (expanded) {
                 if (!highlightedEntry || isLeaf(highlightedEntry)) {
                     return false;
