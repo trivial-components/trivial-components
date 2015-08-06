@@ -157,15 +157,25 @@ gulp.task('tar', ['prepare-dist'], function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('gz-bundle-distro', function () {
-    return gulp.src(['dist/js/bundle/trivial-components.min.js'])
-        .pipe(gzip())
-        .pipe(gulp.dest('dist/js/bundle'));
-});
-
 gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo"]);
 
 gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
 });
+
+
+//====== special tasks =====
+
+gulp.task('gz-bundle-distro', function () {
+    return gulp.src(['dist/js/bundle/trivial-components.min.js'])
+        .pipe(gzip())
+        .pipe(gulp.dest('dist/js/bundle'));
+});
+
+gulp.task('gz-min-css', function () {
+    return gulp.src(['dist/css/trivial-components.min.css'])
+        .pipe(gzip())
+        .pipe(gulp.dest('dist/css'));
+});
+

@@ -228,32 +228,7 @@
             this.addNode = treeBox.addNode;
         }
 
-        $.fn.trivialtree = function (options) {
-            var $trees = [];
-            this.each(function () {
-                var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
-                if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTree) {
-                    $trees.push(existingTreeWrapper[0].trivialTree.$);
-                } else {
-                    var tree = new TrivialTree(this, options);
-                    $trees.push(tree.$);
-                }
-            });
-            return $($trees);
-        };
-        $.fn.TrivialTree = function (options) {
-            var trees = [];
-            this.each(function () {
-                var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
-                if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTree) {
-                    trees.push(existingTreeWrapper[0].trivialTree);
-                } else {
-                    var tree = new TrivialTree(this, options);
-                    trees.push(tree);
-                }
-            });
-            return trees.length == 1 ? trees[0] : trees;
-        };
+        TrivialComponents.registerJqueryPlugin(TrivialTree, "TrivialTree", "tr-tree");
 
         return $.fn.TrivialTree;
     })

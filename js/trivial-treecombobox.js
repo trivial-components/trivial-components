@@ -399,32 +399,7 @@
             this.removeNode = treeBox.removeNode;
         }
 
-        $.fn.trivialtreecombobox = function (options) {
-            var $treeComboBoxes = [];
-            this.each(function () {
-                var existingTreeComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
-                if (existingTreeComboBoxWrapper.length > 0 && existingTreeComboBoxWrapper[0].trivialTreeComboBox) {
-                    $treeComboBoxes.push(existingTreeComboBoxWrapper[0].trivialTreeComboBox.$);
-                } else {
-                    var treeComboBox = new TrivialTreeComboBox(this, options);
-                    $treeComboBoxes.push(treeComboBox.$);
-                }
-            });
-            return $($treeComboBoxes);
-        };
-        $.fn.TrivialTreeComboBox = function (options) {
-            var treeComboBoxes = [];
-            this.each(function () {
-                var existingTreeComboBoxWrapper = $(this).parents('.tr-combobox').addBack('.tr-combobox');
-                if (existingTreeComboBoxWrapper.length > 0 && existingTreeComboBoxWrapper[0].trivialTreeComboBox) {
-                    treeComboBoxes.push(existingTreeComboBoxWrapper[0].trivialTreeComboBox);
-                } else {
-                    var treeComboBox = new TrivialTreeComboBox(this, options);
-                    treeComboBoxes.push(treeComboBox);
-                }
-            });
-            return treeComboBoxes.length == 1 ? treeComboBoxes[0] : treeComboBoxes;
-        };
+        TrivialComponents.registerJqueryPlugin(TrivialTreeComboBox, "TrivialTreeComboBox", "tr-combobox");
 
         return $.fn.TrivialTreeComboBox;
     })

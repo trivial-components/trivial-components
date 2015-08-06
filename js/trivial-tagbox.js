@@ -476,32 +476,7 @@
         }
     }
 
-    $.fn.trivialtagbox = function (options) {
-        var $tagBoxes = [];
-        this.each(function () {
-            var existingTagBoxWrapper = $(this).parents('.tr-tagbox').addBack('.tr-tagbox');
-            if (existingTagBoxWrapper.length > 0 && existingTagBoxWrapper[0].trivialTagBox) {
-                $tagBoxes.push(existingTagBoxWrapper[0].trivialTagBox.$);
-            } else {
-                var tagBox = new TrivialTagBox(this, options);
-                $tagBoxes.push(tagBox.$);
-            }
-        });
-        return $($tagBoxes);
-    };
-    $.fn.TrivialTagBox = function (options) {
-        var tagBoxes = [];
-        this.each(function () {
-            var existingTagBoxWrapper = $(this).parents('.tr-tagbox').addBack('.tr-tagbox');
-            if (existingTagBoxWrapper.length > 0 && existingTagBoxWrapper[0].trivialTagBox) {
-                tagBoxes.push(existingTagBoxWrapper[0].trivialTagBox);
-            } else {
-                var tagBox = new TrivialTagBox(this, options);
-                tagBoxes.push(tagBox);
-            }
-        });
-        return tagBoxes.length == 1 ? tagBoxes[0] : tagBoxes;
-    };
+        TrivialComponents.registerJqueryPlugin(TrivialTagBox, "TrivialTagBox", "tr-tagbox");
 
     return $.fn.TrivialTagBox;
 })

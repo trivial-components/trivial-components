@@ -381,32 +381,7 @@
             }
         }
 
-        $.fn.trivialtreebox = function (options) {
-            var $trees = [];
-            this.each(function () {
-                var existingTreeWrapper = $(this).parents('.tr-tree').addBack('.tr-tree');
-                if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTreeBox) {
-                    $trees.push(existingTreeWrapper[0].trivialTreeBox.$);
-                } else {
-                    var tree = new TrivialTreeBox(this, options);
-                    $trees.push(tree.$);
-                }
-            });
-            return $($trees);
-        };
-        $.fn.TrivialTreeBox = function (options) {
-            var trees = [];
-            this.each(function () {
-                var existingTreeWrapper = $(this).parents('.tr-treebox').addBack('.tr-treebox');
-                if (existingTreeWrapper.length > 0 && existingTreeWrapper[0].trivialTreeBox) {
-                    trees.push(existingTreeWrapper[0].trivialTreeBox);
-                } else {
-                    var tree = new TrivialTreeBox(this, options);
-                    trees.push(tree);
-                }
-            });
-            return trees.length == 1 ? trees[0] : trees;
-        };
+        TrivialComponents.registerJqueryPlugin(TrivialTreeBox, "TrivialTreeBox", "tr-treebox");
 
         return $.fn.TrivialTreeBox;
     })

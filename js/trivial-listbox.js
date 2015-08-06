@@ -185,32 +185,7 @@
             this.highlightTextMatches = highlightTextMatches;
         }
 
-        $.fn.triviallistbox = function (options) {
-            var $listBoxes = [];
-            this.each(function () {
-                var existingListBoxWrapper = $(this).parents('.tr-listbox').addBack('.tr-listbox');
-                if (existingListBoxWrapper.length > 0 && existingListBoxWrapper[0].trivialListBox) {
-                    $listBoxes.push(existingListBoxWrapper[0].trivialListBox.$);
-                } else {
-                    var listBox = new TrivialListBox(this, options);
-                    $listBoxes.push(listBox.$);
-                }
-            });
-            return $($listBoxes);
-        };
-        $.fn.TrivialListBox = function (options) {
-            var listBoxes = [];
-            this.each(function () {
-                var existingListBoxWrapper = $(this).parents('.tr-listbox').addBack('.tr-listbox');
-                if (existingListBoxWrapper.length > 0 && existingListBoxWrapper[0].trivialListBox) {
-                    listBoxes.push(existingListBoxWrapper[0].trivialListBox);
-                } else {
-                    var listBox = new TrivialListBox(this, options);
-                    listBoxes.push(listBox);
-                }
-            });
-            return listBoxes.length == 1 ? listBoxes[0] : listBoxes;
-        };
+        TrivialComponents.registerJqueryPlugin(TrivialListBox, "TrivialListBox", "tr-listbox");
 
         return $.fn.TrivialListBox;
     })
