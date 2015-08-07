@@ -22,6 +22,20 @@
     outline: none;
   }
 
+  &.no-searchfield {
+    overflow: hidden;
+    position: relative;
+    .tr-tree-edit-input {
+      position: absolute;
+      z-index: -1000;
+      top: -1px;
+      font-size: 1px;
+      padding: 0;
+      border: none;
+      opacity: 0;
+    }
+  }
+
   .tr-tree-entryTree {
     flex: 1 1 300px;
     overflow: auto;

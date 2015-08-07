@@ -93,6 +93,10 @@
 <div style="width: 350px; height: 370px">
     <input id="zeroConfigTree">
 </div>
+no search field:
+<div style="width: 350px; height: 370px">
+    <input id="noSearchFieldTree">
+</div>
 
 <div style="width: 300px">
     <h5>TrivialUnitBox</h5>
@@ -230,6 +234,18 @@
                     callback(createDemoTreeNodes())
                 }, 1000);
             }
+        });
+
+        $('#noSearchFieldTree').TrivialTree({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 2 ,
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            },
+            showSearchField: false
         });
 
         $('#unitBox').TrivialUnitBox({

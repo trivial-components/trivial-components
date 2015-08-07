@@ -40,6 +40,7 @@
                 valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
+                showSearchField: true,
                 lazyChildrenQueryFunction: function (node, resultCallback) {
                     resultCallback([])
                 },
@@ -67,7 +68,8 @@
 
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
-            var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput);
+            var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput)
+                .addClass(config.showSearchField ? "" : "no-searchfield");
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
             var $editor = $('<input type="text" class="tr-tree-edit-input"/>')
                 .prependTo($componentWrapper)
@@ -83,6 +85,7 @@
                     }
                 })
                 .keydown(function (e) {
+                    console.log($editor.val());
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
