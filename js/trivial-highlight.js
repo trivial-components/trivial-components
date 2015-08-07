@@ -83,8 +83,16 @@
             searchString = searchString.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"); // escape all regex special chars
             return findRegexMatches(new RegExp('^' + searchString, "g"));
         } else if (options.matchingMode == 'prefix-word') {
+            // ATTENTION: IF YOU CHANGE THIS, MAKE SURE TO EXECUTE THE UNIT TESTS!!
             searchString = searchString.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"); // escape all regex special chars
-            return findRegexMatches(new RegExp('\\b' + searchString, "g"));
+            if (searchString.charAt(0).match(/^\w/)) {
+                return findRegexMatches(new RegExp('\\b' + searchString, "g"));
+            } else {
+                // search string starts with a non-word character, so \b will possibly not match!
+                // After all, we cannot really decide, what is meant to be a word boundary in this context
+                // (e.g.: "12€" with searchString "€"), so we fall back to "contains" mode.
+                return findRegexMatches(new RegExp(searchString, "g"));
+            }
         } else if (options.matchingMode == 'prefix-levenshtein') {
             return findLevenshteinMatches(text.substr(0, Math.min(searchString.length, text.length)), searchString);
         } else if (options.matchingMode == 'levenshtein') {

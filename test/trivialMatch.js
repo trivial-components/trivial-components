@@ -52,6 +52,27 @@ describe('trivialMatch', function() {
         }]);
     });
 
+    it('will, in "prefix-word" mode, find matches to the beginning of the string, even if there is no word boundary (\\b)', function() {
+        expect($.trivialMatch('$123', '$', {
+            matchingMode: 'prefix-word'
+        })).toEqual([{
+            start: 0,
+            length: 1
+        }]);
+        expect($.trivialMatch('... and so on', '..', {
+            matchingMode: 'prefix-word'
+        })).toEqual([{
+            start: 0,
+            length: 2
+        }]);
+        expect($.trivialMatch('Non-word character € with space in front...', '€', {
+            matchingMode: 'prefix-word'
+        })).toEqual([{
+            start: 19,
+            length: 1
+        }]);
+    });
+
     it('matches correctly with "prefix-levenshtein"', function() {
         expect($.trivialMatch('Stephan Riesenhof', 'Steffan', {
             matchingMode: 'prefix-levenshtein'
