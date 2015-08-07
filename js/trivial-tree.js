@@ -85,7 +85,6 @@
                     }
                 })
                 .keydown(function (e) {
-                    console.log($editor.val());
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
