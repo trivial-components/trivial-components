@@ -38,7 +38,7 @@
             var config = $.extend({
                 unitValueProperty: null,
                 decimalSeparator: '.',
-                numberUnitValueSeparatorString: ' ',
+                decimalPrecision: 2,
                 unitDisplayPosition: 'right', // right or left
                 inputTextProperty: 'code',
                 template: TrivialComponents.currency2LineTemplate,
@@ -70,6 +70,7 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var numberRegex = new RegExp('\\d+(?:\\'+config.decimalSeparator+'\\d*)?');
             var queryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ]');
             var lastQueryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ](?=[\\d\\' + config.decimalSeparator + ' ]*$)');
 
@@ -146,13 +147,17 @@
                     } else if (e.which == keyCodes.escape) {
                         closeDropDown();
                         cleanUpEditorValue();
+                    } else if (!e.shiftKey && keyCodes.numberKeys.indexOf(e.which) != -1) {
+                        var numberPart = getEditorValueNumberPart();
+                        var decimalSeparatorIndex = numberPart.indexOf(config.decimalSeparator);
+                        if (decimalSeparatorIndex != -1 && numberPart.length - (decimalSeparatorIndex + 1) >= config.decimalPrecision) {
+                            return false;
+                        }
                     }
                 })
                 .keypress(function (e) {
                     var character = String.fromCharCode(e.which);
-                    if (character >= '0' && character <= '9'
-                        || character === config.decimalSeparator
-                        || character === ' ') {
+                    if (character >= '0' && character <= '9') {
                         // was number input...
                     }
                 })
@@ -207,9 +212,17 @@
                 var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
                 var firstQueryCharacterIndex = nonSelectedEditorValue.search(queryCharacterRegex);
                 var lastQueryCharacterIndex = nonSelectedEditorValue.search(lastQueryCharacterRegex);
-                console.log(firstQueryCharacterIndex + " - " + lastQueryCharacterIndex);
-                if (firstQueryCharacterIndex != lastQueryCharacterIndex) {
+                if (firstQueryCharacterIndex != -1) {
                     return nonSelectedEditorValue.substring(firstQueryCharacterIndex, lastQueryCharacterIndex + 1);
+                } else {
+                    return "";
+                }
+            };
+
+            var getEditorValueNumberPart = function () {
+                var match = numberRegex.exec($editor.val());
+                if (match) {
+                    return match[0];
                 } else {
                     return "";
                 }
