@@ -48,11 +48,11 @@
                 entries: null,
                 emptyEntry: {},
                 queryFunction: null, // defined below...
-                autoComplete: true,
+                autoComplete: false,
                 autoCompleteDelay: 0,
                 showTrigger: true,
                 matchingOptions: {
-                    matchingMode: 'prefix',
+                    matchingMode: 'prefix-word',
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
                 }
