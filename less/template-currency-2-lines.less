@@ -1,0 +1,43 @@
+.tr-template-currency-2-lines {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 1px 3px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .main-line {
+    line-height: 14px;
+    margin: 1px 0;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+
+    .code {
+      font-weight: 500;
+    }
+
+    .symbol + .code {
+      color: #555;
+      &:before {
+        content: '(';
+      }
+      &:after {
+        content: ')';
+      }
+    }
+  }
+  .additional-info {
+    font-size: 90%;
+    color: #555;
+    font-weight: 200;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+
+    .exchange {
+      &:before {
+        content: '= '
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.tr-template-currency-single-line-short {
+  padding: 5px 4px 5px 8px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 15px;
+  white-space: nowrap;
+  text-align: right;
+
+  .symbol {
+  }
+  .code {
+    display: inline-block;
+  }
+  .symbol + .code {
+    color: #555;
+    min-width: 2.7em;
+    &:before {
+      content: '(';
+    }
+    &:after {
+      content: ')';
+    }
+  }
+}

@@ -61,6 +61,26 @@
             '    <div>{{displayValue}}</div> ' +
             '  </div>' +
             '</div>';
+        var currencySingleLineShortTemplate = '<div class="tr-template-currency-single-line-short">' +
+            '  <div class="content-wrapper editor-area"> ' +
+            '    <div>{{#symbol}}<span class="symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="code">{{code}}</span>{{/code}}</div> ' +
+            '  </div>' +
+            '</div>';
+        var currency2LineTemplate = '<div class="tr-template-currency-2-lines">' +
+            '  <div class="content-wrapper editor-area"> ' +
+            '    <div class="main-line">' +
+            '      <span class="code">{{code}}</span>' +
+            '      <span class="name">{{name}}</span>' +
+            '    </div> ' +
+            '    <div class="additional-info">' +
+            '      <span class="symbol">{{symbol}}</span>' +
+            '      <div class="exchange">' +
+            '        <span class="exchange-rate">{{exchangeRate}}</span>' +
+            '        <span class="exchange-rate-base">{{exchangeRateBase}}</span>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>';
 
         function wrapEntryTemplateWithDefaultTagWrapperTemplate(entryTemplate) {
             return ('<div class="tr-tagbox-default-wrapper-template">' +
@@ -93,7 +113,8 @@
             right_window_key: 92,
             select_key: 93,
             num_lock: 144,
-            scroll_lock: 145
+            scroll_lock: 145,
+            specialKeys: [8, 9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 91, 92, 93, 144, 145]
         };
 
         function isModifierKey(e) {
@@ -213,6 +234,8 @@
             icon2LinesTemplate: icon2LinesTemplate,
             iconSingleLineTemplate: iconSingleLineTemplate,
             singleLineTemplate: singleLineTemplate,
+            currencySingleLineShortTemplate: currencySingleLineShortTemplate,
+            currency2LineTemplate: currency2LineTemplate,
             defaultSpinnerTemplate: '<div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div>',
             defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
             wrapEntryTemplateWithDefaultTagWrapperTemplate: wrapEntryTemplateWithDefaultTagWrapperTemplate,

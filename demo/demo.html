@@ -19,6 +19,7 @@
     <script src="../js/trivial-treebox.js"></script>
     <script src="../js/trivial-treecombobox.js"></script>
     <script src="../js/trivial-tree.js"></script>
+    <script src="../js/trivial-unitbox.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -91,6 +92,11 @@
 
 <div style="width: 350px; height: 370px">
     <input id="zeroConfigTree">
+</div>
+
+<div style="width: 300px">
+    <h5>TrivialUnitBox</h5>
+    <input id="unitBox">
 </div>
 
 <script>
@@ -224,6 +230,10 @@
                     callback(createDemoTreeNodes())
                 }, 1000);
             }
+        });
+
+        $('#unitBox').TrivialUnitBox({
+            entries: createCurrencyEntries()
         });
     });
 </script>
