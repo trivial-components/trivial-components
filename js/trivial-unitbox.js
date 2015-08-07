@@ -67,6 +67,8 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var queryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ]');
+            var lastQueryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ](?=[\\d\\' + config.decimalSeparator + ' ]*$)');
 
             var $spinners = $();
             var $originalInput = $(originalInput);
@@ -121,7 +123,6 @@
                     }
 
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
-                        console.log("backspace or delete");
                         doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                     }
 
@@ -149,10 +150,6 @@
                         || character === config.decimalSeparator
                         || character === ' ') {
                         // was number input...
-                    } else if (e.which != keyCodes.enter) {
-                        //console.log("opening because '" + character + "', which: " + e.which);
-                        //openDropDown();
-                        //query(1);
                     }
                 })
                 .keyup(function (e) {
@@ -176,19 +173,16 @@
 
             $unitBox.add($dropDown).mousedown(function () {
                 if ($editor.is(":focus")) {
-                    console.log("mousedown blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = true;
                 }
             }).mouseup(function () {
                 if (blurCausedByClickInsideComponent) {
                     $editor.focus();
-                    console.log("mouseup # blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = false;
                 }
             }).mouseout(function () {
                 if (blurCausedByClickInsideComponent) {
                     $editor.focus();
-                    console.log("mouseout # blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = false;
                 }
             });
@@ -207,9 +201,11 @@
 
             var getQueryString = function () {
                 var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
-                var firstQueryCharacterIndex = nonSelectedEditorValue.search(new RegExp('[^\\d\\' + config.decimalSeparator + ' ]'));
-                if (firstQueryCharacterIndex != -1) {
-                    return nonSelectedEditorValue.substr(firstQueryCharacterIndex);
+                var firstQueryCharacterIndex = nonSelectedEditorValue.search(queryCharacterRegex);
+                var lastQueryCharacterIndex = nonSelectedEditorValue.search(lastQueryCharacterRegex);
+                console.log(firstQueryCharacterIndex + " - " + lastQueryCharacterIndex);
+                if (firstQueryCharacterIndex != lastQueryCharacterIndex) {
+                    return nonSelectedEditorValue.substring(firstQueryCharacterIndex, lastQueryCharacterIndex + 1);
                 } else {
                     return "";
                 }
@@ -263,16 +259,16 @@
                 fireChangeEvents();
             }
 
-            function isEntrySelected() {
-                return selectedEntry != null && selectedEntry !== config.emptyEntry;
-            }
-
             function cleanUpEditorValue() {
-                $editor.val($editor.val().match(/^[\d\.]*/)[0]);
+                var match = /[\d\.]+/.exec($editor.val());
+                if (match) {
+                    $editor.val($editor.val().substr(match.index, match[0].length));
+                } else {
+                    $editor.val("");
+                }
             }
 
             function openDropDown() {
-                console.error("openDropDown")
                 $unitBox.addClass("open");
                 $dropDown
                     .show()
@@ -306,7 +302,6 @@
             }
 
             function getNonAutoCompleteEditorValue() {
-                console.log($editor[0].selectionStart  +  " - " + $editor[0].selectionEnd);
                 if ($editor[0].selectionStart < $editor[0].selectionEnd && $editor.selectionEnd === $editor.val().length) {
                     return $editor.val().substring(0, $editor[0].selectionStart);
                 } else {
@@ -330,7 +325,6 @@
                             } else {
                                 newEditorValue = getNonAutoCompleteEditorValue();
                             }
-                            console.log("setting editor value to " + newEditorValue);
                             $editor.val(newEditorValue);
                             setTimeout(function () { // we need this to guarantee that the editor has been updated...
                                 $editor[0].setSelectionRange(nonSelectedEditorValue.length, newEditorValue.length);
