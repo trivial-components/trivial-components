@@ -75,19 +75,18 @@
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);
             if (config.showTrigger) {
                 var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($selectedEntryAndTriggerWrapper);
-                $trigger.mousedown(function () {
-                    if (isDropDownOpen) {
-                        closeDropDown();
-                    } else {
-                        setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                            openDropDown();
-                            if (entries == null) {
-                                query();
-                            }
-                        });
-                    }
-                });
             }
+            $selectedEntryAndTriggerWrapper.mousedown(function () {
+                if (isDropDownOpen) {
+                    closeDropDown();
+                } else {
+                    setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
+                        openDropDown();
+                        query();
+                    });
+                }
+                $editor.focus();
+            });
             var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
             var $editor;
             if (config.valueProperty) {
@@ -127,15 +126,15 @@
                     }
 
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                        openDropDown();
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                        if (entries != null) {
+                        if (isDropDownOpen) {
                             listBox.highlightNextEntry(direction);
                             autoCompleteIfPossible(config.autoCompleteDelay);
-                            return false; // some browsers move the caret to the beginning on up key
                         } else {
+                            openDropDown();
                             query(direction);
                         }
+                        return false; // some browsers move the caret to the beginning on up key
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
                         selectEntry(listBox.getHighlightedEntry());
                         closeDropDown();
@@ -177,16 +176,19 @@
 
             $unitBox.add($dropDown).mousedown(function () {
                 if ($editor.is(":focus")) {
+                    console.log("mousedown blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = true;
                 }
             }).mouseup(function () {
                 if (blurCausedByClickInsideComponent) {
                     $editor.focus();
+                    console.log("mouseup # blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = false;
                 }
             }).mouseout(function () {
                 if (blurCausedByClickInsideComponent) {
                     $editor.focus();
+                    console.log("mouseout # blurCausedByClickInsideComponent");
                     blurCausedByClickInsideComponent = false;
                 }
             });
@@ -202,13 +204,6 @@
             });
 
             selectEntry(config.selectedEntry || null);
-
-            $selectedEntryWrapper.click(function () {
-                openDropDown();
-                if (entries == null) {
-                    query();
-                }
-            });
 
             var getQueryString = function () {
                 var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
