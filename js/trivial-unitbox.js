@@ -39,6 +39,7 @@
                 unitValueProperty: null,
                 decimalSeparator: '.',
                 numberUnitValueSeparatorString: ' ',
+                unitDisplayPosition: 'right', // right or left
                 inputTextProperty: 'code',
                 template: TrivialComponents.currency2LineTemplate,
                 selectedEntryTemplate: options.template || TrivialComponents.currencySingleLineShortTemplate,
@@ -46,7 +47,9 @@
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
-                emptyEntry: {},
+                emptyEntry: {
+                    code: '...'
+                },
                 queryFunction: null, // defined below...
                 autoComplete: false,
                 autoCompleteDelay: 0,
@@ -72,7 +75,8 @@
 
             var $spinners = $();
             var $originalInput = $(originalInput);
-            var $unitBox = $('<div class="tr-unitbox"/>').insertAfter($originalInput);
+            var $unitBox = $('<div class="tr-unitbox"/>').insertAfter($originalInput)
+                .addClass(config.unitDisplayPosition === 'left' ? 'unit-display-left' : 'unit-display-right');
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);
             if (config.showTrigger) {

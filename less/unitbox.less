@@ -4,7 +4,6 @@
 
   .tr-unitbox-edit-input {
     flex: 1 1 0;
-
     border: none;
     padding: 0 6px 0 4px;
     text-align: right;
@@ -26,11 +25,22 @@
 
     .tr-unitbox-selected-entry-wrapper {
       flex: 0 0 auto;
-      border-left: @tr-border;
     }
     .tr-combobox-trigger {
       border-left: none;
       background-color: transparent;
     }
+  }
+
+  &.unit-display-left {
+    flex-direction: row-reverse;
+
+    .tr-unitbox-selected-entry-and-trigger-wrapper {
+      border-right: @tr-border;
+    }
+  }
+
+  &.unit-display-right .tr-unitbox-selected-entry-and-trigger-wrapper {
+    border-left: @tr-border;
   }
 }
