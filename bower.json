@@ -18,7 +18,8 @@
     "jquery": "2.x",
     "jquery-ui": "1.x",
     "mustache": "1.x",
-    "levenshtein": "1.x"
+    "levenshtein": "1.x",
+    "moment": "~2.10.6"
   },
   "devDependencies": {
     "normalize.css": "latest"

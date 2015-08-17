@@ -9,6 +9,7 @@
     <script src="../bower_components/jquery-ui/ui/position.js"></script>
     <script src="../bower_components/mustache/mustache.js"></script>
     <script src="../bower_components/levenshtein/lib/levenshtein.js"></script>
+    <script src="../bower_components/moment/moment.js"></script>
     <script src="../js/trivial-core.js"></script>
     <script src="../js/trivial-highlight.js"></script>
     <script src="../js/trivial-minimallyScrollTo.js"></script>
@@ -20,6 +21,8 @@
     <script src="../js/trivial-treecombobox.js"></script>
     <script src="../js/trivial-tree.js"></script>
     <script src="../js/trivial-unitbox.js"></script>
+    <script src="../js/trivial-calendarbox.js"></script>
+    <script src="../js/trivial-calendarcombobox.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -103,6 +106,16 @@ no search field:
     <input id="unitBox">
     <h5>unitDisplayPosition: 'left'</h5>
     <input id="unitBoxLeft">
+</div>
+
+<div style="width: 300px">
+    <h3>CalendarBox</h3>
+    <div id="calendarBox"></div>
+</div>
+
+<div style="width: 300px">
+    <h3>CalendarComboBox</h3>
+    <input id="calendarComboBox"/>
 </div>
 
 <script>
@@ -260,6 +273,15 @@ no search field:
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),
             unitDisplayPosition: 'left'
+        });
+
+        calendarBox = $('#calendarBox').TrivialCalendarBox({
+            selectedDate: moment(),
+            firstDayOfWeek: 1
+        });
+        calendarComboBox = $('#calendarComboBox').TrivialCalendarComboBox({
+            selectedDate: moment(),
+            firstDayOfWeek: 1
         });
     });
 </script>

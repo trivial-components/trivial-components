@@ -1,0 +1,19 @@
+.tr-calendarcombobox {
+  &:extend(.tr-combobox all);
+  min-height: @tr-input-min-height;
+
+  .tr-calendarcombobox-edit-input {
+    flex: 1 1 0;
+    border: none;
+    padding: 0 6px 0 4px;
+    text-align: right;
+    outline: none;
+    background-color: transparent;
+    font-family: @tr-editor-font-family;
+    font-size: @tr-editor-font-size;
+  }
+}
+
+.tr-combobox-dropdown {
+  padding: 5px 0;
+}

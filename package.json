@@ -46,6 +46,7 @@
     "gulp-plumber": "latest",
     "gulp-postcss": "5.x",
     "gulp-rename": "1.x",
+    "gulp-sizereport": "^1.1.3",
     "gulp-sourcemaps": "1.x",
     "gulp-strip-css-comments": "^1.1.0",
     "gulp-strip-debug": "^1.0.2",

@@ -23,6 +23,7 @@ var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
 var karma = require('karma').server;
 var header = require('gulp-header');
+var sizereport = require('gulp-sizereport');
 
 gulp.task('clean', function () {
     del(['dist']);
@@ -157,25 +158,34 @@ gulp.task('tar', ['prepare-dist'], function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo"]);
+gulp.task('size-report',  function () {
+    return gulp.src(['dist/js/bundle/trivial-components.min.js', 'dist/css/trivial-components.min.css'
+        //,  'bower_components/moment/min/moment-with-locales.min.js',
+        //'dist/lib/jquery.min.js',
+        //'dist/lib/jquery.position.min.js',
+        //'dist/lib/levenshtein.min.js',
+        //'dist/lib/mustache.min.js'
+    ])
+        .pipe(sizereport({
+            gzip: true,
+            'trivial-components.min.js': {
+                'maxSize': 45000,
+                'maxGzippedSize': 10000
+            },
+            'trivial-components.min.css': {
+                'maxSize': 17000,
+                'maxGzippedSize': 3000
+            },
+            '*': {
+                maxTotalSize: 60000,
+                maxTotalGzippedSize: 12000
+            }
+        }));
+});
+
+gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo", "size-report"]);
 
 gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
 });
-
-
-//====== special tasks =====
-
-gulp.task('gz-bundle-distro', function () {
-    return gulp.src(['dist/js/bundle/trivial-components.min.js'])
-        .pipe(gzip())
-        .pipe(gulp.dest('dist/js/bundle'));
-});
-
-gulp.task('gz-min-css', function () {
-    return gulp.src(['dist/css/trivial-components.min.css'])
-        .pipe(gzip())
-        .pipe(gulp.dest('dist/css'));
-});
-
