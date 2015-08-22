@@ -39,7 +39,6 @@
                 template: TrivialComponents.image2LinesTemplate,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 entries: null,
-                selectedEntry: undefined,
                 queryFunction: null, // defined below...
                 matchingOptions: {
                     matchingMode: 'contains',
@@ -49,7 +48,6 @@
             }, options);
 
             var entries = config.entries;
-            var selectedEntry = null;
             var highlightedEntry = null;
 
             var $listBox = $('<div class="tr-listbox"/>').appendTo($container);
@@ -58,8 +56,6 @@
             if (entries) { // if config.entries was set...
                 updateEntryElements(entries);
             }
-
-            selectEntry(config.selectedEntry || null);
 
             function updateEntryElements(entries) {
                 $entryList.empty();
