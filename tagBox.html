@@ -100,6 +100,11 @@
                 <form id="config">
                     <div class="checkbox">
                         <label>
+                            <input type="checkbox" id="distinct" name="distinct" checked> distinct
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
                             <input type="checkbox" id="showTrigger" name="showTrigger"> showTrigger
                         </label>
                     </div>
@@ -123,7 +128,7 @@
                     </div>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
+                            <input type="checkbox" id="allowFreeText" name="allowFreeText" checked> allowFreeText
                         </label>
                     </div>
                     <div class="form-group">
@@ -134,7 +139,7 @@
                     </div>
                     <div class="form-group">
                         <label for="valueProperty">valueProperty</label>
-                        <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
+                        <input class="form-control" id="valueProperty" name="valueProperty" value="displayValue"/>
                     </div>
                     <div class="form-group">
                         <label for="valueSeparator">valueSeparator</label>
@@ -154,18 +159,16 @@
                         </label>
                     </div>
                     <div class="form-group">
-                        <label for="template">template</label>
-                        <input id="template" name="template"/>
-                    </div>
-                    <div class="form-group">
                         <label for="selectedEntryTemplate">selectedEntryTemplate</label>
                         <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
                     </div>
                     <div class="form-group">
+                        <label for="template">template</label>
+                        <input id="template" name="template"/>
+                    </div>
+                    <div class="form-group">
                         <label for="spinnerTemplate">spinnerTemplate</label>
-                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner">
-    <div>Fetching data...</div>
-</div></textarea>
+                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div></textarea>
                     </div>
                     <div class="form-group">
                         <label for="noEntriesTemplate">noEntriesTemplate</label>
@@ -211,7 +214,12 @@
                     <td>valueProperty</td>
                     <td>Name of the property which should be submitted on form submit. <code>null</code> is <b>not</b> allowed.
                     </td>
-                    <td><code>'id'</code></td>
+                    <td><code>allowFreeText ? 'displayValue' : 'id'</code></td>
+                </tr>
+                <tr>
+                    <td>distinct</td>
+                    <td>Determines whether duplicate entries are allowed. Duplicate entries are identified by their <code>valueProperty</code> property.</td>
+                    <td><code>true</code></td>
                 </tr>
                 <tr>
                     <td>valueSeparator</td>
@@ -325,11 +333,13 @@
 <script src="lib/js/trivial-core.js"></script>
 <script src="lib/js/trivial-highlight.js"></script>
 <script src="lib/js/trivial-minimallyScrollTo.js"></script>
+<script src="lib/js/trivial-listbox.js"></script>
 <script src="lib/js/trivial-combobox.js"></script>
 <script src="lib/js/trivial-list.js"></script>
+<script src="lib/js/trivial-unitbox.js"></script>
 <script src="lib/js/trivial-tagbox.js"></script>
-<script src="lib/js/trivial-tree.js"></script>
 <script src="lib/js/trivial-treebox.js"></script>
+<script src="lib/js/trivial-tree.js"></script>
 <script src="lib/js/trivial-treecombobox.js"></script>
 <script src="js/demo.js"></script>
 <script src="lib/js/prettify.min.js"></script>
@@ -344,26 +354,38 @@
 
         $('#template, #selectedEntryTemplate').each(function() {
             $(this).TrivialComboBox({
-                template: TrivialComponents.singleLineTemplate,
+                template: TrivialComponents.icon2LinesTemplate,
                 entries: [{
                     displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate
-                },{
+                    value: TrivialComponents.image2LinesTemplate,
+                    additionalInfo: 'TrivialComponents.image2LinesTemplate',
+                    imageUrl: 'img/tree/dev.png'
+                }, {
                     displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate
-                },{
+                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
+                    additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate"  ,
+                    imageUrl: 'img/tree/dev.png'
+                }, {
                     displayValue: "Icon with two lines of text",
-                    value: TrivialComponents.icon2LinesTemplate
-                },{
+                    value: TrivialComponents.icon2LinesTemplate,
+                    additionalInfo: "TrivialComponents.icon2LinesTemplate" ,
+                    imageUrl: 'img/tree/dev.png'
+                }, {
                     displayValue: "Icon with single line of text",
-                    value: TrivialComponents.iconSingleLineTemplate
-                },{
+                    value: TrivialComponents.iconSingleLineTemplate,
+                    additionalInfo: "TrivialComponents.iconSingleLineTemplate"  ,
+                    imageUrl: 'img/tree/dev.png'
+                }, {
                     displayValue: "Single line of text",
-                    value: TrivialComponents.singleLineTemplate
+                    value: TrivialComponents.singleLineTemplate,
+                    additionalInfo: "TrivialComponents.singleLineTemplate"  ,
+                    imageUrl: 'img/tree/dev.png'
                 }],
                 selectedEntry: {
                     displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate
+                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
+                    additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate",
+                    imageUrl: 'img/tree/dev.png'
                 },
                 allowFreeText: false
             })
@@ -406,6 +428,7 @@
                 $('#originalInputValue').text($(this).val());
             });
             var config = {
+                distinct: $('#distinct').is(':checked'),
                 showTrigger: $('#showTrigger').is(':checked'),
                 allowFreeText: $('#allowFreeText').is(':checked'),
                 freeTextEntryValues: JSON.parse($('#freeTextEntryValues').val()),

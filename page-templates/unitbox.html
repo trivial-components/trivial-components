@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@@include('includes/head.html', {"title": "TrivialTagBox - Trivial Components"})
+@@include('includes/head.html', {"title": "TrivialUnitBox - Trivial Components"})
 
 <body data-spy="scroll" data-target="#navbar">
 
@@ -10,7 +10,7 @@
 <div class="page-content">
 
     <section class="page-header-box">
-        <h1 class="project-name">TrivialTagBox</h1>
+        <h1 class="project-name">TrivialUnitBox</h1>
     </section>
 
     <div class="container">
@@ -23,22 +23,13 @@
                 <form id="config">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="distinct" name="distinct" checked> distinct
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="showTrigger" name="showTrigger"> showTrigger
+                            <input type="checkbox" id="showTrigger" name="showTrigger" checked="checked"> showTrigger
                         </label>
                     </div>
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
                         </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="freeTextSeparators">freeTextSeparators</label>
-                        <input class="form-control" id="freeTextSeparators" name="freeTextSeparators" type="text" value="[',', ';']"/>
                     </div>
                     <div class="checkbox">
                         <label>
@@ -51,7 +42,7 @@
                     </div>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="allowFreeText" name="allowFreeText" checked> allowFreeText
+                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
                         </label>
                     </div>
                     <div class="form-group">
@@ -62,11 +53,7 @@
                     </div>
                     <div class="form-group">
                         <label for="valueProperty">valueProperty</label>
-                        <input class="form-control" id="valueProperty" name="valueProperty" value="displayValue"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="valueSeparator">valueSeparator</label>
-                        <input class="form-control" id="valueSeparator" name="valueSeparator" value=","/>
+                        <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
                     </div>
                     <div class="form-group">
                         <label for="inputTextProperty">inputTextProperty</label>
@@ -82,16 +69,18 @@
                         </label>
                     </div>
                     <div class="form-group">
-                        <label for="selectedEntryTemplate">selectedEntryTemplate</label>
-                        <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
-                    </div>
-                    <div class="form-group">
                         <label for="template">template</label>
                         <input id="template" name="template"/>
                     </div>
                     <div class="form-group">
+                        <label for="selectedEntryTemplate">selectedEntryTemplate</label>
+                        <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
+                    </div>
+                    <div class="form-group">
                         <label for="spinnerTemplate">spinnerTemplate</label>
-                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div></textarea>
+                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner">
+    <div>Fetching data...</div>
+</div></textarea>
                     </div>
                     <div class="form-group">
                         <label for="noEntriesTemplate">noEntriesTemplate</label>
@@ -105,14 +94,27 @@
                 </textarea>
                     </div>
                     <div class="form-group">
-                        <label for="selectedEntries">selectedEntries</label>
-                <textarea class="form-control code showcase-textarea" id="selectedEntries" name="selectedEntries"></textarea>
+                        <label for="selectedEntry">selectedEntry</label>
+                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">{
+    "displayValue": "Ami Nemitz",
+    "imageUrl": "https://avatars1.githubusercontent.com/u/271349?v=3&s=25",
+    "additionalInfo": "Magna gubergren sit",
+    "id": 2
+}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="emptyEntry">emptyEntry</label>
+                <textarea class="form-control code showcase-textarea" id="emptyEntry" name="emptyEntry">{
+    "displayValue": "Please select...",
+    "imageUrl": "-",
+    "additionalInfo": ""
+}</textarea>
                     </div>
                 </form>
             </div>
             <div class="col-sm-7">
                 <h3>Result</h3>
-                <div id="tagBoxWrapper"></div>
+                <div id="unitBoxWrapper"></div>
                 <h4>Original input value</h4>
                 <code id="originalInputValue"></code>
                 <h4>Selected entry</h4>
@@ -121,6 +123,8 @@
                 <pre id="configDisplay" class="prettyprint lang-js"></pre>
             </div>
         </div>
+
+
 
         <h3>Configuration Options<a class="anchor" id="configuration"></a></h3>
         <div class="table-responsive">
@@ -135,35 +139,19 @@
                 <tbody>
                 <tr>
                     <td>valueProperty</td>
-                    <td>Name of the property which should be submitted on form submit. <code>null</code> is <b>not</b> allowed.
+                    <td>Name of the property which should be submitted on form submit. If
+                        <code>null</code>, then the content of the text input will serve als value.
                     </td>
-                    <td><code>allowFreeText ? 'displayValue' : 'id'</code></td>
-                </tr>
-                <tr>
-                    <td>distinct</td>
-                    <td>Determines whether duplicate entries are allowed. Duplicate entries are identified by their <code>valueProperty</code> property.</td>
-                    <td><code>true</code></td>
-                </tr>
-                <tr>
-                    <td>valueSeparator</td>
-                    <td>String used to separate entry identifiers in the original input field.
-                    </td>
-                    <td><code>','</code></td>
+                    <td><code>null</code></td>
                 </tr>
                 <tr>
                     <td>allowFreeText</td>
                     <td>
                         Allow free text input.<br/>
-                        If <code>true</code>, the user is not forced to select one of the suggested entries but can enter any tags he wants. Fake entries will be generated with the <code>inputTextProperty</code> field set to the value entered by the user.<br/>
+                        If <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. In this case, <code>getSelectedEntry()</code> returns a fake entry with the <code>[inputTextProperty]</code> property set.<br/>
                         If <code>false</code>, the user input will be deleted if he does not select a suggested entry.<br/>
                     </td>
-                    <td><code>true</code></td>
-                </tr>
-                <tr>
-                    <td>freeTextSeparators</td>
-                    <td>Array of separator chars the user may enter to separate free text tags.
-                        <i>Only evaluated if <code>allowFreeText == true</code></i>.</td>
-                    <td><code>[',', ';']</code></td>
+                    <td><code>false</code></td>
                 </tr>
                 <tr>
                     <td>inputTextProperty</td>
@@ -172,13 +160,13 @@
                 </tr>
                 <tr>
                     <td>template</td>
-                    <td>Mustache template to be used for displaying the tagbox dropdown entries.</td>
+                    <td>Mustache template to be used for displaying the combobox dropdown entries.</td>
                     <td><code>TrivialComponents.icon2LinesTemplate</code></td>
                 </tr>
                 <tr>
                     <td>selectedEntryTemplate</td>
-                    <td>Mustacheustache template to be used for displaying the selected tags.</td>
-                    <td>Same as <code>template</code>, but wrapped with a tag display.</td>
+                    <td>Mustacheustache template to be used for displaying the currently selected entry.</td>
+                    <td>Same as <code>template</code></td>
                 </tr>
                 <tr>
                     <td>spinnerTemplate</td>
@@ -201,6 +189,11 @@
                     <td><code>undefined</code></td>
                 </tr>
                 <tr>
+                    <td>emptyEntry</td>
+                    <td>Fake entry that should be displayed when no entry is selected.</td>
+                    <td><code>{}</code></td>
+                </tr>
+                <tr>
                     <td>queryFunction</td>
                     <td>JavaScript function for retrieving entries depending on the user's input. Takes two parameters:
                         <code>queryString</code> (user input) and
@@ -220,7 +213,7 @@
                 </tr>
                 <tr>
                     <td>showTrigger</td>
-                    <td>The trigger is the button-like handle on the side of the tagbox. If false: no trigger is shown.</td>
+                    <td>The trigger is the button-like handle on the side of the combobox. If false: no trigger is shown.</td>
                     <td><code>true</code></td>
                 </tr>
                 <tr>
@@ -250,44 +243,30 @@
 <script>
     $(function () {
 
-        var entries = createEntries(5);
-        $('#entries').val(JSON.stringify(entries, null, 2));
-        $('#selectedEntries').val(JSON.stringify([entries[0]], null, 2));
+        $('#entries').val(JSON.stringify(createEntries(5), null, 2));
 
         $('#template, #selectedEntryTemplate').each(function() {
             $(this).TrivialComboBox({
-                template: TrivialComponents.icon2LinesTemplate,
+                template: TrivialComponents.singleLineTemplate,
                 entries: [{
                     displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate,
-                    additionalInfo: 'TrivialComponents.image2LinesTemplate',
-                    imageUrl: 'img/tree/dev.png'
-                }, {
+                    value: TrivialComponents.image2LinesTemplate
+                },{
                     displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
-                    additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
-                }, {
+                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate
+                },{
                     displayValue: "Icon with two lines of text",
-                    value: TrivialComponents.icon2LinesTemplate,
-                    additionalInfo: "TrivialComponents.icon2LinesTemplate" ,
-                    imageUrl: 'img/tree/dev.png'
-                }, {
+                    value: TrivialComponents.icon2LinesTemplate
+                },{
                     displayValue: "Icon with single line of text",
-                    value: TrivialComponents.iconSingleLineTemplate,
-                    additionalInfo: "TrivialComponents.iconSingleLineTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
-                }, {
+                    value: TrivialComponents.iconSingleLineTemplate
+                },{
                     displayValue: "Single line of text",
-                    value: TrivialComponents.singleLineTemplate,
-                    additionalInfo: "TrivialComponents.singleLineTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
+                    value: TrivialComponents.singleLineTemplate
                 }],
                 selectedEntry: {
-                    displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
-                    additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate",
-                    imageUrl: 'img/tree/dev.png'
+                    displayValue: "Image with two lines of text",
+                    value: TrivialComponents.image2LinesTemplate
                 },
                 allowFreeText: false
             })
@@ -323,64 +302,62 @@
             });
         }
 
-        function createTagBox() {
-            $('#tagBoxWrapper').empty();
-            var $tagBoxOriginalInput = $('<input id="tagbox"/>').appendTo('#tagBoxWrapper');
-            $tagBoxOriginalInput.on('change', function() {
+        function createUnitBox() {
+            $('#unitBoxWrapper').empty();
+            var $unitBoxOriginalInput = $('<input id="unitbox"/>').appendTo('#unitBoxWrapper');
+            $unitBoxOriginalInput.on('change', function() {
                 $('#originalInputValue').text($(this).val());
             });
             var config = {
-                distinct: $('#distinct').is(':checked'),
                 showTrigger: $('#showTrigger').is(':checked'),
                 allowFreeText: $('#allowFreeText').is(':checked'),
                 freeTextEntryValues: JSON.parse($('#freeTextEntryValues').val()),
-                freeTextSeparators: eval($('#freeTextSeparators').val()),
                 autoComplete: $('#autoComplete').is(':checked'),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
                 valueProperty: $('#valueProperty').val(),
-                valueSeparator: $('#valueSeparator').val(),
                 inputTextProperty: $('#inputTextProperty').val(),
                 matchingOptions: {
                     matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
                     ignoreCase: $('#ignoreCase').is(':checked')
                 },
                 template: $('#template').TrivialComboBox().getSelectedEntry().value,
-                selectedEntryTemplate: TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate($('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value),
+                selectedEntryTemplate: $('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value,
                 spinnerTemplate: $('#spinnerTemplate').val(),
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
-                selectedEntries: JSON.parse($('#selectedEntries').val()),
+                selectedEntry: JSON.parse($('#selectedEntry').val()),
+                emptyEntry: JSON.parse($('#emptyEntry').val()),
                 entries: JSON.parse($('#entries').val())
             };
             $('#configDisplay').removeClass("prettyprinted")
-                    .text("$('#tagbox').TrivialTagBox(" + JSON.stringify(config, function(key, value) {
+                    .text("$('#unitbox').TrivialUnitBox(" + JSON.stringify(config, function(key, value) {
                         if (key === 'queryFunction' && config.queryFunction) {
                             return "%queryFunction%";
                         } else {
                             return value;
                         }
                     }, 2).replace("\"%queryFunction%\"", customQueryFunction.toString()) + ");");
-            var trivialTagBox = $tagBoxOriginalInput.TrivialTagBox(config);
+            var trivialUnitBox = $unitBoxOriginalInput.TrivialUnitBox(config);
 
             function updateSelectedEntryDisplay() {
                 $('#selectedEntryDisplay')
-                        .text(JSON.stringify(trivialTagBox.getSelectedEntries(), null, 2))
+                        .text(JSON.stringify(trivialUnitBox.getSelectedEntry(), null, 2))
                         .removeClass("prettyprinted");
                 prettyPrint();
             }
 
             updateSelectedEntryDisplay();
-            trivialTagBox.$.change(function() {
+            trivialUnitBox.$.change(function() {
                 updateSelectedEntryDisplay.call(this);
                 reInitReadMore();
             });
             prettyPrint();
             reInitReadMore();
         }
-        createTagBox();
+        createUnitBox();
 
         $('#config input, #config textarea').change(function() {
-            createTagBox();
+            createUnitBox();
         });
 
     });
