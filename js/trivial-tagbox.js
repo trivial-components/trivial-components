@@ -36,7 +36,7 @@
     function TrivialTagBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
-            valueProperty: options.allowFreeText !== false ? 'displayValue' : 'id',
+            valueProperty: 'displayValue',
             valueSeparator: ',',
             inputTextProperty: 'displayValue',
             template: TrivialComponents.image2LinesTemplate,
@@ -226,8 +226,6 @@
         if (entries) { // if config.entries was set...
             updateDropDownEntryElements(entries);
         }
-
-        // selectEntry(config.selectedEntry || null);// TODO init entries
 
         $tagArea.click(function () {
             $editor.select();

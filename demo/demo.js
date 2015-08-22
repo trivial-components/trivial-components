@@ -1117,112 +1117,111 @@ function createDemoTreeNodes() {
     return [{
         id: 1, displayValue: "Mail",
         additionalInfo: "43 unread",
-        imageUrl: "img/mail.png",
+        imageUrl: "img/icons/mail.png",
         isLeaf: false,
         expanded: true,
         children: [{
             id: 11, displayValue: "Inbox",
             additionalInfo: "21 unread",
-            imageUrl: "img/arrow-down.png",
+            imageUrl: "img/icons/arrow-down.png",
             isLeaf: true
         }, {
             id: 12, displayValue: "Drafts",
             additionalInfo: "5",
-            imageUrl: "img/compose.png",
+            imageUrl: "img/icons/compose.png",
             isLeaf: true
         }, {
             id: 13, displayValue: "Sent",
             additionalInfo: "529 sent, 1 sending",
-            imageUrl: "img/arrow-up.png",
+            imageUrl: "img/icons/arrow-up.png",
             isLeaf: true
         }, {
             id: 14, displayValue: "Tagged",
             additionalInfo: "9 unread",
-            imageUrl: "img/shop.png",
+            imageUrl: "img/icons/shop.png",
             isLeaf: false,
             children: [{
                 id: 141, displayValue: "Important",
                 additionalInfo: "5 unread",
-                imageUrl: "img/shop.png",
+                imageUrl: "img/icons/shop.png",
                 isLeaf: true
 
             }, {
                 id: 142, displayValue: "Private",
                 additionalInfo: "4 unread",
-                imageUrl: "img/shop.png",
+                imageUrl: "img/icons/shop.png",
                 isLeaf: true
 
             }]
         }, {
             id: 15, displayValue: "Folders",
             additionalInfo: "22 unread",
-            imageUrl: "img/folder.png",
+            imageUrl: "img/icons/folder.png",
             isLeaf: false,
             children: [{
                 id: 151, displayValue: "Project X",
                 additionalInfo: "4 unread",
-                imageUrl: "img/folder.png",
+                imageUrl: "img/icons/folder.png",
                 isLeaf: true
 
             }, {
                 id: 152, displayValue: "Bills",
                 additionalInfo: "18 unread",
-                imageUrl: "img/folder.png",
+                imageUrl: "img/icons/folder.png",
                 isLeaf: true
 
             }]
         }, {
             id: 16, displayValue: "Trash",
             additionalInfo: "7293 kB",
-            imageUrl: "img/recycle.png",
+            imageUrl: "img/icons/recycle.png",
             isLeaf: true
         }]
     }, {
         id: 2, displayValue: "Notes",
-        imageUrl: "img/booklet.png",
+        imageUrl: "img/icons/booklet.png",
         isLeaf: false,
         children: [{
             id: 21, displayValue: "Product Management 2.0",
-            imageUrl: "img/folder.png",
+            imageUrl: "img/icons/folder.png",
             isLeaf: false,
             children: [{
                 id: 211, displayValue: "Brainstorming",
                 additionalInfo: "Yesterday",
-                imageUrl: "img/document.png",
+                imageUrl: "img/icons/document.png",
                 isLeaf: true
             }, {
                 id: 212, displayValue: "Presentation Notes",
                 additionalInfo: "5 minutes ago",
-                imageUrl: "img/document.png",
+                imageUrl: "img/icons/document.png",
                 isLeaf: true
             }, {
                 id: 213, displayValue: "Concept",
                 additionalInfo: "2015-05-28",
-                imageUrl: "img/document.png",
+                imageUrl: "img/icons/document.png",
                 isLeaf: true
             }]
         }, {
             id: 22, displayValue: "Marketing",
-            imageUrl: "img/folder.png",
+            imageUrl: "img/icons/folder.png",
             isLeaf: false,
             children: [{
                 id: 221, displayValue: "Promotions 2015",
                 additionalInfo: "2015-01-23",
-                imageUrl: "img/document.png",
+                imageUrl: "img/icons/document.png",
                 isLeaf: true
             }]
 
         }]
     }, {
         id: 3, displayValue: "Calendar",
-        imageUrl: "img/calendar.png",
+        imageUrl: "img/icons/calendar.png",
         isLeaf: true,
         statusColor: "#ee4400",
         additionalInfo: "2 overdue"
     }, {
         id: 4, displayValue: "Contacts",
-        imageUrl: "img/contacts.png",
-        isLeaf: true,
-        hasLazyChildren: true
+        imageUrl: "img/icons/contacts.png",
+        isLeaf: true
     }]
 }
