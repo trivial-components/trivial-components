@@ -168,13 +168,11 @@
                     </div>
                     <div class="form-group">
                         <label for="spinnerTemplate">spinnerTemplate</label>
-                <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"><div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div></textarea>
+                        <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="noEntriesTemplate">noEntriesTemplate</label>
-                <textarea class="form-control code showcase-textarea" id="noEntriesTemplate" name="noEntriesTemplate"><div class="tr-default-no-data-display">
-    <div>No matching entries...</div>
-</div></textarea>
+                        <textarea class="form-control code showcase-textarea" id="noEntriesTemplate" name="noEntriesTemplate"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="entries">entries</label>
@@ -351,6 +349,8 @@
         var entries = createEntries(5);
         $('#entries').val(JSON.stringify(entries, null, 2));
         $('#selectedEntries').val(JSON.stringify([entries[0]], null, 2));
+        $('#spinnerTemplate').val(TrivialComponents.defaultSpinnerTemplate);
+        $('#noEntriesTemplate').val(TrivialComponents.defaultNoEntriesTemplate);
 
         $('#template, #selectedEntryTemplate').each(function() {
             $(this).TrivialComboBox({
@@ -359,33 +359,33 @@
                     displayValue: "Image with two lines of text",
                     value: TrivialComponents.image2LinesTemplate,
                     additionalInfo: 'TrivialComponents.image2LinesTemplate',
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 }, {
                     displayValue: "Round image with two lines of text and status buble",
                     value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
                     additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 }, {
                     displayValue: "Icon with two lines of text",
                     value: TrivialComponents.icon2LinesTemplate,
                     additionalInfo: "TrivialComponents.icon2LinesTemplate" ,
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 }, {
                     displayValue: "Icon with single line of text",
                     value: TrivialComponents.iconSingleLineTemplate,
                     additionalInfo: "TrivialComponents.iconSingleLineTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 }, {
                     displayValue: "Single line of text",
                     value: TrivialComponents.singleLineTemplate,
                     additionalInfo: "TrivialComponents.singleLineTemplate"  ,
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 }],
                 selectedEntry: {
                     displayValue: "Round image with two lines of text and status buble",
                     value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
                     additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate",
-                    imageUrl: 'img/tree/dev.png'
+                    imageUrl: 'img/icons/dev.png'
                 },
                 allowFreeText: false
             })
