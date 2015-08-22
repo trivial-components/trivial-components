@@ -45,6 +45,7 @@
             noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
             entries: null,
             selectedEntries: [],
+            maxSelectedEntries: null,
             emptyEntry: {},  // TODO do we really need this?
             queryFunction: null, // defined below...
             autoComplete: true,
@@ -53,7 +54,7 @@
             freeTextSeparators: [',', ';'],
             freeTextEntryValues: {_isFreeTextEntry: true},
             showTrigger: true,
-            distinct: true,
+            distinct: false,
             matchingOptions: {
                 matchingMode: 'contains',
                 ignoreCase: true,
@@ -150,18 +151,16 @@
                     } else {
                         query(direction);
                     }
-                } else if (isDropDownOpen && e.which == keyCodes.enter) {
-                    if (highlightedEntry != null) {
+                } else if (e.which == keyCodes.enter) {
+                    if (isDropDownOpen && highlightedEntry != null) {
                         selectEntry(highlightedEntry);
+                        entries = null;
                     } else if (config.allowFreeText && $editor.text().trim().length > 0) {
                         var entry = $.extend({}, config.freeTextEntryValues);
                         entry[config.inputTextProperty] = $editor.text();
-                        $editor.text('');
                         selectEntry(entry);
                     }
                     closeDropDown();
-                    entries = null;
-                    $editor.select();
                 } else if (e.which == keyCodes.escape) {
                     closeDropDown();
                     $editor.text("");
@@ -332,6 +331,9 @@
         function selectEntry(entry) {
             if (entry == null) {
                 return; // do nothing
+            }
+            if (config.maxSelectedEntries && selectedEntries.length >= config.maxSelectedEntries) {
+                return; // no more entries allowed
             }
             if (config.distinct && selectedEntries.map(function(entry) {return entry[config.valueProperty]}).indexOf(entry[config.valueProperty]) != -1) {
                 return; // entry already selected

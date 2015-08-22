@@ -81,6 +81,11 @@
     <input id="customTemplateTagBox2">
 </div>
 
+<h5>maxSelectedEntries</h5>
+<div style="width: 600px;">
+    <input id="maxSelectedEntriesTagBox">
+</div>
+
 <h4>Trivial TreeBox</h4>
 
 <div id="treeBoxContainer" style="border: 1px solid black;"></div>
@@ -217,6 +222,13 @@ no search field:
             '</div>',
             showTrigger: false,
             distinct: false
+        });
+
+        $('#maxSelectedEntriesTagBox').TrivialTagBox({
+            entries: createEntries(),
+            template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
+            maxSelectedEntries: 2,
+            allowFreeText: true
         });
 
         $('#treeBoxContainer').TrivialTreeBox({
