@@ -229,7 +229,11 @@
             };
         }
 
-        var TrivialComponents = {
+        function escapeSpecialRegexCharacter(s) {
+            return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        }
+
+        return {
             image2LinesTemplate: image2LinesTemplate,
             roundImage2LinesColorBubbleTemplate: roundImage2LinesColorBubbleTemplate,
             icon2LinesTemplate: icon2LinesTemplate,
@@ -244,8 +248,8 @@
             defaultListQueryFunctionFactory: defaultListQueryFunctionFactory,
             defaultTreeQueryFunctionFactory: defaultTreeQueryFunctionFactory,
             isModifierKey: isModifierKey,
-            registerJqueryPlugin: registerJqueryPlugin
+            registerJqueryPlugin: registerJqueryPlugin,
+            escapeSpecialRegexCharacter: escapeSpecialRegexCharacter
         };
-        return TrivialComponents;
     })
 );

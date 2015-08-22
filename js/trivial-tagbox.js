@@ -179,14 +179,21 @@
                 if (config.allowFreeText) {
                     var editorValueBeforeCursor = getNonSelectedEditorValue();
                     if (editorValueBeforeCursor.length > 0) {
-                        var lastCharBeforeCursor = editorValueBeforeCursor.charAt(editorValueBeforeCursor.length - 1);
-                        if (config.freeTextSeparators.indexOf(lastCharBeforeCursor) != -1) {
-                            if (editorValueBeforeCursor.trim().length > 0) {
+
+                        function splitStringBySeparatorChars(s, separatorChars) {
+                            return s.split(new RegExp("[" + TrivialComponents.escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
+                        }
+                        var tagValuesEnteredByUser = splitStringBySeparatorChars(editorValueBeforeCursor, config.freeTextSeparators);
+
+                        for (var i =0; i< tagValuesEnteredByUser.length -1; i++) {
+                            var value = tagValuesEnteredByUser[i].trim();
+                            if (value.length > 0) {
                                 var entry = {};
-                                entry[config.inputTextProperty] = $editor.text().substr(0, editorValueBeforeCursor.length - 1);
+                                entry[config.inputTextProperty] = value;
                                 selectEntry(entry);
                             }
-                            $editor.text($editor.text().substr(editorValueBeforeCursor.length));
+                            $editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
+                            selectElementContents($editor[0], $editor.text().length, $editor.text().length);
                             entries = null;
                             closeDropDown();
                         }
@@ -399,8 +406,13 @@
         }
 
         function getNonSelectedEditorValue() {
-            var sel = window.getSelection();
-            return $editor.text().replace(String.fromCharCode(160), " ").substring(0, window.getSelection().baseOffset);
+            var editorText = $editor.text().replace(String.fromCharCode(160), " ");
+            var selection = window.getSelection();
+            if (selection.anchorOffset != selection.focusOffset) {
+                return editorText.substring(0, Math.min(window.getSelection().baseOffset, window.getSelection().focusOffset));
+            } else {
+                return editorText;
+            }
         }
 
         function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
@@ -425,7 +437,7 @@
         }
 
         function selectElementContents(el, start, end) {
-            el = el.firstChild;
+            el = el.firstChild || el;
             var range = document.createRange();
             //range.selectNodeContents(el);
             range.setStart(el, start);
