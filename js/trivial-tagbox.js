@@ -36,7 +36,7 @@
     function TrivialTagBox(originalInput, options) {
         options = options || {};
         var config = $.extend({
-            valueProperty: 'id',
+            valueProperty: options.allowFreeText !== false ? 'displayValue' : 'id',
             valueSeparator: ',',
             inputTextProperty: 'displayValue',
             template: TrivialComponents.image2LinesTemplate,
