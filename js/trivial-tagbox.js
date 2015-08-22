@@ -92,10 +92,14 @@
                 }
             });
         }
-        var $dropDown = $('<div class="tr-tagbox-dropdown"></div>').appendTo("body")
-            .scroll(function (e) {
-                return false;
-            });
+        var $dropDown = $('<div class="tr-tagbox-dropdown"></div>');
+        var dropdownNeeded = config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger;
+        if (dropdownNeeded) {
+            $dropDown.appendTo("body")
+                .scroll(function (e) {
+                    return false;
+                });
+        }
         var $editor = $('<span contenteditable="true" class="tagbox-editor"></span>');
 
         $editor.appendTo($tagArea).addClass("tr-tagbox-editor")
@@ -381,10 +385,12 @@
         }
 
         function openDropDown() {
-            $tagBox.addClass("open");
-            $dropDown.show();
-            repositionDropdown();
-            isDropDownOpen = true;
+            if (dropdownNeeded) {
+                $tagBox.addClass("open");
+                $dropDown.show();
+                repositionDropdown();
+                isDropDownOpen = true;
+            }
         }
 
         function closeDropDown() {
