@@ -46,7 +46,6 @@
             entries: null,
             selectedEntries: [],
             maxSelectedEntries: null,
-            emptyEntry: {},  // TODO do we really need this?
             queryFunction: null, // defined below...
             autoComplete: true,
             autoCompleteDelay: 0,
@@ -54,7 +53,7 @@
             freeTextSeparators: [',', ';'],
             freeTextEntryValues: {_isFreeTextEntry: true},
             showTrigger: true,
-            distinct: false,
+            distinct: true,
             matchingOptions: {
                 matchingMode: 'contains',
                 ignoreCase: true,
