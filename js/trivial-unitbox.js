@@ -51,7 +51,7 @@
                     code: '...'
                 },
                 queryFunction: null, // defined below...
-                autoComplete: false,
+                autoComplete: true,
                 autoCompleteDelay: 0,
                 showTrigger: true,
                 matchingOptions: {
@@ -319,7 +319,7 @@
             }
 
             function getNonAutoCompleteEditorValue() {
-                if ($editor[0].selectionStart < $editor[0].selectionEnd && $editor.selectionEnd === $editor.val().length) {
+                if ($editor[0].selectionStart < $editor[0].selectionEnd && $editor[0].selectionEnd === $editor.val().length) {
                     return $editor.val().substring(0, $editor[0].selectionStart);
                 } else {
                     return $editor.val();
@@ -364,12 +364,8 @@
 
             this.updateEntries = updateEntries;
             this.getSelectedEntry = function () {
-                if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
+                if (selectedEntry == null) {
                     return null;
-                } else if (selectedEntry == null && config.allowFreeText) {
-                    var fakeEntry = $.extend({}, config.freeTextEntryValues);
-                    fakeEntry[config.inputTextProperty] = $editor.val();
-                    return fakeEntry;
                 } else {
                     var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
                     selectedEntryToReturn._trEntryElement = undefined;
