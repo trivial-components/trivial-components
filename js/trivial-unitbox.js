@@ -42,7 +42,7 @@
                 unitDisplayPosition: 'right', // right or left
                 inputTextProperty: 'code',
                 template: TrivialComponents.currency2LineTemplate,
-                selectedEntryTemplate: options.template || TrivialComponents.currencySingleLineShortTemplate,
+                selectedEntryTemplate: TrivialComponents.currencySingleLineShortTemplate,
                 selectedEntry: undefined,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,

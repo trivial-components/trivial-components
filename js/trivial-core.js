@@ -63,17 +63,17 @@
             '</div>';
         var currencySingleLineShortTemplate = '<div class="tr-template-currency-single-line-short">' +
             '  <div class="content-wrapper editor-area"> ' +
-            '    <div>{{#symbol}}<span class="symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="code">{{code}}</span>{{/code}}</div> ' +
+            '    <div>{{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="currency-code">{{code}}</span>{{/code}}</div> ' +
             '  </div>' +
             '</div>';
         var currency2LineTemplate = '<div class="tr-template-currency-2-lines">' +
             '  <div class="content-wrapper editor-area"> ' +
             '    <div class="main-line">' +
-            '      <span class="code">{{code}}</span>' +
-            '      <span class="name">{{name}}</span>' +
+            '      <span class="currency-code">{{code}}</span>' +
+            '      <span class="currency-name">{{name}}</span>' +
             '    </div> ' +
             '    <div class="additional-info">' +
-            '      <span class="symbol">{{symbol}}</span>' +
+            '      <span class="currency-symbol">{{symbol}}</span>' +
             '      <div class="exchange">' +
             '        <span class="exchange-rate">{{exchangeRate}}</span>' +
             '        <span class="exchange-rate-base">{{exchangeRateBase}}</span>' +

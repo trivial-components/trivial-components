@@ -1,47 +1,47 @@
 .tr-unitbox {
-  &:extend(.tr-combobox all);
-  min-height: 24px;
+   &:extend(.tr-combobox all);
+   min-height: 24px;
 
-  .tr-unitbox-edit-input {
-    flex: 1 1 0;
-    border: none;
-    padding: 0 6px 0 4px;
-    text-align: right;
-    outline: none;
-    background-color: transparent;
-    font-family: @tr-editor-font-family;
-    font-size: @tr-editor-font-size;
-  }
+   .tr-unitbox-edit-input {
+     flex: 1 1 0;
+     border: none;
+     padding: 0 6px 0 4px;
+     text-align: right;
+     outline: none;
+     background-color: transparent;
+     font-family: @tr-editor-font-family;
+     font-size: @tr-editor-font-size;
+   }
 
-  .tr-unitbox-selected-entry-and-trigger-wrapper {
-    flex: 0 0 auto;
-    display: flex;
+   .tr-unitbox-selected-entry-and-trigger-wrapper {
+     flex: 0 0 auto;
+     display: flex;
 
-    background-color: @tr-button-bg;
-    cursor: default;
+     background-color: @tr-button-bg;
+     cursor: default;
 
-    &:hover, .tr-unitbox.open & {
-      background-color: @tr-button-bg-active;
-    }
+     &:hover, .tr-unitbox.open & {
+       background-color: @tr-button-bg-active;
+     }
 
-    .tr-unitbox-selected-entry-wrapper {
-      flex: 0 0 auto;
-    }
-    .tr-combobox-trigger {
-      border-left: none;
-      background-color: transparent;
-    }
-  }
+     .tr-unitbox-selected-entry-wrapper {
+       flex: 0 0 auto;
+     }
+     .tr-combobox-trigger {
+       border-left: none;
+       background-color: transparent;
+     }
+   }
 
-  &.unit-display-left {
-    flex-direction: row-reverse;
+   &.unit-display-left {
+     flex-direction: row-reverse;
 
-    .tr-unitbox-selected-entry-and-trigger-wrapper {
-      border-right: @tr-border;
-    }
-  }
+     .tr-unitbox-selected-entry-and-trigger-wrapper {
+       border-right: @tr-border;
+     }
+   }
 
-  &.unit-display-right .tr-unitbox-selected-entry-and-trigger-wrapper {
-    border-left: @tr-border;
-  }
-}
+   &.unit-display-right .tr-unitbox-selected-entry-and-trigger-wrapper {
+     border-left: @tr-border;
+   }
+ }
