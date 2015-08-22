@@ -7,17 +7,19 @@
   align-items: center;
   justify-content: space-around;
 
-  .tr-month-display {
+  .tr-calendar-display {
     width: 176px;
 
     .year, .month {
       display: flex;
+      border-radius: 2px;
 
       .name {
         flex: 1 1 100px;
         text-align: center;
         padding: 2px 0;
         font-weight: bold;
+        .fix-firefox-baseline;
       }
 
       .back-button, .forward-button {
@@ -27,12 +29,6 @@
         background-repeat: no-repeat;
         transition: transform 0.1s;
         cursor: pointer;
-        border: 1px solid transparent;
-        border-radius: 0 @tr-border-radius @tr-border-radius 0;
-
-        &:hover {
-          border: @tr-border;
-        }
       }
       .back-button {
         transform: scale(-1, 1);
@@ -41,16 +37,23 @@
       &:hover {
         background-color: @tr-highlight-color;
       }
+
+      &.keyboard-nav {
+        .blinking-box-shadow;
+      }
     }
 
     .month-table {
-      margin-top: 7px;
+      margin-top: 5px;
       th, td {
         width: 28px;
         border: none;
         border-spacing: 0;
+        border-radius: 2px;
         text-align: right;
         padding: 1px 3px;
+        .fix-firefox-baseline;
+        position: relative;
       }
 
       td:hover {
@@ -65,67 +68,131 @@
         color: lightgrey;
       }
 
-      .today {
+      .today:before {
+        position: absolute;
+        top: 7px;
+        left: 2px;
+        display: block;
+        width: 4px;
+        height: 4px;
         border-radius: 2px;
-        box-shadow: inset 0 0 0 2px #ff6300;
+        float: left;
+        background-color: #ff641c;
+        content: '';
       }
 
       .selected {
-        background-color: @tr-select-color;
+        background-color: @tr-highlight-color;
+      }
+
+      .keyboard-nav {
+        .blinking-box-shadow;
       }
 
     }
   }
 
-  .clock {
-    stroke: black;
-    stroke-linecap: round;
+  .tr-clock-display {
+    .clock {
+      stroke: black;
+      stroke-linecap: round;
 
-    .clockcircle {
-      stroke-width: 2px;
-      fill: #fff;
+      .clockcircle {
+        stroke-width: 2px;
+        fill: #fff;
+      }
+
+      .ticks {
+        stroke-width: 1px;
+      }
+
+      .hourhand {
+        stroke-width: 3px;
+      }
+
+      .minutehand {
+        stroke-width: 2px;
+      }
+
+      .hourhand.keyboard-nav, .minutehand.keyboard-nav {
+        .blinking-stroke;
+      }
+
+      .numbers {
+        font-family: sans-serif;
+        font-size: 10pt;
+        text-anchor: middle;
+        stroke: none;
+        fill: black;
+      }
+
+      .numbers {
+        font-family: sans-serif;
+        font-size: 10pt;
+        text-anchor: middle;
+        stroke: none;
+        fill: black;
+      }
+
+      .am-pm-box {
+        fill: transparent;
+        font-weight: 100;
+        font-size: 11px;
+        stroke-width: .5;
+      }
     }
 
-    .ticks {
-      stroke-width: 1px;
+    .digital-time-display {
+      text-align: center;
+      //font-family: 'clock-digits';
+      font-size: 130%;
+      .hour.keyboard-nav, .minute.keyboard-nav {
+        .blinking-stroke;
+      }
     }
-
-    .hourhand {
-      stroke-width: 3px;
-    }
-
-    .minutehand {
-      stroke-width: 2px;
-    }
-
-    .numbers {
-      font-family: sans-serif;
-      font-size: 10pt;
-      text-anchor: middle;
-      stroke: none;
-      fill: black;
-    }
-
-    .numbers {
-      font-family: sans-serif;
-      font-size: 10pt;
-      text-anchor: middle;
-      stroke: none;
-      fill: black;
-    }
-
-    .am-pm-box {
-      fill: transparent;
-      font-weight: 100;
-      font-size: 11px;
-      stroke: #555;
-    }
-
-  }
-
-  .digital-time-display {
-    text-align: center;
   }
 
 }
 
+.blinking-box-shadow {
+  animation: blinking-box-shadow 0.5s ease-in-out infinite alternate;
+  background-color: @tr-highlight-color;
+}
+
+@keyframes blinking-box-shadow {
+  from {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .5);
+  }
+  to {
+    box-shadow: inset 0 0 0 1px @tr-highlight-color-base;
+  }
+}
+
+.blinking-stroke {
+  animation: blinking-stroke 0.5s ease-out infinite alternate;
+}
+
+@keyframes blinking-stroke {
+  from {
+    stroke: black;
+    color: black;
+  }
+  to {
+    stroke: @tr-select-color;
+    color: darken(@tr-select-color, 10%);
+  }
+}
+
+.fix-firefox-baseline {
+  &:after {
+    // this is a hack for fixing firefox baseline. See http://blogs.adobe.com/webplatform/2014/08/13/one-weird-trick-to-baseline-align-text/
+    content: '';
+    display: inline-block;
+    height: 13px;
+  }
+}
+
+//@font-face {
+//  font-family: 'clock-digits';
+//  src: url(data:application/font-woff;base64,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);
+//}

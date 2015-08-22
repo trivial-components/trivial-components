@@ -5,6 +5,7 @@
 @tr-button-bg-active: rgba(0, 0, 0, 0.1);
 @tr-editor-font-family: sans-serif;
 @tr-editor-font-size: 14px;
-@tr-highlight-color: rgba(0, 120, 255, 0.2);
-@tr-select-color: rgba(0, 120, 255, 0.4);
+@tr-highlight-color-base: rgb(0, 120, 255);
+@tr-highlight-color: lighten(@tr-highlight-color-base, 80%, relative);
+@tr-select-color: lighten(@tr-highlight-color-base, 60%, relative);
 @tr-input-min-height: 30px;

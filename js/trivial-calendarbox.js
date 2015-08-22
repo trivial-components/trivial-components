@@ -44,20 +44,24 @@
             var selectedDate = config.selectedDate;
 
             var $calendarBox = $('<div class="tr-calendarbox"/>').appendTo($container);
-            var $monthDisplay = $('<div class="tr-month-display"/>').appendTo($calendarBox);
+            var $calendarDisplay = $('<div class="tr-calendar-display"/>').appendTo($calendarBox);
+            var $yearDisplay;
+            var $monthDisplay;
+            var $monthTable;
             var $clockDisplay = $('<div class="tr-clock-display"/>')
                 .appendTo($calendarBox)
-                .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> <circle class="clockcircle" cx="50" cy="50" r="45"/> <g class="ticks" > <line x1="50" y1="5.000" x2="50.00" y2="10.00"/> <line x1="72.50" y1="11.03" x2="70.00" y2="15.36"/> <line x1="88.97" y1="27.50" x2="84.64" y2="30.00"/> <line x1="95.00" y1="50.00" x2="90.00" y2="50.00"/> <line x1="88.97" y1="72.50" x2="84.64" y2="70.00"/> <line x1="72.50" y1="88.97" x2="70.00" y2="84.64"/> <line x1="50.00" y1="95.00" x2="50.00" y2="90.00"/> <line x1="27.50" y1="88.97" x2="30.00" y2="84.64"/> <line x1="11.03" y1="72.50" x2="15.36" y2="70.00"/> <line x1="5.000" y1="50.00" x2="10.00" y2="50.00"/> <line x1="11.03" y1="27.50" x2="15.36" y2="30.00"/> <line x1="27.50" y1="11.03" x2="30.00" y2="15.36"/> </g> <g class="numbers"> <text x="50" y="22">12</text> <text x="85" y="55">3</text> <text x="50" y="88">6</text> <text x="15" y="55">9</text> </g> <g class="hands"> <line class="hourhand" x1="50" y1="50" x2="50" y2="26"/> <line class="minutehand" x1="50" y1="50" x2="50" y2="20"/> </g> ' +
+                .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> <circle class="clockcircle" cx="50" cy="50" r="45"/> <g class="ticks" > <line x1="50" y1="5.000" x2="50.00" y2="10.00"/> <line x1="72.50" y1="11.03" x2="70.00" y2="15.36"/> <line x1="88.97" y1="27.50" x2="84.64" y2="30.00"/> <line x1="95.00" y1="50.00" x2="90.00" y2="50.00"/> <line x1="88.97" y1="72.50" x2="84.64" y2="70.00"/> <line x1="72.50" y1="88.97" x2="70.00" y2="84.64"/> <line x1="50.00" y1="95.00" x2="50.00" y2="90.00"/> <line x1="27.50" y1="88.97" x2="30.00" y2="84.64"/> <line x1="11.03" y1="72.50" x2="15.36" y2="70.00"/> <line x1="5.000" y1="50.00" x2="10.00" y2="50.00"/> <line x1="11.03" y1="27.50" x2="15.36" y2="30.00"/> <line x1="27.50" y1="11.03" x2="30.00" y2="15.36"/> </g> <g class="numbers"> <text x="50" y="22">12</text> <text x="85" y="55">3</text> <text x="50" y="88">6</text> <text x="15" y="55">9</text> </g> <g class="hands"> <line class="minutehand" x1="50" y1="50" x2="50" y2="20"/> <line class="hourhand" x1="50" y1="50" x2="50" y2="26"/> </g> ' +
                 '<g class="am-pm-box">' +
                 '<rect x="58" y="59" width="20" height="15"/>' +
                 '<text class="amPmText" x="60" y="70" >??</text>' +
                 '</g>' +
                 '</svg>'
-            ).append('<div class="digital-time-display">');
+            ).append('<div class="digital-time-display"><span class="hour">??</span>:<span class="minute">??</span></div>');
             var $hourHand = $clockDisplay.find('.hourhand');
             var $minuteHand = $clockDisplay.find('.minutehand');
             var $amPmText = $clockDisplay.find('.amPmText');
-            var $digitalTimeDisplay = $clockDisplay.find('.digital-time-display');
+            var $digitalTimeHourDisplay = $clockDisplay.find('.digital-time-display .hour');
+            var $digitalTimeMinuteDisplay = $clockDisplay.find('.digital-time-display .minute');
 
             if (selectedDate) { // if config.entries was set...
                 updateMonthDisplay(selectedDate);
@@ -79,10 +83,10 @@
             }
 
             function updateMonthDisplay(dateInMonthToBeDisplayed) {
-                $monthDisplay.empty();
-                var $year = $('<div class="year"><span class="back-button"/><span class="name">' + dateInMonthToBeDisplayed.year() + '</span><span class="forward-button"/></div>').appendTo($monthDisplay);
-                var $month = $('<div class="month"><span class="back-button"/><span class="name">' + moment.months()[dateInMonthToBeDisplayed.month()] + '</span><span class="forward-button"/></div>').appendTo($monthDisplay);
-                var $monthTable = $('<div class="month-table">').appendTo($monthDisplay);
+                $calendarDisplay.empty();
+                $yearDisplay = $('<div class="year"><span class="back-button"/><span class="name">' + dateInMonthToBeDisplayed.year() + '</span><span class="forward-button"/></div>').appendTo($calendarDisplay);
+                $monthDisplay = $('<div class="month"><span class="back-button"/><span class="name">' + moment.months()[dateInMonthToBeDisplayed.month()] + '</span><span class="forward-button"/></div>').appendTo($calendarDisplay);
+                $monthTable = $('<div class="month-table">').appendTo($calendarDisplay);
                 var daysToBeDisplayed = getDaysForCalendarDisplay(dateInMonthToBeDisplayed, 1);
 
                 var $tr = $('<tr>').appendTo($monthTable);
@@ -118,7 +122,8 @@
                 $hourHand.attr("transform", "rotate(" + hourAngle + ",50,50)");
                 $minuteHand.attr("transform", "rotate(" + minutesAngle + ",50,50)");
 
-                $digitalTimeDisplay.text(date.format('HH:mm'));
+                $digitalTimeHourDisplay.text(date.format('HH'));
+                $digitalTimeMinuteDisplay.text(date.format('mm'));
             }
 
             function goToNextMonth(direction) {
@@ -172,6 +177,23 @@
 
             this.setKeyboardNavigationState = function (newKeyboardNavigationState) {
                 keyboardNavigationState = newKeyboardNavigationState;
+                $($yearDisplay).add($monthDisplay).add($monthTable.find('td.keyboard-nav')).add($hourHand).add($digitalTimeHourDisplay).add($minuteHand).add($digitalTimeMinuteDisplay)
+                    .each(function() {
+                        $(this).attr("class", $(this).attr("class").replace("keyboard-nav", ''));
+                    });
+                if (keyboardNavigationState == 'year') {
+                    $yearDisplay.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'month') {
+                    $monthDisplay.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'day') {
+                    $monthTable.find(".selected").addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'hour') {
+                    $hourHand.attr("class", "hourhand keyboard-nav");
+                    $digitalTimeHourDisplay.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'minute') {
+                    $minuteHand.attr("class", "minutehand keyboard-nav");
+                    $digitalTimeMinuteDisplay.addClass("keyboard-nav");
+                }
             };
 
             this.navigate = function (direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
