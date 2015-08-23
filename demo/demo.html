@@ -286,12 +286,20 @@ no search field:
             showSearchField: false
         });
 
-        $('#unitBox').TrivialUnitBox({
+        var trivialUnitBox = $('#unitBox').TrivialUnitBox({
             entries: createCurrencyEntries(),
             emptyEntry: {
                 code: '...'
             }
         });
+        trivialUnitBox.$.on('change', function() {
+            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
+            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
+        });
+        $('#unitBox').on('change', function() {
+            console.log($(this).val());
+        });
+
 
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),

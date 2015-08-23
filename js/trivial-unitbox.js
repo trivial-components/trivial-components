@@ -36,7 +36,7 @@
         function TrivialUnitBox(originalInput, options) {
             options = options || {};
             var config = $.extend({
-                unitValueProperty: null,
+                unitValueProperty: 'code',
                 decimalSeparator: '.',
                 decimalPrecision: 2,
                 unitDisplayPosition: 'right', // right or left
@@ -70,12 +70,13 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
-            var numberRegex = new RegExp('\\d+(?:\\'+config.decimalSeparator+'\\d*)?');
+            var numberRegex = new RegExp('\\d+(?:\\' + config.decimalSeparator + '\\d*)?');
             var queryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ]');
             var lastQueryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ](?=[\\d\\' + config.decimalSeparator + ' ]*$)');
 
             var $spinners = $();
-            var $originalInput = $(originalInput);
+            var $originalInput = $(originalInput).addClass("tr-original-input");
+            var $editor = $('<input type="text"/>');
             var $unitBox = $('<div class="tr-unitbox"/>').insertAfter($originalInput)
                 .addClass(config.unitDisplayPosition === 'left' ? 'unit-display-left' : 'unit-display-right');
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
@@ -95,13 +96,7 @@
                 $editor.focus();
             });
             var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
-            var $editor;
-            if (config.valueProperty) {
-                $originalInput.addClass("tr-original-input");
-                $editor = $('<input type="text"/>');
-            } else {
-                $editor = $originalInput;
-            }
+
 
             $editor.prependTo($unitBox).addClass("tr-unitbox-edit-input")
                 .focus(function () {
@@ -178,6 +173,9 @@
                     if (entries == null) {
                         query();
                     }
+                }).change(function () {
+                    updateOriginalInputValue();
+                    fireChangeEvents();
                 });
 
             $unitBox.add($dropDown).mousedown(function () {
@@ -200,9 +198,11 @@
             listBox.$.change(function () {
                 var selectedListBoxEntry = listBox.getSelectedEntry();
                 if (selectedListBoxEntry) {
-                    selectEntry(selectedListBoxEntry);
+                    selectEntry(selectedListBoxEntry, true);
                     listBox.selectEntry(null);
+                    updateOriginalInputValue();
                     closeDropDown();
+                    fireChangeEvents();
                 }
             });
 
@@ -259,7 +259,7 @@
                 $unitBox.trigger("change");
             }
 
-            function selectEntry(entry) {
+            function selectEntry(entry, doNotFireEvents) {
                 if (entry == null) {
                     selectedEntry = null;
                     var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
@@ -273,7 +273,9 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 }
                 cleanUpEditorValue();
-                fireChangeEvents();
+                if (!doNotFireEvents) {
+                    fireChangeEvents();
+                }
             }
 
             function cleanUpEditorValue() {
@@ -352,6 +354,19 @@
                 }
             }
 
+            var updateOriginalInputValue = function () {
+                if (config.unitDisplayPosition === 'left') {
+                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + ' ' + getAmount());
+                } else {
+                    $originalInput.val(getAmount() + ' ' + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));
+                }
+            };
+
+            function getAmount() {
+                var numberMatch = $editor.val().match(numberRegex);
+                return numberMatch && numberMatch[0];
+            }
+
             this.$ = $unitBox;
             $unitBox[0].trivialUnitBox = this;
 
@@ -363,7 +378,7 @@
             }
 
             this.updateEntries = updateEntries;
-            this.getSelectedEntry = function () {
+            this.getSelectedUnit = function () {
                 if (selectedEntry == null) {
                     return null;
                 } else {
@@ -372,6 +387,7 @@
                     return selectedEntryToReturn;
                 }
             };
+            this.getAmount = getAmount;
             this.selectEntry = selectEntry;
         }
 
