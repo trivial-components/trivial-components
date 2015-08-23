@@ -45,9 +45,16 @@
 
             var $calendarBox = $('<div class="tr-calendarbox"/>').appendTo($container);
             var $calendarDisplay = $('<div class="tr-calendar-display"/>').appendTo($calendarBox);
-            var $yearDisplay;
-            var $monthDisplay;
-            var $monthTable;
+            var $yearDisplay = $('<div class="year"><span class="back-button"/><span class="name"/><span class="forward-button"/></div>').appendTo($calendarDisplay);
+            var $monthDisplay = $('<div class="month"><span class="back-button"/><span class="name"/><span class="forward-button"/></div>').appendTo($calendarDisplay);
+            var $monthTable = $('<div class="month-table">').appendTo($calendarDisplay);
+            var $year = $yearDisplay.find(".name");
+            var $month = $monthDisplay.find(".name");
+            $yearDisplay.find('.back-button').click(navigate.bind(this, "year", "left"));
+            $yearDisplay.find('.forward-button').click(navigate.bind(this, "year", "right"));
+            $monthDisplay.find('.back-button').click(navigate.bind(this, "month", "left"));
+            $monthDisplay.find('.forward-button').click(navigate.bind(this, "month", "right"));
+
             var $clockDisplay = $('<div class="tr-clock-display"/>')
                 .appendTo($calendarBox)
                 .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> <circle class="clockcircle" cx="50" cy="50" r="45"/> <g class="ticks" > <line x1="50" y1="5.000" x2="50.00" y2="10.00"/> <line x1="72.50" y1="11.03" x2="70.00" y2="15.36"/> <line x1="88.97" y1="27.50" x2="84.64" y2="30.00"/> <line x1="95.00" y1="50.00" x2="90.00" y2="50.00"/> <line x1="88.97" y1="72.50" x2="84.64" y2="70.00"/> <line x1="72.50" y1="88.97" x2="70.00" y2="84.64"/> <line x1="50.00" y1="95.00" x2="50.00" y2="90.00"/> <line x1="27.50" y1="88.97" x2="30.00" y2="84.64"/> <line x1="11.03" y1="72.50" x2="15.36" y2="70.00"/> <line x1="5.000" y1="50.00" x2="10.00" y2="50.00"/> <line x1="11.03" y1="27.50" x2="15.36" y2="30.00"/> <line x1="27.50" y1="11.03" x2="30.00" y2="15.36"/> </g> <g class="numbers"> <text x="50" y="22">12</text> <text x="85" y="55">3</text> <text x="50" y="88">6</text> <text x="15" y="55">9</text> </g> <g class="hands"> <line class="minutehand" x1="50" y1="50" x2="50" y2="20"/> <line class="hourhand" x1="50" y1="50" x2="50" y2="26"/> </g> ' +
@@ -56,7 +63,11 @@
                 '<text class="amPmText" x="60" y="70" >??</text>' +
                 '</g>' +
                 '</svg>'
-            ).append('<div class="digital-time-display"><span class="hour">??</span>:<span class="minute">??</span></div>');
+            ).append('<div class="digital-time-display"><div class="hour-wrapper">' +
+                '<div class="up-button"/><div class="hour">??</div><div class="down-button"/>' +
+                '</div>:<div class="minute-wrapper">' +
+                '<div class="up-button"/><div class="minute">??</div><div class="down-button"/>' +
+                '</div></div>');
             var $hourHand = $clockDisplay.find('.hourhand');
             var $minuteHand = $clockDisplay.find('.minutehand');
             var $amPmText = $clockDisplay.find('.amPmText');
@@ -83,10 +94,11 @@
             }
 
             function updateMonthDisplay(dateInMonthToBeDisplayed) {
-                $calendarDisplay.empty();
-                $yearDisplay = $('<div class="year"><span class="back-button"/><span class="name">' + dateInMonthToBeDisplayed.year() + '</span><span class="forward-button"/></div>').appendTo($calendarDisplay);
-                $monthDisplay = $('<div class="month"><span class="back-button"/><span class="name">' + moment.months()[dateInMonthToBeDisplayed.month()] + '</span><span class="forward-button"/></div>').appendTo($calendarDisplay);
+                $year.text(dateInMonthToBeDisplayed.year());
+                $month.text(moment.months()[dateInMonthToBeDisplayed.month()]);
+                $monthTable.remove();
                 $monthTable = $('<div class="month-table">').appendTo($calendarDisplay);
+
                 var daysToBeDisplayed = getDaysForCalendarDisplay(dateInMonthToBeDisplayed, 1);
 
                 var $tr = $('<tr>').appendTo($monthTable);
@@ -97,7 +109,7 @@
                     $tr = $('<tr>').appendTo($monthTable);
                     for (var d = 0; d < 7; d++) {
                         var day = daysToBeDisplayed[w * 7 + d];
-                        var $td = $('<td>' + (day.date()) + '</td>');
+                        var $td = $('<td>' + day.date() + '</td>');
                         if (day.month() == dateInMonthToBeDisplayed.month()) {
                             $td.addClass('current-month');
                         } else {
@@ -108,7 +120,11 @@
                         }
                         if (day.year() == selectedDate.year() && day.dayOfYear() == selectedDate.dayOfYear()) {
                             $td.addClass('selected');
+                            if (keyboardNavigationState === 'day') {
+                                $td.addClass("keyboard-nav");
+                            }
                         }
+                        $td.click(setMonthAndDay.bind(this, day.month() + 1, day.date()));
                         $tr.append($td);
                     }
                 }
@@ -126,11 +142,6 @@
                 $digitalTimeMinuteDisplay.text(date.format('mm'));
             }
 
-            function goToNextMonth(direction) {
-                selectedDate.add(direction, 'month');
-                updateMonthDisplay(selectedDate);
-            }
-
             var updateDisplay = function () {
                 updateMonthDisplay(selectedDate);
                 updateClockDisplay(selectedDate);
@@ -139,46 +150,111 @@
             function setSelectedDate(moment) {
                 selectedDate = moment;
                 updateDisplay();
+                fireChangeEvents();
             }
 
             function setYear(year) {
                 selectedDate.year(year);
                 updateDisplay();
+                fireChangeEvents();
             }
 
             function setMonth(month) {
                 selectedDate.month(month - 1);
                 updateDisplay();
+                fireChangeEvents();
             }
 
             function setDayOfMonth(dayOfMonth) {
                 selectedDate.date(dayOfMonth);
                 updateDisplay();
+                fireChangeEvents();
+            }
+
+            function setMonthAndDay(month, day) {
+                selectedDate.month(month - 1);
+                selectedDate.date(day);
+                updateDisplay();
+                fireChangeEvents();
             }
 
             function setHour(hour) {
                 selectedDate.hour(hour);
                 updateDisplay();
+                fireChangeEvents();
             }
 
             function setMinute(minute) {
                 selectedDate.minute(minute);
                 updateDisplay();
+                fireChangeEvents();
+            }
+
+            function fireChangeEvents() {
+                $calendarBox.trigger("change");
             }
 
             this.$ = $calendarBox;
-            this.goToNextMonth = goToNextMonth;
             this.setSelectedDate = setSelectedDate;
+            this.getSelectedDate = function() {
+                return selectedDate;
+            };
             this.setYear = setYear;
             this.setMonth = setMonth;
             this.setDayOfMonth = setDayOfMonth;
             this.setHour = setHour;
             this.setMinute = setMinute;
 
+            function navigate(unit /* year, month, day, hour, minute*/, direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
+                console.log(unit + direction);
+                if (unit == 'year') {
+                    if (direction == 'down' || direction == 'left') {
+                        setYear(selectedDate.year() - 1);
+                    } else if (direction == 'up' || direction == 'right') {
+                        setYear(selectedDate.year() + 1);
+                    }
+                    return true;
+                } else if (unit == 'month') {
+                    if (direction == 'down' || direction == 'left') {
+                        setMonth(selectedDate.month());
+                    } else if (direction == 'up' || direction == 'right') {
+                        setMonth(selectedDate.month() + 2);
+                    }
+                    return true;
+                } else if (unit == 'day') {
+                    if (direction == 'down') {
+                        selectedDate.dayOfYear(selectedDate.dayOfYear() + 7);
+                    } else if (direction == 'left') {
+                        selectedDate.dayOfYear(selectedDate.dayOfYear() - 1);
+                    } else if (direction == 'up') {
+                        selectedDate.dayOfYear(selectedDate.dayOfYear() - 7);
+                    } else if (direction == 'right') {
+                        selectedDate.dayOfYear(selectedDate.dayOfYear() + 1);
+                    }
+                    updateDisplay();
+                    fireChangeEvents();
+                    return true;
+                } else if (unit == 'hour') {
+                    if (direction == 'down' || direction == 'left') {
+                        setHour(selectedDate.hour() - 1);
+                    } else if (direction == 'up' || direction == 'right') {
+                        setHour(selectedDate.hour() + 1);
+                    }
+                    return true;
+                } else if (unit == 'minute') {
+                    if (direction == 'down' || direction == 'left') {
+                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) - 5);
+                    } else if (direction == 'up' || direction == 'right') {
+                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) + 5);
+                    }
+                    return true;
+                }
+            }
+
             this.setKeyboardNavigationState = function (newKeyboardNavigationState) {
                 keyboardNavigationState = newKeyboardNavigationState;
                 $($yearDisplay).add($monthDisplay).add($monthTable.find('td.keyboard-nav')).add($hourHand).add($digitalTimeHourDisplay).add($minuteHand).add($digitalTimeMinuteDisplay)
-                    .each(function() {
+                    .each(function () {
                         $(this).attr("class", $(this).attr("class").replace("keyboard-nav", ''));
                     });
                 if (keyboardNavigationState == 'year') {
@@ -197,47 +273,7 @@
             };
 
             this.navigate = function (direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
-                if (keyboardNavigationState == 'year') {
-                    if (direction == 'down' || direction == 'left') {
-                        setYear(selectedDate.year() - 1);
-                    } else if (direction == 'up' || direction == 'right') {
-                        setYear(selectedDate.year() + 1);
-                    }
-                    return true;
-                } else if (keyboardNavigationState == 'month') {
-                    if (direction == 'down' || direction == 'left') {
-                        setMonth(selectedDate.month());
-                    } else if (direction == 'up' || direction == 'right') {
-                        setMonth(selectedDate.month() + 2);
-                    }
-                    return true;
-                } else if (keyboardNavigationState == 'day') {
-                    if (direction == 'down') {
-                        selectedDate.dayOfYear(selectedDate.dayOfYear() + 7);
-                    } else if (direction == 'left') {
-                        selectedDate.dayOfYear(selectedDate.dayOfYear() - 1);
-                    } else if (direction == 'up') {
-                        selectedDate.dayOfYear(selectedDate.dayOfYear() - 7);
-                    } else if (direction == 'right') {
-                        selectedDate.dayOfYear(selectedDate.dayOfYear() + 1);
-                    }
-                    updateDisplay();
-                    return true;
-                } else if (keyboardNavigationState == 'hour') {
-                    if (direction == 'down' || direction == 'left') {
-                        setHour(selectedDate.hour() - 1);
-                    } else if (direction == 'up' || direction == 'right') {
-                        setHour(selectedDate.hour() + 1);
-                    }
-                    return true;
-                } else if (keyboardNavigationState == 'minute') {
-                    if (direction == 'down' || direction == 'left') {
-                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) - 5);
-                    } else if (direction == 'up' || direction == 'right') {
-                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) + 5);
-                    }
-                    return true;
-                }
+                navigate(keyboardNavigationState, direction);
             };
         }
 

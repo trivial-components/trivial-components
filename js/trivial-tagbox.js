@@ -193,7 +193,7 @@
                                 selectEntry(entry);
                             }
                             $editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
-                            selectElementContents($editor[0], $editor.text().length, $editor.text().length);
+                            TrivialComponents.selectElementContents($editor[0], $editor.text().length, $editor.text().length);
                             entries = null;
                             closeDropDown();
                         }
@@ -427,22 +427,11 @@
                     $editor.text(newEditorValue);
                     repositionDropdown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
                     setTimeout(function () { // we need this to guarantee that the editor has been updated...
-                        selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
+                        TrivialComponents.selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
                     }, 0);
                 }, delay || 0);
             }
             doNoAutoCompleteBecauseBackspaceWasPressed = false;
-        }
-
-        function selectElementContents(el, start, end) {
-            el = el.firstChild || el;
-            var range = document.createRange();
-            //range.selectNodeContents(el);
-            range.setStart(el, start);
-            range.setEnd(el, end);
-            var sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
         }
 
         function highlightNextEntry(direction) {

@@ -2,6 +2,7 @@
   font-family: @tr-editor-font-family;
   font-size: @tr-editor-font-size;
   cursor: default;
+  user-select: none;
 
   display: flex;
   align-items: center;
@@ -20,22 +21,6 @@
         padding: 2px 0;
         font-weight: bold;
         .fix-firefox-baseline;
-      }
-
-      .back-button, .forward-button {
-        flex: 0 0 16px;
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAMklEQVQYV2NkIAIwIqn5D2Uji4GF0AWwKsTQxcDAgKEQmyKQDSgKyTKJoJuI9h3WUAMAntIHCtDLLc8AAAAASUVORK5CYII=);
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: transform 0.1s;
-        cursor: pointer;
-      }
-      .back-button {
-        transform: scale(-1, 1);
-      }
-
-      &:hover {
-        background-color: @tr-highlight-color;
       }
 
       &.keyboard-nav {
@@ -143,20 +128,47 @@
     }
 
     .digital-time-display {
-      text-align: center;
-      //font-family: 'clock-digits';
+      display: flex;
+      justify-content: center;
+      align-items: center;
       font-size: 130%;
+
+      .hour-wrapper, .minute-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
       .hour.keyboard-nav, .minute.keyboard-nav {
         .blinking-stroke;
       }
     }
   }
 
+  .back-button, .forward-button, .up-button, .down-button {
+    flex: 0 0 16px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAMklEQVQYV2NkIAIwIqn5D2Uji4GF0AWwKsTQxcDAgKEQmyKQDSgKyTKJoJuI9h3WUAMAntIHCtDLLc8AAAAASUVORK5CYII=);
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.1s;
+    cursor: pointer;
+  }
+  .back-button {
+    transform: scale(-1, 1);
+  }
+  .down-button {
+    flex: 0 0 10px;
+    transform: rotate(90deg);
+  }
+  .up-button {
+    flex: 0 0 10px;
+    transform: rotate(-90deg) scale(1, -1);
+  }
+
 }
 
 .blinking-box-shadow {
   animation: blinking-box-shadow 0.5s ease-in-out infinite alternate;
-  background-color: @tr-highlight-color;
+  //background-color: @tr-highlight-color;
 }
 
 @keyframes blinking-box-shadow {

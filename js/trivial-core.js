@@ -229,6 +229,18 @@
             };
         }
 
+        function selectElementContents(domElement, start, end) {
+            domElement = domElement.firstChild || domElement;
+            end = end || start;
+            var range = document.createRange();
+            //range.selectNodeContents(el);
+            range.setStart(domElement, start);
+            range.setEnd(domElement, end);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
         function escapeSpecialRegexCharacter(s) {
             return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
         }
@@ -249,6 +261,7 @@
             defaultTreeQueryFunctionFactory: defaultTreeQueryFunctionFactory,
             isModifierKey: isModifierKey,
             registerJqueryPlugin: registerJqueryPlugin,
+            selectElementContents: selectElementContents,
             escapeSpecialRegexCharacter: escapeSpecialRegexCharacter
         };
     })

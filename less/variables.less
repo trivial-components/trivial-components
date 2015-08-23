@@ -1,4 +1,5 @@
-@tr-border: 1px solid #ccc;
+@tr-border-color: #ccc;
+@tr-border: 1px solid @tr-border-color;
 @tr-border-radius: 4px;
 @tr-input-border-focus: #66afe9;
 @tr-button-bg: rgba(0, 0, 0, 0.05);
@@ -9,3 +10,4 @@
 @tr-highlight-color: lighten(@tr-highlight-color-base, 80%, relative);
 @tr-select-color: lighten(@tr-highlight-color-base, 60%, relative);
 @tr-input-min-height: 30px;
+@tr-disabled-text-color: @tr-border-color;
