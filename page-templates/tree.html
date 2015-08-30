@@ -49,6 +49,10 @@
                         </label>
                     </div>
                     <div class="form-group">
+                        <label for="animationDuration">animationDuration (ms)</label>
+                        <input class="form-control" id="animationDuration" name="animationDuration" type="number" value="70"/>
+                    </div>
+                    <div class="form-group">
                         <label for="templates">templates</label>
                         <input id="templates" name="templates"/>
                     </div>
@@ -289,6 +293,7 @@
                 expandedProperty: $('#expandedProperty').val(),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 matchingOptions: matchingOptions,
+                animationDuration: parseInt($("#animationDuration").val()),
                 templates: $('#templates').TrivialTagBox().getSelectedEntries().map(function (v) {
                     return v.value
                 }),

@@ -77,6 +77,10 @@
                         </label>
                     </div>
                     <div class="form-group">
+                        <label for="animationDuration">animationDuration (ms)</label>
+                        <input class="form-control" id="animationDuration" name="animationDuration" type="number" value="70"/>
+                    </div>
+                    <div class="form-group">
                         <label for="selectedEntryTemplate">selectedEntryTemplate</label>
                         <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
                     </div>
@@ -423,6 +427,7 @@
                     matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
                     ignoreCase: $('#ignoreCase').is(':checked')
                 },
+                animationDuration: parseInt($("#animationDuration").val()),
                 templates: $('#templates').TrivialTagBox().getSelectedEntries().map(function (v) {
                     return v.value
                 }),
