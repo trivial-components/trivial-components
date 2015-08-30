@@ -1,21 +1,4 @@
 .tr-treebox {
-  .tr-tree-edit-input {
-    flex: 0 0 auto;
-    border-width: 0 0 1px 0;
-    border-bottom: @tr-border;
-    border-radius: @tr-border-radius @tr-border-radius 0 0;
-    font-family: @tr-editor-font-family;
-    font-size: @tr-editor-font-size;
-    padding: 6px;
-    outline: none;
-  }
-
-  .tr-tree-entryTree {
-    flex: 1 1 300px;
-    overflow: auto;
-    position: relative;
-  }
-
   .tr-tree-entry-outer-wrapper {
     > .tr-tree-entry-and-expander-wrapper {
       display: flex;
@@ -56,8 +39,8 @@
       position: relative; // for lazy children spinner
     }
 
-    &.expanded > .tr-tree-entry-children-wrapper {
-      display: block;
-    }
+    //&.expanded > .tr-tree-entry-children-wrapper {
+    //  display: block;
+    //}
   }
 }
