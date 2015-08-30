@@ -50,8 +50,10 @@
             var $monthTable = $('<div class="month-table">').appendTo($calendarDisplay);
             var $year = $yearDisplay.find(".name");
             var $month = $monthDisplay.find(".name");
+            $yearDisplay.click(setKeyboardNavigationState.bind(this, "year"));
             $yearDisplay.find('.back-button').click(navigate.bind(this, "year", "left"));
             $yearDisplay.find('.forward-button').click(navigate.bind(this, "year", "right"));
+            $monthDisplay.click(setKeyboardNavigationState.bind(this, "month"));
             $monthDisplay.find('.back-button').click(navigate.bind(this, "month", "left"));
             $monthDisplay.find('.forward-button').click(navigate.bind(this, "month", "right"));
 
@@ -71,8 +73,16 @@
             var $hourHand = $clockDisplay.find('.hourhand');
             var $minuteHand = $clockDisplay.find('.minutehand');
             var $amPmText = $clockDisplay.find('.amPmText');
+            var $digitalTimeHourDisplayWrapper = $clockDisplay.find('.digital-time-display .hour-wrapper');
             var $digitalTimeHourDisplay = $clockDisplay.find('.digital-time-display .hour');
+            $digitalTimeHourDisplayWrapper.click(setKeyboardNavigationState.bind(this, "hour"));
+            $digitalTimeHourDisplayWrapper.find(".up-button").click(navigate.bind(this, "hour", "up"));
+            $digitalTimeHourDisplayWrapper.find(".down-button").click(navigate.bind(this, "hour", "down"));
+            var $digitalTimeMinuteDisplayWrapper = $clockDisplay.find('.digital-time-display .minute-wrapper');
             var $digitalTimeMinuteDisplay = $clockDisplay.find('.digital-time-display .minute');
+            $digitalTimeMinuteDisplayWrapper.click(setKeyboardNavigationState.bind(this, "minute"));
+            $digitalTimeMinuteDisplayWrapper.find(".up-button").click(navigate.bind(this, "minute", "up"));
+            $digitalTimeMinuteDisplayWrapper.find(".down-button").click(navigate.bind(this, "minute", "down"));
 
             if (selectedDate) { // if config.entries was set...
                 updateMonthDisplay(selectedDate);
@@ -124,7 +134,12 @@
                                 $td.addClass("keyboard-nav");
                             }
                         }
-                        $td.click(setMonthAndDay.bind(this, day.month() + 1, day.date()));
+                        $td.click(function (day) {
+                            return function () {
+                                setKeyboardNavigationState("day");
+                                setMonthAndDay(day.month() + 1, day.date());
+                            };
+                        }(day));
                         $tr.append($td);
                     }
                 }
@@ -194,9 +209,30 @@
                 $calendarBox.trigger("change");
             }
 
+            function setKeyboardNavigationState(newKeyboardNavigationState) {
+                keyboardNavigationState = newKeyboardNavigationState;
+                $($yearDisplay).add($monthDisplay).add($monthTable.find('td.keyboard-nav')).add($hourHand).add($digitalTimeHourDisplayWrapper).add($minuteHand).add($digitalTimeMinuteDisplayWrapper)
+                    .each(function () {
+                        $(this).attr("class", $(this).attr("class").replace("keyboard-nav", ''));
+                    });
+                if (keyboardNavigationState == 'year') {
+                    $yearDisplay.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'month') {
+                    $monthDisplay.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'day') {
+                    $monthTable.find(".selected").addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'hour') {
+                    $hourHand.attr("class", "hourhand keyboard-nav");
+                    $digitalTimeHourDisplayWrapper.addClass("keyboard-nav");
+                } else if (keyboardNavigationState == 'minute') {
+                    $minuteHand.attr("class", "minutehand keyboard-nav");
+                    $digitalTimeMinuteDisplayWrapper.addClass("keyboard-nav");
+                }
+            }
+
             this.$ = $calendarBox;
             this.setSelectedDate = setSelectedDate;
-            this.getSelectedDate = function() {
+            this.getSelectedDate = function () {
                 return selectedDate;
             };
             this.setYear = setYear;
@@ -251,26 +287,7 @@
                 }
             }
 
-            this.setKeyboardNavigationState = function (newKeyboardNavigationState) {
-                keyboardNavigationState = newKeyboardNavigationState;
-                $($yearDisplay).add($monthDisplay).add($monthTable.find('td.keyboard-nav')).add($hourHand).add($digitalTimeHourDisplay).add($minuteHand).add($digitalTimeMinuteDisplay)
-                    .each(function () {
-                        $(this).attr("class", $(this).attr("class").replace("keyboard-nav", ''));
-                    });
-                if (keyboardNavigationState == 'year') {
-                    $yearDisplay.addClass("keyboard-nav");
-                } else if (keyboardNavigationState == 'month') {
-                    $monthDisplay.addClass("keyboard-nav");
-                } else if (keyboardNavigationState == 'day') {
-                    $monthTable.find(".selected").addClass("keyboard-nav");
-                } else if (keyboardNavigationState == 'hour') {
-                    $hourHand.attr("class", "hourhand keyboard-nav");
-                    $digitalTimeHourDisplay.addClass("keyboard-nav");
-                } else if (keyboardNavigationState == 'minute') {
-                    $minuteHand.attr("class", "minutehand keyboard-nav");
-                    $digitalTimeMinuteDisplay.addClass("keyboard-nav");
-                }
-            };
+            this.setKeyboardNavigationState = setKeyboardNavigationState;
 
             this.navigate = function (direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
                 navigate(keyboardNavigationState, direction);

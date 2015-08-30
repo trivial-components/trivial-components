@@ -19,7 +19,8 @@
     "jquery-ui": "1.x",
     "mustache": "1.x",
     "levenshtein": "1.x",
-    "moment": "~2.10.6"
+    "moment": "~2.10.6",
+    "moment-timezone": "~0.4.0"
   },
   "devDependencies": {
     "normalize.css": "latest"
