@@ -82,7 +82,7 @@
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);
             if (config.showTrigger) {
-                var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($selectedEntryAndTriggerWrapper);
+                var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($selectedEntryAndTriggerWrapper);
             }
             $selectedEntryAndTriggerWrapper.mousedown(function () {
                 if (isDropDownOpen) {
@@ -95,7 +95,7 @@
                 }
                 $editor.focus();
             });
-            var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
+            var $dropDown = $('<div class="tr-dropdown"></div>').appendTo("body");
 
 
             $editor.prependTo($unitBox).addClass("tr-unitbox-edit-input")

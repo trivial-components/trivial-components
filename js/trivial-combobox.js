@@ -73,7 +73,7 @@
         var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
         if (config.showTrigger) {
-            var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($comboBox);
+            var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($comboBox);
             $trigger.mousedown(function () {
                 if (isDropDownOpen) {
                     showEditor();
@@ -90,7 +90,7 @@
                 }
             });
         }
-        var $dropDown = $('<div class="tr-combobox-dropdown"></div>').appendTo("body");
+        var $dropDown = $('<div class="tr-dropdown"></div>').appendTo("body");
         var $editor;
         if (config.valueProperty) {
             $originalInput.addClass("tr-original-input");

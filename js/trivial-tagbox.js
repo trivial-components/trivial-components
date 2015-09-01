@@ -76,7 +76,7 @@
         $originalInput.appendTo($tagBox);
         var $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo($tagBox);
         if (config.showTrigger) {
-            var $trigger = $('<div class="tr-tagbox-trigger"><span class="tr-tagbox-trigger-icon"/></div>').appendTo($tagBox);
+            var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($tagBox);
             $trigger.mousedown(function () {
                 if (isDropDownOpen) {
                     closeDropDown();
@@ -91,7 +91,7 @@
                 }
             });
         }
-        var $dropDown = $('<div class="tr-tagbox-dropdown"></div>');
+        var $dropDown = $('<div class="tr-dropdown"></div>');
         var dropdownNeeded = config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger;
         if (dropdownNeeded) {
             $dropDown.appendTo("body")

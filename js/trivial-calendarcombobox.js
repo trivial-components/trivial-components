@@ -52,7 +52,7 @@
             var $originalInput = $(originalInput);
             var $calendarComboBox = $('<div class="tr-calendarcombobox"/>').insertAfter($originalInput);
             if (config.showTrigger) {
-                var $trigger = $('<div class="tr-combobox-trigger"><span class="tr-combobox-trigger-icon"/></div>').appendTo($calendarComboBox);
+                var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($calendarComboBox);
                 $trigger.mousedown(function () {
                     if (isDropDownOpen) {
                         closeDropDown();
@@ -65,7 +65,7 @@
                     return false;
                 });
             }
-            var $dropDown = $('<div class="tr-calendarcombobox-dropdown tr-combobox-dropdown"></div>').appendTo("body");
+            var $dropDown = $('<div class="tr-calendarcombobox-dropdown tr-dropdown"></div>').appendTo("body");
             var $editor = $('<div class="tr-formatted-field"></div>');
             var $dayInput = $('<span class="dayInput tr-formatted-input-section tr-2-chars right" contenteditable="true" data-maxlength="2" data-placeholder="TT"></span>').appendTo($editor);
             $editor.append('<span class="separator">.</span>');
