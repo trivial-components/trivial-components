@@ -58,7 +58,8 @@
                 matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
-            }
+            },
+            editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
         }, options);
 
         config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
@@ -72,7 +73,9 @@
         var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
         var $originalInput = $(originalInput).addClass("tr-original-input");
-        var $tagBox = $('<div class="tr-tagbox tr-input-wrapper"/>').insertAfter($originalInput);
+        var $tagBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
+            .addClass(config.editingMode)
+            .insertAfter($originalInput);
         $originalInput.appendTo($tagBox);
         var $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo($tagBox);
         if (config.showTrigger) {
@@ -91,17 +94,17 @@
                 }
             });
         }
-        var $dropDown = $('<div class="tr-dropdown"></div>');
-        var dropdownNeeded = config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger;
+        var $dropDown = $('<div class="tr-dropdown"></div>')
+            .scroll(function (e) {
+                return false;
+            });
+        var dropdownNeeded = config.editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
         if (dropdownNeeded) {
-            $dropDown.appendTo("body")
-                .scroll(function (e) {
-                    return false;
-                });
+            $dropDown.appendTo("body");
         }
         var $editor = $('<span contenteditable="true" class="tagbox-editor"></span>');
 
-        $editor.appendTo($tagArea).addClass("tr-tagbox-editor")
+        $editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
             .focus(function () {
                 if (blurCausedByClickInsideComponent) {
                     // do nothing!
@@ -366,7 +369,7 @@
             fireChangeEvents();
         }
 
-        function repositionDropdown() {
+        function repositionDropDown() {
             $dropDown.position({
                 my: "left top",
                 at: "left bottom",
@@ -392,7 +395,7 @@
             if (dropdownNeeded) {
                 $tagBox.addClass("open");
                 $dropDown.show();
-                repositionDropdown();
+                repositionDropDown();
                 isDropDownOpen = true;
             }
         }
@@ -425,7 +428,7 @@
                         newEditorValue = getNonSelectedEditorValue();
                     }
                     $editor.text(newEditorValue);
-                    repositionDropdown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
+                    repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
                     setTimeout(function () { // we need this to guarantee that the editor has been updated...
                         TrivialComponents.selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
                     }, 0);

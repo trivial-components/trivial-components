@@ -55,7 +55,8 @@
                 matchingMode: 'contains',
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
-            }
+            },
+            editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
         }, options);
 
         config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
@@ -70,7 +71,9 @@
 
         var $spinners = $();
         var $originalInput = $(originalInput);
-        var $comboBox = $('<div class="tr-combobox tr-input-wrapper"/>').insertAfter($originalInput);
+        var $comboBox = $('<div class="tr-combobox tr-input-wrapper"/>')
+            .addClass(config.editingMode)
+            .insertAfter($originalInput);
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
         if (config.showTrigger) {
             var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($comboBox);
@@ -90,7 +93,14 @@
                 }
             });
         }
-        var $dropDown = $('<div class="tr-dropdown"></div>').appendTo("body");
+        var $dropDown = $('<div class="tr-dropdown"></div>')
+            .scroll(function (e) {
+                return false;
+            });
+        var dropdownNeeded = config.editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
+        if (dropdownNeeded) {
+            $dropDown.appendTo("body");
+        }
         var $editor;
         if (config.valueProperty) {
             $originalInput.addClass("tr-original-input");
@@ -99,7 +109,7 @@
             $editor = $originalInput;
         }
 
-        $editor.prependTo($comboBox).addClass("tr-combobox-edit-input")
+        $editor.prependTo($comboBox).addClass("tr-combobox-editor tr-editor")
             .focus(function () {
                 if (blurCausedByClickInsideComponent) {
                     // do nothing!
@@ -215,7 +225,7 @@
             setTimeout(function () {
                 config.queryFunction($editor.val(), function (newEntries) {
                     updateEntries(newEntries);
-                    
+
                     var nonSelectedEditorValue = getNonSelectedEditorValue();
                     if (nonSelectedEditorValue.length > 0) {
                         listBox.highlightTextMatches(nonSelectedEditorValue);
@@ -298,8 +308,7 @@
             $editor.width(0).height(0);
         }
 
-        function openDropDown() {
-            $comboBox.addClass("open");
+        var repositionDropDown = function () {
             $dropDown
                 .show()
                 .position({
@@ -322,7 +331,14 @@
                     }
                 })
                 .width($comboBox.width());
-            isDropDownOpen = true;
+        };
+
+        function openDropDown() {
+            if (dropdownNeeded) {
+                $comboBox.addClass("open");
+                repositionDropDown();
+                isDropDownOpen = true;
+            }
         }
 
         function closeDropDown() {

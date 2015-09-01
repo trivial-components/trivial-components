@@ -60,7 +60,7 @@
             var $originalInput = $(originalInput).addClass("tr-original-input");
             var $componentWrapper = $('<div class="tr-list"/>').insertAfter($originalInput);
             var $entryList = $('<div class="tr-list-entryList"></div>').appendTo($componentWrapper);
-            var $editor = $('<input type="text" class="tr-list-edit-input"/>')
+            var $editor = $('<input type="text" class="tr-list-editor tr-editor"/>')
                 .prependTo($componentWrapper)
                 .focus(function () {
                     $componentWrapper.addClass('focus');

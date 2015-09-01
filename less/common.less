@@ -100,32 +100,6 @@
   background-color: @tr-select-color;
 }
 
-.tr-trigger {
-  @tr-caret-width: 4px;
-  order: 9999999;
-  flex: 0 0 20px;
-  width: 20px;
-  border-left: @tr-border;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: @tr-button-bg;
-
-  .tr-trigger-icon {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    vertical-align: middle;
-    border-top: @tr-caret-width solid black;
-    border-right: @tr-caret-width solid transparent;
-    border-left: @tr-caret-width solid transparent;
-  }
-
-  &:hover, .open & {
-    background-color: @tr-button-bg-active;
-  }
-}
-
 .tr-dropdown {
   display: none;
   position: absolute;
@@ -162,5 +136,60 @@
   }
   &, * {
     box-sizing: border-box;
+  }
+
+  .tr-trigger {
+    @tr-caret-width: 4px;
+    order: 9999999;
+    flex: 0 0 20px;
+    width: 20px;
+    border-left: @tr-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: @tr-button-bg;
+
+    .tr-trigger-icon {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      vertical-align: middle;
+      border-top: @tr-caret-width solid black;
+      border-right: @tr-caret-width solid transparent;
+      border-left: @tr-caret-width solid transparent;
+    }
+
+    &:hover, .open & {
+      background-color: @tr-button-bg-active;
+    }
+  }
+
+  &.disabled {
+    background-color: @tr-button-bg;
+
+    .tr-trigger:hover {
+      background-color: inherit;
+    }
+
+    .tr-trigger-icon {
+      border-top-color: white;
+    }
+
+    .tr-editor {
+      display: none;
+    }
+  }
+
+  &.readonly {
+    border-color: transparent;
+    box-shadow: none;
+
+    .tr-trigger {
+      display: none;
+    }
+
+    .tr-editor {
+      display: none;
+    }
   }
 }

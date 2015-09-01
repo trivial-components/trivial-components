@@ -98,7 +98,7 @@
             var $dropDown = $('<div class="tr-dropdown"></div>').appendTo("body");
 
 
-            $editor.prependTo($unitBox).addClass("tr-unitbox-edit-input")
+            $editor.prependTo($unitBox).addClass("tr-unitbox-editor tr-editor")
                 .focus(function () {
                     if (blurCausedByClickInsideComponent) {
                         // do nothing!

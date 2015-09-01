@@ -12,9 +12,10 @@
 }
 
 .tr-tagbox-default-wrapper-template {
-  border: @tr-border;
+  border: 1px solid #BAD2EA;
   border-radius: 3px;
-  background-color: @tr-button-bg;
+  box-shadow: 1px 2px 1px -1px rgba(0, 0, 0, 0.13);
+  background-color: white;
   margin: 2px;
 
   display: flex;
@@ -22,6 +23,7 @@
 
   .tr-tagbox-tag-content {
     flex: 1 1 auto;
+    padding: 0 1px;
   }
 
   .tr-tagbox-tag-remove-button {
@@ -34,6 +36,11 @@
     background-repeat: no-repeat;
     border-radius: 3px;
     margin: 2px;
+
+    .tr-input-wrapper.disabled &,
+    .tr-input-wrapper.readonly & {
+      display: none;
+    }
 
     &:hover {
       background-color: rgba(0,0,0,.06);

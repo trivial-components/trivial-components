@@ -50,6 +50,10 @@
 
     <h5>No trigger</h5>
     <input id="noTriggerComboBox">
+
+    <h5>disabled and readonly</h5>
+    <input id="disabledComboBox">
+    <input id="readonlyComboBox">
 </div>
 
 
@@ -91,6 +95,13 @@
 <div style="width: 600px;">
     <input id="noDropdownTagBox">
 </div>
+<h5>disabled and reaonly</h5>
+<div style="width: 600px;">
+    <input id="disabledTagBox">
+</div>
+<div style="width: 600px;">
+    <input id="readonlyTagBox">
+</div>
 
 <h4>Trivial TreeBox</h4>
 
@@ -98,8 +109,14 @@
 
 <h4>Trivial TreeComboBox</h4>
 
-<div style="width: 350px; height: 370px">
+<div style="width: 350px">
     <input id="treeComboBox">
+</div>
+<div style="width: 350px">
+    <input id="disabledTreeComboBox">
+</div>
+<div style="width: 350px">
+    <input id="readonlyTreeComboBox">
 </div>
 
 <h4>Trivial Tree</h4>
@@ -192,6 +209,16 @@ no search field:
             showTrigger: false
         });
 
+        $('#disabledComboBox').TrivialComboBox({
+            selectedEntry: createEntries(1)[0],
+            editingMode: 'disabled'
+        });
+
+        $('#readonlyComboBox').TrivialComboBox({
+            selectedEntry: createEntries(1)[0],
+            editingMode: 'readonly'
+        });
+
         $('#listBox').TrivialListBox({
             entries: createEntries(10)
         });
@@ -243,6 +270,18 @@ no search field:
             showTrigger: false
         });
 
+        $('#disabledTagBox').TrivialTagBox({
+            template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
+            selectedEntries: createEntries(2),
+            editingMode: 'disabled'
+        });
+
+        $('#readonlyTagBox').TrivialTagBox({
+            template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
+            selectedEntries: createEntries(2),
+            editingMode: 'readonly'
+        });
+
         $('#treeBoxContainer').TrivialTreeBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
@@ -263,6 +302,20 @@ no search field:
                 }, 1000);
             },
             animationDuration: 200
+        });
+
+        $('#disabledTreeComboBox').TrivialTreeComboBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 1,
+            editingMode: 'disabled'
+        });
+
+        $('#readonlyTreeComboBox').TrivialTreeComboBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 1,
+            editingMode: 'readonly'
         });
 
         $('#zeroConfigTree').TrivialTree({

@@ -71,7 +71,7 @@
             var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput)
                 .addClass(config.showSearchField ? "" : "no-searchfield");
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
-            var $editor = $('<input type="text" class="tr-tree-edit-input"/>')
+            var $editor = $('<input type="text" class="tr-tree-editor tr-editor"/>')
                 .prependTo($componentWrapper)
                 .focus(function () {
                     $componentWrapper.addClass('focus');
