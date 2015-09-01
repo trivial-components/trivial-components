@@ -70,7 +70,7 @@
 
         var $spinners = $();
         var $originalInput = $(originalInput);
-        var $comboBox = $('<div class="tr-combobox"/>').insertAfter($originalInput);
+        var $comboBox = $('<div class="tr-combobox tr-input-wrapper"/>').insertAfter($originalInput);
         var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
         if (config.showTrigger) {
             var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($comboBox);

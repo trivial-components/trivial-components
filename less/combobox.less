@@ -1,22 +1,3 @@
-.tr-combobox {
-  display: flex;
-  background-color: white;
-  border: @tr-border;
-  border-radius: @tr-border-radius;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-  .tr-component-focus;
-  &.open {
-    border-radius: @tr-border-radius @tr-border-radius 0 0;
-  }
-  &.open.dropdown-flipped {
-    border-radius: 0 0 @tr-border-radius @tr-border-radius;
-  }
-  &, * {
-    box-sizing: border-box;
-  }
-}
-
 .tr-combobox-selected-entry-wrapper {
   flex: 1 1 auto;
   overflow: hidden;

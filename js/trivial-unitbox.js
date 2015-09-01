@@ -77,7 +77,7 @@
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
             var $editor = $('<input type="text"/>');
-            var $unitBox = $('<div class="tr-unitbox"/>').insertAfter($originalInput)
+            var $unitBox = $('<div class="tr-unitbox tr-input-wrapper"/>').insertAfter($originalInput)
                 .addClass(config.unitDisplayPosition === 'left' ? 'unit-display-left' : 'unit-display-right');
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);

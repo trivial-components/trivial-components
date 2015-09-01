@@ -50,7 +50,7 @@
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
             var $originalInput = $(originalInput);
-            var $calendarComboBox = $('<div class="tr-calendarcombobox"/>').insertAfter($originalInput);
+            var $calendarComboBox = $('<div class="tr-calendarcombobox tr-input-wrapper"/>').insertAfter($originalInput);
             if (config.showTrigger) {
                 var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($calendarComboBox);
                 $trigger.mousedown(function () {

@@ -72,7 +72,7 @@
         var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
         var $originalInput = $(originalInput).addClass("tr-original-input");
-        var $tagBox = $('<div class="tr-tagbox"/>').insertAfter($originalInput);
+        var $tagBox = $('<div class="tr-tagbox tr-input-wrapper"/>').insertAfter($originalInput);
         $originalInput.appendTo($tagBox);
         var $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo($tagBox);
         if (config.showTrigger) {
