@@ -114,6 +114,10 @@
                         </label>
                     </div>
                     <div class="form-group">
+                        <label for="editingMode">editingMode</label>
+                        <input id="editingMode" name="editingMode"/>
+                    </div>
+                    <div class="form-group">
                         <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
                         <input class="form-control" id="autoCompleteDelay" name="autoCompleteDelay" type="number" value="0"/>
                     </div>
@@ -393,6 +397,20 @@
                 },
                 allowFreeText: false
         });
+        $('#editingMode').TrivialComboBox({
+                template: TrivialComponents.singleLineTemplate,
+                entries: [{
+                    displayValue: "editable"
+                },{
+                    displayValue: "disabled"
+                },{
+                    displayValue: "readonly"
+                }],
+                selectedEntry: {
+                    displayValue: "editable"
+                },
+                allowFreeText: false
+        });
 
         var customQueryFunction = function (queryString, resultCallback) {
             setTimeout(function () {
@@ -435,7 +453,8 @@
                 noEntriesTemplate: $('#noEntriesTemplate').val(),
                 selectedEntry: JSON.parse($('#selectedEntry').val()),
                 emptyEntry: JSON.parse($('#emptyEntry').val()),
-                entries: JSON.parse($('#entries').val())
+                entries: JSON.parse($('#entries').val()),
+                editingMode: $('#editingMode').TrivialComboBox().getSelectedEntry().displayValue
             };
             $('#configDisplay').removeClass("prettyprinted")
                     .text("$('#combobox').TrivialComboBox(" + JSON.stringify(config, function(key, value) {
