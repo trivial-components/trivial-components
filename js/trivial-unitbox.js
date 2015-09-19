@@ -396,6 +396,9 @@
                 }
             };
             this.getAmount = getAmount;
+            this.setAmount = function(amount) {
+                $editor.val(amount);
+            };
             this.selectEntry = selectEntry;
             this.selectUnit = selectUnit;
         }

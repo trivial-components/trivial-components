@@ -134,6 +134,8 @@ no search field:
     <input id="unitBox">
     <h5>unitDisplayPosition: 'left'</h5>
     <input id="unitBoxLeft">
+    <h5>long single line template:</h5>
+    <input id="unitBoxSingleLineTemplate">
 </div>
 
 <div style="width: 300px">
@@ -345,6 +347,9 @@ no search field:
             entries: createCurrencyEntries(),
             emptyEntry: {
                 code: '...'
+            }  ,
+            selectedEntry: {
+                code: 'EUR'
             }
         });
         trivialUnitBox.$.on('change', function() {
@@ -354,11 +359,13 @@ no search field:
         $('#unitBox').on('change', function() {
             console.log($(this).val());
         });
-
-
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),
             unitDisplayPosition: 'left'
+        });
+        $('#unitBoxSingleLineTemplate').TrivialUnitBox({
+            entries: createCurrencyEntries(),
+            template: TrivialComponents.currencySingleLineLongTemplate
         });
 
         calendarBox = $('#calendarBox').TrivialCalendarBox({

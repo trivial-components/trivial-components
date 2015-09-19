@@ -64,8 +64,8 @@ function createCurrencyEntries() {
         "code": "AFN",
         "shortName": "Afghanis",
         "name": "Afghan Afghanis",
-        "symbol": "؋",
-        "exchangeRate": 62.04,
+        //"symbol": "؋",
+        //"exchangeRate": 62.04,
         "exchangeRateBase": "USD"
     }, {
         "code": "ALL",

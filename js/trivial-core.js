@@ -66,6 +66,12 @@
             '    <div>{{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="currency-code">{{code}}</span>{{/code}}</div> ' +
             '  </div>' +
             '</div>';
+        var currencySingleLineLongTemplate = '<div class="tr-template-currency-single-line-long">' +
+            '  <div class="content-wrapper editor-area"> ' +
+            '    <div class="symbol-and-code">{{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="currency-code">{{code}}</span>{{/code}}</div>' +
+            '    <div class="currency-name">{{name}}</div>' +
+            '  </div>' +
+            '</div>';
         var currency2LineTemplate = '<div class="tr-template-currency-2-lines">' +
             '  <div class="content-wrapper editor-area"> ' +
             '    <div class="main-line">' +
@@ -73,11 +79,14 @@
             '      <span class="currency-name">{{name}}</span>' +
             '    </div> ' +
             '    <div class="additional-info">' +
-            '      <span class="currency-symbol">{{symbol}}</span>' +
+            '      <span class="currency-symbol">{{symbol}}</span>&nbsp;' +
+            '      {{#exchangeRate}}' +
             '      <div class="exchange">' +
+            '        = ' +
             '        <span class="exchange-rate">{{exchangeRate}}</span>' +
             '        <span class="exchange-rate-base">{{exchangeRateBase}}</span>' +
             '      </div>' +
+            '      {{/exchangeRate}}' +
             '    </div>' +
             '  </div>' +
             '</div>';
@@ -197,14 +206,15 @@
         };
 
         function registerJqueryPlugin(componentConstructor, componentName, cssClass) {
-            var jsApiName = componentName.charAt(0).toUpperCase() + componentName.slice(1);;
+            var jsApiName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
+            ;
             var plainJqueryName = componentName.toLowerCase();
             var domToJsObjectReferenceName = componentName.charAt(0).toLocaleLowerCase() + componentName.slice(1);
 
             $.fn[plainJqueryName] = function (options) {
                 var $comboBoxes = [];
                 this.each(function () {
-                    var existingComboBoxWrapper = $(this).parents('.'+cssClass).addBack('.'+cssClass);
+                    var existingComboBoxWrapper = $(this).parents('.' + cssClass).addBack('.' + cssClass);
                     if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0][domToJsObjectReferenceName]) {
                         $comboBoxes.push(existingComboBoxWrapper[0][domToJsObjectReferenceName].$);
                     } else {
@@ -217,7 +227,7 @@
             $.fn[jsApiName] = function (options) {
                 var comboBoxes = [];
                 this.each(function () {
-                    var existingComboBoxWrapper = $(this).parents('.'+cssClass).addBack('.'+cssClass);
+                    var existingComboBoxWrapper = $(this).parents('.' + cssClass).addBack('.' + cssClass);
                     if (existingComboBoxWrapper.length > 0 && existingComboBoxWrapper[0][domToJsObjectReferenceName]) {
                         comboBoxes.push(existingComboBoxWrapper[0][domToJsObjectReferenceName]);
                     } else {
@@ -252,6 +262,7 @@
             iconSingleLineTemplate: iconSingleLineTemplate,
             singleLineTemplate: singleLineTemplate,
             currencySingleLineShortTemplate: currencySingleLineShortTemplate,
+            currencySingleLineLongTemplate: currencySingleLineLongTemplate,
             currency2LineTemplate: currency2LineTemplate,
             defaultSpinnerTemplate: '<div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div>',
             defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
