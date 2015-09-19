@@ -68,7 +68,7 @@
             '</div>';
         var currencySingleLineLongTemplate = '<div class="tr-template-currency-single-line-long">' +
             '  <div class="content-wrapper editor-area"> ' +
-            '    <div class="symbol-and-code">{{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="currency-code">{{code}}</span>{{/code}}</div>' +
+            '    <div class="symbol-and-code">{{#code}}<span class="currency-code">{{code}}</span>{{/code}} {{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}}</div>' +
             '    <div class="currency-name">{{name}}</div>' +
             '  </div>' +
             '</div>';
