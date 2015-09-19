@@ -37,6 +37,7 @@
             options = options || {};
             var config = $.extend({
                 unitValueProperty: 'code',
+                idProperty: 'code',
                 decimalSeparator: '.',
                 decimalPrecision: 2,
                 unitDisplayPosition: 'right', // right or left
@@ -79,6 +80,7 @@
             var $editor = $('<input type="text"/>');
             var $unitBox = $('<div class="tr-unitbox tr-input-wrapper"/>').insertAfter($originalInput)
                 .addClass(config.unitDisplayPosition === 'left' ? 'unit-display-left' : 'unit-display-right');
+            $originalInput.appendTo($unitBox);
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);
             if (config.showTrigger) {
@@ -367,6 +369,12 @@
                 return numberMatch && numberMatch[0];
             }
 
+            function selectUnit(unitIdentifier) {
+                selectEntry(entries.filter(function(entry) {
+                    return entry[config.idProperty] === unitIdentifier;
+                })[0], true);
+            }
+
             this.$ = $unitBox;
             $unitBox[0].trivialUnitBox = this;
 
@@ -389,6 +397,7 @@
             };
             this.getAmount = getAmount;
             this.selectEntry = selectEntry;
+            this.selectUnit = selectUnit;
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialUnitBox, "TrivialUnitBox", "tr-unitbox");
