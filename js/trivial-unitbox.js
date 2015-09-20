@@ -52,6 +52,8 @@
                     code: '...'
                 },
                 queryFunction: null, // defined below...
+                queryOnNonNumberFields: true,
+                openDropdownOnEditorClick: false,
                 autoComplete: true,
                 autoCompleteDelay: 0,
                 showTrigger: true,
@@ -163,7 +165,7 @@
                         && e.which != keyCodes.backspace
                         && e.which != keyCodes.delete) {
                         // ignore
-                    } else if (getQueryString().length > 0) {
+                    } else if (getQueryString().length > 0 && config.queryOnNonNumberFields) {
                         openDropDown();
                         query(1);
                     } else {
@@ -171,9 +173,11 @@
                     }
                 })
                 .mousedown(function () {
-                    openDropDown();
-                    if (entries == null) {
-                        query();
+                    if (config.openDropdownOnEditorClick) {
+                        openDropDown();
+                        if (entries == null) {
+                            query();
+                        }
                     }
                 }).change(function () {
                     updateOriginalInputValue();
