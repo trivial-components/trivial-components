@@ -324,7 +324,7 @@
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
             this.highlightNextMatchingEntry = function (direction) {
-                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction);
+                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
                 if (nextMatchingEntry != null) {
                     setHighlightedEntry(nextMatchingEntry);
                 }

@@ -234,21 +234,7 @@
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     config.queryFunction($editor.val(), function (newEntries) {
-                        updateEntries(newEntries);
-
-                        var nonSelectedEditorValue = getNonSelectedEditorValue();
-                        if (nonSelectedEditorValue.length > 0) {
-                            treeBox.highlightTextMatches(nonSelectedEditorValue);
-                            treeBox.highlightNextMatchingEntry(highlightDirection);
-                        } else {
-                            treeBox.highlightNextEntry(highlightDirection);
-                        }
-
-                        autoCompleteIfPossible(config.autoCompleteDelay);
-
-                        if (isDropDownOpen) {
-                            openDropDown(); // only for repositioning!
-                        }
+                        updateEntries(newEntries, highlightDirection);
                     });
                 }, 0);
             }
@@ -389,11 +375,25 @@
             this.$ = $treeComboBox;
             $treeComboBox[0].trivialTreeComboBox = this;
 
-            function updateEntries(newEntries) {
+            function updateEntries(newEntries, highlightDirection) {
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();
                 treeBox.updateEntries(newEntries);
+
+                var nonSelectedEditorValue = getNonSelectedEditorValue();
+                if (nonSelectedEditorValue.length > 0) {
+                    treeBox.highlightTextMatches(nonSelectedEditorValue);
+                    treeBox.highlightNextMatchingEntry(highlightDirection);
+                } else {
+                    treeBox.highlightNextEntry(highlightDirection);
+                }
+
+                autoCompleteIfPossible(config.autoCompleteDelay);
+
+                if (isDropDownOpen) {
+                    openDropDown(); // only for repositioning!
+                }
             }
 
             this.updateEntries = updateEntries;
