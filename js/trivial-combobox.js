@@ -230,7 +230,7 @@
             }
 
             function fireChangeEvents() {
-                $originalInput.triggerHandler("change"); // does not bubble!
+                $originalInput.triggerHandler("change"); // do not bubble this event!
                 $comboBox.trigger("change");
             }
 

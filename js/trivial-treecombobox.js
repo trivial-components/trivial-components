@@ -240,7 +240,7 @@
             }
 
             function fireChangeEvents() {
-                $originalInput.trigger("change");
+                $originalInput.triggerHandler("change"); // do not bubble this event!
                 $treeComboBox.trigger("change");
             }
 
