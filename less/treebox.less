@@ -5,14 +5,15 @@
       align-items: center;
 
       .tr-indent-spacer {
-        width: 29px;
-        flex: 0 0 29px;
+        width: @tr-tree-indent;
+        flex: 0 0 @tr-tree-indent;
       }
 
       .tr-tree-expander {
-        flex: 0 0 15px;
-        width: 15px;
-        height: 15px;
+        @tr-tree-expander-size: 15px;
+        flex: 0 0 @tr-tree-expander-size;
+        width: @tr-tree-expander-size;
+        height: @tr-tree-expander-size;
         margin: 7px;
       }
 
