@@ -113,16 +113,16 @@
                     $expander.mousedown(function (e) {
                         return false;
                     }).click(function (e) {
-                        setNodeExpanded(entry, !entry[config.expandedProperty]);
+                        setNodeExpanded(entry, !entry[config.expandedProperty], true);
                     });
                     if (entry[config.childrenProperty]) {
                         for (var i = 0; i < entry[config.childrenProperty].length; i++) {
                             createEntryElement(entry[config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
                         }
                     } else if (entry[config.lazyChildrenFlagProperty]) {
-                        $childrenWrapper.append(config.spinnerTemplate);
+                        $childrenWrapper.hide().append(config.spinnerTemplate).fadeIn();
                     }
-                    setNodeExpanded(entry, entry[config.expandedProperty]);
+                    setNodeExpanded(entry, entry[config.expandedProperty], false);
                 }
                 return $outerEntryWrapper;
             }
@@ -140,14 +140,14 @@
             }
 
 
-            function setNodeExpanded(node, expanded) {
+            function setNodeExpanded(node, expanded, animate) {
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
                 if (expanded) {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideDown(config.animationDuration);
+                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideDown(animate ? config.animationDuration : 0);
                 } else {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(config.animationDuration);
+                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
                 }
 
 
@@ -338,7 +338,7 @@
                     return false;
                 } else {
                     var wasExpanded = highlightedEntry[config.expandedProperty];
-                    setNodeExpanded(highlightedEntry, expanded);
+                    setNodeExpanded(highlightedEntry, expanded, true);
                     return !wasExpanded != !expanded;
                 }
             };
