@@ -34,8 +34,6 @@
         function TrivialListBox($container, options) {
             options = options || {};
             var config = $.extend({
-                valueProperty: null,
-                inputTextProperty: 'displayValue',
                 template: TrivialComponents.image2LinesTemplate,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 entries: null,
@@ -51,7 +49,11 @@
             var entries = config.entries;
             var highlightedEntry = null;
 
-            var $listBox = $('<div class="tr-listbox"/>').appendTo($container);
+            var $listBox = $('<div class="tr-listbox"/>')
+                .appendTo($container)
+                .mouseleave(function() {
+                    setHighlightedEntry(null);
+                });
             var $entryList = $('<div class="tr-listbox-entry-list"></div>').appendTo($listBox);
 
             if (entries) { // if config.entries was set...
@@ -72,9 +74,7 @@
                                 selectEntry(entry);
                             }).mouseup(function (e) {
                                 $listBox.trigger("mouseup", e);
-                            }).mouseout(function (e) {
-                                $listBox.trigger("mouseout", e);
-                            }).mouseover(function () {
+                            }).mouseenter(function () {
                                 setHighlightedEntry(entry);
                             });
                         })(entry);
@@ -105,11 +105,13 @@
             }
 
             function setHighlightedEntry(entry) {
-                highlightedEntry = entry;
-                $entryList.find('.tr-listbox-entry').removeClass('tr-highlighted-entry');
-                if (entry != null) {
-                    entry._trEntryElement.addClass('tr-highlighted-entry');
-                    minimallyScrollTo(entry._trEntryElement);
+                if (entry !== highlightedEntry) {
+                    highlightedEntry = entry;
+                    $entryList.find('.tr-listbox-entry').removeClass('tr-highlighted-entry');
+                    if (entry != null) {
+                        entry._trEntryElement.addClass('tr-highlighted-entry');
+                        minimallyScrollTo(entry._trEntryElement);
+                    }
                 }
             }
 

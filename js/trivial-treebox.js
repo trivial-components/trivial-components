@@ -63,7 +63,7 @@
             var $componentWrapper = $('<div class="tr-treebox"/>').appendTo($container);
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
 
-            $tree.mouseout(function () {
+            $tree.mouseleave(function () {
                 setHighlightedEntry(null);
             });
 
@@ -101,9 +101,7 @@
                         selectNode(entry);
                     }).mouseup(function (e) {
                         $componentWrapper.trigger("mouseup", e);
-                    }).mouseout(function (e) {
-                        $componentWrapper.trigger("mouseout", e);
-                    }).mouseover(function () {
+                    }).mouseenter(function () {
                         setHighlightedEntry(entry);
                     });
 
@@ -258,16 +256,18 @@
             }
 
             function setHighlightedEntry(entry) {
-                highlightedEntry = entry;
-                $tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
-                if (entry != null) {
-                    var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
-                    $entry.addClass('tr-highlighted-entry');
-                    minimallyScrollTo($entry);
-                } else {
-                    var selectedEntry = getSelectedEntry();
-                    if (selectedEntry) {
-                        highlightedEntry = selectedEntry;
+                if (entry !== highlightedEntry) {
+                    highlightedEntry = entry;
+                    $tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
+                    if (entry != null) {
+                        var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
+                        $entry.addClass('tr-highlighted-entry');
+                        minimallyScrollTo($entry);
+                    } else {
+                        var selectedEntry = getSelectedEntry();
+                        if (selectedEntry) {
+                            highlightedEntry = selectedEntry;
+                        }
                     }
                 }
             }
