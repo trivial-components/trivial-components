@@ -38,6 +38,7 @@
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 entries: null,
                 queryFunction: null, // defined below...
+                textHighlightingEntryLimit: 100,
                 matchingOptions: {
                     matchingMode: 'contains',
                     ignoreCase: true,
@@ -51,7 +52,7 @@
 
             var $listBox = $('<div class="tr-listbox"/>')
                 .appendTo($container)
-                .mouseleave(function() {
+                .mouseleave(function () {
                     setHighlightedEntry(null);
                 });
             var $entryList = $('<div class="tr-listbox-entry-list"></div>').appendTo($listBox);
@@ -65,8 +66,14 @@
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
                         var entry = entries[i];
-                        var html = Mustache.render(config.template, entry);
-                        var $entry = $(html).addClass("tr-listbox-entry filterable-item").appendTo($entryList);
+                        var $entry;
+                        if (!entry._trEntryElement) {
+                            var html = Mustache.render(config.template, entry);
+                            $entry = $(html).addClass("tr-listbox-entry filterable-item");
+                        } else {
+                            $entry = entry._trEntryElement;
+                        }
+                        $entry.appendTo($entryList);
                         entry._trEntryElement = $entry;
                         (function (entry) {
                             $entry.mousedown(function (e) {
@@ -90,7 +97,9 @@
                 updateEntryElements(entries);
 
                 if (entries.length > 0) {
-                    highlightTextMatches();
+                    if (entries.length <= config.textHighlightingEntryLimit) {
+                        highlightTextMatches();
+                    }
 
                     if (typeof highlightDirection != 'undefined') {
                         highlightNextEntry(highlightDirection);
