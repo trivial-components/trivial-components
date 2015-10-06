@@ -50,11 +50,7 @@
             var entries = config.entries;
             var highlightedEntry = null;
 
-            var $listBox = $('<div class="tr-listbox"/>')
-                .appendTo($container)
-                .mouseleave(function () {
-                    setHighlightedEntry(null);
-                });
+            var $listBox = $('<div class="tr-listbox"/>').appendTo($container);
             var $entryList = $('<div class="tr-listbox-entry-list"></div>').appendTo($listBox);
 
             if (entries) { // if config.entries was set...
@@ -83,6 +79,10 @@
                                 $listBox.trigger("mouseup", e);
                             }).mouseenter(function () {
                                 setHighlightedEntry(entry);
+                            }).mouseleave(function (e) {
+                                if (!$(e.toElement).is('.tr-listbox-entry')) {
+                                    setHighlightedEntry(null);
+                                }
                             });
                         })(entry);
                     }

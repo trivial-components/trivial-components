@@ -63,10 +63,6 @@
             var $componentWrapper = $('<div class="tr-treebox"/>').appendTo($container);
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
 
-            $tree.mouseleave(function () {
-                setHighlightedEntry(null);
-            });
-
             if (entries) { // if config.entries was set...
                 updateTreeEntryElements(entries);
             }
@@ -103,6 +99,10 @@
                         $componentWrapper.trigger("mouseup", e);
                     }).mouseenter(function () {
                         setHighlightedEntry(entry);
+                    }).mouseleave(function (e) {
+                        if (!$(e.toElement).is('.tr-tree-entry-outer-wrapper')) {
+                            setHighlightedEntry(null);
+                        }
                     });
 
                 if (!leaf) {

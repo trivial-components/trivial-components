@@ -138,9 +138,7 @@
                 }
             });
 
-            $tree.mouseout(function () {
-                treeBox.setHighlightedEntry(null);
-            }).click(function() {
+            $tree.click(function() {
                 $editor.focus();
             });
 
