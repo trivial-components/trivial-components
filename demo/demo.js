@@ -1115,7 +1115,7 @@ function createCurrencyEntries() {
 
 function createDemoTreeNodes() {
     return [{
-        id: 1, displayValue: "Mail",
+        id: 0, displayValue: "Mail",
         additionalInfo: "43 unread",
         imageUrl: "img/icons/mail.png",
         isLeaf: false,

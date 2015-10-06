@@ -67,7 +67,7 @@
                 updateTreeEntryElements(entries);
             }
 
-            selectNode(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
+            selectNode((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
 
             function isLeaf(entry) {
                 return (entry[config.childrenProperty] == null || entry[config.childrenProperty].length == 0) && !entry[config.lazyChildrenFlagProperty];
@@ -310,7 +310,7 @@
             }
 
             function getSelectedEntry() {
-                return selectedEntryId ? findEntryById(selectedEntryId) : null;
+                return (selectedEntryId !== undefined && selectedEntryId !== null) ? findEntryById(selectedEntryId) : null;
             }
 
             this.$ = $componentWrapper;

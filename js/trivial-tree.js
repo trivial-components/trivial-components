@@ -142,7 +142,7 @@
                 $editor.focus();
             });
 
-            selectEntry(config.selectedEntryId ? findEntryById(config.selectedEntryId) : null);
+            selectEntry((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
 
             function updateEntries(newEntries) {
                 entries = newEntries;
