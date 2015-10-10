@@ -323,7 +323,7 @@ no search field:
         $('#zeroConfigTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 2 ,
+            selectedEntryId: 2,
             lazyChildrenQueryFunction: function (node, callback) {
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
@@ -334,7 +334,7 @@ no search field:
         $('#noSearchFieldTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 2 ,
+            selectedEntryId: 2,
             lazyChildrenQueryFunction: function (node, callback) {
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
@@ -347,16 +347,16 @@ no search field:
             entries: createCurrencyEntries(),
             emptyEntry: {
                 code: '...'
-            }  ,
+            },
             selectedEntry: {
                 code: 'EUR'
             }
         });
-        trivialUnitBox.$.on('change', function() {
+        trivialUnitBox.$.on('change', function () {
             console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
             console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
         });
-        $('#unitBox').on('change', function() {
+        $('#unitBox').on('change', function () {
             console.log($(this).val());
         });
         $('#unitBoxLeft').TrivialUnitBox({

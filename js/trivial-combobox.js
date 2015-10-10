@@ -43,6 +43,7 @@
                 selectedEntry: undefined,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+                textHighlightingEntryLimit: 100,
                 entries: null,
                 emptyEntry: {},
                 queryFunction: null, // defined below...
@@ -373,7 +374,7 @@
                 listBox.updateEntries(newEntries);
 
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
-                if (nonSelectedEditorValue.length > 0) {
+                if (nonSelectedEditorValue.length > 0 && newEntries.length <= config.textHighlightingEntryLimit) {
                     listBox.highlightTextMatches(nonSelectedEditorValue);
                     listBox.highlightNextMatchingEntry(highlightDirection);
                 } else {

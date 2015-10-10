@@ -97,10 +97,6 @@
                 updateEntryElements(entries);
 
                 if (entries.length > 0) {
-                    if (entries.length <= config.textHighlightingEntryLimit) {
-                        highlightTextMatches();
-                    }
-
                     if (typeof highlightDirection != 'undefined') {
                         highlightNextEntry(highlightDirection);
                     }
