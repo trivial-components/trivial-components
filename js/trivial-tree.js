@@ -114,6 +114,16 @@
                     }
                 });
 
+            if ($originalInput.attr("placeholder")) { // TODO
+                $editor.attr("placeholder", $originalInput.attr("placeholder"));
+            }
+            if ($originalInput.attr("tabindex")) {
+                $editor.attr("tabindex", $originalInput.attr("tabindex"));
+            }
+            if ($originalInput.attr("autofocus")) {
+                $editor.focus();
+            }
+
             treeBox = $tree.TrivialTreeBox(config);
             treeBox.$.change(function () {
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();

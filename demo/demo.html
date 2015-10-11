@@ -49,7 +49,7 @@
     <input id="separateOriginalInputComboBox">
 
     <h5>No trigger</h5>
-    <input id="noTriggerComboBox">
+    <input id="noTriggerComboBox" tabindex="12">
 
     <h5>disabled and readonly</h5>
     <input id="disabledComboBox">
@@ -88,7 +88,7 @@
 
 <h5>maxSelectedEntries</h5>
 <div style="width: 600px;">
-    <input id="maxSelectedEntriesTagBox">
+    <input id="maxSelectedEntriesTagBox" tabindex="11">
 </div>
 
 <h5>no dropdown</h5>
@@ -110,7 +110,7 @@
 <h4>Trivial TreeComboBox</h4>
 
 <div style="width: 350px">
-    <input id="treeComboBox">
+    <input id="treeComboBox" tabindex="13">
 </div>
 <div style="width: 350px">
     <input id="disabledTreeComboBox">
@@ -122,7 +122,7 @@
 <h4>Trivial Tree</h4>
 
 <div style="width: 350px; height: 370px">
-    <input id="zeroConfigTree">
+    <input id="zeroConfigTree" tabindex="15">
 </div>
 no search field:
 <div style="width: 350px; height: 370px">
@@ -145,7 +145,7 @@ no search field:
 
 <div style="width: 300px">
     <h3>CalendarComboBox</h3>
-    <input id="calendarComboBox"/>
+    <input id="calendarComboBox" tabindex="14"/>
 </div>
 
 <script>
@@ -237,8 +237,7 @@ no search field:
             entries: createEntries(),
             selectedEntries: createEntries(2),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
-            showTrigger: false,
-            placeholder: "Please select..."
+            showTrigger: false
         });
 
         $('#customTemplateTagBox2').TrivialTagBox({

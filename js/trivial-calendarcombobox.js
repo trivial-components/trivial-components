@@ -204,6 +204,16 @@
                     }
                 });
 
+            if ($originalInput.attr("placeholder")) {  // TODO
+                $editor.attr("placeholder", $originalInput.attr("placeholder"));
+            }
+            if ($originalInput.attr("tabindex")) {
+                $inputFields.first().attr("tabindex", $originalInput.attr("tabindex")); // only first!!!
+            }
+            if ($originalInput.attr("autofocus")) {
+                $inputFields.first().focus();
+            }
+
 
             $calendarComboBox.add($dropDown).add($trigger).mousedown(function (e) {
                 if ($calendarComboBox.is(".focus")) {

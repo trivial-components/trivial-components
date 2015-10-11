@@ -180,6 +180,13 @@
                     }
                 });
 
+            if ($originalInput.attr("tabindex")) {
+                $editor.attr("tabindex", $originalInput.attr("tabindex"));
+            }
+            if ($originalInput.attr("autofocus")) {
+                $editor.focus();
+            }
+
             $comboBox.add($dropDown).mousedown(function () {
                 if ($editor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;

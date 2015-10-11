@@ -59,8 +59,7 @@
                 ignoreCase: true,
                 maxLevenshteinDistance: 2
             },
-            editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
-            placeholder: null
+            editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
         }, options);
 
         config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
@@ -104,11 +103,6 @@
             $dropDown.appendTo("body");
         }
         var $editor = $('<span contenteditable="true" class="tagbox-editor"></span>');
-        if (config.placeholder) {
-            $editor.attr("placeholder", config.placeholder);
-        } else if ($originalInput.attr("placeholder")) {
-            $editor.attr("placeholder", $originalInput.attr("placeholder"));
-        }
 
         $editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
             .focus(function () {
@@ -215,6 +209,17 @@
                     query();
                 }
             });
+
+
+        if ($originalInput.attr("placeholder")) {
+            $editor.attr("placeholder", $originalInput.attr("placeholder"));
+        }
+        if ($originalInput.attr("tabindex")) {
+            $editor.attr("tabindex", $originalInput.attr("tabindex"));
+        }
+        if ($originalInput.attr("autofocus")) {
+            $editor.focus();
+        }
 
         $tagBox.add($dropDown).mousedown(function () {
             if ($editor.is(":focus")) {
