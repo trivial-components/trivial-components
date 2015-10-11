@@ -56,4 +56,9 @@
   margin: 2px;
   font-family: @tr-editor-font-family;
   font-size: @tr-editor-font-size;
+
+  &:first-child:not(:focus):empty:before {
+    content: attr(placeholder);
+    color: @tr-disabled-text-color;
+  }
 }

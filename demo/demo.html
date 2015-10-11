@@ -83,7 +83,7 @@
 <h5>Custom Tag Wrapper Template</h5>
 
 <div style="width: 600px;">
-    <input id="customTemplateTagBox2">
+    <input id="customTemplateTagBox2" placeholder="placeholder defined on input field...">
 </div>
 
 <h5>maxSelectedEntries</h5>
@@ -237,7 +237,8 @@ no search field:
             entries: createEntries(),
             selectedEntries: createEntries(2),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
-            showTrigger: false
+            showTrigger: false,
+            placeholder: "Please select..."
         });
 
         $('#customTemplateTagBox2').TrivialTagBox({
