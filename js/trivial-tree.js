@@ -40,7 +40,7 @@
                 valueProperty: 'id',
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
-                showSearchField: true,
+                searchBarMode: 'show-if-filled', // none, show-if-filled, always-visible
                 lazyChildrenQueryFunction: function (node, resultCallback) {
                     resultCallback([])
                 },
@@ -68,8 +68,10 @@
 
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
-            var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput)
-                .addClass(config.showSearchField ? "" : "no-searchfield");
+            var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput);
+            if (config.searchBarMode !== 'always-visible') {
+                $componentWrapper.addClass(config.showSearchField ? "" : "hide-searchfield");
+            }
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
             var $editor = $('<input type="text" class="tr-tree-editor tr-editor"/>')
                 .prependTo($componentWrapper)
@@ -111,6 +113,15 @@
                         query();
                     } else {
                         query(1);
+                    }
+                })
+                .on('keyup change', function() {
+                    if (config.searchBarMode === 'show-if-filled') {
+                        if ($editor.val()) {
+                            $componentWrapper.removeClass('hide-searchfield');
+                        } else {
+                            $componentWrapper.addClass('hide-searchfield');
+                        }
                     }
                 });
 
@@ -162,21 +173,23 @@
             }
 
             function query(highlightDirection) {
-                var $spinner = $(config.spinnerTemplate).appendTo($tree);
-                $spinners = $spinners.add($spinner);
+                if (config.searchBarMode === 'always-visible' || config.searchBarMode === 'show-if-filled') {
+                    var $spinner = $(config.spinnerTemplate).appendTo($tree);
+                    $spinners = $spinners.add($spinner);
 
-                // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-                setTimeout(function () {
-                    config.queryFunction($editor.val(), function (newEntries) {
-                        updateEntries(newEntries);
-                        if ($editor.val().length > 0) {
-                            treeBox.highlightTextMatches($editor.val());
-                            treeBox.highlightNextMatchingEntry(highlightDirection);
-                        } else {
-                            treeBox.highlightNextEntry(highlightDirection);
-                        }
-                    });
-                }, 0);
+                    // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
+                    setTimeout(function () {
+                        config.queryFunction($editor.val(), function (newEntries) {
+                            updateEntries(newEntries);
+                            if ($editor.val().length > 0) {
+                                treeBox.highlightTextMatches($editor.val());
+                                treeBox.highlightNextMatchingEntry(highlightDirection);
+                            } else {
+                                treeBox.highlightNextEntry(highlightDirection);
+                            }
+                        });
+                    }, 0);
+                }
             }
 
             function setHighlightedEntry(entry) {
