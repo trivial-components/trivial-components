@@ -120,9 +120,13 @@
 </div>
 
 <h4>Trivial Tree</h4>
-
+search field always visible:
 <div style="width: 350px; height: 370px">
     <input id="zeroConfigTree" tabindex="15" placeholder="Search here...">
+</div>
+on demand search field:
+<div style="width: 350px; height: 370px">
+    <input id="onDemandSearchFieldTree">
 </div>
 no search field:
 <div style="width: 350px; height: 370px">
@@ -328,7 +332,20 @@ no search field:
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
                 }, 1000);
-            }
+            },
+            searchBarMode: 'always-visible'
+        });
+
+        $('#onDemandSearchFieldTree').TrivialTree({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 2,
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            },
+            showSearchField: false
         });
 
         $('#noSearchFieldTree').TrivialTree({
@@ -340,7 +357,8 @@ no search field:
                     callback(createDemoTreeNodes())
                 }, 1000);
             },
-            showSearchField: false
+            showSearchField: false,
+            searchBarMode: 'none'
         });
 
         var trivialUnitBox = $('#unitBox').TrivialUnitBox({
