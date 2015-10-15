@@ -114,7 +114,7 @@
                     }
                 });
 
-            if ($originalInput.attr("placeholder")) { // TODO
+            if ($originalInput.attr("placeholder")) {
                 $editor.attr("placeholder", $originalInput.attr("placeholder"));
             }
             if ($originalInput.attr("tabindex")) {
