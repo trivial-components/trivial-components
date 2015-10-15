@@ -34,6 +34,7 @@
         var keyCodes = TrivialComponents.keyCodes;
 
         function TrivialTree(originalInput, options) {
+            var me = this;
 
             options = options || {};
             var defaultOptions = {
@@ -57,8 +58,10 @@
                 }
             };
             var config = $.extend(defaultOptions, options);
-
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
+
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
+            this.onNodeExpansionStateChanged = new TrivialComponents.Event();
 
             var treeBox;
             var entries = config.entries;
@@ -136,6 +139,9 @@
             }
 
             treeBox = $tree.TrivialTreeBox(config);
+            treeBox.onNodeExpansionStateChanged.addListener(function(node) {
+                me.onNodeExpansionStateChanged.fire(node);
+            });
             treeBox.$.change(function () {
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
@@ -232,12 +238,13 @@
             function selectEntry(entry) {
                 selectedEntryId = entry ? entry[config.valueProperty] : null;
                 $originalInput.val(entry ? entry[config.valueProperty] : null);
-                fireChangeEvents();
+                fireChangeEvents(entry);
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(entry) {
                 $originalInput.trigger("change");
                 $componentWrapper.trigger("change");
+                me.onSelectedEntryChanged.fire(entry);
             }
 
             this.$ = $componentWrapper;

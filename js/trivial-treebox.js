@@ -32,6 +32,7 @@
     }(function (TrivialComponents, $, Mustache) {
 
         function TrivialTreeBox($container, options) {
+            var me = this;
 
             options = options || {};
             var defaultOptions = {
@@ -55,6 +56,9 @@
                 animationDuration: 70
             };
             var config = $.extend(defaultOptions, options);
+
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
+            this.onNodeExpansionStateChanged = new TrivialComponents.Event();
 
             var entries = config.entries;
             var selectedEntryId;
@@ -139,6 +143,7 @@
 
 
             function setNodeExpanded(node, expanded, animate) {
+                var wasExpanded = node[config.expandedProperty];
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
@@ -156,6 +161,10 @@
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
+                }
+
+                if (!!wasExpanded != !!expanded) {
+                    me.onNodeExpansionStateChanged.fire(node);
                 }
             }
 
@@ -228,7 +237,7 @@
             function selectNode(entry) {
                 selectedEntryId = entry ? entry[config.valueProperty] : null;
                 markSelectedEntry(entry);
-                fireChangeEvents();
+                fireChangeEvents(entry);
             }
 
             function minimallyScrollTo($entryWrapper) {
@@ -244,8 +253,9 @@
                 }
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(entry) {
                 $componentWrapper.trigger("change");
+                me.onSelectedEntryChanged.fire(entry);
             }
 
             function selectNextEntry(direction) {
@@ -386,7 +396,7 @@
                 entryElement
                     .appendTo(parentNode._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
                 parentNode._trEntryElement.addClass('has-children');
-            }
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTreeBox, "TrivialTreeBox", "tr-treebox");

@@ -255,6 +255,27 @@
             return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
         }
 
+        function Event() {
+            var listeners = [];
+
+            this.addListener = function (fn) {
+                listeners.push(fn);
+            };
+
+            this.removeListener = function (fn) {
+                var listenerIndex = listeners.indexOf(fn);
+                if (listenerIndex != -1) {
+                    listeners.splice(listenerIndex, 1);
+                }
+            };
+
+            this.fire = function () {
+                for (var i = 0; i < listeners.length; i++) {
+                    listeners[i].apply(listeners[i], arguments);
+                }
+            };
+        }
+
         return {
             image2LinesTemplate: image2LinesTemplate,
             roundImage2LinesColorBubbleTemplate: roundImage2LinesColorBubbleTemplate,
@@ -273,7 +294,8 @@
             isModifierKey: isModifierKey,
             registerJqueryPlugin: registerJqueryPlugin,
             selectElementContents: selectElementContents,
-            escapeSpecialRegexCharacter: escapeSpecialRegexCharacter
+            escapeSpecialRegexCharacter: escapeSpecialRegexCharacter,
+            Event: Event
         };
     })
 );
