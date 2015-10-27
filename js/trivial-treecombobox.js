@@ -217,7 +217,7 @@
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
                     selectEntry(selectedTreeBoxEntry);
-                    treeBox.selectNode(null);
+                    treeBox.setSelectedEntry(null);
                     closeDropDown();
                 }
                 hideEditorIfNotContainsFreeText();

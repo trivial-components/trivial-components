@@ -327,7 +327,7 @@ no search field:
         var zeroConfigTree = $('#zeroConfigTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 2,
+//            selectedEntryId: 2,
             lazyChildrenQueryFunction: function (node, callback) {
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
@@ -336,15 +336,16 @@ no search field:
             searchBarMode: 'always-visible'
         });
         zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
-            alert("onSelectedEntryChanged " + node.id)
+            console.log("onSelectedEntryChanged " + node.id)
         });
         zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
-            alert("onNodeExpansionStateChanged " + node.id)
+            console.log("onNodeExpansionStateChanged " + node.id)
         });
 
         $('#onDemandSearchFieldTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
+            directSelectionViaArrowKeys: true,
             selectedEntryId: 2,
             lazyChildrenQueryFunction: function (node, callback) {
                 setTimeout(function () {

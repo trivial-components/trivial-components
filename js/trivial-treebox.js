@@ -71,7 +71,7 @@
                 updateTreeEntryElements(entries);
             }
 
-            selectNode((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
+            setSelectedEntry((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
 
             function isLeaf(entry) {
                 return (entry[config.childrenProperty] == null || entry[config.childrenProperty].length == 0) && !entry[config.lazyChildrenFlagProperty];
@@ -98,7 +98,7 @@
                 $entryAndExpanderWrapper
                     .mousedown(function (e) {
                         $componentWrapper.trigger("mousedown", e);
-                        selectNode(entry);
+                        setSelectedEntry(entry);
                     }).mouseup(function (e) {
                         $componentWrapper.trigger("mouseup", e);
                     }).mouseenter(function () {
@@ -234,9 +234,10 @@
                 })[0];
             }
 
-            function selectNode(entry) {
+            function setSelectedEntry(entry) {
                 selectedEntryId = entry ? entry[config.valueProperty] : null;
                 markSelectedEntry(entry);
+                setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
                 fireChangeEvents(entry);
             }
 
@@ -261,7 +262,7 @@
             function selectNextEntry(direction) {
                 var nextVisibleEntry = getNextVisibleEntry(getSelectedEntry(), direction);
                 if (nextVisibleEntry != null) {
-                    selectNode(nextVisibleEntry);
+                    setSelectedEntry(nextVisibleEntry);
                 }
             }
 
@@ -283,7 +284,7 @@
             }
 
             function highlightNextEntry(direction) {
-                var nextVisibleEntry = getNextVisibleEntry(highlightedEntry, direction);
+                var nextVisibleEntry = getNextVisibleEntry(highlightedEntry || getSelectedEntry(), direction);
                 if (nextVisibleEntry != null) {
                     setHighlightedEntry(nextVisibleEntry);
                 }
@@ -328,8 +329,17 @@
 
             this.updateEntries = updateEntries;
             this.getSelectedEntry = getSelectedEntry;
-            this.selectNode = function(nodeId) {
-                selectNode(findEntryById(nodeId));
+            this.setSelectedEntry = function (nodeId) {
+                setSelectedEntry(findEntryById(nodeId));
+            };
+            this.selectNextEntry = selectNextEntry;
+            this.revealSelectedEntry = function (animate) {
+                var selectedEntry = getSelectedEntry();
+                while (selectedEntry) {
+                    selectedEntry = findParentNode(selectedEntry);
+                    setNodeExpanded(selectedEntry, true, animate);
+                }
+
             };
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
@@ -337,6 +347,12 @@
                 var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
                 if (nextMatchingEntry != null) {
                     setHighlightedEntry(nextMatchingEntry);
+                }
+            };
+            this.selectNextMatchingEntry = function (direction) {
+                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
+                if (nextMatchingEntry != null) {
+                    setSelectedEntry(nextMatchingEntry);
                 }
             };
             this.getHighlightedEntry = function () {

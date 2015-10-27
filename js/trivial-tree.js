@@ -55,7 +55,8 @@
                     matchingMode: 'contains',
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
-                }
+                },
+                directSelectionViaArrowKeys: false
             };
             var config = $.extend(defaultOptions, options);
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
@@ -71,28 +72,51 @@
 
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
-            var $componentWrapper = $('<div class="tr-tree"/>').insertAfter($originalInput);
+            var $componentWrapper = $('<div class="tr-tree" tabindex="0"/>').insertAfter($originalInput);
             if (config.searchBarMode !== 'always-visible') {
                 $componentWrapper.addClass(config.showSearchField ? "" : "hide-searchfield");
             }
+            $componentWrapper.keydown(function (e) {
+                if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
+                    return; // tab or modifier key was pressed...
+                }
+                if ($editor.is(':visible') && keyCodes.specialKeys.indexOf(e.which) === -1) {
+                    $editor.focus();
+                }
+                if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
+                    var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                    if (entries != null) {
+                        if (config.directSelectionViaArrowKeys) {
+                            treeBox.selectNextEntry(direction)
+                        } else {
+                            treeBox.highlightNextEntry(direction);
+                        }
+                        return false; // some browsers move the caret to the beginning on up key
+                    }
+                } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                    treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
+                } else if (e.which == keyCodes.enter) {
+                    treeBox.setSelectedEntry(treeBox.getHighlightedEntry()[config.valueProperty]);
+                } else if (e.which == keyCodes.escape) {
+                    $editor.val("");
+                    query();
+                    $componentWrapper.focus();
+                } else {
+                    query(1);
+                }
+            });
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
             var $editor = $('<input type="text" class="tr-tree-editor tr-editor"/>')
                 .prependTo($componentWrapper)
+                .attr("tabindex", $originalInput.attr("-1"))
                 .focus(function () {
                     $componentWrapper.addClass('focus');
                 })
                 .blur(function () {
-                    if (blurCausedByClickInsideComponent) {
-                        $editor.focus();
-                    } else {
-                        $componentWrapper.removeClass('focus');
-                        treeBox.setHighlightedEntry(null);
-                    }
+                    $componentWrapper.removeClass('focus');
                 })
                 .keydown(function (e) {
-                    if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
-                        return; // tab or modifier key was pressed...
-                    } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                     if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         // expand the currently highlighted node.
                         var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                         if (changedExpandedState) {
@@ -101,24 +125,8 @@
                             return; // let the user navigate freely left and right...
                         }
                     }
-
-                    if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                        var direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                        if (entries != null) {
-                            treeBox.highlightNextEntry(direction);
-                            return false; // some browsers move the caret to the beginning on up key
-                        }
-                    } else if (e.which == keyCodes.enter) {
-                        treeBox.selectNode(treeBox.getHighlightedEntry()[config.valueProperty]);
-                        $editor.select();
-                    } else if (e.which == keyCodes.escape) {
-                        $editor.val("");
-                        query();
-                    } else {
-                        query(1);
-                    }
                 })
-                .on('keyup change', function() {
+                .on('keyup change', function () {
                     if (config.searchBarMode === 'show-if-filled') {
                         if ($editor.val()) {
                             $componentWrapper.removeClass('hide-searchfield');
@@ -127,19 +135,22 @@
                         }
                     }
                 });
+            if (config.searchBarMode === 'none') {
+                $editor.css("display", "none");
+            }
 
             if ($originalInput.attr("placeholder")) {
                 $editor.attr("placeholder", $originalInput.attr("placeholder"));
             }
             if ($originalInput.attr("tabindex")) {
-                $editor.attr("tabindex", $originalInput.attr("tabindex"));
+                $componentWrapper.attr("tabindex", $originalInput.attr("tabindex"));
             }
             if ($originalInput.attr("autofocus")) {
-                $editor.focus();
+                $componentWrapper.focus();
             }
 
             treeBox = $tree.TrivialTreeBox(config);
-            treeBox.onNodeExpansionStateChanged.addListener(function(node) {
+            treeBox.onNodeExpansionStateChanged.addListener(function (node) {
                 me.onNodeExpansionStateChanged.fire(node);
             });
             treeBox.$.change(function () {
@@ -147,26 +158,6 @@
                 if (selectedTreeBoxEntry) {
                     selectEntry(selectedTreeBoxEntry);
                 }
-            });
-
-            $componentWrapper.mousedown(function () {
-                if ($editor.is(":focus")) {
-                    blurCausedByClickInsideComponent = true;
-                }
-            }).mouseup(function () {
-                if (blurCausedByClickInsideComponent) {
-                    $editor.focus();
-                    blurCausedByClickInsideComponent = false;
-                }
-            }).mouseout(function () {
-                if (blurCausedByClickInsideComponent) {
-                    $editor.focus();
-                    blurCausedByClickInsideComponent = false;
-                }
-            });
-
-            $tree.click(function() {
-                $editor.focus();
             });
 
             selectEntry((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
@@ -189,22 +180,13 @@
                             updateEntries(newEntries);
                             if ($editor.val().length > 0) {
                                 treeBox.highlightTextMatches($editor.val());
-                                treeBox.highlightNextMatchingEntry(highlightDirection);
-                            } else {
-                                treeBox.highlightNextEntry(highlightDirection);
+                                if (!config.directSelectionViaArrowKeys) {
+                                    treeBox.highlightNextMatchingEntry(highlightDirection);
+                                }
                             }
+                            treeBox.revealSelectedEntry();
                         });
                     }, 0);
-                }
-            }
-
-            function setHighlightedEntry(entry) {
-                highlightedEntry = entry;
-                $tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
-                if (entry != null) {
-                    var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
-                    $entry.addClass('tr-highlighted-entry');
-                    $tree.minimallyScrollTo($entry);
                 }
             }
 
