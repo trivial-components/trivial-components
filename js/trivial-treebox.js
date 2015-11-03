@@ -130,7 +130,8 @@
             }
 
             function updateTreeEntryElements(entries) {
-                $tree.empty();
+                $tree.remove();
+                $tree = $('<div class="tr-tree-entryTree"></div>');
 
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
@@ -139,6 +140,7 @@
                 } else {
                     $tree.append(config.noEntriesTemplate);
                 }
+                $tree.appendTo($componentWrapper);
             }
 
 
@@ -313,11 +315,13 @@
             }
 
             function highlightTextMatches(searchString) {
+                $tree.detach();
                 for (var i = 0; i < entries.length; i++) {
                     var entry = entries[i];
                     var $entryElement = entry._trEntryElement.find('.tr-tree-entry');
                     $entryElement.trivialHighlight(searchString, config.matchingOptions);
                 }
+                $tree.appendTo($componentWrapper);
             }
 
             function getSelectedEntry() {
