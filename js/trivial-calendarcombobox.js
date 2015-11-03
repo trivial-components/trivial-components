@@ -115,7 +115,6 @@
                     $calendarComboBox.addClass('focus');
                 })
                 .blur(function (e) {
-                    console.log("blur");
                     if (blurCausedByInputFieldSwitching) {
                         // ignore!!
                     } else if (blurCausedByClickInsideComponent) {
@@ -232,7 +231,6 @@
 
             dropdownBox = $dropDown.TrivialCalendarBox(config);
             dropdownBox.$.change(function () {
-                console.log("box change");
                 var date = dropdownBox.getSelectedDate();
                 if (date) {
                     selectedDate = date;
@@ -264,7 +262,6 @@
             }
 
             function openDropDown() {
-                console.log("###");
                 $calendarComboBox.addClass("open");
                 $dropDown
                     .show()

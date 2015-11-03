@@ -34,6 +34,8 @@
     var keyCodes = TrivialComponents.keyCodes;
 
     function TrivialTagBox(originalInput, options) {
+        var me = this;
+
         options = options || {};
         var config = $.extend({
             valueProperty: 'displayValue',
@@ -63,6 +65,7 @@
         }, options);
 
         config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
+        this.onSelectedEntryChanged = new TrivialComponents.Event();
 
         var isDropDownOpen = false;
         var entries = config.entries;
@@ -250,7 +253,7 @@
         });
 
         for (var i = 0; i < config.selectedEntries.length; i++) {
-            selectEntry(config.selectedEntries[i]);
+            selectEntry(config.selectedEntries[i], true);
         }
 
         function updateDropDownEntryElements(entries) {
@@ -313,7 +316,7 @@
             }
             tagToBeRemoved._trEntryElement.remove();
             $originalInput.val(calculateOriginalInputValue());
-            fireChangeEvents();
+            fireChangeEvents(me.getSelectedEntries());
         }
 
         function query(highlightDirection) {
@@ -339,9 +342,9 @@
             }
         }
 
-        function fireChangeEvents() {
+        function fireChangeEvents(entries) {
             $originalInput.trigger("change");
-            $tagBox.trigger("change");
+            me.onSelectedEntryChanged.fire(entries);
         }
 
         function calculateOriginalInputValue() {
@@ -350,7 +353,7 @@
                 .join(config.valueSeparator);
         }
 
-        function selectEntry(entry) {
+        function selectEntry(entry, muteEvent) {
             if (entry == null) {
                 return; // do nothing
             }
@@ -377,7 +380,9 @@
 
             $editor.text("");
 
-            fireChangeEvents();
+            if (!muteEvent) {
+                fireChangeEvents(me.getSelectedEntries());
+            }
         }
 
         function repositionDropDown() {

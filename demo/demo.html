@@ -155,11 +155,14 @@ no search field:
 <script>
     $(function () {
 
-        $('#defaultFilteringComboBox').TrivialComboBox({
+        var defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             }
+        });
+        defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("defaultFilteringCombobox onSelectedEntryChanged " + entry.displayValue)
         });
 
         $('#freeTextComboBox').TrivialComboBox({
@@ -233,8 +236,11 @@ no search field:
             entries: createEntries()
         });
 
-        $('#zeroConfigTagBox').TrivialTagBox({
+        var trivialTagBox = $('#zeroConfigTagBox').TrivialTagBox({
             entries: createEntries()
+        });
+        trivialTagBox.onSelectedEntryChanged.addListener(function(entries) {
+            console.log("trivialTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
         });
 
         $('#customTemplateTagBox1').TrivialTagBox({
@@ -299,7 +305,7 @@ no search field:
             }
         });
 
-        $('#treeComboBox').TrivialTreeComboBox({
+        var trivialTreeComboBox = $('#treeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             lazyChildrenQueryFunction: function (node, callback) {
@@ -308,6 +314,9 @@ no search field:
                 }, 1000);
             },
             animationDuration: 200
+        });
+        trivialTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("trivialTreeComboBox onSelectedEntryChanged " + entry.displayValue)
         });
 
         $('#disabledTreeComboBox').TrivialTreeComboBox({

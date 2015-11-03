@@ -219,7 +219,7 @@
                 hideEditorIfNotContainsFreeText();
             });
 
-            selectEntry(config.selectedEntry || null);
+            selectEntry(config.selectedEntry || null, true);
 
             $selectedEntryWrapper.click(function () {
                 showEditor();
@@ -247,7 +247,7 @@
                 me.onSelectedEntryChanged.fire(entry);
             }
 
-            function selectEntry(entry) {
+            function selectEntry(entry, muteEvent) {
                 if (entry == null) {
                     if (config.valueProperty) {
                         $originalInput.val("");
@@ -267,7 +267,9 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(entry[config.inputTextProperty]);
                 }
-                fireChangeEvents(entry);
+                if (!muteEvent) {
+                    fireChangeEvents(entry);
+                }
             }
 
             function isEntrySelected() {

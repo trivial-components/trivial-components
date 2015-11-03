@@ -34,6 +34,8 @@
         var keyCodes = TrivialComponents.keyCodes;
 
         function TrivialTreeComboBox(originalInput, options) {
+            var me = this;
+
             options = options || {};
             var config = $.extend({
                 valueProperty: 'id',
@@ -63,6 +65,7 @@
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var treeBox;
             var isDropDownOpen = false;
@@ -223,7 +226,7 @@
                 hideEditorIfNotContainsFreeText();
             });
 
-            selectEntry(treeBox.getSelectedEntry());
+            selectEntry(treeBox.getSelectedEntry(), true);
 
             $selectedEntryWrapper.click(function () {
                 showEditor();
@@ -246,12 +249,12 @@
                 }, 0);
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(entry) {
                 $originalInput.triggerHandler("change"); // do not bubble this event!
-                $treeComboBox.trigger("change");
+                me.onSelectedEntryChanged.fire(entry);
             }
 
-            function selectEntry(entry) {
+            function selectEntry(entry, muteEvent) {
                 if (entry == null) {
                     if (config.valueProperty) {
                         $originalInput.val("");
@@ -271,7 +274,9 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(entry[config.inputTextProperty]);
                 }
-                fireChangeEvents();
+                if (!muteEvent) {
+                    fireChangeEvents(entry);
+                }
             }
 
             function isEntrySelected() {
@@ -297,7 +302,7 @@
                     $originalInput.val("");
                     $editor.val("");
                     entries = null; // so we will query again when we treecombobox is re-focused
-                    fireChangeEvents();
+                    fireChangeEvents(null);
                 }
             }
 
