@@ -34,6 +34,8 @@
         var keyCodes = TrivialComponents.keyCodes;
 
         function TrivialComboBox(originalInput, options) {
+            var me = this;
+
             options = options || {};
             var config = $.extend({
                 valueProperty: null,
@@ -61,6 +63,8 @@
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
+
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var listBox;
             var isDropDownOpen = false;
@@ -126,6 +130,7 @@
                         clearEditorIfNotContainsFreeText();
                         hideEditorIfNotContainsFreeText();
                         closeDropDown();
+                        fireChangeEvents(me.getSelectedEntry());
                     }
                 })
                 .keydown(function (e) {
@@ -237,9 +242,9 @@
                 });
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(entry) {
                 $originalInput.triggerHandler("change"); // do not bubble this event!
-                $comboBox.trigger("change");
+                me.onSelectedEntryChanged.fire(entry);
             }
 
             function selectEntry(entry) {
@@ -262,7 +267,7 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(entry[config.inputTextProperty]);
                 }
-                fireChangeEvents();
+                fireChangeEvents(entry);
             }
 
             function isEntrySelected() {
@@ -288,7 +293,7 @@
                     $originalInput.val("");
                     $editor.val("");
                     entries = null; // so we will query again when we combobox is re-focused
-                    fireChangeEvents();
+                    fireChangeEvents(null);
                 }
             }
 
