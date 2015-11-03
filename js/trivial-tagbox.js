@@ -128,7 +128,7 @@
                         selectEntry(entry);
                     }
                     $editor.text("");
-                    fireChangeEvents(me.getSelectedEntries());
+                    //fireChangeEvents(me.getSelectedEntries());
                 }
             })
             .keydown(function (e) {
