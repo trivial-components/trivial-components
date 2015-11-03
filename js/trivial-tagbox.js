@@ -128,6 +128,7 @@
                         selectEntry(entry);
                     }
                     $editor.text("");
+                    fireChangeEvents(me.getSelectedEntries());
                 }
             })
             .keydown(function (e) {

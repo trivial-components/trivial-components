@@ -131,6 +131,7 @@
                         clearEditorIfNotContainsFreeText();
                         hideEditorIfNotContainsFreeText();
                         closeDropDown();
+                        fireChangeEvents(me.getSelectedEntry());
                     }
                 })
                 .keydown(function (e) {
