@@ -122,7 +122,7 @@ gulp.task('js-single', function () {
 
 gulp.task('js-bundle', function () {
     return gulp.src(['js/trivial-core.js', 'js/*.js'])
-        .pipe(stripDebug())
+        //.pipe(stripDebug())    TODO!!!!!!!!!!!!!!!!!!!!!!!#########################
         .pipe(concat('trivial-components.js'))
         .pipe(mirror(
             pipe(
@@ -188,4 +188,8 @@ gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo", "size-report"])
 gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
+});
+
+gulp.task('watch-js', function () {
+    gulp.watch(['js/*.js'], ['js-bundle']);
 });

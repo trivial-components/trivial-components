@@ -56,7 +56,11 @@
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
                 },
-                directSelectionViaArrowKeys: false
+                directSelectionViaArrowKeys: false,
+                performanceOptimizationSettings: {
+                    toManyVisibleItemsRenderDelay: 750,
+                    toManyVisibleItemsThreshold: 75
+                }
             };
             var config = $.extend(defaultOptions, options);
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
@@ -116,7 +120,7 @@
                     $componentWrapper.removeClass('focus');
                 })
                 .keydown(function (e) {
-                     if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                    if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         // expand the currently highlighted node.
                         var changedExpandedState = treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                         if (changedExpandedState) {
@@ -169,6 +173,8 @@
                 treeBox.updateEntries(newEntries);
             }
 
+            var processUpdateTimer;
+
             function query(highlightDirection) {
                 if (config.searchBarMode === 'always-visible' || config.searchBarMode === 'show-if-filled') {
                     var $spinner = $(config.spinnerTemplate).appendTo($tree);
@@ -177,17 +183,46 @@
                     // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                     setTimeout(function () {
                         config.queryFunction($editor.val(), function (newEntries) {
-                            updateEntries(newEntries);
-                            if ($editor.val().length > 0) {
-                                treeBox.highlightTextMatches($editor.val());
-                                if (!config.directSelectionViaArrowKeys) {
-                                    treeBox.highlightNextMatchingEntry(highlightDirection);
+                            function processUpdate() {
+                                updateEntries(newEntries);
+                                if ($editor.val().length > 0) {
+                                    treeBox.highlightTextMatches($editor.val());
+                                    if (!config.directSelectionViaArrowKeys) {
+                                        treeBox.highlightNextMatchingEntry(highlightDirection);
+                                    }
                                 }
+                                treeBox.revealSelectedEntry();
                             }
-                            treeBox.revealSelectedEntry();
+
+                            clearTimeout(processUpdateTimer);
+                            if (countVisibleEntries(newEntries) < config.performanceOptimizationSettings.toManyVisibleItemsThreshold) {
+                                processUpdate();
+                            } else {
+                                processUpdateTimer = setTimeout(processUpdate, config.performanceOptimizationSettings.toManyVisibleItemsRenderDelay);
+                            }
                         });
                     }, 0);
                 }
+            }
+
+            function countVisibleEntries(entries) {
+                function countVisibleChildrenAndSelf(node) {
+                    if (node[config.expandedProperty] && node[config.childrenProperty]) {
+                        return node[config.childrenProperty].map(function (entry) {
+                            return countVisibleChildrenAndSelf(entry);
+                        }).reduce(function (a, b) {
+                            return a + b;
+                        }, 0) + 1;
+                    } else {
+                        return 1;
+                    }
+                }
+
+                return entries.map(function (entry) {
+                    return countVisibleChildrenAndSelf(entry);
+                }).reduce(function (a, b) {
+                    return a + b;
+                }, 0);
             }
 
             function findEntries(filterFunction) {
