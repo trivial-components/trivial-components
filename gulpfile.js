@@ -122,7 +122,7 @@ gulp.task('js-single', function () {
 
 gulp.task('js-bundle', function () {
     return gulp.src(['js/trivial-core.js', 'js/*.js'])
-        //.pipe(stripDebug())    TODO!!!!!!!!!!!!!!!!!!!!!!!#########################
+        .pipe(stripDebug())
         .pipe(concat('trivial-components.js'))
         .pipe(mirror(
             pipe(

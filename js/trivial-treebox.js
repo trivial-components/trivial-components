@@ -157,11 +157,18 @@
                     node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
                 }
 
+                function nodeHasUnrenderedChildren(node) {
+                    return node[config.childrenProperty] && node[config.childrenProperty].some(function (child) {
+                            return !child._trEntryElement || !jQuery.contains(document.documentElement, child._trEntryElement[0]);
+                        });
+                }
 
                 if (expanded && node[config.lazyChildrenFlagProperty] && !node[config.childrenProperty]) {
                     config.lazyChildrenQueryFunction(node, function (children) {
                         setChildren(node, children);
                     });
+                } else if (expanded && nodeHasUnrenderedChildren(node)) {
+                    renderChildren(node);
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
@@ -179,9 +186,13 @@
             function setChildren(node, children) {
                 node[config.childrenProperty] = children;
                 node[config.lazyChildrenFlagProperty] = false;
+                renderChildren(node, children);
+            }
 
+            function renderChildren(node) {
                 var $childrenWrapper = node._trEntryElement.find('> .tr-tree-entry-children-wrapper');
                 $childrenWrapper.empty();
+                var children = node[config.childrenProperty];
                 if (children && children.length > 0) {
                     var depth = nodeDepth(node);
                     for (var i = 0; i < children.length; i++) {
