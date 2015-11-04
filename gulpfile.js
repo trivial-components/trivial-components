@@ -189,3 +189,7 @@ gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
 });
+
+gulp.task('watch-js', function () {
+    gulp.watch(['js/*.js'], ['js-bundle']);
+});

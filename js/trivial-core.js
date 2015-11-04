@@ -183,10 +183,14 @@
             }
 
             function entryMatches(entry, queryString) {
-                var $entryElement = entry._trEntryElement;
-                return !queryString || $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
+                if (!queryString) {
+                    return true;
+                } else if (entry._entryText !== undefined) {
+                    return $.trivialMatch(entry._entryText, queryString, matchingOptions).length > 0;
+                } else {
+                    return $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
+                }
             }
-
 
             return function (queryString, resultCallback) {
                 if (!queryString) {
@@ -205,9 +209,43 @@
             }
         };
 
+        //function findTreeNodes(entries, filterFunction, childrenPropertyName) {
+        //    function findEntriesInSubTree(node, listOfFoundEntries) {
+        //        if (filterFunction.call(this, node)) {
+        //            listOfFoundEntries.push(node);
+        //        }
+        //        if (node[childrenPropertyName]) {
+        //            for (var i = 0; i < node[childrenPropertyName].length; i++) {
+        //                var child = node[childrenPropertyName][i];
+        //                findEntriesInSubTree(child, listOfFoundEntries);
+        //            }
+        //        }
+        //    }
+        //
+        //    var matchingEntries = [];
+        //    for (var i = 0; i < entries.length; i++) {
+        //        var rootEntry = entries[i];
+        //        findEntriesInSubTree(rootEntry, matchingEntries);
+        //    }
+        //    return matchingEntries;
+        //}
+        //
+        //function findTreeNodeById(entries, id, childrenPropertyName) {
+        //    return findTreeNodes(entries, function (entry) {
+        //        return entry[config.valueProperty] == id
+        //    }, childrenPropertyName)[0];
+        //}
+        //
+        //function findParentTreeNode(entries, childNode, childrenPropertyName) {
+        //    return findTreeNodes(entries, function (entry) {
+        //        return entry[childrenPropertyName] && entry[childrenPropertyName].some(function (child) {
+        //                return child.id === childNode.id;
+        //            });
+        //    }, childrenPropertyName)[0];
+        //}
+
         function registerJqueryPlugin(componentConstructor, componentName, cssClass) {
             var jsApiName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
-            ;
             var plainJqueryName = componentName.toLowerCase();
             var domToJsObjectReferenceName = componentName.charAt(0).toLocaleLowerCase() + componentName.slice(1);
 
@@ -295,7 +333,11 @@
             registerJqueryPlugin: registerJqueryPlugin,
             selectElementContents: selectElementContents,
             escapeSpecialRegexCharacter: escapeSpecialRegexCharacter,
-            Event: Event
+            Event: Event,
+
+            //findTreeNodes: findTreeNodes,
+            //findTreeNodeById: findTreeNodeById,
+            //findParentTreeNode: findParentTreeNode
         };
     })
 );

@@ -68,7 +68,7 @@
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
 
             if (entries) { // if config.entries was set...
-                updateTreeEntryElements(entries);
+                updateEntries(entries);
             }
 
             setSelectedEntry((config.selectedEntryId !== undefined && config.selectedEntryId !== null) ? findEntryById(config.selectedEntryId) : null);
@@ -100,14 +100,14 @@
                         $componentWrapper.trigger("mousedown", e);
                         setSelectedEntry(entry);
                     }).mouseup(function (e) {
-                        $componentWrapper.trigger("mouseup", e);
-                    }).mouseenter(function () {
-                        setHighlightedEntry(entry);
-                    }).mouseleave(function (e) {
-                        if (!$(e.toElement).is('.tr-tree-entry-outer-wrapper')) {
-                            setHighlightedEntry(null);
-                        }
-                    });
+                    $componentWrapper.trigger("mouseup", e);
+                }).mouseenter(function () {
+                    setHighlightedEntry(entry);
+                }).mouseleave(function (e) {
+                    if (!$(e.toElement).is('.tr-tree-entry-outer-wrapper')) {
+                        setHighlightedEntry(null);
+                    }
+                });
 
                 if (!leaf) {
                     var $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
@@ -118,8 +118,10 @@
                         setNodeExpanded(entry, !entry[config.expandedProperty], true);
                     });
                     if (entry[config.childrenProperty]) {
-                        for (var i = 0; i < entry[config.childrenProperty].length; i++) {
-                            createEntryElement(entry[config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
+                        if (entry[config.expandedProperty]) {
+                            for (var i = 0; i < entry[config.childrenProperty].length; i++) {
+                                createEntryElement(entry[config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
+                            }
                         }
                     } else if (entry[config.lazyChildrenFlagProperty]) {
                         $childrenWrapper.hide().append(config.spinnerTemplate).fadeIn();
@@ -155,11 +157,18 @@
                     node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
                 }
 
+                function nodeHasUnrenderedChildren(node) {
+                    return node[config.childrenProperty] && node[config.childrenProperty].some(function (child) {
+                            return !child._trEntryElement || !jQuery.contains(document.documentElement, child._trEntryElement[0]);
+                        });
+                }
 
                 if (expanded && node[config.lazyChildrenFlagProperty] && !node[config.childrenProperty]) {
                     config.lazyChildrenQueryFunction(node, function (children) {
                         setChildren(node, children);
                     });
+                } else if (expanded && nodeHasUnrenderedChildren(node)) {
+                    renderChildren(node);
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
@@ -177,9 +186,13 @@
             function setChildren(node, children) {
                 node[config.childrenProperty] = children;
                 node[config.lazyChildrenFlagProperty] = false;
+                renderChildren(node, children);
+            }
 
+            function renderChildren(node) {
                 var $childrenWrapper = node._trEntryElement.find('> .tr-tree-entry-children-wrapper');
                 $childrenWrapper.empty();
+                var children = node[config.childrenProperty];
                 if (children && children.length > 0) {
                     var depth = nodeDepth(node);
                     for (var i = 0; i < children.length; i++) {
@@ -194,6 +207,12 @@
             function updateEntries(newEntries, highlightDirection) {  // TODO remove hightlightDirection - no more needed!
                 highlightedEntry = null;
                 entries = newEntries;
+
+                findEntries(function (entry) {
+                    var entryHtml = Mustache.render(config.templates[0], entry);
+                    entry._entryText = entryHtml.replace(/<.*?>/g, "").replace(/\s{2,}/g, ' ');
+                });
+
                 updateTreeEntryElements(entries);
 
                 var selectedEntry = findEntryById(selectedEntryId);
@@ -295,10 +314,14 @@
             function getNextVisibleEntry(currentEntry, direction, onlyEntriesWithTextMatches) {
                 var newSelectedElementIndex;
                 var visibleEntriesAsList = findEntries(function (entry) {
-                    if (onlyEntriesWithTextMatches) {
-                        return entry._trEntryElement.is(':visible') && entry._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
+                    if (!entry._trEntryElement) {
+                        return false;
                     } else {
-                        return entry._trEntryElement.is(':visible') || entry === currentEntry;
+                        if (onlyEntriesWithTextMatches) {
+                            return entry._trEntryElement.is(':visible') && entry._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
+                        } else {
+                            return entry._trEntryElement.is(':visible') || entry === currentEntry;
+                        }
                     }
                 });
                 if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
@@ -339,11 +362,12 @@
             this.selectNextEntry = selectNextEntry;
             this.revealSelectedEntry = function (animate) {
                 var selectedEntry = getSelectedEntry();
-                while (selectedEntry) {
-                    selectedEntry = findParentNode(selectedEntry);
+                if (!selectedEntry) {
+                    return;
+                }
+                while (selectedEntry = findParentNode(selectedEntry)) {
                     setNodeExpanded(selectedEntry, true, animate);
                 }
-
             };
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
