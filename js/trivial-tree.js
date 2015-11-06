@@ -71,8 +71,6 @@
             var treeBox;
             var entries = config.entries;
             var selectedEntryId;
-            var highlightedEntry = null;
-            var blurCausedByClickInsideComponent = false;
 
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");

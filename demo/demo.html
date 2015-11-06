@@ -132,6 +132,10 @@ no search field:
 <div style="width: 350px; height: 370px">
     <input id="noSearchFieldTree">
 </div>
+include exclude forcer:
+<div style="width: 350px; height: 370px">
+    <input id="includeExcludeForcerTree">
+</div>
 
 <div style="width: 300px">
     <h3>TrivialUnitBox</h3>
@@ -362,6 +366,22 @@ no search field:
                 }, 1000);
             },
             showSearchField: false
+        });
+
+        var entries = createDemoTreeNodes();
+        $('#includeExcludeForcerTree').TrivialTree({
+            entries: entries,
+            searchBarMode: 'always-visible',
+            queryFunction: TrivialComponents.defaultTreeQueryFunctionFactory(entries, {
+                matchingMode: 'contains',
+                ignoreCase: true
+            }, "children", "expanded", function (node, depth) {
+                if (depth === 0) {
+                    return true;
+                } else {
+                    return;
+                }
+            })
         });
 
         $('#noSearchFieldTree').TrivialTree({

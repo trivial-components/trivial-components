@@ -212,7 +212,7 @@
                 highlightedEntry = null;
                 entries = newEntries;
 
-                findEntries(function (entry) {
+                findEntries(function (entry) { // TODO remove this. this should be done by trivial-core (default query stuff)
                     var entryHtml = Mustache.render(config.templates[0], entry);
                     entry._entryText = entryHtml.replace(/<.*?>/g, "").replace(/\s{2,}/g, ' ');
                 });

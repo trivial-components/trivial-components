@@ -150,7 +150,12 @@
             }
         };
 
-        var defaultTreeQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName, expandedPropertyName) {
+        var defaultTreeQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName, expandedPropertyName, includeExcludeForcer) {
+
+            function defaultIncludeExcludeForcer(node, depth) {
+                return undefined; // true = force include node, false = force exclude node, undefined = default behaviour
+            }
+            includeExcludeForcer = includeExcludeForcer || defaultIncludeExcludeForcer;
 
             function createProxy(delegate) {
                 var proxyConstructor = function () {
@@ -159,14 +164,14 @@
                 return new proxyConstructor();
             }
 
-            function findMatchingEntriesAndTheirAncestors(entry, queryString) {
+            function findMatchingEntriesAndTheirAncestors(entry, queryString, nodeDepth) {
                 var entryProxy = createProxy(entry);
                 entryProxy[childrenPropertyName] = [];
                 entryProxy[expandedPropertyName] = false;
                 if (entry[childrenPropertyName]) {
                     for (var i = 0; i < entry[childrenPropertyName].length; i++) {
                         var child = entry[childrenPropertyName][i];
-                        var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString);
+                        var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
                         if (childProxy) {
                             entryProxy[childrenPropertyName].push(childProxy);
                             entryProxy[expandedPropertyName] = true;
@@ -174,7 +179,7 @@
                     }
                 }
                 var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
-                var matchesItself = entryMatches(entry, queryString);
+                var matchesItself = entryMatches(entry, queryString, nodeDepth);
                 if (matchesItself && !hasMatchingChildren) {
                     // still make it expandable!
                     entryProxy[childrenPropertyName] = entry[childrenPropertyName];
@@ -182,10 +187,14 @@
                 return matchesItself || hasMatchingChildren ? entryProxy : null;
             }
 
-            function entryMatches(entry, queryString) {
+            function entryMatches(entry, queryString, nodeDepth) {
+                var includeExcludeForcerResult = includeExcludeForcer(entry, nodeDepth);
+                if (includeExcludeForcerResult !== undefined) {
+                    return includeExcludeForcerResult;
+                }
                 if (!queryString) {
                     return true;
-                } else if (entry._entryText !== undefined) {
+                } else if (entry._entryText !== undefined) {    // TODO move the entryText generation here from treebox!!
                     return $.trivialMatch(entry._entryText, queryString, matchingOptions).length > 0;
                 } else {
                     return $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
@@ -199,7 +208,7 @@
                     var matchingEntries = [];
                     for (var i = 0; i < topLevelEntries.length; i++) {
                         var topLevelEntry = topLevelEntries[i];
-                        var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString);
+                        var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
                         if (entryProxy) {
                             matchingEntries.push(entryProxy);
                         }
@@ -208,41 +217,6 @@
                 }
             }
         };
-
-        //function findTreeNodes(entries, filterFunction, childrenPropertyName) {
-        //    function findEntriesInSubTree(node, listOfFoundEntries) {
-        //        if (filterFunction.call(this, node)) {
-        //            listOfFoundEntries.push(node);
-        //        }
-        //        if (node[childrenPropertyName]) {
-        //            for (var i = 0; i < node[childrenPropertyName].length; i++) {
-        //                var child = node[childrenPropertyName][i];
-        //                findEntriesInSubTree(child, listOfFoundEntries);
-        //            }
-        //        }
-        //    }
-        //
-        //    var matchingEntries = [];
-        //    for (var i = 0; i < entries.length; i++) {
-        //        var rootEntry = entries[i];
-        //        findEntriesInSubTree(rootEntry, matchingEntries);
-        //    }
-        //    return matchingEntries;
-        //}
-        //
-        //function findTreeNodeById(entries, id, childrenPropertyName) {
-        //    return findTreeNodes(entries, function (entry) {
-        //        return entry[config.valueProperty] == id
-        //    }, childrenPropertyName)[0];
-        //}
-        //
-        //function findParentTreeNode(entries, childNode, childrenPropertyName) {
-        //    return findTreeNodes(entries, function (entry) {
-        //        return entry[childrenPropertyName] && entry[childrenPropertyName].some(function (child) {
-        //                return child.id === childNode.id;
-        //            });
-        //    }, childrenPropertyName)[0];
-        //}
 
         function registerJqueryPlugin(componentConstructor, componentName, cssClass) {
             var jsApiName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
