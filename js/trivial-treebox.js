@@ -95,6 +95,10 @@
                 var $entry = createEntryDisplay(entry, depth);
                 $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
+                if (entry[config.valueProperty] === selectedEntryId) {
+                    $entryAndExpanderWrapper.addClass("tr-selected-entry");
+                }
+
                 $entryAndExpanderWrapper
                     .mousedown(function (e) {
                         $componentWrapper.trigger("mousedown", e);
@@ -268,10 +272,9 @@
 
             function markSelectedEntry(entry) {
                 $tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
-                if (entry) {
+                if (entry && entry._trEntryElement) {
                     var $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entryWrapper.addClass("tr-selected-entry");
-                    minimallyScrollTo($entryWrapper);
                 }
             }
 
@@ -365,9 +368,11 @@
                 if (!selectedEntry) {
                     return;
                 }
-                while (selectedEntry = findParentNode(selectedEntry)) {
-                    setNodeExpanded(selectedEntry, true, animate);
+                var currentEntry = selectedEntry;
+                while (currentEntry = findParentNode(currentEntry)) {
+                    setNodeExpanded(currentEntry, true, animate);
                 }
+                minimallyScrollTo(selectedEntry._trEntryElement);
             };
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
