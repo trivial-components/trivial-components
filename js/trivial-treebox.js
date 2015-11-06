@@ -155,12 +155,6 @@
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
-                if (expanded) {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideDown(animate ? config.animationDuration : 0);
-                } else {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
-                }
-
                 function nodeHasUnrenderedChildren(node) {
                     return node[config.childrenProperty] && node[config.childrenProperty].some(function (child) {
                             return !child._trEntryElement || !jQuery.contains(document.documentElement, child._trEntryElement[0]);
@@ -176,6 +170,12 @@
                 }
                 if (expanded) {
                     minimallyScrollTo(node._trEntryElement);
+                }
+
+                if (expanded) {
+                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideDown(animate ? config.animationDuration : 0);
+                } else {
+                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
                 }
 
                 if (!!wasExpanded != !!expanded) {
