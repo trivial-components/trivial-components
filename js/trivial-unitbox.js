@@ -141,6 +141,7 @@
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
+                        e.preventDefault(); // do not submit form
                         selectEntry(listBox.getHighlightedEntry());
                         closeDropDown();
                     } else if (e.which == keyCodes.escape) {

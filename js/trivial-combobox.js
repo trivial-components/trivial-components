@@ -157,6 +157,7 @@
                             query(direction);
                         }
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
+                        e.preventDefault(); // do not submit form
                         selectEntry(listBox.getHighlightedEntry());
                         closeDropDown();
                         hideEditorIfNotContainsFreeText();
