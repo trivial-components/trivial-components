@@ -134,8 +134,13 @@
                     }
                 })
                 .keydown(function (e) {
-                    if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
-                        return; // tab or modifier key was pressed...
+                    if (TrivialComponents.isModifierKey(e)) {
+                        return;
+                    } else if (e.which == keyCodes.tab) {
+                        var highlightedEntry = listBox.getHighlightedEntry();
+                        if (isDropDownOpen && highlightedEntry) {
+                            selectEntry(highlightedEntry);
+                        }
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         showEditor();
                         return; // let the user navigate freely left and right...
@@ -210,7 +215,7 @@
             });
 
             listBox = $dropDown.TrivialListBox(config);
-            listBox.$.change(function() {
+            listBox.$.change(function () {
                 var selectedListBoxEntry = listBox.getSelectedEntry();
                 if (selectedListBoxEntry) {
                     selectEntry(selectedListBoxEntry);
@@ -382,7 +387,7 @@
             $comboBox[0].trivialComboBox = this;
 
             function updateEntries(newEntries, highlightDirection) {
-                highlightDirection = highlightDirection === undefined ? 1: highlightDirection;
+                highlightDirection = highlightDirection === undefined ? 1 : highlightDirection;
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();

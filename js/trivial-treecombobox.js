@@ -135,8 +135,13 @@
                     }
                 })
                 .keydown(function (e) {
-                    if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
-                        return; // tab or modifier key was pressed...
+                    if (TrivialComponents.isModifierKey(e)) {
+                        return;
+                    } else if (e.which == keyCodes.tab) {
+                        var highlightedEntry = treeBox.getHighlightedEntry();
+                        if (isDropDownOpen && highlightedEntry) {
+                            selectEntry(highlightedEntry);
+                        }
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         if (isDropDownOpen) {
                             // expand the currently highlighted node.
@@ -218,7 +223,7 @@
             });
 
             treeBox = $dropDown.TrivialTreeBox(config);
-            treeBox.$.change(function() {
+            treeBox.$.change(function () {
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
                     selectEntry(selectedTreeBoxEntry);
