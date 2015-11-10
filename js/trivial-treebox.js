@@ -212,11 +212,6 @@
                 highlightedEntry = null;
                 entries = newEntries;
 
-                findEntries(function (entry) { // TODO remove this. this should be done by trivial-core (default query stuff)
-                    var entryHtml = Mustache.render(config.templates[0], entry);
-                    entry._entryText = entryHtml.replace(/<.*?>/g, "").replace(/\s{2,}/g, ' ');
-                });
-
                 updateTreeEntryElements(entries);
 
                 var selectedEntry = findEntryById(selectedEntryId);
@@ -294,7 +289,7 @@
                 if (entry !== highlightedEntry) {
                     highlightedEntry = entry;
                     $tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
-                    if (entry != null) {
+                    if (entry != null && entry._trEntryElement) {
                         var $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                         $entry.addClass('tr-highlighted-entry');
                         minimallyScrollTo($entry);

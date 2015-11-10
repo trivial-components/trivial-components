@@ -64,7 +64,7 @@
                 editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
             }, options);
 
-            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.matchingOptions, config.childrenProperty, config.expandedProperty);
+            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.templates, config.matchingOptions, config.childrenProperty, config.expandedProperty);
             this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var treeBox;
@@ -233,7 +233,7 @@
                 hideEditorIfNotContainsFreeText();
             });
 
-            selectEntry(treeBox.getSelectedEntry(), true);
+            selectEntry(config.selectedEntry, true);
 
             $selectedEntryWrapper.click(function () {
                 showEditor();

@@ -319,6 +319,7 @@ include exclude forcer:
         var trivialTreeComboBox = $('#treeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
+            selectedEntry: createDemoTreeNodes()[0],
             lazyChildrenQueryFunction: function (node, callback) {
                 setTimeout(function () {
                     callback(createDemoTreeNodes())
@@ -333,14 +334,14 @@ include exclude forcer:
         $('#disabledTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 1,
+            selectedEntry: createDemoTreeNodes()[1],
             editingMode: 'disabled'
         });
 
         $('#readonlyTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            selectedEntryId: 1,
+            selectedEntry: createDemoTreeNodes()[2],
             editingMode: 'readonly'
         });
 

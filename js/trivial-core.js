@@ -150,12 +150,7 @@
             }
         };
 
-        var defaultTreeQueryFunctionFactory = function (topLevelEntries, matchingOptions, childrenPropertyName, expandedPropertyName, includeExcludeForcer) {
-
-            function defaultIncludeExcludeForcer(node, depth) {
-                return undefined; // true = force include node, false = force exclude node, undefined = default behaviour
-            }
-            includeExcludeForcer = includeExcludeForcer || defaultIncludeExcludeForcer;
+        var defaultTreeQueryFunctionFactory = function (topLevelEntries, entryTemplates, matchingOptions, childrenPropertyName, expandedPropertyName) {
 
             function createProxy(delegate) {
                 var proxyConstructor = function () {
@@ -188,16 +183,12 @@
             }
 
             function entryMatches(entry, queryString, nodeDepth) {
-                var includeExcludeForcerResult = includeExcludeForcer(entry, nodeDepth);
-                if (includeExcludeForcerResult !== undefined) {
-                    return includeExcludeForcerResult;
-                }
                 if (!queryString) {
                     return true;
-                } else if (entry._entryText !== undefined) {    // TODO move the entryText generation here from treebox!!
-                    return $.trivialMatch(entry._entryText, queryString, matchingOptions).length > 0;
                 } else {
-                    return $.trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0;
+                    var entryHtml = Mustache.render(entryTemplates[Math.min(entryTemplates.length - 1, nodeDepth)], entry);
+                    entry._entryText = entryHtml.replace(/<.*?>/g, "").replace(/\s{2,}/g, ' ');
+                    return $.trivialMatch(entry._entryText, queryString, matchingOptions).length > 0;
                 }
             }
 
