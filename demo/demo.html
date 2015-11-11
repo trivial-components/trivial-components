@@ -173,7 +173,7 @@ include exclude forcer:
             }
         });
         defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("defaultFilteringCombobox onSelectedEntryChanged " + entry.displayValue)
+            console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         $('#freeTextComboBox').TrivialComboBox({
@@ -328,7 +328,7 @@ include exclude forcer:
             animationDuration: 200
         });
         trivialTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("trivialTreeComboBox onSelectedEntryChanged " + entry.displayValue)
+            console.log("trivialTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         $('#disabledTreeComboBox').TrivialTreeComboBox({
@@ -357,7 +357,7 @@ include exclude forcer:
             searchBarMode: 'always-visible'
         });
         zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
-            console.log("onSelectedEntryChanged " + node.id)
+            console.log("onSelectedEntryChanged " + (node ? node.id : "null"))
         });
         zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
             console.log("onNodeExpansionStateChanged " + node.id)
