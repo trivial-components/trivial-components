@@ -90,11 +90,15 @@ gulp.task('less', ['bower'], function () {
     return compileLess(['less/trivial-components.less'], 'dist/css');
 });
 
+gulp.task('less-bootstrap', ['bower'], function () {
+    return compileLess(['less/trivial-components-bootstrap.less'], 'dist/css');
+});
+
 gulp.task('less-demo', ['bower'], function () {
     return compileLess(['demo/less/demo.less'], 'demo/css');
 });
 
-gulp.task('minifyCss', ['less'], function () {
+gulp.task('minifyCss', ['less', 'less-bootstrap'], function () {
     return gulp.src(["dist/css/*.css", "!dist/css/*.min.css", "!dist/css/*.sourcemaps.css"])
         .pipe(rename(function (path) {
             path.basename += ".min"
@@ -143,7 +147,7 @@ gulp.task('test', ['bower'], function (done) {
     }, done);
 });
 
-gulp.task('prepare-dist', ['test', 'bower', 'less', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['test', 'bower', 'less', 'less-bootstrap', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -187,7 +191,7 @@ gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo", "size-report"])
 
 gulp.task('watch', function () {
     livereload.listen();
-    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', "less-demo"]);
+    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', 'less-bootstrap', "less-demo"]);
 });
 
 gulp.task('watch-js', function () {
