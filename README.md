@@ -1,8 +1,10 @@
-# ![Trivial Components](http://trivial-components.github.io/trivial-components/img/logo-40x40.png) Trivial Componentns
+# ![Trivial Components](http://trivial-components.github.io/trivial-components/img/logo-40x40.png) Trivial Components
 
-[Trivial Components](http://trivial-components.github.io/trivial-components/) delivers UI components the way you always wanted them.
+UI components the way you always wanted them.
+
+[![Build Status](https://travis-ci.org/trivial-components/trivial-components.svg?branch=master)](https://travis-ci.org/trivial-components/trivial-components)
 
 
 #### Who uses Trivial Components?
 
-The [ButterFaces](http://www.butterfaces.org/) team is currently playing arround with trivial-combobox. Have a look at [the corresponding branch](https://bitbucket.org/butterfaces/butterfaces/branch/BUT-258-integrate-trivial-combobox-templ).  
+The [ButterFaces](http://www.butterfaces.org/) team has integrated several trivial components into their framework.
