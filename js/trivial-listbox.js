@@ -32,6 +32,8 @@
     }(function (TrivialComponents, $, Mustache) {
 
         function TrivialListBox($container, options) {
+            var me = this;
+
             options = options || {};
             var config = $.extend({
                 template: TrivialComponents.image2LinesTemplate,
@@ -45,6 +47,8 @@
                     maxLevenshteinDistance: 2
                 }
             }, options);
+
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var selectedEntry;
             var entries = config.entries;
@@ -74,7 +78,7 @@
                         (function (entry) {
                             $entry.mousedown(function (e) {
                                 $listBox.trigger("mousedown", e);
-                                selectEntry(entry);
+                                selectEntry(entry, e);
                             }).mouseup(function (e) {
                                 $listBox.trigger("mouseup", e);
                             }).mouseenter(function () {
@@ -120,17 +124,18 @@
                 }
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(selectedEntry, originalEvent) {
                 $listBox.trigger("change");
+                me.onSelectedEntryChanged.fire(selectedEntry, originalEvent);
             }
 
-            function selectEntry(entry) {
+            function selectEntry(entry, originalEvent) {
                 selectedEntry = entry;
                 $entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
                 if (entry != null) {
                     selectedEntry._trEntryElement.addClass("tr-selected-entry");
                 }
-                fireChangeEvents();
+                fireChangeEvents(selectedEntry, originalEvent);
             }
 
             function highlightNextEntry(direction) {

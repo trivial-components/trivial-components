@@ -215,10 +215,9 @@
             });
 
             listBox = $dropDown.TrivialListBox(config);
-            listBox.$.change(function () {
-                var selectedListBoxEntry = listBox.getSelectedEntry();
-                if (selectedListBoxEntry) {
-                    selectEntry(selectedListBoxEntry);
+            listBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
+                if (selectedEntry) {
+                    selectEntry(selectedEntry);
                     listBox.selectEntry(null);
                     closeDropDown();
                 }
