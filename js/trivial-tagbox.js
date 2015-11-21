@@ -446,9 +446,10 @@
                     }
                     $editor.text(newEditorValue);
                     repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
-                    setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                    // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
+                    if ($editor.is(":focus")) {
                         TrivialComponents.selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
-                    }, 0);
+                    }
                 }, delay || 0);
             }
             doNoAutoCompleteBecauseBackspaceWasPressed = false;

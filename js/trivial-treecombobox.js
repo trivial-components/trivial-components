@@ -382,9 +382,10 @@
                                 newEditorValue = getNonSelectedEditorValue();
                             }
                             $editor.val(newEditorValue);
-                            setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                            // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
+                            if ($editor.is(":focus")) {
                                 $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
-                            }, 0);
+                            }
                         }, delay || 0);
                     }
                     doNoAutoCompleteBecauseBackspaceWasPressed = false;
