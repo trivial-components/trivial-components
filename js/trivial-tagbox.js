@@ -500,7 +500,13 @@
                 selectedEntriesToReturn.push(selectedEntryToReturn);
             }
             return selectedEntriesToReturn;
-        }
+        };
+        this.selectEntry = selectEntry;
+        this.setSelectedEntries = function(entries) {
+            for (var i = 0; i < entries.length; i++) {
+                selectEntry(entries[i], true);
+            }
+        };
     }
 
         TrivialComponents.registerJqueryPlugin(TrivialTagBox, "TrivialTagBox", "tr-tagbox");
