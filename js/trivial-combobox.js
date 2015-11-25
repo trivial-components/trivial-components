@@ -423,6 +423,13 @@
                 }
             };
             this.selectEntry = selectEntry;
+            this.focus = function () {
+                showEditor();
+                setTimeout(function () {
+                    $editor.select();
+                }, 0);
+            }
+
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialComboBox, "TrivialComboBox", "tr-combobox");
