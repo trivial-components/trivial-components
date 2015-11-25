@@ -411,6 +411,9 @@
             };
             this.selectEntry = selectEntry;
             this.selectUnit = selectUnit;
+            this.focus = function () {
+                $editor.select();
+            }
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialUnitBox, "TrivialUnitBox", "tr-unitbox");

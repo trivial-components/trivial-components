@@ -513,6 +513,9 @@
                     }
                 }
             };
+            this.focus = function () {
+                $editor.select();
+            }
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTagBox, "TrivialTagBox", "tr-tagbox");

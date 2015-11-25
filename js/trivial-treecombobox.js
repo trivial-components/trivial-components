@@ -433,6 +433,10 @@
             this.updateChildren = treeBox.updateChildren;
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;
+            this.focus = function () {
+                showEditor();
+                $editor.select();
+            }
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTreeComboBox, "TrivialTreeComboBox", "tr-combobox");

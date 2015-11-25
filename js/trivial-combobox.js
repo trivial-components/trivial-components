@@ -425,9 +425,7 @@
             this.selectEntry = selectEntry;
             this.focus = function () {
                 showEditor();
-                setTimeout(function () {
-                    $editor.select();
-                }, 0);
+                $editor.select();
             }
 
         }
