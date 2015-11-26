@@ -514,7 +514,7 @@
                 }
             };
             this.focus = function () {
-                $editor.select();
+                TrivialComponents.selectElementContents($editor[0], 0, $editor.text().length);
             }
         }
 
