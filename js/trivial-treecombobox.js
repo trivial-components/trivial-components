@@ -294,7 +294,7 @@
                 var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor
                     .css({
-                        "width": $editorArea.width() + "px",
+                        "width": Math.min($editorArea[0].offsetWidth, $trigger[0].offsetLeft - $editorArea[0].offsetLeft) + "px", // prevent the editor from surpassing the trigger!
                         "height": ($editorArea.height()) + "px"
                     })
                     .position({

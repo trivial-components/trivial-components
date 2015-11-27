@@ -252,10 +252,8 @@
                         var queryString = getQueryString();
                         if (queryString.length > 0) {
                             listBox.highlightTextMatches(queryString);
-                            listBox.highlightNextMatchingEntry(highlightDirection);
-                        } else {
-                            listBox.highlightNextEntry(highlightDirection);
                         }
+                        listBox.highlightNextEntry(highlightDirection);
 
                         autoCompleteIfPossible(config.autoCompleteDelay);
 

@@ -120,6 +120,7 @@
                         // do nothing!
                     } else {
                         $comboBox.addClass('focus');
+                        showEditor();
                     }
                 })
                 .blur(function () {
@@ -141,6 +142,7 @@
                         if (isDropDownOpen && highlightedEntry) {
                             selectEntry(highlightedEntry);
                         }
+                        return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         showEditor();
                         return; // let the user navigate freely left and right...
@@ -181,7 +183,7 @@
                     if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                         selectEntry(null);
                     } else if (e.which == keyCodes.tab) {
-                        showEditor();
+                        //showEditor();
                     }
                 })
                 .mousedown(function () {
@@ -241,6 +243,7 @@
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
+                    console.log($editor.val());
                     config.queryFunction($editor.val(), function (newEntries) {
                         updateEntries(newEntries, highlightDirection);
                     });
@@ -285,7 +288,7 @@
                 var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor
                     .css({
-                        "width": $editorArea.width() + "px",
+                        "width": Math.min($editorArea[0].offsetWidth, $trigger[0].offsetLeft - $editorArea[0].offsetLeft) + "px", // prevent the editor from surpassing the trigger!
                         "height": ($editorArea.height()) + "px"
                     })
                     .position({
@@ -394,12 +397,10 @@
                 listBox.updateEntries(newEntries);
 
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
-                if (nonSelectedEditorValue.length > 0 && newEntries.length <= config.textHighlightingEntryLimit) {
-                    listBox.highlightTextMatches(nonSelectedEditorValue);
-                    listBox.highlightNextMatchingEntry(highlightDirection);
-                } else {
-                    listBox.highlightNextEntry(highlightDirection);
-                }
+
+                listBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
+
+                listBox.highlightNextEntry(highlightDirection);
 
                 autoCompleteIfPossible(config.autoCompleteDelay);
 

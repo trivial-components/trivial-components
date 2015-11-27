@@ -302,13 +302,6 @@
                 }
             }
 
-            function highlightNextEntry(direction) {
-                var nextVisibleEntry = getNextVisibleEntry(highlightedEntry || getSelectedEntry(), direction);
-                if (nextVisibleEntry != null) {
-                    setHighlightedEntry(nextVisibleEntry);
-                }
-            }
-
             function getNextVisibleEntry(currentEntry, direction, onlyEntriesWithTextMatches) {
                 var newSelectedElementIndex;
                 var visibleEntriesAsList = findEntries(function (entry) {
@@ -370,9 +363,14 @@
                 minimallyScrollTo(selectedEntry._trEntryElement);
             };
             this.setHighlightedEntry = setHighlightedEntry;
-            this.highlightNextEntry = highlightNextEntry;
+            this.highlightNextEntry = function (direction) {
+                var nextVisibleEntry = getNextVisibleEntry(highlightedEntry || getSelectedEntry(), direction);
+                if (nextVisibleEntry != null) {
+                    setHighlightedEntry(nextVisibleEntry);
+                }
+            };
             this.highlightNextMatchingEntry = function (direction) {
-                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry, direction, true);
+                var nextMatchingEntry = getNextVisibleEntry(highlightedEntry || getSelectedEntry(), direction, true);
                 if (nextMatchingEntry != null) {
                     setHighlightedEntry(nextMatchingEntry);
                 }

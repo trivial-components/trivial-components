@@ -182,12 +182,7 @@
             };
             this.selectEntry = selectEntry;
             this.highlightNextEntry = highlightNextEntry;
-            this.highlightNextMatchingEntry = function (direction) {
-                var nextMatchingEntry = getNextHighlightableEntry(direction);
-                if (nextMatchingEntry != null) {
-                    setHighlightedEntry(nextMatchingEntry);
-                }
-            };
+            this.highlightNextMatchingEntry = highlightNextEntry;
             this.getHighlightedEntry = function () {
                 return highlightedEntry
             };
