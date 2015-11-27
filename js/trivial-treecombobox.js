@@ -69,6 +69,7 @@
 
             var treeBox;
             var isDropDownOpen = false;
+            var isEditorVisible = false;
             var entries = config.entries;
             var selectedEntry = null;
             var blurCausedByClickInsideComponent = false;
@@ -121,6 +122,7 @@
                         // do nothing!
                     } else {
                         $treeComboBox.addClass('focus');
+                        showEditor();
                     }
                 })
                 .blur(function () {
@@ -142,6 +144,7 @@
                         if (isDropDownOpen && highlightedEntry) {
                             selectEntry(highlightedEntry);
                         }
+                        return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         if (isDropDownOpen) {
                             // expand the currently highlighted node.
@@ -159,22 +162,24 @@
                     }
 
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                        showEditor();
-                        openDropDown();
+                        if (!isEditorVisible) {
+                            $editor.select();
+                            showEditor();
+                        }
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                        if (entries != null) {
+                        if (!isDropDownOpen) {
+                            query(direction);
+                            openDropDown();
+                        } else {
                             treeBox.highlightNextEntry(direction);
                             autoCompleteIfPossible(config.autoCompleteDelay);
-                            return false; // some browsers move the caret to the beginning on up key
-                        } else {
-                            query(direction);
                         }
+                        return false; // some browsers move the caret to the beginning on up key
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
                         e.preventDefault(); // do not submit form
                         selectEntry(treeBox.getHighlightedEntry());
                         closeDropDown();
                         hideEditorIfNotContainsFreeText();
-                        $editor.select();
                     } else if (e.which == keyCodes.escape) {
                         closeDropDown();
                         clearEditorIfNotContainsFreeText();
@@ -188,8 +193,6 @@
                 .keyup(function (e) {
                     if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                         selectEntry(null);
-                    } else if (e.which == keyCodes.tab) {
-                        showEditor();
                     }
                 })
                 .mousedown(function () {
@@ -250,7 +253,7 @@
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
-                    config.queryFunction($editor.val(), function (newEntries) {
+                    config.queryFunction(getNonSelectedEditorValue(), function (newEntries) {
                         updateEntries(newEntries, highlightDirection);
                     });
                 }, 0);
@@ -302,13 +305,14 @@
                         at: "left top",
                         of: $editorArea
                     });
+                isEditorVisible = true;
             }
 
             function clearEditorIfNotContainsFreeText() {
                 if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
                     $originalInput.val("");
                     $editor.val("");
-                    entries = null; // so we will query again when we treecombobox is re-focused
+                    entries = null; // so we will query again when we combobox is re-focused
                     fireChangeEvents(null);
                 }
             }
@@ -321,6 +325,7 @@
 
             function hideEditor() {
                 $editor.width(0).height(0);
+                isEditorVisible = false;
             }
 
             var repositionDropDown = function () {
