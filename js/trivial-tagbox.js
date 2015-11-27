@@ -84,6 +84,7 @@
             if (config.showTrigger) {
                 var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($tagBox);
                 $trigger.mousedown(function () {
+                    $editor.focus();
                     if (isDropDownOpen) {
                         closeDropDown();
                     } else {
@@ -146,7 +147,7 @@
                                 $editor.focus();
                             }
                         }
-                        return; // let the user navigate freely left and right...
+                        return;
                     }
 
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
@@ -237,7 +238,10 @@
                 $editor.focus();
             }
 
-            $tagBox.add($dropDown).mousedown(function () {
+            $tagBox.add($dropDown).mousedown(function (e) {
+                if (e.target === $tagArea[0]) {
+                    $editor.focus();
+                }
                 if ($editor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;
                 }
@@ -258,7 +262,6 @@
             }
 
             $tagArea.click(function () {
-                $editor.select();
                 openDropDown();
                 if (entries == null) {
                     query();
