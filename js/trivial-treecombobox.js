@@ -70,6 +70,7 @@
             var treeBox;
             var isDropDownOpen = false;
             var isEditorVisible = false;
+            var lastQueryString = null;
             var entries = config.entries;
             var selectedEntry = null;
             var blurCausedByClickInsideComponent = false;
@@ -248,14 +249,19 @@
             });
 
             function query(highlightDirection) {
-                var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
-                $spinners = $spinners.add($spinner);
-
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
-                    config.queryFunction(getNonSelectedEditorValue(), function (newEntries) {
+                    var queryString = getNonSelectedEditorValue();
+                    if (lastQueryString !== queryString) {
+                        if ($spinners.length === 0) {
+                var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
+                $spinners = $spinners.add($spinner);
+                        }
+                        config.queryFunction(queryString, function (newEntries) {
                         updateEntries(newEntries, highlightDirection);
                     });
+                        lastQueryString = queryString;
+                    }
                 }, 0);
             }
 
