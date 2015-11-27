@@ -135,13 +135,24 @@
                     if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                        if (e.which == keyCodes.left_arrow && $editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
+                            if ($editor.prev()) {
+                                $editor.insertBefore($editor.prev());
+                                $editor.focus();
+                            }
+                        } else if (e.which == keyCodes.right_arrow && $editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
+                            if ($editor.next()) {
+                                $editor.insertAfter($editor.next());
+                                $editor.focus();
+                            }
+                        }
                         return; // let the user navigate freely left and right...
                     }
 
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                         if ($editor.text() == "") {
-                            if (selectedEntries.length > 0) {
-                                var tagToBeRemoved = selectedEntries[selectedEntries.length - 1];
+                            var tagToBeRemoved = selectedEntries[$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
+                            if (tagToBeRemoved) {
                                 removeTag(tagToBeRemoved);
                                 closeDropDown();
                             }
@@ -190,9 +201,10 @@
                             function splitStringBySeparatorChars(s, separatorChars) {
                                 return s.split(new RegExp("[" + TrivialComponents.escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
                             }
+
                             var tagValuesEnteredByUser = splitStringBySeparatorChars(editorValueBeforeCursor, config.freeTextSeparators);
 
-                            for (var i =0; i< tagValuesEnteredByUser.length -1; i++) {
+                            for (var i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
                                 var value = tagValuesEnteredByUser[i].trim();
                                 if (value.length > 0) {
                                     var entry = {};
@@ -350,7 +362,9 @@
 
             function calculateOriginalInputValue() {
                 return selectedEntries
-                    .map(function(entry) {return entry[config.valueProperty]})
+                    .map(function (entry) {
+                        return entry[config.valueProperty]
+                    })
                     .join(config.valueSeparator);
             }
 
@@ -361,12 +375,14 @@
                 if (config.maxSelectedEntries && selectedEntries.length >= config.maxSelectedEntries) {
                     return; // no more entries allowed
                 }
-                if (config.distinct && selectedEntries.map(function(entry) {return entry[config.valueProperty]}).indexOf(entry[config.valueProperty]) != -1) {
+                if (config.distinct && selectedEntries.map(function (entry) {
+                        return entry[config.valueProperty]
+                    }).indexOf(entry[config.valueProperty]) != -1) {
                     return; // entry already selected
                 }
 
                 var tag = $.extend({}, entry);
-                selectedEntries.push(tag);
+                selectedEntries.splice($editor.index(), 0, tag);
                 $originalInput.val(calculateOriginalInputValue());
 
                 var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
@@ -494,7 +510,7 @@
             this.updateEntries = updateEntries;
             this.getSelectedEntries = function () {
                 var selectedEntriesToReturn = [];
-                for (var i=0; i<selectedEntries.length; i++) {
+                for (var i = 0; i < selectedEntries.length; i++) {
                     var selectedEntryToReturn = jQuery.extend({}, selectedEntries[i]);
                     selectedEntryToReturn._trEntryElement = undefined;
                     selectedEntriesToReturn.push(selectedEntryToReturn);
@@ -502,7 +518,7 @@
                 return selectedEntriesToReturn;
             };
             this.selectEntry = selectEntry;
-            this.setSelectedEntries = function(entries) {
+            this.setSelectedEntries = function (entries) {
                 for (var i = 0; i < selectedEntries.length; i++) {
                     var selectedEntry = selectedEntries[i];
                     removeTag(selectedEntry);
