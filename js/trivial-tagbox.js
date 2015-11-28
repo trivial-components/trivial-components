@@ -136,8 +136,13 @@
                     }
                 })
                 .keydown(function (e) {
-                    if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
+                    if (TrivialComponents.isModifierKey(e)) {
                         return; // tab or modifier key was pressed...
+                    } else if (e.which == keyCodes.tab) {
+                        if (isDropDownOpen && highlightedEntry) {
+                            selectEntry(highlightedEntry);
+                        }
+                        return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         if (e.which == keyCodes.left_arrow && $editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                             if ($editor.prev()) {
