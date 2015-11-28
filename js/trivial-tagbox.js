@@ -273,19 +273,21 @@
                 for (var i = 0; i < selectedEntries.length; i++) {
                     var selectedEntry = selectedEntries[i];
                     var $tag = selectedEntry._trEntryElement;
-                    var sameRow = e.pageY >= $tag[0].offsetTop && e.pageY < $tag[0].offsetTop + $tag[0].offsetHeight;
-                    var sameCol = e.pageX >= $tag[0].offsetLeft && e.pageX < $tag[0].offsetLeft + $tag[0].offsetWidth;
-                    var distanceX = sameCol ? 0 : Math.min(Math.abs(e.pageX - $tag[0].offsetLeft), Math.abs(e.pageX - ($tag[0].offsetLeft + $tag[0].offsetWidth)));
+                    var tagBoundingRect = $tag[0].getBoundingClientRect();
+                    var sameRow = e.clientY >= tagBoundingRect.top && e.clientY < tagBoundingRect.bottom;
+                    var sameCol = e.clientX >= tagBoundingRect.left && e.clientX < tagBoundingRect.right;
+                    var distanceX = sameCol ? 0 : Math.min(Math.abs(e.clientX - tagBoundingRect.left), Math.abs(e.clientX - tagBoundingRect.right));
                     if (sameRow && distanceX < smallestDistanceX) {
                         $tagWithSmallestDistance = $tag;
                         smallestDistanceX = distanceX;
-                        if (smallestDistanceX === 0) {
+                        if (distanceX === 0) {
                             break;
                         }
                     }
                 }
                 if ($tagWithSmallestDistance) {
-                    var isRightSide = e.pageX > $tagWithSmallestDistance[0].offsetLeft + $tagWithSmallestDistance[0].offsetWidth / 2;
+                    var tagBoundingRect = $tagWithSmallestDistance[0].getBoundingClientRect();
+                    var isRightSide = e.clientX > (tagBoundingRect.left + tagBoundingRect.right) / 2;
                     if (isRightSide) {
                         $editor.insertAfter($tagWithSmallestDistance);
                     } else {
