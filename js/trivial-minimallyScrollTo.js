@@ -30,5 +30,17 @@ $.fn.minimallyScrollTo = function (target) {
         } else if (targetMaxY > viewPortMaxY) {
             $this.scrollTop(Math.min(targetMinY, targetMaxY - $this.innerHeight()));
         }
+        
+        var viewPortMinX = $this.scrollLeft();
+        var viewPortMaxX = viewPortMinX + $this.innerWidth();
+
+        var targetMinX = $(target).offset().left - $(this).offset().left + $this.scrollLeft();
+        var targetMaxX = targetMinX + target.width();
+
+        if (targetMinX < viewPortMinX) {
+            $this.scrollLeft(targetMinX);
+        } else if (targetMaxX > viewPortMaxX) {
+            $this.scrollLeft(Math.min(targetMinX, targetMaxX - $this.innerWidth()));
+        }
     });
 };

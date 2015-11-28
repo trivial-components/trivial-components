@@ -115,6 +115,9 @@
                     } else {
                         $tagBox.addClass('focus');
                     }
+                    setTimeout(function() { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
+                        $tagArea.minimallyScrollTo($editor);
+                    });
                 })
                 .blur(function () {
                     if (blurCausedByClickInsideComponent) {
@@ -239,9 +242,6 @@
             }
 
             $tagBox.add($dropDown).mousedown(function (e) {
-                if (e.target === $tagArea[0]) {
-                    $editor.focus();
-                }
                 if ($editor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;
                 }
