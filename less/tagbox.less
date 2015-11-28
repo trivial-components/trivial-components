@@ -16,8 +16,10 @@
   cursor: default;
 }
 
+@tr-default-tag-border-color: #BAD2EA;
+
 .tr-tagbox-default-wrapper-template {
-  border: 1px solid #BAD2EA;
+  border: 1px solid @tr-default-tag-border-color;
   border-radius: 3px;
   box-shadow: 1px 2px 1px -1px rgba(0, 0, 0, 0.13);
   background-color: white;
@@ -49,13 +51,14 @@
 
     &:hover {
       background-color: rgba(0,0,0,.06);
+      border: 1px solid @tr-default-tag-border-color;
     }
   }
 }
 
 .tr-tagbox-editor {
   flex: 0 0 auto;
-  min-width: 10px;
+  min-width: 4px;
   max-width: 100%;
   outline: none;
   margin: 2px;

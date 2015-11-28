@@ -261,11 +261,38 @@
                 updateDropDownEntryElements(entries);
             }
 
-            $tagArea.click(function () {
+            $tagArea.click(function (e) {
                 openDropDown();
                 if (entries == null) {
                     query();
                 }
+
+                // find the tag in the same row as the click with the smallest distance to the click
+                var $tagWithSmallestDistance = null;
+                var smallestDistanceX = 1000000;
+                for (var i = 0; i < selectedEntries.length; i++) {
+                    var selectedEntry = selectedEntries[i];
+                    var $tag = selectedEntry._trEntryElement;
+                    var sameRow = e.pageY >= $tag[0].offsetTop && e.pageY < $tag[0].offsetTop + $tag[0].offsetHeight;
+                    var sameCol = e.pageX >= $tag[0].offsetLeft && e.pageX < $tag[0].offsetLeft + $tag[0].offsetWidth;
+                    var distanceX = sameCol ? 0 : Math.min(Math.abs(e.pageX - $tag[0].offsetLeft), Math.abs(e.pageX - ($tag[0].offsetLeft + $tag[0].offsetWidth)));
+                    if (sameRow && distanceX < smallestDistanceX) {
+                        $tagWithSmallestDistance = $tag;
+                        smallestDistanceX = distanceX;
+                        if (smallestDistanceX === 0) {
+                            break;
+                        }
+                    }
+                }
+                if ($tagWithSmallestDistance) {
+                    var isRightSide = e.pageX > $tagWithSmallestDistance[0].offsetLeft + $tagWithSmallestDistance[0].offsetWidth / 2;
+                    if (isRightSide) {
+                        $editor.insertAfter($tagWithSmallestDistance);
+                    } else {
+                        $editor.insertBefore($tagWithSmallestDistance);
+                    }
+                }
+                $editor.focus();
             });
 
             for (var i = 0; i < config.selectedEntries.length; i++) {
@@ -389,14 +416,16 @@
                 $originalInput.val(calculateOriginalInputValue());
 
                 var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
-                $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
-                    removeTag(tag);
-                    return false;
-                });
-
                 var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
                 $tagWrapper.append($entry).insertBefore($editor);
                 tag._trEntryElement = $tagWrapper;
+
+                if (config.editingMode == "editable") {
+                    $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
+                        removeTag(tag);
+                        return false;
+                    });
+                }
 
                 $editor.text("");
 
@@ -427,6 +456,7 @@
                 }).width($tagBox.width());
             }
 
+            var repositionDropDownScheduler = null;
             function openDropDown() {
                 if (dropdownNeeded) {
                     $tagBox.addClass("open");
@@ -434,12 +464,18 @@
                     repositionDropDown();
                     isDropDownOpen = true;
                 }
+                if (repositionDropDownScheduler == null) {
+                    repositionDropDownScheduler = setInterval(repositionDropDown, 1000); // make sure that under no circumstances the dropdown is mal-positioned
+                }
             }
 
             function closeDropDown() {
                 $tagBox.removeClass("open");
                 $dropDown.hide();
                 isDropDownOpen = false;
+                if (repositionDropDownScheduler != null) {
+                    clearInterval(repositionDropDownScheduler);
+                }
             }
 
             function getNonSelectedEditorValue() {
