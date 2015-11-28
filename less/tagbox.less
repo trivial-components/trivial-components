@@ -58,13 +58,17 @@
 
 .tr-tagbox-editor {
   flex: 0 0 auto;
-  min-width: 4px;
   max-width: 100%;
   outline: none;
-  margin: 2px;
   font-family: @tr-editor-font-family;
   font-size: @tr-editor-font-size;
   min-height: 1em;
+
+  &:focus,
+  &:not(:empty){
+    min-width: 4px;
+    margin: 2px;
+  }
 
   &:first-child:not(:focus):empty:before {
     content: attr(placeholder);
