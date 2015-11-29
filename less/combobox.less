@@ -4,8 +4,11 @@
   display:flex;
   align-items: center; // if the template doesn't take the whole space...
 
-  .tr-combobox-entry * {
-    cursor: text;
+  .tr-combobox-entry {
+    flex-grow: 1;
+    * {
+      cursor: text;
+    }
   }
 }
 
