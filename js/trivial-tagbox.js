@@ -565,10 +565,9 @@
             };
             this.selectEntry = selectEntry;
             this.setSelectedEntries = function (entries) {
-                for (var i = 0; i < selectedEntries.length; i++) {
-                    var selectedEntry = selectedEntries[i];
-                    removeTag(selectedEntry);
-                }
+                selectedEntries
+                    .slice() // copy the array as it gets changed during the forEach loop
+                    .forEach(removeTag);
                 if (entries) {
                     for (var i = 0; i < entries.length; i++) {
                         selectEntry(entries[i], true);
