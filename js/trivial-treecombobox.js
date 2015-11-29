@@ -79,7 +79,7 @@
 
             var $spinners = $();
             var $originalInput = $(originalInput);
-            var $treeComboBox = $('<div class="tr-combobox tr-input-wrapper"/>')
+            var $treeComboBox = $('<div class="tr-treecombobox tr-combobox tr-input-wrapper"/>')
                 .addClass(config.editingMode)
                 .insertAfter($originalInput);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($treeComboBox);
@@ -448,6 +448,11 @@
                 showEditor();
                 $editor.select();
             }
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($treeComboBox);
+                $treeComboBox.remove();
+                $dropDown.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTreeComboBox, "TrivialTreeComboBox", "tr-combobox");

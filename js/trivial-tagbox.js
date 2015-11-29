@@ -577,7 +577,12 @@
             };
             this.focus = function () {
                 TrivialComponents.selectElementContents($editor[0], 0, $editor.text().length);
-            }
+            };
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($tagBox);
+                $tagBox.remove();
+                $dropDown.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTagBox, "TrivialTagBox", "tr-tagbox");

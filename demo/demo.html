@@ -161,6 +161,7 @@ include exclude forcer:
 
 
     <input type="submit" value="submit">
+    <input id="destroyAllButton" type="button" value="call destroy() on all (except the internal components)">
 
 </form>
 
@@ -438,6 +439,16 @@ include exclude forcer:
         calendarComboBox = $('#calendarComboBox').TrivialCalendarComboBox({
             selectedDate: moment(),
             firstDayOfWeek: 1
+        });
+
+        $destroyAllButton = $('#destroyAllButton').click(function() {
+            $('.tr-combobox').TrivialComboBox().forEach(function(c) {c.destroy()});
+            $('.tr-list').TrivialList().destroy();
+            $('.tr-tagbox').TrivialTagBox().forEach(function(c) {c.destroy()});
+            $('.tr-tree').TrivialTree().forEach(function(c) {c.destroy()});
+            $('.tr-treecombobox').TrivialTreeComboBox().forEach(function(c) {c.destroy()});
+            $('.tr-unitbox').TrivialUnitBox().forEach(function(c) {c.destroy()});
+            $('.tr-calendarcombobox').TrivialCalendarComboBox().destroy();
         });
     });
 </script>

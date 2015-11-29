@@ -411,7 +411,12 @@
             this.selectUnit = selectUnit;
             this.focus = function () {
                 $editor.select();
-            }
+            };
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($unitBox);
+                $unitBox.remove();
+                $dropDown.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialUnitBox, "TrivialUnitBox", "tr-unitbox");

@@ -296,6 +296,12 @@
 
             this.$ = $calendarComboBox;
             $calendarComboBox[0].trivialCalendarComboBox = this;
+
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($calendarComboBox);
+                $calendarComboBox.remove();
+                $dropDown.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialCalendarComboBox, "TrivialCalendarComboBox", "tr-calendarcombobox");

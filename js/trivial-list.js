@@ -260,7 +260,11 @@
             this.updateEntries = updateEntries;
             this.getSelectedEntry = function () {
                 return selectedEntry;
-            }
+            };
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($componentWrapper);
+                $componentWrapper.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialList, "TrivialList", "tr-list");

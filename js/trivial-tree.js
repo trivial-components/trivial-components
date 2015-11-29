@@ -271,6 +271,10 @@
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;
             this.addNode = treeBox.addNode;
+            this.destroy = function() {
+                $originalInput.removeClass('tr-original-input').insertBefore($componentWrapper);
+                $componentWrapper.remove();
+            };
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialTree, "TrivialTree", "tr-tree");
