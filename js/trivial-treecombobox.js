@@ -110,12 +110,8 @@
                 $dropDown.appendTo("body");
             }
             var $editor;
-            if (config.valueProperty) {
-                $originalInput.addClass("tr-original-input");
-                $editor = $('<input type="text"/>');
-            } else {
-                $editor = $originalInput;
-            }
+            $originalInput.addClass("tr-original-input");
+            $editor = $('<input type="text"/>');
 
             $editor.prependTo($treeComboBox).addClass("tr-combobox-editor tr-editor")
                 .focus(function () {
@@ -274,7 +270,7 @@
                 if (entry == null) {
                     if (config.valueProperty) {
                         $originalInput.val("");
-                    } // else the $originalInput IS the $editor
+                    }
                     selectedEntry = null;
                     var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
                         .addClass("tr-combobox-entry")
@@ -283,7 +279,7 @@
                 } else {
                     if (config.valueProperty) {
                         $originalInput.val(entry[config.valueProperty]);
-                    } // else the $originalInput IS the $editor
+                    }
                     selectedEntry = entry;
                     var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, entry))
                         .addClass("tr-combobox-entry");
@@ -303,7 +299,7 @@
                 var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor
                     .css({
-                        "width": Math.min($editorArea[0].offsetWidth, $trigger[0].offsetLeft - $editorArea[0].offsetLeft) + "px", // prevent the editor from surpassing the trigger!
+                        "width": Math.min($editorArea[0].offsetWidth, $trigger ? $trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
                         "height": ($editorArea.height()) + "px"
                     })
                     .position({
@@ -441,13 +437,14 @@
                     return selectedEntryToReturn;
                 }
             };
+            this.selectEntry = selectEntry;
             this.updateChildren = treeBox.updateChildren;
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;
             this.focus = function () {
                 showEditor();
                 $editor.select();
-            }
+            };
             this.destroy = function() {
                 $originalInput.removeClass('tr-original-input').insertBefore($treeComboBox);
                 $treeComboBox.remove();
