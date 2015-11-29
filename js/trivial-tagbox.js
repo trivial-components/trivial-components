@@ -575,6 +575,7 @@
                 }
             };
             this.focus = function () {
+                $editor.focus();
                 TrivialComponents.selectElementContents($editor[0], 0, $editor.text().length);
             };
             this.destroy = function() {
