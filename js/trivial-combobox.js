@@ -371,20 +371,22 @@
                     var highlightedEntry = listBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                         var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                        autoCompleteTimeoutId = setTimeout(function () {
-                            var oldEditorValue = getNonSelectedEditorValue();
-                            var newEditorValue;
-                            if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                                newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                            } else {
-                                newEditorValue = getNonSelectedEditorValue();
-                            }
-                            $editor.val(newEditorValue);
-                            // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
-                            if ($editor.is(":focus")) {
-                                $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
-                            }
-                        }, delay || 0);
+                        if (autoCompletingEntryDisplayValue) {
+                            autoCompleteTimeoutId = setTimeout(function () {
+                                var oldEditorValue = getNonSelectedEditorValue();
+                                var newEditorValue;
+                                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
+                                    newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
+                                } else {
+                                    newEditorValue = getNonSelectedEditorValue();
+                                }
+                                $editor.val(newEditorValue);
+                                // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
+                                if ($editor.is(":focus")) {
+                                    $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                                }
+                            }, delay || 0);
+                        }
                     }
                     doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 }

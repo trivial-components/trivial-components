@@ -186,9 +186,9 @@
                         }
                     }
                 }).change(function () {
-                    updateOriginalInputValue();
-                    fireChangeEvents();
-                });
+                updateOriginalInputValue();
+                fireChangeEvents();
+            });
 
             $unitBox.add($dropDown).mousedown(function () {
                 if ($editor.is(":focus")) {
@@ -345,20 +345,22 @@
                     var highlightedEntry = listBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                         var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                        autoCompleteTimeoutId = setTimeout(function () {
-                            var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
-                            var queryString = getQueryString();
-                            var newEditorValue;
-                            if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(queryString.toLowerCase()) === 0) {
-                                newEditorValue = nonSelectedEditorValue + autoCompletingEntryDisplayValue.substr(queryString.length);
-                            } else {
-                                newEditorValue = getNonAutoCompleteEditorValue();
-                            }
-                            $editor.val(newEditorValue);
-                            setTimeout(function () { // we need this to guarantee that the editor has been updated...
-                                $editor[0].setSelectionRange(nonSelectedEditorValue.length, newEditorValue.length);
-                            }, 0);
-                        }, delay || 0);
+                        if (autoCompletingEntryDisplayValue) {
+                            autoCompleteTimeoutId = setTimeout(function () {
+                                var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
+                                var queryString = getQueryString();
+                                var newEditorValue;
+                                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(queryString.toLowerCase()) === 0) {
+                                    newEditorValue = nonSelectedEditorValue + autoCompletingEntryDisplayValue.substr(queryString.length);
+                                } else {
+                                    newEditorValue = getNonAutoCompleteEditorValue();
+                                }
+                                $editor.val(newEditorValue);
+                                setTimeout(function () { // we need this to guarantee that the editor has been updated...
+                                    $editor[0].setSelectionRange(nonSelectedEditorValue.length, newEditorValue.length);
+                                }, 0);
+                            }, delay || 0);
+                        }
                     }
                     doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 }
@@ -378,7 +380,7 @@
             }
 
             function selectUnit(unitIdentifier) {
-                selectEntry(entries.filter(function(entry) {
+                selectEntry(entries.filter(function (entry) {
                     return entry[config.idProperty] === unitIdentifier;
                 })[0], true);
             }
@@ -404,7 +406,7 @@
                 }
             };
             this.getAmount = getAmount;
-            this.setAmount = function(amount) {
+            this.setAmount = function (amount) {
                 $editor.val(amount);
             };
             this.selectEntry = selectEntry;
@@ -412,7 +414,7 @@
             this.focus = function () {
                 $editor.select();
             };
-            this.destroy = function() {
+            this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($unitBox);
                 $unitBox.remove();
                 $dropDown.remove();

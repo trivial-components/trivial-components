@@ -115,7 +115,7 @@
                     } else {
                         $tagBox.addClass('focus');
                     }
-                    setTimeout(function() { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
+                    setTimeout(function () { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
                         $tagArea.minimallyScrollTo($editor);
                     });
                 })
@@ -464,6 +464,7 @@
             }
 
             var repositionDropDownScheduler = null;
+
             function openDropDown() {
                 if (dropdownNeeded) {
                     $tagBox.addClass("open");
@@ -497,7 +498,7 @@
 
             function autoCompleteIfPossible(autoCompletingEntryDisplayValue, delay) {
                 clearTimeout(autoCompleteTimeoutId);
-                if (!doNoAutoCompleteBecauseBackspaceWasPressed) {
+                if (!doNoAutoCompleteBecauseBackspaceWasPressed && autoCompletingEntryDisplayValue) {
                     autoCompleteTimeoutId = setTimeout(function () {
                         var oldEditorValue = getNonSelectedEditorValue();
                         var newEditorValue;
@@ -578,7 +579,7 @@
                 $editor.focus();
                 TrivialComponents.selectElementContents($editor[0], 0, $editor.text().length);
             };
-            this.destroy = function() {
+            this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($tagBox);
                 $tagBox.remove();
                 $dropDown.remove();

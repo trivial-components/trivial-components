@@ -250,12 +250,12 @@
                     var queryString = getNonSelectedEditorValue();
                     if (lastQueryString !== queryString) {
                         if ($spinners.length === 0) {
-                var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
-                $spinners = $spinners.add($spinner);
+                            var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
+                            $spinners = $spinners.add($spinner);
                         }
                         config.queryFunction(queryString, function (newEntries) {
-                        updateEntries(newEntries, highlightDirection);
-                    });
+                            updateEntries(newEntries, highlightDirection);
+                        });
                         lastQueryString = queryString;
                     }
                 }, 0);
@@ -380,20 +380,22 @@
                     var highlightedEntry = treeBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                         var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                        autoCompleteTimeoutId = setTimeout(function () {
-                            var oldEditorValue = getNonSelectedEditorValue();
-                            var newEditorValue;
-                            if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                                newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                            } else {
-                                newEditorValue = getNonSelectedEditorValue();
-                            }
-                            $editor.val(newEditorValue);
-                            // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
-                            if ($editor.is(":focus")) {
-                                $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
-                            }
-                        }, delay || 0);
+                        if (autoCompletingEntryDisplayValue) {
+                            autoCompleteTimeoutId = setTimeout(function () {
+                                var oldEditorValue = getNonSelectedEditorValue();
+                                var newEditorValue;
+                                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
+                                    newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
+                                } else {
+                                    newEditorValue = getNonSelectedEditorValue();
+                                }
+                                $editor.val(newEditorValue);
+                                // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
+                                if ($editor.is(":focus")) {
+                                    $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                                }
+                            }, delay || 0);
+                        }
                     }
                     doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 }
@@ -445,7 +447,7 @@
                 showEditor();
                 $editor.select();
             };
-            this.destroy = function() {
+            this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($treeComboBox);
                 $treeComboBox.remove();
                 $dropDown.remove();
