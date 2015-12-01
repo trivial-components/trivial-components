@@ -104,6 +104,19 @@
 }(jQuery));
 
 (function ($) {
+    function normalizeForIE11 (node) {
+        if (!node) { return; }
+        if (node.nodeType == 3) {
+            while (node.nextSibling && node.nextSibling.nodeType == 3) {
+                node.nodeValue += node.nextSibling.nodeValue;
+                node.parentNode.removeChild(node.nextSibling);
+            }
+        } else {
+            normalizeForIE11(node.firstChild);
+        }
+        normalizeForIE11(node.nextSibling);
+    }
+
     $.fn.trivialHighlight = function (searchString, options) {
         options = $.extend({
             highlightClassName: 'tr-highlighted-text',
@@ -116,7 +129,11 @@
             var $this = $(this);
 
             $this.find('.' + options.highlightClassName).contents().unwrap();
-            this.normalize();
+            if (!(window.ActiveXObject) && "ActiveXObject" in window) { // this is ie11
+                normalizeForIE11(this);
+            } else {
+                this.normalize();
+            }
 
             if (searchString && searchString !== '') {
                 $this.contents().filter(function () {

@@ -111,7 +111,7 @@
             }
             var $editor;
             $originalInput.addClass("tr-original-input");
-            $editor = $('<input type="text"/>');
+            $editor = $('<input type="text" autocomplete="off"/>');
 
             $editor.prependTo($treeComboBox).addClass("tr-combobox-editor tr-editor")
                 .focus(function () {

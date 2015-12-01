@@ -106,7 +106,7 @@
             if (dropdownNeeded) {
                 $dropDown.appendTo("body");
             }
-            var $editor = $('<span contenteditable="true" class="tagbox-editor"></span>');
+            var $editor = $('<span contenteditable="true" class="tagbox-editor" autocomplete="off"></span>');
 
             $editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
                 .focus(function () {
