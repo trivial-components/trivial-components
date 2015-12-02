@@ -104,6 +104,7 @@
 }(jQuery));
 
 (function ($) {
+    var isIE11 = !(window.ActiveXObject) && "ActiveXObject" in window;
     function normalizeForIE11 (node) {
         if (!node) { return; }
         if (node.nodeType == 3) {
@@ -129,7 +130,7 @@
             var $this = $(this);
 
             $this.find('.' + options.highlightClassName).contents().unwrap();
-            if (!(window.ActiveXObject) && "ActiveXObject" in window) { // this is ie11
+            if (isIE11) { // this is ie11
                 normalizeForIE11(this);
             } else {
                 this.normalize();
