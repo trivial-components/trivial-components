@@ -247,9 +247,8 @@
             });
 
             treeBox = $dropDown.TrivialTreeBox(config);
-            treeBox.$.change(function () {
-                var selectedTreeBoxEntry = treeBox.getSelectedEntry();
-                if (selectedTreeBoxEntry) {
+            treeBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
+                if (selectedEntry) {
                     selectEntry(selectedEntry, true, TrivialComponents.objectEquals(selectedEntry, lastCommittedValue));
                     treeBox.setSelectedEntry(null);
                     closeDropDown();
