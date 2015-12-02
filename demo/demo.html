@@ -115,6 +115,10 @@
 <div style="width: 350px">
     <input id="treeComboBox">
 </div>
+    <h5>freeText...</h5>
+<div style="width: 350px">
+    <input id="freeTextTreeComboBox">
+</div>
 <div style="width: 350px">
     <input id="disabledTreeComboBox">
 </div>
@@ -178,12 +182,15 @@ include exclude forcer:
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        $('#freeTextComboBox').TrivialComboBox({
+        var freeTextComboBox = $('#freeTextComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
             allowFreeText: true
+        });
+        freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         $('#noAutoCompleteComboBox').TrivialComboBox({
@@ -331,6 +338,21 @@ include exclude forcer:
         });
         trivialTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("trivialTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+        });
+        var freeTextTreeComboBox = $('#freeTextTreeComboBox').TrivialTreeComboBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntry: createDemoTreeNodes()[0],
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            },
+            allowFreeText: true,
+            animationDuration: 0
+        });
+        freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         $('#disabledTreeComboBox').TrivialTreeComboBox({

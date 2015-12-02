@@ -45,6 +45,7 @@
                 selectedEntry: null,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+                textHighlightingEntryLimit: 100,
                 entries: null,
                 emptyEntry: {},
                 queryFunction: null, // defined below...
@@ -65,6 +66,7 @@
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.templates, config.matchingOptions, config.childrenProperty, config.expandedProperty);
+
             this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var treeBox;
@@ -73,6 +75,7 @@
             var lastQueryString = null;
             var entries = config.entries;
             var selectedEntry = null;
+            var lastCommittedValue = null;
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
@@ -127,10 +130,16 @@
                         $editor.focus();
                     } else {
                         $treeComboBox.removeClass('focus');
-                        clearEditorIfNotContainsFreeText();
-                        hideEditorIfNotContainsFreeText();
+                        if (editorContainsFreeText()) {
+                            if (!TrivialComponents.objectEquals(me.getSelectedEntry(), lastCommittedValue)) {
+                                selectEntry(me.getSelectedEntry(), true);
+                            }
+                        } else {
+                            $editor.val("");
+                            selectEntry(lastCommittedValue);
+                        }
+                        hideEditor();
                         closeDropDown();
-                        fireChangeEvents(me.getSelectedEntry());
                     }
                 })
                 .keydown(function (e) {
@@ -139,7 +148,7 @@
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = treeBox.getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
-                            selectEntry(highlightedEntry);
+                            selectEntry(highlightedEntry, true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -173,23 +182,38 @@
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
-                        e.preventDefault(); // do not submit form
-                        selectEntry(treeBox.getHighlightedEntry());
-                        closeDropDown();
-                        hideEditorIfNotContainsFreeText();
+                        if (isDropDownOpen || editorContainsFreeText()) {
+                            e.preventDefault(); // do not submit form
+                            var highlightedEntry = treeBox.getHighlightedEntry();
+                            if (isDropDownOpen && highlightedEntry) {
+                                selectEntry(highlightedEntry, true);
+                            } else if (config.allowFreeText) {
+                                selectEntry(me.getSelectedEntry(), true);
+                            }
+                            closeDropDown();
+                            hideEditor();
+                        }
                     } else if (e.which == keyCodes.escape) {
+                        e.preventDefault(); // prevent ie from doing its text field magic...
+                        if (!(editorContainsFreeText() && isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
+                            hideEditor();
+                            $editor.val("");
+                            entries = null; // so we will query again when we combobox is re-focused
+                            selectEntry(lastCommittedValue, false);
+                        }
                         closeDropDown();
-                        clearEditorIfNotContainsFreeText();
-                        hideEditorIfNotContainsFreeText();
                     } else {
-                        showEditor();
+                        if (!isEditorVisible) {
+                            showEditor();
+                            $editor.select();
+                        }
                         openDropDown();
                         query(1);
                     }
                 })
                 .keyup(function (e) {
                     if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
-                        selectEntry(null);
+                        selectEntry(null, false);
                     }
                 })
                 .mousedown(function () {
@@ -226,14 +250,14 @@
             treeBox.$.change(function () {
                 var selectedTreeBoxEntry = treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
-                    selectEntry(selectedTreeBoxEntry);
+                    selectEntry(selectedEntry, true, TrivialComponents.objectEquals(selectedEntry, lastCommittedValue));
                     treeBox.setSelectedEntry(null);
                     closeDropDown();
                 }
-                hideEditorIfNotContainsFreeText();
+                hideEditor();
             });
 
-            selectEntry(config.selectedEntry, true);
+            selectEntry(config.selectedEntry, true, true);
 
             $selectedEntryWrapper.click(function () {
                 showEditor();
@@ -262,11 +286,11 @@
             }
 
             function fireChangeEvents(entry) {
-                $originalInput.triggerHandler("change"); // do not bubble this event!
+                $originalInput.trigger("change");
                 me.onSelectedEntryChanged.fire(entry);
             }
 
-            function selectEntry(entry, muteEvent) {
+            function selectEntry(entry, commit, muteEvent) {
                 if (entry == null) {
                     if (config.valueProperty) {
                         $originalInput.val("");
@@ -286,8 +310,11 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(entry[config.inputTextProperty]);
                 }
-                if (!muteEvent) {
-                    fireChangeEvents(entry);
+                if (commit) {
+                    lastCommittedValue = entry;
+                    if (!muteEvent) {
+                        fireChangeEvents(entry);
+                    }
                 }
             }
 
@@ -310,20 +337,9 @@
                 isEditorVisible = true;
             }
 
-            function clearEditorIfNotContainsFreeText() {
-                if (!config.allowFreeText && !isEntrySelected() && ($originalInput.val().length > 0 || $editor.val().length > 0)) {
-                    $originalInput.val("");
-                    $editor.val("");
-                    entries = null; // so we will query again when we combobox is re-focused
-                    fireChangeEvents(null);
-                }
-            }
-
-            function hideEditorIfNotContainsFreeText() {
-                if (!(config.allowFreeText && $editor.val().length > 0 && !isEntrySelected())) {
-                    hideEditor();
-                }
-            }
+            var editorContainsFreeText = function () {
+                return config.allowFreeText && $editor.val().length > 0 && !isEntrySelected();
+            };
 
             function hideEditor() {
                 $editor.width(0).height(0);
@@ -412,7 +428,7 @@
 
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
                 if (nonSelectedEditorValue.length > 0) {
-                    treeBox.highlightTextMatches(nonSelectedEditorValue);
+                    treeBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
                     treeBox.highlightNextMatchingEntry(highlightDirection);
                 } else {
                     treeBox.highlightNextEntry(highlightDirection);
@@ -439,7 +455,9 @@
                     return selectedEntryToReturn;
                 }
             };
-            this.selectEntry = selectEntry;
+            this.selectEntry = function(entry, muteEvent) {
+                selectEntry(entry, true, muteEvent);
+            };
             this.updateChildren = treeBox.updateChildren;
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;

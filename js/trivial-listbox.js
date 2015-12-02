@@ -62,6 +62,7 @@
             }
 
             function updateEntryElements(entries) {
+                $entryList.detach();
                 $entryList.empty();
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
@@ -93,6 +94,7 @@
                 } else {
                     $entryList.append(config.noEntriesTemplate);
                 }
+                $entryList.appendTo($listBox);
             }
 
             function updateEntries(newEntries, highlightDirection) {

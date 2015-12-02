@@ -136,7 +136,7 @@
             }
 
             function updateTreeEntryElements(entries) {
-                $tree.remove();
+                $tree.detach();
                 $tree = $('<div class="tr-tree-entryTree"></div>');
 
                 if (entries.length > 0) {
