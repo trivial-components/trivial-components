@@ -296,6 +296,20 @@
                 p.every(function (i) { return objectEquals(x[i], y[i]); });
         }
 
+        function formatNumber(number, precision, decimalSeparator, thousandsSeparator) {
+            if (number == null || isNaN(number)) {
+                return "";
+            }
+            var numberString = Number(number).toFixed(precision);
+            var separatorIndex = numberString.indexOf('.');
+            numberString = numberString.replace('.', decimalSeparator);
+
+            var integerPart = numberString.substring(0, separatorIndex === -1 ? numberString.length : separatorIndex);
+            var rest = numberString.substring(separatorIndex === -1 ? numberString.length : separatorIndex, numberString.length);
+            var formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
+            return formattedIntegerPart + rest;
+        }
+
         return {
             image2LinesTemplate: image2LinesTemplate,
             roundImage2LinesColorBubbleTemplate: roundImage2LinesColorBubbleTemplate,
@@ -316,7 +330,8 @@
             selectElementContents: selectElementContents,
             escapeSpecialRegexCharacter: escapeSpecialRegexCharacter,
             Event: Event,
-            objectEquals: objectEquals
+            objectEquals: objectEquals,
+            formatNumber: formatNumber
 
             //findTreeNodes: findTreeNodes,
             //findTreeNodeById: findTreeNodeById,

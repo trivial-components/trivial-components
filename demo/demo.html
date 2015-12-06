@@ -436,14 +436,17 @@ include exclude forcer:
             },
             selectedEntry: {
                 code: 'EUR'
-            }
+            }, decimalPrecision: 3,
+            decimalSeparator: ',',
+            thousandsSeparator: '.',
+            allowNoValue: false
         });
         trivialUnitBox.$.on('change', function () {
-            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
-            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
+//            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
+//            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
         });
         $('#unitBox').on('change', function () {
-            console.log($(this).val());
+//            console.log($(this).val());
         });
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),

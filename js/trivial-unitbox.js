@@ -38,8 +38,10 @@
             var config = $.extend({
                 unitValueProperty: 'code',
                 idProperty: 'code',
-                decimalSeparator: '.',
                 decimalPrecision: 2,
+                decimalSeparator: '.',
+                thousandsSeparator: ',',
+                allowNoValue: false,
                 unitDisplayPosition: 'right', // right or left
                 inputTextProperty: 'code',
                 template: TrivialComponents.currency2LineTemplate,
@@ -54,8 +56,6 @@
                 queryFunction: null, // defined below...
                 queryOnNonNumberFields: true,
                 openDropdownOnEditorClick: false,
-                autoComplete: true,
-                autoCompleteDelay: 0,
                 showTrigger: true,
                 matchingOptions: {
                     matchingMode: 'prefix-word',
@@ -71,11 +71,7 @@
             var entries = config.entries;
             var selectedEntry = null;
             var blurCausedByClickInsideComponent = false;
-            var autoCompleteTimeoutId = -1;
-            var doNoAutoCompleteBecauseBackspaceWasPressed = false;
-            var numberRegex = new RegExp('\\d+(?:\\' + config.decimalSeparator + '\\d*)?');
-            var queryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ]');
-            var lastQueryCharacterRegex = new RegExp('[^\\d\\' + config.decimalSeparator + ' ](?=[\\d\\' + config.decimalSeparator + ' ]*$)');
+            var numberRegex = new RegExp('\\d*\\' + config.decimalSeparator + '?\\d*', 'g');
 
             var $spinners = $();
             var $originalInput = $(originalInput).addClass("tr-original-input");
@@ -108,6 +104,7 @@
                         // do nothing!
                     } else {
                         $unitBox.addClass('focus');
+                        cleanupEditorValue();
                     }
                 })
                 .blur(function () {
@@ -115,7 +112,7 @@
                         $editor.focus();
                     } else {
                         $unitBox.removeClass('focus');
-                        cleanUpEditorValue();
+                        formatEditorValue();
                         closeDropDown();
                     }
                 })
@@ -131,15 +128,10 @@
                         return; // let the user navigate freely left and right...
                     }
 
-                    if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
-                        doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
-                    }
-
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (isDropDownOpen) {
                             listBox.highlightNextEntry(direction);
-                            autoCompleteIfPossible(config.autoCompleteDelay);
                         } else {
                             openDropDown();
                             query(direction);
@@ -151,11 +143,17 @@
                         closeDropDown();
                     } else if (e.which == keyCodes.escape) {
                         closeDropDown();
-                        cleanUpEditorValue();
+                        cleanupEditorValue();
                     } else if (!e.shiftKey && keyCodes.numberKeys.indexOf(e.which) != -1) {
                         var numberPart = getEditorValueNumberPart();
-                        var decimalSeparatorIndex = numberPart.indexOf(config.decimalSeparator);
-                        if (decimalSeparatorIndex != -1 && numberPart.length - (decimalSeparatorIndex + 1) >= config.decimalPrecision) {
+                        var numberPartDecimalSeparatorIndex = numberPart.indexOf(config.decimalSeparator);
+                        var maxDecimalDigitsReached = numberPartDecimalSeparatorIndex != -1 && numberPart.length - (numberPartDecimalSeparatorIndex + 1) >= config.decimalPrecision;
+
+                        var editorValue = $editor.val();
+                        var decimalSeparatorIndex = editorValue.indexOf(config.decimalSeparator);
+                        var selection = window.getSelection();
+                        var wouldAddAnotherDigit = decimalSeparatorIndex !== -1 && $editor[0].selectionEnd > decimalSeparatorIndex && $editor[0].selectionStart === $editor[0].selectionEnd;
+                        if (maxDecimalDigitsReached && wouldAddAnotherDigit) {
                             return false;
                         }
                     }
@@ -221,24 +219,22 @@
             selectEntry(config.selectedEntry || null);
 
             var getQueryString = function () {
-                var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
-                var firstQueryCharacterIndex = nonSelectedEditorValue.search(queryCharacterRegex);
-                var lastQueryCharacterIndex = nonSelectedEditorValue.search(lastQueryCharacterRegex);
-                if (firstQueryCharacterIndex != -1) {
-                    return nonSelectedEditorValue.substring(firstQueryCharacterIndex, lastQueryCharacterIndex + 1);
-                } else {
-                    return "";
-                }
+                return $editor.val().replace(numberRegex, '');
             };
 
-            var getEditorValueNumberPart = function () {
-                var match = numberRegex.exec($editor.val());
-                if (match) {
-                    return match[0];
+            function getEditorValueNumberPart () {
+                var matches = $editor.val().match(numberRegex);
+                var rawNumberPart = matches.join('');
+                var decimalDeparatorIndex = rawNumberPart.indexOf(config.decimalSeparator);
+                var numberPart;
+                if (decimalDeparatorIndex !== -1) {
+                    var decimalPart = rawNumberPart.substring(decimalDeparatorIndex + 1);
+                    numberPart = rawNumberPart.substring(0, decimalDeparatorIndex + 1) + decimalPart.replace(/\D/g, '')
                 } else {
-                    return "";
+                    numberPart = rawNumberPart;
                 }
-            };
+                return numberPart;
+            }
 
             function query(highlightDirection) {
                 var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
@@ -254,8 +250,6 @@
                             listBox.highlightTextMatches(queryString);
                         }
                         listBox.highlightNextEntry(highlightDirection);
-
-                        autoCompleteIfPossible(config.autoCompleteDelay);
 
                         if (isDropDownOpen) {
                             openDropDown(); // only for repositioning!
@@ -282,19 +276,27 @@
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 }
-                cleanUpEditorValue();
+                cleanupEditorValue();
                 if (!doNotFireEvents) {
                     fireChangeEvents();
                 }
             }
 
-            function cleanUpEditorValue() {
-                var match = /[\d\.]+/.exec($editor.val());
-                if (match) {
-                    $editor.val($editor.val().substr(match.index, match[0].length));
-                } else {
+            function formatEditorValue() {
+                var numberPart = getEditorValueNumberPart();
+                if (numberPart) {
+                    var amount = parseFloat(numberPart);
+                    var formattedValue = TrivialComponents.formatNumber(amount, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator);
+                    $editor.val(formattedValue);
+                } else if (config.allowNoValue) {
                     $editor.val("");
+                } else {
+                    $editor.val(TrivialComponents.formatNumber(0, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
                 }
+            }
+
+            function cleanupEditorValue() {
+                $editor.val(getEditorValueNumberPart());
             }
 
             function openDropDown() {
@@ -330,53 +332,16 @@
                 isDropDownOpen = false;
             }
 
-            function getNonAutoCompleteEditorValue() {
-                if ($editor[0].selectionStart < $editor[0].selectionEnd && $editor[0].selectionEnd === $editor.val().length) {
-                    return $editor.val().substring(0, $editor[0].selectionStart);
-                } else {
-                    return $editor.val();
-                }
-            }
-
-            function autoCompleteIfPossible(delay) {
-                if (config.autoComplete) {
-                    clearTimeout(autoCompleteTimeoutId);
-
-                    var highlightedEntry = listBox.getHighlightedEntry();
-                    if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
-                        var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                        if (autoCompletingEntryDisplayValue) {
-                            autoCompleteTimeoutId = setTimeout(function () {
-                                var nonSelectedEditorValue = getNonAutoCompleteEditorValue();
-                                var queryString = getQueryString();
-                                var newEditorValue;
-                                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(queryString.toLowerCase()) === 0) {
-                                    newEditorValue = nonSelectedEditorValue + autoCompletingEntryDisplayValue.substr(queryString.length);
-                                } else {
-                                    newEditorValue = getNonAutoCompleteEditorValue();
-                                }
-                                $editor.val(newEditorValue);
-                                setTimeout(function () { // we need this to guarantee that the editor has been updated...
-                                    $editor[0].setSelectionRange(nonSelectedEditorValue.length, newEditorValue.length);
-                                }, 0);
-                            }, delay || 0);
-                        }
-                    }
-                    doNoAutoCompleteBecauseBackspaceWasPressed = false;
-                }
-            }
-
             var updateOriginalInputValue = function () {
                 if (config.unitDisplayPosition === 'left') {
-                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + ' ' + getAmount());
+                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + TrivialComponents.formatNumber(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));
                 } else {
-                    $originalInput.val(getAmount() + ' ' + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));
+                    $originalInput.val(TrivialComponents.formatNumber(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));
                 }
             };
 
             function getAmount() {
-                var numberMatch = $editor.val().match(numberRegex);
-                return numberMatch && numberMatch[0];
+                return parseFloat(getEditorValueNumberPart() || "0");
             }
 
             function selectUnit(unitIdentifier) {
