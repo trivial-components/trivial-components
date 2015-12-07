@@ -181,11 +181,13 @@
                         cleanupEditorValue();
                         $editor[0].setSelectionRange($editor.val().length - config.decimalPrecision, $editor.val().length - config.decimalPrecision);
                     }
-                    if (getQueryString().length > 0 && config.queryOnNonNumberCharacters) {
-                        openDropDown();
-                        query(1);
-                    } else {
-                        closeDropDown();
+                    if (config.queryOnNonNumberCharacters) {
+                        if (getQueryString().length > 0) {
+                            openDropDown();
+                            query(1);
+                        } else {
+                            closeDropDown();
+                        }
                     }
                 })
                 .mousedown(function () {
