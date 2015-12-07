@@ -439,7 +439,7 @@ include exclude forcer:
             }, decimalPrecision: 3,
             decimalSeparator: ',',
             thousandsSeparator: '.',
-            allowNoValue: false
+            allowNullAmount: true
         });
         trivialUnitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);

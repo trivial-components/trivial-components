@@ -162,7 +162,7 @@
                         if (maxDecimalDigitsReached && wouldAddAnotherDigit) {
                             if (/^\d$/.test(editorValue[selectionEnd])) {
                                 $editor.val(editorValue.substring(0, selectionEnd) + editorValue.substring(selectionEnd + 1)); // override the following digit
-                                
+
                                 $editor[0].setSelectionRange(selectionEnd, selectionEnd);
                             } else {
                                 return false; // cannot add another digit!
@@ -228,7 +228,8 @@
                 }
             });
 
-            $editor.val(config.amount || $originalInput.amount);
+            $editor.val(config.amount || $originalInput.val());
+            formatEditorValue();
             selectEntry(config.selectedEntry || null, true);
 
             var getQueryString = function () {
@@ -321,7 +322,7 @@
 
             function cleanupEditorValue() {
                 if ($editor.val()) {
-                    $editor.val(getEditorValueNumberPart(true));  
+                    $editor.val(getEditorValueNumberPart(true));
                 }
             }
 
@@ -330,8 +331,8 @@
                     return "";
                 }
                 var amountAsString = "" + integerNumber;
-                if (amountAsString.length <= config.decimalPrecision) {
-                    return 0 + config.decimalSeparator + new Array(config.decimalPrecision - amountAsString.length + 1).join("0") + amountAsString;
+                if (amountAsString.length <= precision) {
+                    return 0 + decimalSeparator + new Array(precision - amountAsString.length + 1).join("0") + amountAsString;
                 } else {
                     var integerPart = amountAsString.substring(0, amountAsString.length - precision);
                     var formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
@@ -377,11 +378,11 @@
                 isDropDownOpen = false;
             }
 
-            function updateOriginalInputValue () {
+            function updateOriginalInputValue() {
                 if (config.unitDisplayPosition === 'left') {
-                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));   
+                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));
                 } else {
-                    $originalInput.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));   
+                    $originalInput.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));
                 }
             }
 
@@ -422,12 +423,19 @@
             };
             this.getAmount = getAmount;
             this.setAmount = function (amount) {
+                if (amount != null && amount !== parseInt(amount)) {
+                    throw "TrivialUnitBox: You must specify an integer amount!";
+                }
                 if (amount == null) {
-                    $editor.val("");
+                    if (config.allowNullAmount) {
+                        $editor.val("");
+                    } else {
+                        $editor.val(formatAmount(0, config.decimalPrecision, config.decimalSeparator, ''));
+                    }
                 } else if ($editor.is(":focus")) {
-                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, ''));          
+                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, ''));
                 } else {
-                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));    
+                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
                 }
             };
             this.selectEntry = selectEntry;
