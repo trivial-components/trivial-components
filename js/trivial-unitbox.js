@@ -41,7 +41,6 @@
                 decimalPrecision: 2,
                 decimalSeparator: '.',
                 thousandsSeparator: ',',
-                allowNoValue: false,
                 unitDisplayPosition: 'right', // right or left
                 inputTextProperty: 'code',
                 template: TrivialComponents.currency2LineTemplate,
@@ -54,7 +53,7 @@
                     code: '...'
                 },
                 queryFunction: null, // defined below...
-                queryOnNonNumberFields: true,
+                queryOnNonNumberCharacters: true,
                 openDropdownOnEditorClick: false,
                 showTrigger: true,
                 matchingOptions: {
@@ -82,7 +81,7 @@
             var $selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo($unitBox);
             var $selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo($selectedEntryAndTriggerWrapper);
             if (config.showTrigger) {
-                var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($selectedEntryAndTriggerWrapper);
+                $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($selectedEntryAndTriggerWrapper);
             }
             $selectedEntryAndTriggerWrapper.mousedown(function () {
                 if (isDropDownOpen) {
@@ -151,25 +150,32 @@
 
                         var editorValue = $editor.val();
                         var decimalSeparatorIndex = editorValue.indexOf(config.decimalSeparator);
-                        var selection = window.getSelection();
-                        var wouldAddAnotherDigit = decimalSeparatorIndex !== -1 && $editor[0].selectionEnd > decimalSeparatorIndex && $editor[0].selectionStart === $editor[0].selectionEnd;
+                        var selectionStart = $editor[0].selectionStart;
+                        var selectionEnd = $editor[0].selectionEnd;
+                        var wouldAddAnotherDigit = decimalSeparatorIndex !== -1 && selectionEnd > decimalSeparatorIndex && selectionStart === selectionEnd;
                         if (maxDecimalDigitsReached && wouldAddAnotherDigit) {
-                            return false;
+                            if (/^\d$/.test(editorValue[selectionEnd])) {
+                                $editor.val(editorValue.substring(0, selectionEnd) + editorValue.substring(selectionEnd + 1)); // override the following digit
+                                
+                                $editor[0].setSelectionRange(selectionEnd, selectionEnd);
+                            } else {
+                                return false; // cannot add another digit!
+                            }
                         }
-                    }
-                })
-                .keypress(function (e) {
-                    var character = String.fromCharCode(e.which);
-                    if (character >= '0' && character <= '9') {
-                        // was number input...
                     }
                 })
                 .keyup(function (e) {
                     if (keyCodes.specialKeys.indexOf(e.which) != -1
                         && e.which != keyCodes.backspace
                         && e.which != keyCodes.delete) {
-                        // ignore
-                    } else if (getQueryString().length > 0 && config.queryOnNonNumberFields) {
+                        return; // ignore
+                    }
+                    var hasDoubleDecimalSeparator = new RegExp("(?:\\" + config.decimalSeparator + ".*)" + "\\" + config.decimalSeparator, "g").test($editor.val());
+                    if (hasDoubleDecimalSeparator) {
+                        cleanupEditorValue();
+                        $editor[0].setSelectionRange($editor.val().length - config.decimalPrecision, $editor.val().length - config.decimalPrecision);
+                    }
+                    if (getQueryString().length > 0 && config.queryOnNonNumberCharacters) {
                         openDropDown();
                         query(1);
                     } else {
@@ -184,9 +190,10 @@
                         }
                     }
                 }).change(function () {
-                updateOriginalInputValue();
-                fireChangeEvents();
-            });
+                    updateOriginalInputValue();
+                    fireChangeEvents();
+                }
+            );
 
             $unitBox.add($dropDown).mousedown(function () {
                 if ($editor.is(":focus")) {
@@ -222,18 +229,23 @@
                 return $editor.val().replace(numberRegex, '');
             };
 
-            function getEditorValueNumberPart () {
+            function getEditorValueNumberPart(fillupDecimals) {
                 var matches = $editor.val().match(numberRegex);
                 var rawNumberPart = matches.join('');
                 var decimalDeparatorIndex = rawNumberPart.indexOf(config.decimalSeparator);
-                var numberPart;
+                var integerPart;
+                var fractionalPart;
                 if (decimalDeparatorIndex !== -1) {
-                    var decimalPart = rawNumberPart.substring(decimalDeparatorIndex + 1);
-                    numberPart = rawNumberPart.substring(0, decimalDeparatorIndex + 1) + decimalPart.replace(/\D/g, '')
+                    integerPart = rawNumberPart.substring(0, decimalDeparatorIndex);
+                    fractionalPart = rawNumberPart.substring(decimalDeparatorIndex + 1, rawNumberPart.length).replace(/\D/g, '');
                 } else {
-                    numberPart = rawNumberPart;
+                    integerPart = rawNumberPart;
+                    fractionalPart = "";
                 }
-                return numberPart;
+                if (fillupDecimals) {
+                    fractionalPart = (fractionalPart + new Array(config.decimalPrecision + 1).join("0")).substr(0, config.decimalPrecision);
+                }
+                return integerPart + config.decimalSeparator + fractionalPart;
             }
 
             function query(highlightDirection) {
@@ -283,20 +295,30 @@
             }
 
             function formatEditorValue() {
-                var numberPart = getEditorValueNumberPart();
+                var numberPart = getEditorValueNumberPart(true);
                 if (numberPart) {
-                    var amount = parseFloat(numberPart);
-                    var formattedValue = TrivialComponents.formatNumber(amount, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator);
-                    $editor.val(formattedValue);
-                } else if (config.allowNoValue) {
-                    $editor.val("");
+                    $editor.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
                 } else {
-                    $editor.val(TrivialComponents.formatNumber(0, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
+                    $editor.val(formatAmount(0, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));   
                 }
             }
 
             function cleanupEditorValue() {
-                $editor.val(getEditorValueNumberPart());
+                if ($editor.val()) {
+                    $editor.val(getEditorValueNumberPart(true));  
+                }
+            }
+
+            function formatAmount(integerNumber, precision, decimalSeparator, thousandsSeparator) {
+                var amountAsString = "" + integerNumber;
+                if (amountAsString.length <= config.decimalPrecision) {
+                    return 0 + config.decimalSeparator + new Array(config.decimalPrecision - amountAsString.length).join("0") + amountAsString;
+                } else {
+                    var integerPart = amountAsString.substring(0, amountAsString.length - precision);
+                    var formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
+                    var fractionalPart = amountAsString.substr(amountAsString.length - precision, precision);
+                    return formattedIntegerPart + decimalSeparator + fractionalPart;
+                }
             }
 
             function openDropDown() {
@@ -334,14 +356,14 @@
 
             var updateOriginalInputValue = function () {
                 if (config.unitDisplayPosition === 'left') {
-                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + TrivialComponents.formatNumber(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));
+                    $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));   
                 } else {
-                    $originalInput.val(TrivialComponents.formatNumber(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));
+                    $originalInput.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));   
                 }
             };
 
             function getAmount() {
-                return parseFloat(getEditorValueNumberPart() || "0");
+                return parseInt(getEditorValueNumberPart(true).replace(/\D/g, ""));
             }
 
             function selectUnit(unitIdentifier) {
@@ -372,7 +394,13 @@
             };
             this.getAmount = getAmount;
             this.setAmount = function (amount) {
-                $editor.val(amount);
+                if (amount == null) {
+                    $editor.val("");
+                } else if ($editor.is(":focus")) {
+                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, ''));          
+                } else {
+                    $editor.val(formatAmount(amount, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));    
+                }
             };
             this.selectEntry = selectEntry;
             this.selectUnit = selectUnit;

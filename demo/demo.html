@@ -442,11 +442,8 @@ include exclude forcer:
             allowNoValue: false
         });
         trivialUnitBox.$.on('change', function () {
-//            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
-//            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
-        });
-        $('#unitBox').on('change', function () {
-//            console.log($(this).val());
+            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
+            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
         });
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),
