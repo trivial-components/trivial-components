@@ -34,17 +34,20 @@
         var keyCodes = TrivialComponents.keyCodes;
 
         function TrivialUnitBox(originalInput, options) {
+            var me = this;
+
             options = options || {};
             var config = $.extend({
                 unitValueProperty: 'code',
-                idProperty: 'code',
+                unitIdProperty: 'code',
                 decimalPrecision: 2,
                 decimalSeparator: '.',
                 thousandsSeparator: ',',
                 unitDisplayPosition: 'right', // right or left
-                inputTextProperty: 'code',
+                allowNullAmount: true,
                 template: TrivialComponents.currency2LineTemplate,
                 selectedEntryTemplate: TrivialComponents.currencySingleLineShortTemplate,
+                amount: null,
                 selectedEntry: undefined,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
@@ -64,6 +67,9 @@
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
+
+            this.onChange = new TrivialComponents.Event();
+            this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var listBox;
             var isDropDownOpen = false;
@@ -212,40 +218,43 @@
             });
 
             listBox = $dropDown.TrivialListBox(config);
-            listBox.$.change(function () {
-                var selectedListBoxEntry = listBox.getSelectedEntry();
-                if (selectedListBoxEntry) {
-                    selectEntry(selectedListBoxEntry, true);
+            listBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
+                if (selectedEntry) {
+                    selectEntry(selectedEntry, false);
                     listBox.selectEntry(null);
-                    updateOriginalInputValue();
                     closeDropDown();
-                    fireChangeEvents();
                 }
             });
 
-            selectEntry(config.selectedEntry || null);
+            $editor.val(config.amount || $originalInput.amount);
+            selectEntry(config.selectedEntry || null, true);
 
             var getQueryString = function () {
                 return $editor.val().replace(numberRegex, '');
             };
 
             function getEditorValueNumberPart(fillupDecimals) {
-                var matches = $editor.val().match(numberRegex);
-                var rawNumberPart = matches.join('');
-                var decimalDeparatorIndex = rawNumberPart.indexOf(config.decimalSeparator);
+                var rawNumber = $editor.val().match(numberRegex).join('');
+                var decimalDeparatorIndex = rawNumber.indexOf(config.decimalSeparator);
+
                 var integerPart;
                 var fractionalPart;
                 if (decimalDeparatorIndex !== -1) {
-                    integerPart = rawNumberPart.substring(0, decimalDeparatorIndex);
-                    fractionalPart = rawNumberPart.substring(decimalDeparatorIndex + 1, rawNumberPart.length).replace(/\D/g, '');
+                    integerPart = rawNumber.substring(0, decimalDeparatorIndex);
+                    fractionalPart = rawNumber.substring(decimalDeparatorIndex + 1, rawNumber.length).replace(/\D/g, '');
                 } else {
-                    integerPart = rawNumberPart;
+                    integerPart = rawNumber;
                     fractionalPart = "";
                 }
-                if (fillupDecimals) {
-                    fractionalPart = (fractionalPart + new Array(config.decimalPrecision + 1).join("0")).substr(0, config.decimalPrecision);
+
+                if (integerPart.length == 0 && fractionalPart == 0) {
+                    return "";
+                } else {
+                    if (fillupDecimals) {
+                        fractionalPart = (fractionalPart + new Array(config.decimalPrecision + 1).join("0")).substr(0, config.decimalPrecision);
+                    }
+                    return integerPart + config.decimalSeparator + fractionalPart;
                 }
-                return integerPart + config.decimalSeparator + fractionalPart;
             }
 
             function query(highlightDirection) {
@@ -270,9 +279,18 @@
                 });
             }
 
+            function fireSelectedEntryChangedEvent() {
+                me.onSelectedEntryChanged.fire(selectedEntry);
+            }
+
             function fireChangeEvents() {
                 $originalInput.trigger("change");
-                $unitBox.trigger("change");
+                me.onChange.fire({
+                    unit: selectedEntry != null ? selectedEntry[config.unitValueProperty] : null,
+                    unitEntry: selectedEntry,
+                    amount: getAmount(),
+                    amountAsFloatingPointNumber: parseFloat(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator))
+                });
             }
 
             function selectEntry(entry, doNotFireEvents) {
@@ -289,18 +307,14 @@
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 }
                 cleanupEditorValue();
+                updateOriginalInputValue();
                 if (!doNotFireEvents) {
-                    fireChangeEvents();
+                    fireSelectedEntryChangedEvent();
                 }
             }
 
             function formatEditorValue() {
-                var numberPart = getEditorValueNumberPart(true);
-                if (numberPart) {
-                    $editor.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
-                } else {
-                    $editor.val(formatAmount(0, config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));   
-                }
+                $editor.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, config.thousandsSeparator));
             }
 
             function cleanupEditorValue() {
@@ -310,9 +324,12 @@
             }
 
             function formatAmount(integerNumber, precision, decimalSeparator, thousandsSeparator) {
+                if (integerNumber == null || isNaN(integerNumber)) {
+                    return "";
+                }
                 var amountAsString = "" + integerNumber;
                 if (amountAsString.length <= config.decimalPrecision) {
-                    return 0 + config.decimalSeparator + new Array(config.decimalPrecision - amountAsString.length).join("0") + amountAsString;
+                    return 0 + config.decimalSeparator + new Array(config.decimalPrecision - amountAsString.length + 1).join("0") + amountAsString;
                 } else {
                     var integerPart = amountAsString.substring(0, amountAsString.length - precision);
                     var formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
@@ -321,8 +338,7 @@
                 }
             }
 
-            function openDropDown() {
-                $unitBox.addClass("open");
+            var repositionDropDown = function () {
                 $dropDown
                     .show()
                     .position({
@@ -345,6 +361,11 @@
                         }
                     })
                     .width($unitBox.width());
+            };
+
+            function openDropDown() {
+                $unitBox.addClass("open");
+                repositionDropDown();
                 isDropDownOpen = true;
             }
 
@@ -354,21 +375,26 @@
                 isDropDownOpen = false;
             }
 
-            var updateOriginalInputValue = function () {
+            function updateOriginalInputValue () {
                 if (config.unitDisplayPosition === 'left') {
                     $originalInput.val((selectedEntry ? selectedEntry[config.unitValueProperty] : '') + formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, ''));   
                 } else {
                     $originalInput.val(formatAmount(getAmount(), config.decimalPrecision, config.decimalSeparator, '') + (selectedEntry ? selectedEntry[config.unitValueProperty] : ''));   
                 }
-            };
+            }
 
             function getAmount() {
-                return parseInt(getEditorValueNumberPart(true).replace(/\D/g, ""));
+                var editorValueNumberPart = getEditorValueNumberPart(false);
+                if (editorValueNumberPart.length === 0 && config.allowNullAmount) {
+                    return null;
+                } else {
+                    return parseInt(getEditorValueNumberPart(true).replace(/\D/g, ""));
+                }
             }
 
             function selectUnit(unitIdentifier) {
                 selectEntry(entries.filter(function (entry) {
-                    return entry[config.idProperty] === unitIdentifier;
+                    return entry[config.unitIdProperty] === unitIdentifier;
                 })[0], true);
             }
 

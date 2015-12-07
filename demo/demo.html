@@ -441,9 +441,9 @@ include exclude forcer:
             thousandsSeparator: '.',
             allowNoValue: false
         });
-        trivialUnitBox.$.on('change', function () {
-            console.log("trivialUnitBox.getAmount(): " + trivialUnitBox.getAmount());
-            console.log("trivialUnitBox.getSelectedUnit(): " + trivialUnitBox.getSelectedUnit());
+        trivialUnitBox.onChange.addListener(function (data) {
+            console.log("trivialUnitBox.amount: " + data.amount);
+            console.log("trivialUnitBox.unit: " + data.unit);
         });
         $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),
