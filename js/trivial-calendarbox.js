@@ -59,10 +59,21 @@
 
             var $clockDisplay = $('<div class="tr-clock-display"/>')
                 .appendTo($calendarBox)
-                .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> <circle class="clockcircle" cx="50" cy="50" r="45"/> <g class="ticks" > <line x1="50" y1="5.000" x2="50.00" y2="10.00"/> <line x1="72.50" y1="11.03" x2="70.00" y2="15.36"/> <line x1="88.97" y1="27.50" x2="84.64" y2="30.00"/> <line x1="95.00" y1="50.00" x2="90.00" y2="50.00"/> <line x1="88.97" y1="72.50" x2="84.64" y2="70.00"/> <line x1="72.50" y1="88.97" x2="70.00" y2="84.64"/> <line x1="50.00" y1="95.00" x2="50.00" y2="90.00"/> <line x1="27.50" y1="88.97" x2="30.00" y2="84.64"/> <line x1="11.03" y1="72.50" x2="15.36" y2="70.00"/> <line x1="5.000" y1="50.00" x2="10.00" y2="50.00"/> <line x1="11.03" y1="27.50" x2="15.36" y2="30.00"/> <line x1="27.50" y1="11.03" x2="30.00" y2="15.36"/> </g> <g class="numbers"> <text x="50" y="22">12</text> <text x="85" y="55">3</text> <text x="50" y="88">6</text> <text x="15" y="55">9</text> </g> <g class="hands"> <line class="minutehand" x1="50" y1="50" x2="50" y2="20"/> <line class="hourhand" x1="50" y1="50" x2="50" y2="26"/> </g> ' +
+                .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> ' +
+                '<circle class="clockcircle" cx="50" cy="50" r="45"/> ' +
+                '<g class="ticks" > ' +
+                ' <line x1="50" y1="5.000" x2="50.00" y2="10.00"/> <line x1="72.50" y1="11.03" x2="70.00" y2="15.36"/> <line x1="88.97" y1="27.50" x2="84.64" y2="30.00"/> <line x1="95.00" y1="50.00" x2="90.00" y2="50.00"/> <line x1="88.97" y1="72.50" x2="84.64" y2="70.00"/> <line x1="72.50" y1="88.97" x2="70.00" y2="84.64"/> <line x1="50.00" y1="95.00" x2="50.00" y2="90.00"/> <line x1="27.50" y1="88.97" x2="30.00" y2="84.64"/> <line x1="11.03" y1="72.50" x2="15.36" y2="70.00"/> <line x1="5.000" y1="50.00" x2="10.00" y2="50.00"/> <line x1="11.03" y1="27.50" x2="15.36" y2="30.00"/> <line x1="27.50" y1="11.03" x2="30.00" y2="15.36"/> ' +
+                '</g> ' +
+                '<g class="numbers">' +
+                ' <text x="50" y="22">12</text> <text x="85" y="55">3</text> <text x="50" y="88">6</text> <text x="15" y="55">9</text> ' +
+                '</g> ' +
+                '<g class="hands">' +
+                ' <line class="minutehand" x1="50" y1="50" x2="50" y2="20"/>' +
+                ' <line class="hourhand" x1="50" y1="50" x2="50" y2="26"/> ' +
+                '</g> ' +
                 '<g class="am-pm-box">' +
-                '<rect x="58" y="59" width="20" height="15"/>' +
-                '<text class="amPmText" x="60" y="70" >??</text>' +
+                ' <rect x="58" y="59" width="20" height="15"/>' +
+                ' <text class="am-pm-text" x="60" y="70" >??</text>' +
                 '</g>' +
                 '</svg>'
             ).append('<div class="digital-time-display"><div class="hour-wrapper">' +
@@ -72,7 +83,7 @@
                 '</div></div>');
             var $hourHand = $clockDisplay.find('.hourhand');
             var $minuteHand = $clockDisplay.find('.minutehand');
-            var $amPmText = $clockDisplay.find('.amPmText');
+            var $amPmText = $clockDisplay.find('.am-pm-text');
             var $digitalTimeHourDisplayWrapper = $clockDisplay.find('.digital-time-display .hour-wrapper');
             var $digitalTimeHourDisplay = $clockDisplay.find('.digital-time-display .hour');
             $digitalTimeHourDisplayWrapper.click(setKeyboardNavigationState.bind(this, "hour"));
@@ -242,7 +253,6 @@
             this.setMinute = setMinute;
 
             function navigate(unit /* year, month, day, hour, minute*/, direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
-                console.log(unit + direction);
                 if (unit == 'year') {
                     if (direction == 'down' || direction == 'left') {
                         setYear(selectedDate.year() - 1);
