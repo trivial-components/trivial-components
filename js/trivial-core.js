@@ -124,7 +124,13 @@
             num_lock: 144,
             scroll_lock: 145,
             specialKeys: [8, 9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 91, 92, 93, 144, 145],
-            numberKeys: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105]
+            numberKeys: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
+            isSpecialKey: function(keyCode) {
+                return this.specialKeys.indexOf(keyCode) != -1;
+            },
+            isDigitKey: function(keyCode) {
+                return this.numberKeys.indexOf(keyCode) != -1;
+            }
         };
 
         function isModifierKey(e) {

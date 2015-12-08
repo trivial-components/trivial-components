@@ -36,7 +36,7 @@
         function TrivialCalendarComboBox(originalInput, options) {
             options = options || {};
             var config = $.extend({
-                selectedDate: null,
+                selectedDate: moment(),
                 firstDayOfWeek: 1,
                 showTrigger: true
             }, options);
@@ -47,7 +47,7 @@
             var selectedDate = null;
             var blurCausedByClickInsideComponent = null;
             var blurCausedByInputFieldSwitching = false;
-            var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var inputTextOnKeyDown;
 
             var $originalInput = $(originalInput);
             var $calendarComboBox = $('<div class="tr-calendarcombobox tr-input-wrapper"/>').insertAfter($originalInput);
@@ -76,24 +76,9 @@
             var $hourInput = $('<span class="hourInput tr-formatted-input-section tr-2-chars right" contenteditable="true" data-maxlength="2" data-placeholder="ss"></span>').appendTo($editor);
             $editor.append('<span class="separator">:</span>');
             var $minuteInput = $('<span class="minuteInput tr-formatted-input-section tr-2-chars right" contenteditable="true" data-maxlength="2" data-placeholder="mm"></span>').appendTo($editor);
-            $editor.append('<span class="separator"> &nbsp;&nbsp; </span>');
-            var $timeZoneInput = $('<span class="timeZoneInput tr-formatted-input-section tr-3-chars right" contenteditable="true" data-maxlength="3" data-placeholder="ZZ">CET</span>').appendTo($editor);
 
             var $inputFields = $editor.find("[contenteditable='true']");
-            $inputFields.not($inputFields.first()).attr("tabindex", "-1");
-
-            $editor.find(".tr-formatted-input-section")
-                .on("keydown", function (e) {
-                    var $this = $(this);
-                    var isSpecialKey = keyCodes.specialKeys.indexOf(e.which) != -1;
-                    var maxLengthReached = $this.text().length >= parseInt($this.attr("data-maxlength"));
-                    var wouldAddNewCharacter = window.getSelection().anchorOffset === window.getSelection().focusOffset;
-                    if (!isSpecialKey && maxLengthReached && wouldAddNewCharacter) {
-                        e.preventDefault();
-                    } else if (!isSpecialKey) {
-                        // TODO update dropdown!!!! ##################################################
-                    }
-                });
+            //$inputFields.not($inputFields.first()).attr("tabindex", "-1");
 
             $originalInput.addClass("tr-original-input");
 
@@ -125,12 +110,14 @@
                     }
                 })
                 .keydown(function (e) {
-                    if (e.which == keyCodes.tab || TrivialComponents.isModifierKey(e)) {
-                        return; // tab or modifier key was pressed...
-                    }
-
-                    if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
-                        doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
+                    inputTextOnKeyDown = $(this).text();
+                    if (TrivialComponents.isModifierKey(e) || e.altKey | e.ctrlKey | e.metaKey) {
+                        return; // modifier key or keyboard shortcut was pressed...
+                    } else if (e.which == keyCodes.tab) {
+                        return !navigateToNextInputField(e.shiftKey ? -1 : 1, true);
+                    } else if (!keyCodes.isSpecialKey(e.which) && !keyCodes.isDigitKey(e.which)) {
+                        navigateToNextInputField(1, true);
+                        return false;     debugger;
                     }
 
                     if (e.which == keyCodes.up_arrow) {
@@ -141,7 +128,7 @@
                             dropdownBox.navigate('up');
                         }
                         TrivialComponents.selectElementContents(e.target, 0, $(e.target).text().length);
-                        return false;
+                        return false;       debugger;
                     } else if (e.which == keyCodes.down_arrow) {
                         openDropDown();
                         if (e.target == $dayInput[0]) {
@@ -150,23 +137,14 @@
                             dropdownBox.navigate('down');
                         }
                         TrivialComponents.selectElementContents(e.target, 0, $(e.target).text().length);
-                        return false;
+                        return false;        debugger;
                     } else if (e.which == keyCodes.left_arrow) {
-                        var fieldIndex = $inputFields.get().indexOf(e.target);
-                        if (fieldIndex != 0 && window.getSelection().anchorOffset == 0) {
-                            var targetField = $inputFields.eq(fieldIndex - 1);
-                            blurCausedByInputFieldSwitching = true;
-                            targetField.focus();
-                            TrivialComponents.selectElementContents(targetField[0], targetField.text().length);
-                            return false;
+                        if (window.getSelection().anchorOffset == 0 && window.getSelection().focusOffset == 0) {
+                            return !navigateToNextInputField(-1);
                         }
                     } else if (e.which == keyCodes.right_arrow) {
-                        var fieldIndex = $inputFields.get().indexOf(e.target);
-                        if (fieldIndex != $inputFields.length - 1 && window.getSelection().anchorOffset == $(e.target).text().length) {
-                            var targetField = $inputFields.eq($inputFields.get().indexOf(e.target) + 1);
-                            blurCausedByInputFieldSwitching = true;
-                            targetField.focus();
-                            return false;
+                        if (window.getSelection().anchorOffset == $(e.target).text().length && window.getSelection().focusOffset == $(e.target).text().length) {
+                            return !navigateToNextInputField(1);
                         }
                     } else if (isDropDownOpen && e.which == keyCodes.enter) {
                         closeDropDown();
@@ -175,10 +153,47 @@
                         closeDropDown();
                         clearEditorIfNotContainsFreeText();
                     } else {
-                        openDropDown();
+                        var $this = $(this);
+                        var isSpecialKey = keyCodes.isSpecialKey(e.which);
+                        var maxLengthReached = $this.text().length >= parseInt($this.attr("data-maxlength"));
+                        var wouldAddNewCharacter = window.getSelection().anchorOffset === window.getSelection().focusOffset;
+                        if (!isSpecialKey && maxLengthReached && wouldAddNewCharacter) {
+                            e.preventDefault();
+                        } else {
+                            openDropDown();
+                        }
+                    }
+                })
+                .keyup(function(e) {
+                    if (e.keyCode !== keyCodes.up_arrow && e.keyCodes !== keyCodes.down_arrow && e.keyCode !== keyCodes.left_arrow && e.keyCodes !== keyCodes.right_arrow) {
+                        updateDropdown();
                     }
                 });
 
+            function navigateToNextInputField(direction, selectText) {
+                var fieldIndex = $inputFields.get().indexOf(document.activeElement);
+                var newFieldIndex = fieldIndex + direction;
+                if (newFieldIndex >= 0 && newFieldIndex < $inputFields.length) {
+                    var targetField = $inputFields.eq(newFieldIndex);
+                    blurCausedByInputFieldSwitching = true;
+                    targetField.focus();
+                    if (selectText) {
+                        TrivialComponents.selectElementContents(targetField[0], 0, targetField.text().length);
+                    } else if (direction == -1) {
+                        TrivialComponents.selectElementContents(targetField[0], targetField.text().length);
+                    } else {
+                        TrivialComponents.selectElementContents(targetField[0], 0);
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function updateDropdown() {
+                var mom = moment.utc().year($yearInput.text()).month(parseInt(($monthInput.text()) || 0) - 1).date($dayInput.text()).hour($hourInput.text()).minute($minuteInput.text());
+                dropdownBox.setSelectedDate(mom);
+            }
 
             $editor.prependTo($calendarComboBox)
                 .mousedown(function (e) {
@@ -254,7 +269,9 @@
                 return s;
             }
 
+            selectedDate = config.selectedDate;
             dropdownBox.setSelectedDate(config.selectedDate || null);
+            updateInputFieldValues();
 
             function fireChangeEvents() {
                 $originalInput.trigger("change");
@@ -297,7 +314,7 @@
             this.$ = $calendarComboBox;
             $calendarComboBox[0].trivialCalendarComboBox = this;
 
-            this.destroy = function() {
+            this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($calendarComboBox);
                 $calendarComboBox.remove();
                 $dropDown.remove();

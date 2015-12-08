@@ -44,7 +44,7 @@
     .generate-char-widths(10);
     .generate-char-widths(@n, @i: 1) when (@i =< @n) {
       .tr-formatted-input-section.tr-@{i}-chars {
-        min-width: (1em + @i * 0.5em);
+        min-width: ~"calc(" @i * 1ch ~" + 6px)";
       }
       .generate-char-widths(@n, (@i + 1));
     }

@@ -176,7 +176,6 @@
             function setSelectedDate(moment) {
                 selectedDate = moment;
                 updateDisplay();
-                fireChangeEvents();
             }
 
             function setYear(year) {
