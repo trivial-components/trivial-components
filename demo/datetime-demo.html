@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="css/demo.css">
+
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/jquery-ui/ui/position.js"></script>
+    <script src="../bower_components/mustache/mustache.js"></script>
+    <script src="../bower_components/levenshtein/lib/levenshtein.js"></script>
+    <script src="../bower_components/moment/moment.js"></script>
+    <script src="../bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
+    <script src="../js/trivial-core.js"></script>
+    <script src="../js/trivial-highlight.js"></script>
+    <script src="../js/trivial-minimallyScrollTo.js"></script>
+    <script src="../js/trivial-combobox.js"></script>
+    <script src="../js/trivial-listbox.js"></script>
+    <script src="../js/trivial-list.js"></script>
+    <script src="../js/trivial-tagbox.js"></script>
+    <script src="../js/trivial-treebox.js"></script>
+    <script src="../js/trivial-treecombobox.js"></script>
+    <script src="../js/trivial-tree.js"></script>
+    <script src="../js/trivial-unitbox.js"></script>
+    <script src="../js/trivial-calendarbox.js"></script>
+    <script src="../js/trivial-calendarcombobox.js"></script>
+    <script src="../js/trivial-datetimefield.js"></script>
+    <script src="demo.js"></script>
+</head>
+<body>
+
+<form>
+    <div style="width: 400px">
+        <input id="datetimefield" value="2013-02-08 09:30Z">
+    </div>
+</form>
+
+<script>
+    $(function () {
+
+        var dateTimeField = $('#datetimefield').TrivialDateTimeField({
+
+        });
+
+    });
+</script>
+
+
+</body>
+</html>
+
+

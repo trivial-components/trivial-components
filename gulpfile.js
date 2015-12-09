@@ -191,7 +191,7 @@ gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo", "size-report"])
 
 gulp.task('watch', function () {
     livereload.listen();
-    gulp.watch(['less/*.less', 'demo/less/*.less'], ['less', 'less-bootstrap', "less-demo"]);
+    gulp.watch(['less/*.less', 'demo/less/*.less'], ["less-demo", 'less', 'less-bootstrap']);
 });
 
 gulp.task('watch-js', function () {
