@@ -211,6 +211,19 @@
             $activeEditor = $dateEditor;
             setActiveBox(calendarBox);
 
+            function selectHighlightedListBoxEntry () {
+                if (activeBox === dateListBox || activeBox === timeListBox) {
+                    var highlightedEntry = getActiveBox().getHighlightedEntry();
+                    if (isDropDownOpen && highlightedEntry) {
+                        if (getActiveEditor() === $dateEditor) {
+                            setDate(highlightedEntry, true);
+                        } else {
+                            setTime(highlightedEntry, true);
+                        }
+                    }
+                }
+            }
+
             $dateEditor.add($timeEditor)
                 .focus(function () {
                     $dateTimeField.addClass('focus');
@@ -226,16 +239,16 @@
                     if (TrivialComponents.isModifierKey(e)) {
                         return;
                     } else if (e.which == keyCodes.tab) {
-                        var highlightedEntry = getActiveBox().getHighlightedEntry();
-                        if (isDropDownOpen && highlightedEntry) {
-                            if (getActiveEditor() === $dateEditor) {
-                                setDate(highlightedEntry, true);
-                            } else {
-                                setTime(highlightedEntry, true);
-                            }
-                        }
+                        selectHighlightedListBoxEntry();
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
+                        if (getActiveEditor() === $timeEditor && e.which == keyCodes.left_arrow && window.getSelection().focusOffset === 0) {
+                            e.preventDefault();
+                            TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
+                        } else if (getActiveEditor() === $dateEditor && e.which == keyCodes.right_arrow && window.getSelection().focusOffset === $dateEditor.text().length) {
+                            e.preventDefault();
+                            TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
+                        }
                         return; // let the user navigate freely left and right...
                     }
 
@@ -260,14 +273,8 @@
                     } else if (e.which == keyCodes.enter) {
                         if (isDropDownOpen) {
                             e.preventDefault(); // do not submit form
-                            var highlightedEntry = getActiveBox().getHighlightedEntry();
-                            if (isDropDownOpen && highlightedEntry) {
-                                if (getActiveEditor() === $dateEditor) {
-                                    setDate(highlightedEntry, true);
-                                } else {
-                                    setTime(highlightedEntry, true);
-                                }
-                            }
+                            selectHighlightedListBoxEntry();
+                            TrivialComponents.selectElementContents(getActiveEditor()[0], 0, getActiveEditor().text().length);
                             closeDropDown();
                         }
                     } else if (e.which == keyCodes.escape) {
@@ -345,7 +352,7 @@
                 } else {
                     return moment([
                         dateValue.year,
-                        dateValue.month,
+                        dateValue.month - 1,
                         dateValue.day,
                         timeValue.hour,
                         timeValue.minute
@@ -501,7 +508,7 @@
             this.setValue = setValue;
             this.getValue = getValue;
             this.focus = function () {
-                getActiveEditor().select();
+                TrivialComponents.selectElementContents(getActiveEditor()[0], 0, getActiveEditor().text().length);
             };
             this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($dateTimeField);
