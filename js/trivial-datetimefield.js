@@ -31,8 +31,7 @@
         }
     }(function (TrivialComponents, $, Mustache) {
 
-        var dateTemplate = '<div class="tr-template-icon-single-line">'
-            + '<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">'
+        var dateIconTemplate = '<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">'
             + '<g id="layer1">'
             + '<rect class="calendar-symbol-page-background" x="90" y="90" width="360" height="400" ry="3.8"></rect>'
             + '<rect class="calendar-symbol-color" x="90" y="90" width="360" height="100" ry="3.5"></rect>'
@@ -42,18 +41,21 @@
             + '<rect class="calendar-symbol-ring" x="360" y="30" width="40" height="120" ry="30.8"></rect>'
             + '<text class="calendar-symbol-date" x="270" y="415" text-anchor="middle">{{weekDay}}</text>'
             + '</g>'
-            + '</svg>'
-            + '<div class="content-wrapper editor-area">{{completeDateString}}</div>'
+            + '</svg>';
+        var dateTemplate = '<div class="tr-template-icon-single-line">'
+            + dateIconTemplate
+            + '<div class="content-wrapper editor-area">{{displayString}}</div>'
             + '</div>';
-        var timeTemplate = '<div class="tr-template-icon-single-line">' +
-            '<svg class="clock-icon night-{{isNight}}" viewBox="0 0 110 110" width="22" height="22"> ' +
+        var timeIconTemplate = '<svg class="clock-icon night-{{isNight}}" viewBox="0 0 110 110" width="22" height="22"> ' +
             '<circle class="clockcircle" cx="55" cy="55" r="45"/>' +
             '<g class="hands">' +
-            ' <line class="hourhand" x1="55" y1="55" x2="55" y2="35" transform="rotate({{hourAngle}},55,55)"/> ' +
-            ' <line class="minutehand" x1="55" y1="55" x2="55" y2="22" transform="rotate({{minuteAngle}},55,55)"/>' +
+            ' <line class="hourhand" x1="55" y1="55" x2="55" y2="35" {{#hourAngle}}transform="rotate({{hourAngle}},55,55)"{{/hourAngle}}/> ' +
+            ' <line class="minutehand" x1="55" y1="55" x2="55" y2="22" {{#minuteAngle}}transform="rotate({{minuteAngle}},55,55)"{{/minuteAngle}}/>' +
             '</g> ' +
-            '</svg>' +
-            '  <div class="content-wrapper editor-area">{{completeTimeString}}</div>' +
+            '</svg>';
+        var timeTemplate = '<div class="tr-template-icon-single-line">' +
+            timeIconTemplate +
+            '  <div class="content-wrapper editor-area">{{displayString}}</div>' +
             '</div>';
 
         var keyCodes = TrivialComponents.keyCodes;
@@ -75,36 +77,50 @@
 
             var dateListBox;
             var timeListBox;
+            var calendarBox;
             var isDropDownOpen = false;
-            var isDateEditorVisible = false;
-            var isTimeEditorVisible = false;
-            var lastDateQueryString = null;
-            var lastTimeQueryString = null;
-            var selectedDateEntry = null;
-            var selectedTimeEntry = null;
 
-
-            var lastCommittedDate = null; // moment object representing the current value
-            var lastCommittedTime = null; // moment object representing the current value
+            var dateValue = null; // moment object representing the current value
+            var timeValue = null; // moment object representing the current value
 
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
-            var $originalInput = $(originalInput);
-            var $dateTimeField = $('<div class="tr-dateTimeField tr-input-wrapper"/>')
+            var $originalInput = $(originalInput).addClass("tr-original-input");;
+            var $dateTimeField = $('<div class="tr-datetimefield tr-input-wrapper"/>')
                 .addClass(config.editingMode)
                 .insertAfter($originalInput);
 
-            var $selectedDateEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper tr-date-selected-entry-wrapper"/>').appendTo($dateTimeField);
-            var $selectedTimeEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper tr-time-selected-entry-wrapper"/>').appendTo($dateTimeField);
+            var $editorWrapper = $('<div class="tr-editor-wrapper">').appendTo($dateTimeField);
 
-            function getActiveSelectedElementWrapper() {
-                return currentMode == 'date' ? $selectedDateEntryWrapper : $selectedTimeEntryWrapper;
+            var $dateIconWrapper = $('<div class="tr-date-icon-wrapper"/>').appendTo($editorWrapper);
+            var $dateEditor = $('<div class="tr-date-editor" contenteditable="true"/>').appendTo($editorWrapper);
+            var $timeIconWrapper = $('<div class="tr-time-icon-wrapper"/>').appendTo($editorWrapper);
+            var $timeEditor = $('<div class="tr-time-editor" contenteditable="true"/>').appendTo($editorWrapper);
+
+            $dateEditor.on("mousedown focus", function() {
+                setCurrentMode('date');
+                TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
+            });
+            $timeEditor.on("mousedown focus", function() {
+                setCurrentMode('time');
+                TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
+            });
+
+            var currentMode;
+            function setCurrentMode(mode) {
+                currentMode = mode;
+                dateListBox.$.toggle(mode === 'date');
+                timeListBox.$.toggle(mode === 'time');
             }
 
-            function getActiveDropdownBox() {
+            function getActiveListBox() {
                 return currentMode == 'date' ? dateListBox : timeListBox;
+            }
+
+            function getActiveEditor() {
+                return currentMode == 'date' ? $dateEditor : $timeEditor;
             }
 
             if (config.showTrigger) {
@@ -115,8 +131,7 @@
                         closeDropDown();
                     } else {
                         setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                            showEditor();
-                            $editor.select();
+                            getActiveEditor().select();
                             openDropDown();
                             query();
                         });
@@ -127,30 +142,56 @@
                 .scroll(function (e) {
                     return false;
                 });
-            var dropdownNeeded = config.editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
+            var dropdownNeeded = config.editingMode == 'editable';
             if (dropdownNeeded) {
                 $dropDown.appendTo("body");
             }
-            $originalInput.addClass("tr-original-input");
-            var $editor = $('<input type="text" autocomplete="off" style="background-color: yellow"/>');
 
-            $editor.prependTo($dateTimeField).addClass("tr-combobox-editor tr-editor")
+            dateListBox = $('<div class="date-listbox">').appendTo($dropDown).TrivialListBox({
+                template: dateTemplate
+            });
+            dateListBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
+                if (selectedEntry) {
+                    setDate(selectedEntry, selectedEntry.displayString != (dateValue && dateValue.displayString));
+                    dateListBox.selectEntry(null);
+                    closeDropDown();
+                }
+            });
+            timeListBox = $('<div class="time-listbox">').appendTo($dropDown).TrivialListBox({
+                template: timeTemplate
+            });
+            timeListBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
+                if (selectedEntry) {
+                    setTime(selectedEntry, selectedEntry.displayString != (timeValue && timeValue.displayString));
+                    dateListBox.selectEntry(null);
+                    closeDropDown();
+                }
+            });
+            //calendarBox = $('<div class="calendarbox">').appendTo($dropDown).TrivialCalendarBox({
+            //    selectedDate: null,
+            //    firstDayOfWeek: 1,
+            //    mode: 'datetime' // 'date', 'time', 'datetime'
+            //});
+            //calendarBox.onChange.addListener(function (selectedEntry) {
+            //    if (selectedEntry) {
+            //        setTime(selectedEntry, selectedEntry.displayString != (timeValue && timeValue.displayString));
+            //        dateListBox.selectEntry(null);
+            //        closeDropDown();
+            //    }
+            //});
+
+            setCurrentMode('date');
+
+            $dateEditor.add($timeEditor)
                 .focus(function () {
-                    if (blurCausedByClickInsideComponent) {
-                        // do nothing!
-                    } else {
-                        $dateTimeField.addClass('focus');
-                        showEditor();
-                    }
+                    $dateTimeField.addClass('focus');
                 })
                 .blur(function () {
                     if (blurCausedByClickInsideComponent) {
-                        $editor.focus();
+                        getActiveEditor().focus();
                     } else {
                         $dateTimeField.removeClass('focus');
-                        $editor.val("");
-                        selectDateEntry(lastCommittedValue); // TODO handle this correctly for date and time!
-                        hideEditor();
+                        updateDisplay();
                         closeDropDown();
                     }
                 })
@@ -160,12 +201,16 @@
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = getActiveListBox().getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
-                            selectDateEntry(highlightedEntry, true);
+                            if (currentMode == 'date') {
+                                setDate(highlightedEntry, true);
+                            } else {
+                                setTime(highlightedEntry, true);
+                            }
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         showEditor();
-                        return; // var the user navigate freely left and right...
+                        return; // let the user navigate freely left and right...
                     }
 
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
@@ -173,10 +218,7 @@
                     }
 
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                        if (!isEditorVisible) {
-                            $editor.select();
-                            showEditor();
-                        }
+                        getActiveEditor().select();
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
                             query(direction);
@@ -187,43 +229,28 @@
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (e.which == keyCodes.enter) {
-                        if (isDropDownOpen || editorContainsFreeText()) {
+                        if (isDropDownOpen) {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = getActiveListBox().getHighlightedEntry();
                             if (isDropDownOpen && highlightedEntry) {
-                                selectDateEntry(highlightedEntry, true);
-                            } else if (config.allowFreeText) {
-                                selectDateEntry(me.getSelectedEntry(), true);
+                                if (currentMode == 'date') {
+                                    setDate(highlightedEntry, true);
+                                } else {
+                                    setTime(highlightedEntry, true);
+                                }
                             }
                             closeDropDown();
-                            hideEditor();
                         }
                     } else if (e.which == keyCodes.escape) {
                         e.preventDefault(); // prevent ie from doing its text field magic...
-                        if (!(editorContainsFreeText() && isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
-                            hideEditor();
-                            $editor.val("");
-                            entries = null; // so we will query again when we dateTimeField is re-focused
-                            selectDateEntry(lastCommittedValue, false);
+                        if (!isDropDownOpen) {
+                            updateDisplay();
                         }
                         closeDropDown();
                     } else {
-                        if (!isEditorVisible) {
-                            showEditor();
-                            $editor.select();
-                        }
                         openDropDown();
                         query(1);
                     }
-                })
-                .keyup(function (e) {
-                    if (!TrivialComponents.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
-                        selectDateEntry(null, false);
-                    }
-                })
-                .mousedown(function () {
-                    openDropDown();
-                    query();
                 });
 
             if ($originalInput.val()) {
@@ -233,69 +260,30 @@
             }
 
             if ($originalInput.attr("tabindex")) {
-                $editor.attr("tabindex", $originalInput.attr("tabindex"));
+                $dateEditor.add($timeEditor).attr("tabindex", $originalInput.attr("tabindex"));
             }
             if ($originalInput.attr("autofocus")) {
-                $editor.focus();
+                $dateEditor.focus();
             }
 
             $dateTimeField.add($dropDown).mousedown(function () {
-                if ($editor.is(":focus")) {
+                if ($dateEditor.is(":focus") || $timeEditor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;
                 }
             }).mouseup(function () {
                 if (blurCausedByClickInsideComponent) {
-                    $editor.focus();
+                    getActiveEditor().focus();
                     blurCausedByClickInsideComponent = false;
                 }
             }).mouseout(function () {
                 if (blurCausedByClickInsideComponent) {
-                    $editor.focus();
+                    getActiveEditor().focus();
                     blurCausedByClickInsideComponent = false;
                 }
             });
 
-            dateListBox = $('<div class="date-listbox">').appendTo($dropDown).TrivialListBox({
-                template: dateTemplate
-            });
-            dateListBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
-                if (selectedEntry) {
-                    selectDateEntry(selectedEntry, true, TrivialComponents.objectEquals(selectedEntry, lastCommittedValue));
-                    dateListBox.selectEntry(null);
-                    closeDropDown();
-                }
-                hideEditor();
-            });
-            timeListBox = $('<div class="time-listbox">').appendTo($dropDown).TrivialListBox({
-                template: timeTemplate
-            });
-            timeListBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
-                if (selectedEntry) {
-                    selectTimeEntry(selectedEntry, true, TrivialComponents.objectEquals(selectedEntry, lastCommittedValue));
-                    timeListBox.selectEntry(null);
-                    closeDropDown();
-                }
-                hideEditor();
-            });
-
-            function setCurrentMode(mode) {
-                currentMode = mode;
-                dateListBox.$.toggle(mode === 'date');
-                timeListBox.$.toggle(mode === 'time');
-            }
-
-            $selectedDateEntryWrapper.add($selectedTimeEntryWrapper).click(function (e) {
-                setCurrentMode(e.currentTarget === $selectedDateEntryWrapper[0] ? 'date' : 'time');
-                showEditor();
-                $editor.select();
-                openDropDown();
-                query();
-            });
-
-            setCurrentMode('date');
-
             function query(highlightDirection) {
-                // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
+                // call queryFunction asynchronously to be sure the editor has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
                     if (currentMode == 'date') {
@@ -310,95 +298,51 @@
                 }, 0);
             }
 
-            function fireChangeEvents(entry) {
+            function fireChangeEvents() {
                 $originalInput.trigger("change");
-                me.onSelectedEntryChanged.fire(entry);
+                //me.onSelectedEntryChanged.fire(moment(dateValue).hour(timeValue.hour()).minute(timeValue.minute())); // TODO
             }
 
-            function selectDateEntry(entry, commit, muteEvent) {
-                if (entry == null) {
-                    if (config.valueProperty) {
-                        $originalInput.val("");
-                    }
-                    selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(dateTemplate, {})).addClass("tr-combobox-entry").addClass("empty");
-                    $selectedDateEntryWrapper.empty().append($selectedEntry);
-                } else {
-                    if (config.valueProperty) {
-                        $originalInput.val(entry[config.valueProperty]);
-                    }
-                    selectedEntry = entry;
-                    var $selectedEntry = $(Mustache.render(dateTemplate, entry))
-                        .addClass("tr-combobox-entry");
-                    $selectedDateEntryWrapper.empty().append($selectedEntry);
-                    $editor.val(entry[config.inputTextProperty]);
+            function setDate(newDateValue, fireEvent) {
+                dateValue = newDateValue;
+                updateDisplay();
+                if (fireEvent) {
+                    fireChangeEvents();
                 }
-                if (commit) {
-                    lastCommittedValue = entry;
-                    if (!muteEvent) {
-                        fireChangeEvents(entry);
-                    }
-                }
+                // TODO update original input
+                // TODO update icon
             }
 
-            function selectTimeEntry(entry, commit, muteEvent) {
-                if (entry == null) {
-                    if (config.valueProperty) {
-                        $originalInput.val("");
-                    }
-                    selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(timeTemplate, {})).addClass("tr-combobox-entry").addClass("empty");
-                    $selectedTimeEntryWrapper.empty().append($selectedEntry);
-                } else {
-                    if (config.valueProperty) {
-                        $originalInput.val(entry[config.valueProperty]);
-                    }
-                    selectedEntry = entry;
-                    var $selectedEntry = $(Mustache.render(timeTemplate, entry)).addClass("tr-combobox-entry");
-                    $selectedTimeEntryWrapper.empty().append($selectedEntry);
-                    $editor.val(entry[config.inputTextProperty]);
+            function setTime(newTimeValue, fireEvent) {
+                timeValue = newTimeValue;
+                updateDisplay();
+                if (fireEvent) {
+                    fireChangeEvents(entry);
                 }
-                if (commit) {
-                    lastCommittedValue = entry;
-                    if (!muteEvent) {
-                        fireChangeEvents(entry);
-                    }
+                // TODO update original input
+                // TODO update icon
+            }
+
+            function updateDisplay() {
+                if (dateValue) {
+                    $dateEditor.text(moment([dateValue.year, dateValue.month - 1, dateValue.day]).format(config.dateFormat));
+                    $dateIconWrapper.empty().append(Mustache.render(dateIconTemplate, dateValue));
+                } else {
+                    $dateEditor.text("");
+                    $dateIconWrapper.empty().append(Mustache.render(dateIconTemplate, {}));
+                }
+                if (timeValue) {
+                    $timeEditor.text(moment([1970, 0, 1, timeValue.hour, timeValue.minute]).format(config.timeFormat));
+                    $timeIconWrapper.empty().append(Mustache.render(timeIconTemplate, timeValue));
+                } else {
+                    $timeEditor.text("");
+                    $timeIconWrapper.empty().append(Mustache.render(timeIconTemplate, {}));
                 }
             }
 
             function setValue(mom) {
-                if (mom == null) {
-                    selectDateEntry({}, true, true);
-                    selectTimeEntry({}, true, true);
-                } else {
-                    selectDateEntry(createDateComboBoxEntry(mom, config.dateFormat), true, true);
-                    selectTimeEntry(createTimeComboBoxEntry(mom.hour(), mom.minute(), config.timeFormat), true, true);
-                }
-            }
-
-            function isEntrySelected() {
-                return selectedEntry != null && selectedEntry !== config.emptyEntry;
-            }
-
-            function showEditor() {
-                var $editorArea = getActiveSelectedElementWrapper().find(".editor-area");
-                var maxX = currentMode == 'date' ? $selectedTimeEntryWrapper[0].offsetLeft - $editorArea[0].offsetLeft : $trigger ? $trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999;
-                $editor
-                    .css({
-                        "width": Math.min($editorArea[0].offsetWidth, maxX) + "px", // prevent the editor from surpassing the trigger!
-                        "height": ($editorArea.height()) + "px"
-                    })
-                    .position({
-                        my: "left top",
-                        at: "left top",
-                        of: $editorArea
-                    });
-                isEditorVisible = true;
-            }
-
-            function hideEditor() {
-                $editor.width(0).height(0);
-                isEditorVisible = false;
+                setDate(createDateComboBoxEntry(mom, config.dateFormat));
+                setTime(createTimeComboBoxEntry(mom.hour(), mom.minute(), config.timeFormat));
             }
 
             var repositionDropDown = function () {
@@ -441,7 +385,13 @@
             }
 
             function getNonSelectedEditorValue() {
-                return $editor.val().substring(0, $editor[0].selectionStart);
+                var editorText = getActiveEditor().text().replace(String.fromCharCode(160), " ");
+                var selection = window.getSelection();
+                if (selection.anchorOffset != selection.focusOffset) {
+                    return editorText.substring(0, Math.min(selection.anchorOffset, selection.focusOffset));
+                } else {
+                    return editorText;
+                }
             }
 
             function autoCompleteIfPossible(delay) {
@@ -451,7 +401,7 @@
                     var listBox = getActiveListBox();
                     var highlightedEntry = listBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
-                        var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
+                        var autoCompletingEntryDisplayValue = highlightedEntry.displayString;
                         if (autoCompletingEntryDisplayValue) {
                             autoCompleteTimeoutId = setTimeout(function () {
                                 var oldEditorValue = getNonSelectedEditorValue();
@@ -461,10 +411,10 @@
                                 } else {
                                     newEditorValue = getNonSelectedEditorValue();
                                 }
-                                $editor.val(newEditorValue);
+                                getActiveEditor().text(newEditorValue);
                                 // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
-                                if ($editor.is(":focus")) {
-                                    $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                                if (getActiveEditor().is(":focus")) {
+                                    TrivialComponents.selectElementContents(getActiveEditor()[0], oldEditorValue.length, newEditorValue.length);
                                 }
                             }, delay || 0);
                         }
@@ -475,10 +425,6 @@
 
             this.$ = $dateTimeField;
             $dateTimeField[0].trivialDateTimeField = this;
-
-            function getActiveListBox() {
-                return currentMode == 'date' ? dateListBox : timeListBox;
-            }
 
             function updateEntries(newEntries, highlightDirection) {
                 var listBox = getActiveListBox();
@@ -499,22 +445,9 @@
                 }
             }
 
-            this.getSelectedEntry = function () {
-                if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
-                    return null;
-                } else {
-                    var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
-                    selectedEntryToReturn._trEntryElement = undefined;
-                    return selectedEntryToReturn;
-                }
-            };
-            this.selectEntry = function (entry, muteEvent) {
-                selectDateEntry(entry, true, muteEvent);
-            };
             this.setValue = setValue;
             this.focus = function () {
-                showEditor();
-                $editor.select();
+                getActiveEditor().select();
             };
             this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($dateTimeField);
@@ -572,10 +505,10 @@
                 return {
                     moment: m,
                     day: m.date(),
-                    weekDay: m.format('dd'), // see UiRootPanel.setConfig()...
+                    weekDay: m.format('dd'),
                     month: m.month() + 1,
                     year: m.year(),
-                    completeDateString: m.format(dateFormat)
+                    displayString: m.format(dateFormat)
                 };
             }
 
@@ -748,7 +681,7 @@
                     minute: m,
                     hourString: pad(h, 2),
                     minuteString: pad(m, 2),
-                    completeTimeString: moment().hour(h).minute(m).format(timeFormat),
+                    displayString: moment().hour(h).minute(m).format(timeFormat),
                     hourAngle: ((h % 12) + m / 60) * 30,
                     minuteAngle: m * 6,
                     isNight: h < 6 || h >= 20
@@ -801,7 +734,7 @@
 
         }
 
-        TrivialComponents.registerJqueryPlugin(TrivialDateTimeField, "TrivialDateTimeField", "tr-dateTimeField");
+        TrivialComponents.registerJqueryPlugin(TrivialDateTimeField, "TrivialDateTimeField", "tr-datetimefield");
 
         return $.fn.TrivialDateTimeField;
     })

@@ -34,7 +34,7 @@
         function TrivialCalendarBox($container, options) {
             options = options || {};
             var config = $.extend({
-                selectedDate: null,
+                selectedDate: moment(),
                 firstDayOfWeek: 1,
                 mode: 'datetime' // 'date', 'time', 'datetime'
             }, options);

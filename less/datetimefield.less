@@ -1,8 +1,35 @@
-.tr-dateTimeField {
-  .tr-date-selected-entry-wrapper {
-    flex: 1 1 60%;
-  }
-  .tr-time-selected-entry-wrapper {
-    flex: 1 1 40%;
+.tr-datetimefield {
+  .tr-editor-wrapper {
+    padding: 2px 0;
+    flex: 1 1 0px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+
+    .tr-date-icon-wrapper,
+    .tr-time-icon-wrapper {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+    }
+    .tr-time-icon-wrapper {
+      margin-left: 2px;
+    }
+
+    .tr-date-editor,
+    .tr-time-editor {
+      flex: 0 0 auto;
+      outline: none;
+      font-family: @tr-editor-font-family;
+      font-size: @tr-editor-font-size;
+    }
+    .tr-date-editor {
+      flex: 0 0 auto;
+      min-width: 9ch;
+    }
+    .tr-time-editor {
+      flex: 0 0 auto;
+      min-width: 4.5ch;
+    }
   }
 }
