@@ -32,12 +32,16 @@
     }(function (TrivialComponents, $, Mustache) {
 
         function TrivialCalendarBox($container, options) {
+            var me = this;
+
             options = options || {};
             var config = $.extend({
                 selectedDate: moment(),
                 firstDayOfWeek: 1,
                 mode: 'datetime' // 'date', 'time', 'datetime'
             }, options);
+
+            this.onChange = new TrivialComponents.Event();
 
             var keyboardNavigationState = config.mode == 'time' ? 'hour' : 'day'; // 'year','month','day','hour','minute'
 
@@ -217,6 +221,7 @@
 
             function fireChangeEvents() {
                 $calendarBox.trigger("change");
+                me.onChange.fire(getSelectedDate());
             }
 
             function setKeyboardNavigationState(newKeyboardNavigationState) {

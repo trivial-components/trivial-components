@@ -84,10 +84,11 @@
             var timeValue = null; // moment object representing the current value
 
             var blurCausedByClickInsideComponent = false;
+            var focusGoesToOtherEditor = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
 
-            var $originalInput = $(originalInput).addClass("tr-original-input");;
+            var $originalInput = $(originalInput).addClass("tr-original-input");
             var $dateTimeField = $('<div class="tr-datetimefield tr-input-wrapper"/>')
                 .addClass(config.editingMode)
                 .insertAfter($originalInput);
@@ -99,41 +100,40 @@
             var $timeIconWrapper = $('<div class="tr-time-icon-wrapper"/>').appendTo($editorWrapper);
             var $timeEditor = $('<div class="tr-time-editor" contenteditable="true"/>').appendTo($editorWrapper);
 
-            $dateEditor.on("mousedown focus", function() {
-                setCurrentMode('date');
+            $dateIconWrapper.click(function () {
+                $activeEditor = $dateEditor;
+                setActiveBox(calendarBox);
                 TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
             });
-            $timeEditor.on("mousedown focus", function() {
-                setCurrentMode('time');
+            $timeIconWrapper.click(function () {
+                $activeEditor = $timeEditor;
+                setActiveBox(calendarBox);
                 TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
             });
 
-            var currentMode;
-            function setCurrentMode(mode) {
-                currentMode = mode;
-                dateListBox.$.toggle(mode === 'date');
-                timeListBox.$.toggle(mode === 'time');
-            }
-
-            function getActiveListBox() {
-                return currentMode == 'date' ? dateListBox : timeListBox;
-            }
-
-            function getActiveEditor() {
-                return currentMode == 'date' ? $dateEditor : $timeEditor;
-            }
+            $dateEditor.focus(function () {
+                $activeEditor = $dateEditor;
+                if (!blurCausedByClickInsideComponent || focusGoesToOtherEditor) {
+                    TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
+                }
+            });
+            $timeEditor.focus(function () {
+                $activeEditor = $timeEditor;
+                if (!blurCausedByClickInsideComponent || focusGoesToOtherEditor) {
+                    TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
+                }
+            });
 
             if (config.showTrigger) {
                 var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($dateTimeField);
                 $trigger.mousedown(function () {
                     if (isDropDownOpen) {
-                        showEditor();
                         closeDropDown();
                     } else {
                         setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                            getActiveEditor().select();
+                            setActiveBox(calendarBox);
+                            $activeEditor.focus();
                             openDropDown();
-                            query();
                         });
                     }
                 });
@@ -167,29 +167,47 @@
                     closeDropDown();
                 }
             });
-            //calendarBox = $('<div class="calendarbox">').appendTo($dropDown).TrivialCalendarBox({
-            //    selectedDate: null,
-            //    firstDayOfWeek: 1,
-            //    mode: 'datetime' // 'date', 'time', 'datetime'
-            //});
-            //calendarBox.onChange.addListener(function (selectedEntry) {
-            //    if (selectedEntry) {
-            //        setTime(selectedEntry, selectedEntry.displayString != (timeValue && timeValue.displayString));
-            //        dateListBox.selectEntry(null);
-            //        closeDropDown();
-            //    }
-            //});
+            calendarBox = $('<div class="calendarbox">').appendTo($dropDown).TrivialCalendarBox({
+                firstDayOfWeek: 1,
+                mode: 'datetime' // 'date', 'time', 'datetime'
+            });
+            calendarBox.onChange.addListener(function (selectedEntry) {
+                if (selectedEntry) {
+                    setTime(selectedEntry, selectedEntry.displayString != (timeValue && timeValue.displayString));
+                    dateListBox.selectEntry(null);
+                    closeDropDown();
+                }
+            });
 
-            setCurrentMode('date');
+            var $activeEditor;
+            function setActiveBox(activeBox) {
+                calendarBox.$.toggle(activeBox === calendarBox);
+                dateListBox.$.toggle(activeBox === dateListBox);
+                timeListBox.$.toggle(activeBox === timeListBox);
+            }
+
+            var currentMode; // one of 'date', 'time', 'calendarbox'
+            function setCurrentMode(mode) {
+                currentMode = mode;
+            }
+
+            function getActiveListBox() {
+                return currentMode == 'date' ? dateListBox : timeListBox;
+            }
+
+            function getActiveEditor() {
+                return currentMode == 'date' ? $dateEditor : $timeEditor;
+            }
+
+            $activeEditor = $dateEditor;
+            setActiveBox(calendarBox);
 
             $dateEditor.add($timeEditor)
                 .focus(function () {
                     $dateTimeField.addClass('focus');
                 })
                 .blur(function () {
-                    if (blurCausedByClickInsideComponent) {
-                        getActiveEditor().focus();
-                    } else {
+                    if (!blurCausedByClickInsideComponent) {
                         $dateTimeField.removeClass('focus');
                         updateDisplay();
                         closeDropDown();
@@ -201,7 +219,7 @@
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = getActiveListBox().getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
-                            if (currentMode == 'date') {
+                            if (getActiveEditor() === $dateEditor) {
                                 setDate(highlightedEntry, true);
                             } else {
                                 setTime(highlightedEntry, true);
@@ -209,9 +227,10 @@
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
-                        showEditor();
                         return; // let the user navigate freely left and right...
                     }
+
+                    setCurrentMode(this == $dateEditor[0] ? 'date' : 'time');
 
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                         doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
@@ -222,6 +241,7 @@
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
                             query(direction);
+                            setActiveBox($activeEditor === $dateEditor ? dateListBox : timeListBox);
                             openDropDown();
                         } else {
                             getActiveListBox().highlightNextEntry(direction);
@@ -233,7 +253,7 @@
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = getActiveListBox().getHighlightedEntry();
                             if (isDropDownOpen && highlightedEntry) {
-                                if (currentMode == 'date') {
+                                if (getActiveEditor() === $dateEditor) {
                                     setDate(highlightedEntry, true);
                                 } else {
                                     setTime(highlightedEntry, true);
@@ -245,10 +265,12 @@
                         e.preventDefault(); // prevent ie from doing its text field magic...
                         if (!isDropDownOpen) {
                             updateDisplay();
+                            TrivialComponents.selectElementContents(getActiveEditor()[0], 0, getActiveEditor().text().length);
                         }
                         closeDropDown();
                     } else {
                         openDropDown();
+                        setActiveBox($activeEditor === $dateEditor ? dateListBox : timeListBox);
                         query(1);
                     }
                 });
@@ -266,27 +288,30 @@
                 $dateEditor.focus();
             }
 
-            $dateTimeField.add($dropDown).mousedown(function () {
+            $dateTimeField.add($dropDown).mousedown(function (e) {
                 if ($dateEditor.is(":focus") || $timeEditor.is(":focus")) {
                     blurCausedByClickInsideComponent = true;
                 }
-            }).mouseup(function () {
-                if (blurCausedByClickInsideComponent) {
-                    getActiveEditor().focus();
-                    blurCausedByClickInsideComponent = false;
+                if (e.target === $dateEditor[0]
+                    || e.target === $timeEditor[0]
+                    || e.target === $dateIconWrapper[0]
+                    || e.target === $timeIconWrapper[0]) {
+                    focusGoesToOtherEditor = true;
+                    console.log('focusGoesToOtherEditor');
                 }
-            }).mouseout(function () {
-                if (blurCausedByClickInsideComponent) {
+            }).on('mouseup mouseout', function () {
+                if (blurCausedByClickInsideComponent && !focusGoesToOtherEditor) {
                     getActiveEditor().focus();
-                    blurCausedByClickInsideComponent = false;
                 }
+                blurCausedByClickInsideComponent = false;
+                focusGoesToOtherEditor = false;
             });
 
             function query(highlightDirection) {
                 // call queryFunction asynchronously to be sure the editor has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
-                    if (currentMode == 'date') {
+                    if (getActiveEditor() === $dateEditor) {
                         dateQueryFunction(queryString, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
                         });
@@ -317,7 +342,7 @@
                 timeValue = newTimeValue;
                 updateDisplay();
                 if (fireEvent) {
-                    fireChangeEvents(entry);
+                    fireChangeEvents();
                 }
                 // TODO update original input
                 // TODO update icon
