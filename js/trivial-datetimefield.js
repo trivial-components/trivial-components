@@ -187,6 +187,7 @@
 
             var $activeEditor;
             var activeBox;
+
             function setActiveBox(newActiveBox) {
                 activeBox = newActiveBox;
                 calendarBox.$.toggle(newActiveBox === calendarBox);
@@ -333,11 +334,11 @@
             function fireChangeEvents() {
                 $originalInput.trigger("change");
                 me.onChange.fire(moment([
-                    dateValue.year || moment().year(),
-                    dateValue.month - 1 || moment().month(),
-                    dateValue.day || moment().date(),
-                    timeValue.hour || moment().hours(),
-                    timeValue.minute || moment().minute()
+                    dateValue ? dateValue.year : moment().year(),
+                    dateValue ? dateValue.month - 1 : moment().month(),
+                    dateValue ? dateValue.day : moment().date(),
+                    timeValue ? timeValue.hour : moment().hours(),
+                    timeValue ? timeValue.minute : moment().minute()
                 ]));
             }
 
@@ -348,7 +349,6 @@
                     fireChangeEvents();
                 }
                 // TODO update original input
-                // TODO update icon
             }
 
             function setTime(newTimeValue, fireEvent) {
@@ -358,7 +358,6 @@
                     fireChangeEvents();
                 }
                 // TODO update original input
-                // TODO update icon
             }
 
             function updateDisplay() {
@@ -379,8 +378,8 @@
             }
 
             function setValue(mom) {
-                setDate(createDateComboBoxEntry(mom, config.dateFormat));
-                setTime(createTimeComboBoxEntry(mom.hour(), mom.minute(), config.timeFormat));
+                setDate(mom && createDateComboBoxEntry(mom, config.dateFormat));
+                setTime(mom && createTimeComboBoxEntry(mom.hour(), mom.minute(), config.timeFormat));
             }
 
             var repositionDropDown = function () {

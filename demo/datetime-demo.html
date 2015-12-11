@@ -31,18 +31,18 @@
 
 <form>
     <div style="width: 200px">
-        <input id="datetimefield" value="2013-02-08 09:30Z">
+        <input id="dateTimeField" value="2013-02-08 09:30Z">
+        <input id="emptyDateTimeField">
     </div>
 </form>
 
 <script>
     $(function () {
 
-        var dateTimeField = $('#datetimefield').TrivialDateTimeField({
+        var dateDateTimeField = $('#dateTimeField').TrivialDateTimeField({});
+        var emptyDateTimeField = $('#emptyDateTimeField').TrivialDateTimeField({});
 
-        });
-
-        dateTimeField.onChange.addListener(function(moment) {
+        dateDateTimeField.onChange.addListener(function(moment) {
             console.log(moment.format());
         });
 
