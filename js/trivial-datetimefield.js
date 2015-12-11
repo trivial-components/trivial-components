@@ -131,8 +131,10 @@
                         closeDropDown();
                     } else {
                         setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
+                            calendarBox.setSelectedDate(dateValue ? dateValue.moment : moment());
                             setActiveBox(calendarBox);
-                            $activeEditor.focus();
+                            $activeEditor = $dateEditor;
+                            TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
                             openDropDown();
                         });
                     }
@@ -169,21 +171,26 @@
             });
             calendarBox = $('<div class="calendarbox">').appendTo($dropDown).TrivialCalendarBox({
                 firstDayOfWeek: 1,
-                mode: 'datetime' // 'date', 'time', 'datetime'
+                mode: 'date' // 'date', 'time', 'datetime'
             });
-            calendarBox.onChange.addListener(function (selectedEntry) {
-                if (selectedEntry) {
-                    setTime(selectedEntry, selectedEntry.displayString != (timeValue && timeValue.displayString));
-                    dateListBox.selectEntry(null);
+            calendarBox.setKeyboardNavigationState('month');
+            calendarBox.onChange.addListener(function (changedUnit, selectedDate) {
+                setDate(createDateComboBoxEntry(selectedDate, config.dateFormat));
+                if (changedUnit === 'day') {
                     closeDropDown();
+                    $activeEditor = $timeEditor;
+                    TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
                 }
             });
 
             var $activeEditor;
-            function setActiveBox(activeBox) {
-                calendarBox.$.toggle(activeBox === calendarBox);
-                dateListBox.$.toggle(activeBox === dateListBox);
-                timeListBox.$.toggle(activeBox === timeListBox);
+            var activeBox;
+            function setActiveBox(newActiveBox) {
+                console.log("#" + activeBox);
+                activeBox = newActiveBox;
+                calendarBox.$.toggle(newActiveBox === calendarBox);
+                dateListBox.$.toggle(newActiveBox === dateListBox);
+                timeListBox.$.toggle(newActiveBox === timeListBox);
             }
 
             var currentMode; // one of 'date', 'time', 'calendarbox'
@@ -191,12 +198,12 @@
                 currentMode = mode;
             }
 
-            function getActiveListBox() {
-                return currentMode == 'date' ? dateListBox : timeListBox;
+            function getActiveBox() {
+                return activeBox;
             }
 
             function getActiveEditor() {
-                return currentMode == 'date' ? $dateEditor : $timeEditor;
+                return $activeEditor;
             }
 
             $activeEditor = $dateEditor;
@@ -217,7 +224,7 @@
                     if (TrivialComponents.isModifierKey(e)) {
                         return;
                     } else if (e.which == keyCodes.tab) {
-                        var highlightedEntry = getActiveListBox().getHighlightedEntry();
+                        var highlightedEntry = getActiveBox().getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
                             if (getActiveEditor() === $dateEditor) {
                                 setDate(highlightedEntry, true);
@@ -230,8 +237,6 @@
                         return; // let the user navigate freely left and right...
                     }
 
-                    setCurrentMode(this == $dateEditor[0] ? 'date' : 'time');
-
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                         doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                     }
@@ -240,18 +245,21 @@
                         getActiveEditor().select();
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
+                            console.log("setActiveBox!!");
+                            setActiveBox(this === $dateEditor[0] ? dateListBox : timeListBox);
                             query(direction);
-                            setActiveBox($activeEditor === $dateEditor ? dateListBox : timeListBox);
                             openDropDown();
                         } else {
-                            getActiveListBox().highlightNextEntry(direction);
-                            autoCompleteIfPossible(config.autoCompleteDelay);
+                            if (getActiveBox() !== calendarBox) {
+                                getActiveBox().navigate(direction === 1 ? 'down' : 'up');
+                                autoCompleteIfPossible(config.autoCompleteDelay);
+                            }
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (e.which == keyCodes.enter) {
                         if (isDropDownOpen) {
                             e.preventDefault(); // do not submit form
-                            var highlightedEntry = getActiveListBox().getHighlightedEntry();
+                            var highlightedEntry = getActiveBox().getHighlightedEntry();
                             if (isDropDownOpen && highlightedEntry) {
                                 if (getActiveEditor() === $dateEditor) {
                                     setDate(highlightedEntry, true);
@@ -269,9 +277,9 @@
                         }
                         closeDropDown();
                     } else {
-                        openDropDown();
-                        setActiveBox($activeEditor === $dateEditor ? dateListBox : timeListBox);
+                        setActiveBox(this === $dateEditor[0] ? dateListBox : timeListBox);
                         query(1);
+                        openDropDown();
                     }
                 });
 
@@ -420,10 +428,10 @@
             }
 
             function autoCompleteIfPossible(delay) {
-                if (config.autoComplete) {
+                if (config.autoComplete && (getActiveBox() === dateListBox || getActiveBox() === timeListBox)) {
                     clearTimeout(autoCompleteTimeoutId);
 
-                    var listBox = getActiveListBox();
+                    var listBox = getActiveBox();
                     var highlightedEntry = listBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                         var autoCompletingEntryDisplayValue = highlightedEntry.displayString;
@@ -452,7 +460,7 @@
             $dateTimeField[0].trivialDateTimeField = this;
 
             function updateEntries(newEntries, highlightDirection) {
-                var listBox = getActiveListBox();
+                var listBox = getActiveBox();
 
                 highlightDirection = highlightDirection === undefined ? 1 : highlightDirection;
                 listBox.updateEntries(newEntries);

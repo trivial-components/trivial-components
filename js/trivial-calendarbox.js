@@ -38,31 +38,33 @@
             var config = $.extend({
                 selectedDate: moment(),
                 firstDayOfWeek: 1,
-                mode: 'datetime' // 'date', 'time', 'datetime'
+                mode: 'datetime', // 'date', 'time', 'datetime',
+                highlightKeyboardNavigationState: false
             }, options);
 
             this.onChange = new TrivialComponents.Event();
 
             var keyboardNavigationState = config.mode == 'time' ? 'hour' : 'day'; // 'year','month','day','hour','minute'
+            var keyboardNavCssClass = config.highlightKeyboardNavigationState ? "keyboard-nav" : "";
 
             var selectedDate = config.selectedDate;
 
             var $calendarBox = $('<div class="tr-calendarbox"/>').appendTo($container);
-            var $calendarDisplay = $('<div class="tr-calendar-display"/>').appendTo($calendarBox);
+
+            var $calendarDisplay = $('<div class="tr-calendar-display"/>');
             var $yearDisplay = $('<div class="year"><span class="back-button"/><span class="name"/><span class="forward-button"/></div>').appendTo($calendarDisplay);
             var $monthDisplay = $('<div class="month"><span class="back-button"/><span class="name"/><span class="forward-button"/></div>').appendTo($calendarDisplay);
             var $monthTable = $('<div class="month-table">').appendTo($calendarDisplay);
             var $year = $yearDisplay.find(".name");
             var $month = $monthDisplay.find(".name");
             $yearDisplay.click(setKeyboardNavigationState.bind(this, "year"));
-            $yearDisplay.find('.back-button').click(navigate.bind(this, "year", "left"));
-            $yearDisplay.find('.forward-button').click(navigate.bind(this, "year", "right"));
+            $yearDisplay.find('.back-button').click(navigate.bind(this, "year", "left", true));
+            $yearDisplay.find('.forward-button').click(navigate.bind(this, "year", "right", true));
             $monthDisplay.click(setKeyboardNavigationState.bind(this, "month"));
-            $monthDisplay.find('.back-button').click(navigate.bind(this, "month", "left"));
-            $monthDisplay.find('.forward-button').click(navigate.bind(this, "month", "right"));
+            $monthDisplay.find('.back-button').click(navigate.bind(this, "month", "left", true));
+            $monthDisplay.find('.forward-button').click(navigate.bind(this, "month", "right", true));
 
             var $clockDisplay = $('<div class="tr-clock-display"/>')
-                .appendTo($calendarBox)
                 .append('<svg class="clock" viewBox="0 0 100 100" width="100" height="100"> ' +
                 '<circle class="clockcircle" cx="50" cy="50" r="45"/> ' +
                 '<g class="ticks" > ' +
@@ -91,13 +93,20 @@
             var $digitalTimeHourDisplayWrapper = $clockDisplay.find('.digital-time-display .hour-wrapper');
             var $digitalTimeHourDisplay = $clockDisplay.find('.digital-time-display .hour');
             $digitalTimeHourDisplayWrapper.click(setKeyboardNavigationState.bind(this, "hour"));
-            $digitalTimeHourDisplayWrapper.find(".up-button").click(navigate.bind(this, "hour", "up"));
-            $digitalTimeHourDisplayWrapper.find(".down-button").click(navigate.bind(this, "hour", "down"));
+            $digitalTimeHourDisplayWrapper.find(".up-button").click(navigate.bind(this, "hour", "up", true));
+            $digitalTimeHourDisplayWrapper.find(".down-button").click(navigate.bind(this, "hour", "down", true));
             var $digitalTimeMinuteDisplayWrapper = $clockDisplay.find('.digital-time-display .minute-wrapper');
             var $digitalTimeMinuteDisplay = $clockDisplay.find('.digital-time-display .minute');
             $digitalTimeMinuteDisplayWrapper.click(setKeyboardNavigationState.bind(this, "minute"));
-            $digitalTimeMinuteDisplayWrapper.find(".up-button").click(navigate.bind(this, "minute", "up"));
-            $digitalTimeMinuteDisplayWrapper.find(".down-button").click(navigate.bind(this, "minute", "down"));
+            $digitalTimeMinuteDisplayWrapper.find(".up-button").click(navigate.bind(this, "minute", "up", true));
+            $digitalTimeMinuteDisplayWrapper.find(".down-button").click(navigate.bind(this, "minute", "down", true));
+
+            if (config.mode == 'date' || config.mode == 'datetime') {
+                $calendarDisplay.appendTo($calendarBox)
+            }
+            if (config.mode == 'time' || config.mode === 'datetime') {
+                $clockDisplay.appendTo($calendarBox);
+            }
 
             if (selectedDate) { // if config.entries was set...
                 updateMonthDisplay(selectedDate);
@@ -146,13 +155,13 @@
                         if (day.year() == selectedDate.year() && day.dayOfYear() == selectedDate.dayOfYear()) {
                             $td.addClass('selected');
                             if (keyboardNavigationState === 'day') {
-                                $td.addClass("keyboard-nav");
+                                $td.addClass(keyboardNavCssClass);
                             }
                         }
                         $td.click(function (day) {
                             return function () {
                                 setKeyboardNavigationState("day");
-                                setMonthAndDay(day.month() + 1, day.date());
+                                setMonthAndDay(day.month() + 1, day.date(), true);
                             };
                         }(day));
                         $tr.append($td);
@@ -182,66 +191,79 @@
                 updateDisplay();
             }
 
-            function setYear(year) {
+            function setYear(year, fireEvent) {
                 selectedDate.year(year);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('year');
+                }
             }
 
-            function setMonth(month) {
+            function setMonth(month, fireEvent) {
                 selectedDate.month(month - 1);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('month');
+                }
             }
 
-            function setDayOfMonth(dayOfMonth) {
+            function setDayOfMonth(dayOfMonth, fireEvent) {
                 selectedDate.date(dayOfMonth);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('day');
+                }
             }
 
-            function setMonthAndDay(month, day) {
+            function setMonthAndDay(month, day, fireEvent) {
                 selectedDate.month(month - 1);
                 selectedDate.date(day);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('month');
+                    fireChangeEvents('day');
+                }
             }
 
-            function setHour(hour) {
+            function setHour(hour, fireEvent) {
                 selectedDate.hour(hour);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('hour');
+                }
             }
 
-            function setMinute(minute) {
+            function setMinute(minute, fireEvent) {
                 selectedDate.minute(minute);
                 updateDisplay();
-                fireChangeEvents();
+                if (fireEvent) {
+                    fireChangeEvents('minute');
+                }
             }
 
-            function fireChangeEvents() {
+            function fireChangeEvents(type) {
                 $calendarBox.trigger("change");
-                me.onChange.fire(getSelectedDate());
+                me.onChange.fire(type, me.getSelectedDate());
             }
 
             function setKeyboardNavigationState(newKeyboardNavigationState) {
                 keyboardNavigationState = newKeyboardNavigationState;
                 $($yearDisplay).add($monthDisplay).add($monthTable.find('td.keyboard-nav')).add($hourHand).add($digitalTimeHourDisplayWrapper).add($minuteHand).add($digitalTimeMinuteDisplayWrapper)
                     .each(function () {
-                        $(this).attr("class", $(this).attr("class").replace("keyboard-nav", ''));
+                        $(this).attr("class", $(this).attr("class").replace(keyboardNavCssClass, ''));
                     });
                 if (keyboardNavigationState == 'year') {
-                    $yearDisplay.addClass("keyboard-nav");
+                    $yearDisplay.addClass(keyboardNavCssClass);
                 } else if (keyboardNavigationState == 'month') {
-                    $monthDisplay.addClass("keyboard-nav");
+                    $monthDisplay.addClass(keyboardNavCssClass);
                 } else if (keyboardNavigationState == 'day') {
-                    $monthTable.find(".selected").addClass("keyboard-nav");
+                    $monthTable.find(".selected").addClass(keyboardNavCssClass);
                 } else if (keyboardNavigationState == 'hour') {
                     $hourHand.attr("class", "hourhand keyboard-nav");
-                    $digitalTimeHourDisplayWrapper.addClass("keyboard-nav");
+                    $digitalTimeHourDisplayWrapper.addClass(keyboardNavCssClass);
                 } else if (keyboardNavigationState == 'minute') {
                     $minuteHand.attr("class", "minutehand keyboard-nav");
-                    $digitalTimeMinuteDisplayWrapper.addClass("keyboard-nav");
+                    $digitalTimeMinuteDisplayWrapper.addClass(keyboardNavCssClass);
                 }
             }
 
@@ -256,19 +278,19 @@
             this.setHour = setHour;
             this.setMinute = setMinute;
 
-            function navigate(unit /* year, month, day, hour, minute*/, direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
+            function navigate(unit /* year, month, day, hour, minute*/, direction /*up, left, down, right, tab*/, fireEvent) { // returns true if effectively navigated, false if nothing has changed
                 if (unit == 'year') {
                     if (direction == 'down' || direction == 'left') {
-                        setYear(selectedDate.year() - 1);
+                        setYear(selectedDate.year() - 1, fireEvent);
                     } else if (direction == 'up' || direction == 'right') {
-                        setYear(selectedDate.year() + 1);
+                        setYear(selectedDate.year() + 1, fireEvent);
                     }
                     return true;
                 } else if (unit == 'month') {
                     if (direction == 'down' || direction == 'left') {
-                        setMonth(selectedDate.month());
+                        setMonth(selectedDate.month(), fireEvent);
                     } else if (direction == 'up' || direction == 'right') {
-                        setMonth(selectedDate.month() + 2);
+                        setMonth(selectedDate.month() + 2, fireEvent);
                     }
                     return true;
                 } else if (unit == 'day') {
@@ -282,20 +304,20 @@
                         selectedDate.dayOfYear(selectedDate.dayOfYear() + 1);
                     }
                     updateDisplay();
-                    fireChangeEvents();
+                    fireChangeEvents('day');
                     return true;
                 } else if (unit == 'hour') {
                     if (direction == 'down' || direction == 'left') {
-                        setHour(selectedDate.hour() - 1);
+                        setHour(selectedDate.hour() - 1, fireEvent);
                     } else if (direction == 'up' || direction == 'right') {
-                        setHour(selectedDate.hour() + 1);
+                        setHour(selectedDate.hour() + 1, fireEvent);
                     }
                     return true;
                 } else if (unit == 'minute') {
                     if (direction == 'down' || direction == 'left') {
-                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) - 5);
+                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) - 5, fireEvent);
                     } else if (direction == 'up' || direction == 'right') {
-                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) + 5);
+                        setMinute(selectedDate.minute() - (selectedDate.minute() % 5) + 5, fireEvent);
                     }
                     return true;
                 }
@@ -303,7 +325,7 @@
 
             this.setKeyboardNavigationState = setKeyboardNavigationState;
 
-            this.navigate = function (direction /*up, left, down, right, tab*/) { // returns true if effectively navigated, false if nothing has changed
+            this.navigate = function (direction /*up, left, down, right*/) { // returns true if effectively navigated, false if nothing has changed
                 navigate(keyboardNavigationState, direction);
             };
         }

@@ -189,6 +189,13 @@
                 return highlightedEntry
             };
             this.highlightTextMatches = highlightTextMatches;
+            this.navigate = function(direction /*up, left, down, right*/) {
+                if (direction === 'up') {
+                    highlightNextEntry(-1);
+                } else if (direction === 'down') {
+                    highlightNextEntry(1);
+                }
+            }
         }
 
         TrivialComponents.registerJqueryPlugin(TrivialListBox, "TrivialListBox", "tr-listbox");
