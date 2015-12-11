@@ -42,6 +42,10 @@
 
         });
 
+        dateTimeField.onChange.addListener(function(moment) {
+            console.log(moment.format());
+        });
+
     });
 </script>
 

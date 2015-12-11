@@ -73,7 +73,7 @@
                 editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
             }, options);
 
-            this.onSelectedEntryChanged = new TrivialComponents.Event();
+            this.onChange = new TrivialComponents.Event();
 
             var dateListBox;
             var timeListBox;
@@ -103,6 +103,7 @@
             $dateIconWrapper.click(function () {
                 $activeEditor = $dateEditor;
                 setActiveBox(calendarBox);
+                openDropDown();
                 TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
             });
             $timeIconWrapper.click(function () {
@@ -180,13 +181,13 @@
                     closeDropDown();
                     $activeEditor = $timeEditor;
                     TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
+                    fireChangeEvents();
                 }
             });
 
             var $activeEditor;
             var activeBox;
             function setActiveBox(newActiveBox) {
-                console.log("#" + activeBox);
                 activeBox = newActiveBox;
                 calendarBox.$.toggle(newActiveBox === calendarBox);
                 dateListBox.$.toggle(newActiveBox === dateListBox);
@@ -245,7 +246,6 @@
                         getActiveEditor().select();
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
-                            console.log("setActiveBox!!");
                             setActiveBox(this === $dateEditor[0] ? dateListBox : timeListBox);
                             query(direction);
                             openDropDown();
@@ -305,7 +305,6 @@
                     || e.target === $dateIconWrapper[0]
                     || e.target === $timeIconWrapper[0]) {
                     focusGoesToOtherEditor = true;
-                    console.log('focusGoesToOtherEditor');
                 }
             }).on('mouseup mouseout', function () {
                 if (blurCausedByClickInsideComponent && !focusGoesToOtherEditor) {
@@ -333,7 +332,13 @@
 
             function fireChangeEvents() {
                 $originalInput.trigger("change");
-                //me.onSelectedEntryChanged.fire(moment(dateValue).hour(timeValue.hour()).minute(timeValue.minute())); // TODO
+                me.onChange.fire(moment([
+                    dateValue.year || moment().year(),
+                    dateValue.month - 1 || moment().month(),
+                    dateValue.day || moment().date(),
+                    timeValue.hour || moment().hours(),
+                    timeValue.minute || moment().minute()
+                ]));
             }
 
             function setDate(newDateValue, fireEvent) {
