@@ -331,15 +331,31 @@
                 }, 0);
             }
 
+            var getValue = function () {
+                if (dateValue == null && timeValue == null) {
+                    return null;
+                } else if (dateValue == null) {
+                    return null;
+                } else if (timeValue == null) {
+                    return moment([
+                        dateValue.year,
+                        dateValue.month - 1,
+                        dateValue.day
+                    ]).startOf('day');
+                } else {
+                    return moment([
+                        dateValue.year,
+                        dateValue.month,
+                        dateValue.day,
+                        timeValue.hour,
+                        timeValue.minute
+                    ]);
+                }
+            };
+
             function fireChangeEvents() {
                 $originalInput.trigger("change");
-                me.onChange.fire(moment([
-                    dateValue ? dateValue.year : moment().year(),
-                    dateValue ? dateValue.month - 1 : moment().month(),
-                    dateValue ? dateValue.day : moment().date(),
-                    timeValue ? timeValue.hour : moment().hours(),
-                    timeValue ? timeValue.minute : moment().minute()
-                ]));
+                me.onChange.fire(getValue());
             }
 
             function setDate(newDateValue, fireEvent) {
@@ -483,6 +499,7 @@
             }
 
             this.setValue = setValue;
+            this.getValue = getValue;
             this.focus = function () {
                 getActiveEditor().select();
             };
