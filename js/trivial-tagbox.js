@@ -374,7 +374,10 @@
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
-                    config.queryFunction($editor.text().replace(String.fromCharCode(160), " "), function (newEntries) {
+                    config.queryFunction($editor.text().replace(String.fromCharCode(160), " "), {
+                        completeInputString: $editor.text(),
+                        currentlySelectedEntries: selectedEntries
+                    }, function (newEntries) {
                         updateEntries(newEntries, highlightDirection);
                         if (isDropDownOpen) {
                             openDropDown(); // only for repositioning!

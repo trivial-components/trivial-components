@@ -40,7 +40,9 @@
     $(function () {
 
         var dateDateTimeField = $('#dateTimeField').TrivialDateTimeField({});
-        var emptyDateTimeField = $('#emptyDateTimeField').TrivialDateTimeField({});
+        var emptyDateTimeField = $('#emptyDateTimeField').TrivialDateTimeField({
+            dateFormat: "DD.MM.YYYY"
+        });
 
         dateDateTimeField.onChange.addListener(function(moment) {
             console.log(moment.format());

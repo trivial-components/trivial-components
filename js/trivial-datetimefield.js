@@ -327,11 +327,15 @@
                 setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
                     if (getActiveEditor() === $dateEditor) {
-                        dateQueryFunction(queryString, function (newEntries) {
+                        dateQueryFunction(queryString, {
+                            completeInputString: $dateEditor.text()
+                        }, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
                         });
                     } else {
-                        timeQueryFunction(queryString, function (newEntries) {
+                        timeQueryFunction(queryString, {
+                            completeInputString: $timeEditor.text()
+                        }, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
                         });
                     }
@@ -519,7 +523,7 @@
 
             // ====================== static DATE functions =========================
 
-            function dateQueryFunction(searchString, resultCallback) {
+            function dateQueryFunction(searchString, additionalQueryParameters, resultCallback) {
                 var suggestions;
                 if (searchString.match(/[^\d]/)) {
                     var fragments = searchString.split(/[^\d]/).filter(function (f) {
@@ -695,7 +699,7 @@
 
             // ================ static TIME functions =======================
 
-            function timeQueryFunction(searchString, resultCallback) {
+            function timeQueryFunction(searchString, additionalQueryParameters, resultCallback) {
                 var suggestedValues = [];
 
                 var match = searchString.match(/[^\d]/);

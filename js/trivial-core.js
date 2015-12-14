@@ -108,6 +108,7 @@
             pause: 19,
             caps_lock: 20,
             escape: 27,
+            space: 32,
             page_up: 33,
             page_down: 34,
             end: 35,
@@ -151,7 +152,7 @@
                 return visibleEntries;
             }
 
-            return function (queryString, resultCallback) {
+            return function (queryString, additionalQueryParameters, resultCallback) {
                 resultCallback(filterElements(queryString));
             }
         };
@@ -198,7 +199,7 @@
                 }
             }
 
-            return function (queryString, resultCallback) {
+            return function (queryString, additionalQueryParameters, resultCallback) {
                 if (!queryString) {
                     resultCallback(topLevelEntries);
                 } else {

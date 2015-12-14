@@ -266,7 +266,10 @@
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
-                    config.queryFunction(getQueryString(), function (newEntries) {
+                    config.queryFunction(getQueryString(), {
+                        completeInputString: $editor.val(),
+                        currentlySelectedEntry: selectedEntry
+                    }, function (newEntries) {
                         updateEntries(newEntries);
 
                         var queryString = getQueryString();

@@ -266,7 +266,10 @@
                             var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
                             $spinners = $spinners.add($spinner);
                         }
-                        config.queryFunction(queryString, function (newEntries) {
+                        config.queryFunction(queryString, {
+                            completeInputString: $editor.val(),
+                            currentlySelectedEntry: selectedEntry
+                        }, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
                         });
                         lastQueryString = queryString;

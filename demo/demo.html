@@ -215,7 +215,7 @@ include exclude forcer:
                 imageUrl: "-",
                 additionalInfo: ""
             },
-            queryFunction: function (queryString, resultCallback) {
+            queryFunction: function (queryString, additionalQueryParameters, resultCallback) {
                 setTimeout(function () {
                     resultCallback(createEntries().filter(function (entry) {
                         return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
