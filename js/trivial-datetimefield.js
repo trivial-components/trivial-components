@@ -524,6 +524,10 @@
             // ====================== static DATE functions =========================
 
             function dateQueryFunction(searchString, additionalQueryParameters, resultCallback) {
+                if (searchString === "" && additionalQueryParameters.completeInputString.length > 0) {
+                    searchString = additionalQueryParameters.completeInputString;
+                }
+
                 var suggestions;
                 if (searchString.match(/[^\d]/)) {
                     var fragments = searchString.split(/[^\d]/).filter(function (f) {
@@ -550,7 +554,11 @@
                 // sort by relevance
                 var preferredYmdOrder = dateFormatToYmdOrder(config.dateFormat);
                 suggestions.sort(function (a, b) {
-                    if (a.ymdOrder.length != b.ymdOrder.length) { // D < DM < DMY
+                    if (preferredYmdOrder.indexOf(a.ymdOrder) === -1 && preferredYmdOrder.indexOf(b.ymdOrder) !== -1) {
+                        return 1;
+                    } else if (preferredYmdOrder.indexOf(a.ymdOrder) !== -1 && preferredYmdOrder.indexOf(b.ymdOrder) === -1) {
+                        return -1;
+                    } else if (a.ymdOrder.length != b.ymdOrder.length) { // D < DM < DMY
                         return a.ymdOrder.length - b.ymdOrder.length;
                     } else if (a.ymdOrder !== b.ymdOrder) {
                         return new Levenshtein(a.ymdOrder, preferredYmdOrder).distance - new Levenshtein(b.ymdOrder, preferredYmdOrder).distance;
@@ -700,6 +708,10 @@
             // ================ static TIME functions =======================
 
             function timeQueryFunction(searchString, additionalQueryParameters, resultCallback) {
+                if (searchString === "" && additionalQueryParameters.completeInputString.length > 0) {
+                    searchString = additionalQueryParameters.completeInputString;
+                }
+
                 var suggestedValues = [];
 
                 var match = searchString.match(/[^\d]/);
