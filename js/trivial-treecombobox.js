@@ -73,6 +73,7 @@
             var isDropDownOpen = false;
             var isEditorVisible = false;
             var lastQueryString = null;
+            var lastCompleteInputQueryString = null;
             var entries = config.entries;
             var selectedEntry = null;
             var lastCommittedValue = null;
@@ -271,7 +272,7 @@
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
-                    if (lastQueryString !== queryString) {
+                    if (lastQueryString !== queryString || lastCompleteInputQueryString !== $editor.val()) {
                         if ($spinners.length === 0) {
                             var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
                             $spinners = $spinners.add($spinner);
@@ -283,6 +284,7 @@
                             updateEntries(newEntries, highlightDirection);
                         });
                         lastQueryString = queryString;
+                        lastCompleteInputQueryString = queryString;
                     }
                 }, 0);
             }
