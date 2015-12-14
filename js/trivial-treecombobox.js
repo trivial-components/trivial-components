@@ -272,19 +272,20 @@
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
-                    if (lastQueryString !== queryString || lastCompleteInputQueryString !== $editor.val()) {
+                    var completeInputString = $editor.val();
+                    if (lastQueryString !== queryString || lastCompleteInputQueryString !== completeInputString) {
                         if ($spinners.length === 0) {
                             var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
                             $spinners = $spinners.add($spinner);
                         }
                         config.queryFunction(queryString, {
-                            completeInputString: $editor.val(),
+                            completeInputString: completeInputString,
                             currentlySelectedEntry: selectedEntry
                         }, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
                         });
                         lastQueryString = queryString;
-                        lastCompleteInputQueryString = queryString;
+                        lastCompleteInputQueryString = completeInputString;
                     }
                 }, 0);
             }
