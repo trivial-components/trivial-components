@@ -274,6 +274,9 @@
             this.updateNode = treeBox.updateNode;
             this.removeNode = treeBox.removeNode;
             this.addNode = treeBox.addNode;
+            this.selectNode = function(nodeId) {
+                treeBox.setSelectedEntry(nodeId);
+            };
             this.destroy = function() {
                 $originalInput.removeClass('tr-original-input').insertBefore($componentWrapper);
                 $componentWrapper.remove();
