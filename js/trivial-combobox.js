@@ -37,16 +37,18 @@
             var me = this;
 
             options = options || {};
+            var _selectedEntryTemplate = options.template || TrivialComponents.image2LinesTemplate;
             var config = $.extend({
                 valueProperty: null,
                 inputTextProperty: 'displayValue',
                 template: TrivialComponents.image2LinesTemplate,
-                selectedEntryTemplate: options.template || TrivialComponents.image2LinesTemplate,
+                selectedEntryTemplate: _selectedEntryTemplate,
                 selectedEntry: undefined,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 entries: null,
+                emptyEntryTemplate: options.emptyEntryTemplate || _selectedEntryTemplate,
                 emptyEntry: {},
                 queryFunction: null, // defined below...
                 autoComplete: true,
@@ -291,7 +293,7 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
+                    var $selectedEntry = $(Mustache.render(config.emptyEntryTemplate, config.emptyEntry))
                         .addClass("tr-combobox-entry")
                         .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);

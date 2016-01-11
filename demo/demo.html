@@ -34,6 +34,7 @@
     <h5>Default query implementation:</h5>
     <small>Configured entries are filtered locally.</small>
     <input id="defaultFilteringComboBox">
+    <input id="emptyEntryTemplateFilteringCombobox">
     <input id="asdf">
     <small>allowFreeText: true</small>
     <input id="freeTextComboBox">
@@ -115,7 +116,7 @@
 <div style="width: 350px">
     <input id="treeComboBox">
 </div>
-    <h5>freeText...</h5>
+<h5>freeText...</h5>
 <div style="width: 350px">
     <input id="freeTextTreeComboBox">
 </div>
@@ -124,6 +125,13 @@
 </div>
 <div style="width: 350px">
     <input id="readonlyTreeComboBox">
+</div>
+<div style="width: 350px">
+   <input id="emptyEntryTemplateTreeComboBox">
+</div>
+
+<div style="width: 350px">
+   <input id="emptyEntryTreeComboBox">
 </div>
 
 <h4>Trivial Tree</h4>
@@ -180,6 +188,17 @@ include exclude forcer:
         });
         defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+        });
+
+        var emptyEntryTemplateFilteringCombobox = $('#emptyEntryTemplateFilteringCombobox').TrivialComboBox({
+            entries: createEntries(),
+            emptyEntry: {
+                displayValue: "Please select..."
+            },
+            emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
+        });
+        emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("emptyEntryTemplateFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         var freeTextComboBox = $('#freeTextComboBox').TrivialComboBox({
@@ -367,6 +386,42 @@ include exclude forcer:
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[2],
             editingMode: 'readonly'
+        });
+
+        var emptyEntryTemplateTreeComboBox = $('#emptyEntryTemplateTreeComboBox').TrivialTreeComboBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>Please choose ...</i></div>',
+            lazyChildrenQueryFunction: function (node, callback) {
+               setTimeout(function () {
+                  callback(createDemoTreeNodes())
+               }, 1000);
+            },
+            animationDuration: 200
+        });
+        emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+        });
+
+        var emptyEntryTreeComboBox = $('#emptyEntryTreeComboBox').TrivialTreeComboBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            emptyEntry: {
+                id: -1,
+                displayValue: "nothing selected",
+                additionalInfo: "-",
+                imageUrl: "img/icons/pin.png",
+                isLeaf: true
+            },
+            lazyChildrenQueryFunction: function (node, callback) {
+               setTimeout(function () {
+                  callback(createDemoTreeNodes())
+               }, 1000);
+            },
+            animationDuration: 200
+        });
+        emptyEntryTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         var zeroConfigTree = $('#zeroConfigTree').TrivialTree({
