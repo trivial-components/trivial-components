@@ -303,9 +303,12 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(config.emptyEntryTemplate, config.emptyEntry))
-                        .addClass("tr-combobox-entry")
-                        .addClass("empty");
+                    // show selected entry template when in editing mode, even if no entry has been selected
+                    // to use the editor area of the selected entry template
+                    var templateToShow = isEditorVisible ? config.selectedEntryTemplate : config.emptyEntryTemplate;
+                    var $selectedEntry = $(Mustache.render(templateToShow, config.emptyEntry))
+                            .addClass("tr-combobox-entry")
+                            .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 } else {
                     if (config.valueProperty) {
@@ -330,6 +333,14 @@
             }
 
             function showEditor() {
+                // show selected entry template when in editing mode, even if no entry has been selected
+                // to use the editor area of the selected entry template
+                if(selectedEntry == null) {
+                    var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
+                            .addClass("tr-combobox-entry")
+                            .addClass("empty");
+                    $selectedEntryWrapper.empty().append($selectedEntry);
+                }
                 var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor
                     .css({
@@ -350,6 +361,13 @@
 
             function hideEditor() {
                 $editor.width(0).height(0);
+                // show empty entry again if no entry has been selected and free text is not allowed
+                if(selectedEntry == null && !config.allowFreeText) {
+                    var $selectedEntry = $(Mustache.render(config.emptyEntryTemplate, config.emptyEntry))
+                            .addClass("tr-combobox-entry")
+                            .addClass("empty");
+                    $selectedEntryWrapper.empty().append($selectedEntry);
+                }
                 isEditorVisible = false;
             }
 
