@@ -44,7 +44,7 @@
             + '</svg>';
         var dateTemplate = '<div class="tr-template-icon-single-line">'
             + dateIconTemplate
-            + '<div class="content-wrapper editor-area">{{displayString}}</div>'
+            + '<div class="content-wrapper tr-editor-area">{{displayString}}</div>'
             + '</div>';
         var timeIconTemplate = '<svg class="clock-icon night-{{isNight}}" viewBox="0 0 110 110" width="22" height="22"> ' +
             '<circle class="clockcircle" cx="55" cy="55" r="45"/>' +
@@ -55,7 +55,7 @@
             '</svg>';
         var timeTemplate = '<div class="tr-template-icon-single-line">' +
             timeIconTemplate +
-            '  <div class="content-wrapper editor-area">{{displayString}}</div>' +
+            '  <div class="content-wrapper tr-editor-area">{{displayString}}</div>' +
             '</div>';
 
         var keyCodes = TrivialComponents.keyCodes;
