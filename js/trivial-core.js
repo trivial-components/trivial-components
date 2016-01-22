@@ -33,47 +33,47 @@
 
         var image2LinesTemplate = '<div class="tr-template-image-2-lines">' +
             '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div class="main-line">{{displayValue}}</div> ' +
             '    <div class="additional-info">{{additionalInfo}}</div>' +
             '  </div>' +
             '</div>';
         var roundImage2LinesColorBubbleTemplate = '<div class="tr-template-round-image-2-lines-color-bubble">' +
             '  {{#imageUrl}}<div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>{{/imageUrl}}' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div class="main-line">{{displayValue}}</div> ' +
             '    <div class="additional-info">{{#statusColor}}<span class="status-bubble" style="background-color: {{statusColor}}"></span>{{/statusColor}}{{additionalInfo}}</div>' +
             '  </div>' +
             '</div>';
         var icon2LinesTemplate = '<div class="tr-template-icon-2-lines">' +
             '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div class="main-line">{{displayValue}}</div> ' +
             '    <div class="additional-info">{{additionalInfo}}</div>' +
             '  </div>' +
             '</div>';
         var iconSingleLineTemplate = '<div class="tr-template-icon-single-line">' +
             '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
-            '  <div class="content-wrapper editor-area">{{displayValue}}</div>' +
+            '  <div class="content-wrapper tr-editor-area">{{displayValue}}</div>' +
             '</div>';
         var singleLineTemplate = '<div class="tr-template-single-line">' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div>{{displayValue}}</div> ' +
             '  </div>' +
             '</div>';
         var currencySingleLineShortTemplate = '<div class="tr-template-currency-single-line-short">' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div>{{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}} {{#code}}<span class="currency-code">{{code}}</span>{{/code}}</div> ' +
             '  </div>' +
             '</div>';
         var currencySingleLineLongTemplate = '<div class="tr-template-currency-single-line-long">' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div class="symbol-and-code">{{#code}}<span class="currency-code">{{code}}</span>{{/code}} {{#symbol}}<span class="currency-symbol">{{symbol}}</span>{{/symbol}}</div>' +
             '    <div class="currency-name">{{name}}</div>' +
             '  </div>' +
             '</div>';
         var currency2LineTemplate = '<div class="tr-template-currency-2-lines">' +
-            '  <div class="content-wrapper editor-area"> ' +
+            '  <div class="content-wrapper tr-editor-area"> ' +
             '    <div class="main-line">' +
             '      <span class="currency-code">{{code}}</span>' +
             '      <span class="currency-name">{{name}}</span>' +

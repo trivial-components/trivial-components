@@ -323,15 +323,10 @@
             }
 
             function showEditor() {
-                // show selected entry template when in editing mode, even if no entry has been selected
-                // to use the editor area of the selected entry template
-                if(selectedEntry == null) {
-                    var $selectedEntry = $(Mustache.render(config.selectedEntryTemplate, config.emptyEntry))
-                            .addClass("tr-combobox-entry")
-                            .addClass("empty");
-                    $selectedEntryWrapper.empty().append($selectedEntry);
+                var $editorArea = $selectedEntryWrapper.find(".tr-editor-area");
+                if ($editorArea.length === 0) {
+                    $editorArea = $selectedEntryWrapper;
                 }
-                var $editorArea = $selectedEntryWrapper.find(".editor-area");
                 $editor
                     .css({
                         "width": Math.min($editorArea[0].offsetWidth, $trigger ? $trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
