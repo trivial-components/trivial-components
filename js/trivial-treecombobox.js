@@ -488,6 +488,9 @@
                 showEditor();
                 $editor.select();
             };
+            this.getDropDown = function() {
+                return $dropDown;
+            };
             this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($treeComboBox);
                 $treeComboBox.remove();
