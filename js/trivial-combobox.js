@@ -37,7 +37,7 @@
             var me = this;
 
             options = options || {};
-            var _selectedEntryTemplate = options.template || TrivialComponents.image2LinesTemplate;
+            var _selectedEntryTemplate = options.selectedEntryTemplate || options.template || TrivialComponents.image2LinesTemplate;
             var config = $.extend({
                 valueProperty: null,
                 inputTextProperty: 'displayValue',
