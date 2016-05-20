@@ -184,7 +184,8 @@ include exclude forcer:
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
-            }
+            },
+            valueProperty: 'additionalInfo',
         });
         defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
@@ -195,6 +196,7 @@ include exclude forcer:
             emptyEntry: {
                 displayValue: "Please select..."
             },
+           valueProperty: 'additionalInfo',
             emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
         });
         emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
@@ -206,6 +208,7 @@ include exclude forcer:
             emptyEntry: {
                 displayValue: "Please select..."
             },
+           valueProperty: 'additionalInfo',
             allowFreeText: true
         });
         freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
@@ -217,6 +220,7 @@ include exclude forcer:
             emptyEntry: {
                 displayValue: "Please select..."
             },
+            valueProperty: 'additionalInfo',
             autoComplete: false
         });
 
@@ -225,7 +229,8 @@ include exclude forcer:
             emptyEntry: {
                 displayValue: "Please select..."
             },
-            template: TrivialComponents.iconSingleLineTemplate
+            template: TrivialComponents.iconSingleLineTemplate,
+            valueProperty: 'additionalInfo'
         });
 
         $('#customFilteringComboBox').trivialcombobox({
@@ -241,6 +246,7 @@ include exclude forcer:
                     }));
                 }, 500);
             },
+            valueProperty: 'additionalInfo',
             selectedEntryTemplate: TrivialComponents.singleLineTemplate
         });
 
@@ -254,17 +260,20 @@ include exclude forcer:
 
         $('#noTriggerComboBox').TrivialComboBox({
             entries: createEntries(),
-            showTrigger: false
+            showTrigger: false,
+            valueProperty: 'additionalInfo'
         });
 
         $('#disabledComboBox').TrivialComboBox({
             selectedEntry: createEntries(1)[0],
-            editingMode: 'disabled'
+            editingMode: 'disabled',
+            valueProperty: 'additionalInfo'
         });
 
         $('#readonlyComboBox').TrivialComboBox({
             selectedEntry: createEntries(1)[0],
-            editingMode: 'readonly'
+            editingMode: 'readonly',
+            valueProperty: 'additionalInfo'
         });
 
         var listBoxEntries = createEntries(10);
@@ -274,7 +283,8 @@ include exclude forcer:
         });
 
         $('#zeroConfigList').TrivialList({
-            entries: createEntries()
+            entries: createEntries(),
+            valueProperty: 'additionalInfo'
         });
 
         var trivialTagBox = $('#zeroConfigTagBox').TrivialTagBox({
@@ -380,14 +390,16 @@ include exclude forcer:
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[1],
-            editingMode: 'disabled'
+            editingMode: 'disabled',
+            valueProperty: 'additionalInfo'
         });
 
         $('#readonlyTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[2],
-            editingMode: 'readonly'
+            editingMode: 'readonly',
+            valueProperty: 'additionalInfo'
         });
 
         var emptyEntryTemplateTreeComboBox = $('#emptyEntryTemplateTreeComboBox').TrivialTreeComboBox({
@@ -399,7 +411,8 @@ include exclude forcer:
                   callback(createDemoTreeNodes())
                }, 1000);
             },
-            animationDuration: 200
+            animationDuration: 200,
+            valueProperty: 'additionalInfo'
         });
         emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
@@ -420,7 +433,8 @@ include exclude forcer:
                   callback(createDemoTreeNodes())
                }, 1000);
             },
-            animationDuration: 200
+            animationDuration: 200,
+            valueProperty: 'additionalInfo'
         });
         emptyEntryTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))

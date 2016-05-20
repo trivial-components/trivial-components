@@ -147,7 +147,10 @@
                         return;
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = listBox.getHighlightedEntry();
-                        if (isDropDownOpen && highlightedEntry) {
+                        if(isDropDownOpen && $editor.val() === ""){
+                            // delete selected value if user empties the editor
+                            selectEntry(null, true);
+                        }else if (isDropDownOpen && highlightedEntry) {
                             selectEntry(highlightedEntry, true);
                         }
                         return;
@@ -178,7 +181,10 @@
                         if (isDropDownOpen || editorContainsFreeText()) {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = listBox.getHighlightedEntry();
-                            if (isDropDownOpen && highlightedEntry) {
+                            if(isDropDownOpen && $editor.val() === ""){
+                                // delete selected value if user empties the editor
+                                selectEntry(null, true);
+                            }else if (isDropDownOpen && highlightedEntry) {
                                 selectEntry(highlightedEntry, true);
                             } else if (config.allowFreeText) {
                                 selectEntry(me.getSelectedEntry(), true);
