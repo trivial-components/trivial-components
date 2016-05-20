@@ -157,14 +157,14 @@
             }
         };
 
-        var defaultTreeQueryFunctionFactory = function (topLevelEntries, entryTemplates, matchingOptions, childrenPropertyName, expandedPropertyName) {
+        var createProxy = function(delegate) {
+            var proxyConstructor = function () {
+            };
+            proxyConstructor.prototype = delegate;
+            return new proxyConstructor();
+        };
 
-            function createProxy(delegate) {
-                var proxyConstructor = function () {
-                };
-                proxyConstructor.prototype = delegate;
-                return new proxyConstructor();
-            }
+        var defaultTreeQueryFunctionFactory = function (topLevelEntries, entryTemplates, matchingOptions, childrenPropertyName, expandedPropertyName) {
 
             function findMatchingEntriesAndTheirAncestors(entry, queryString, nodeDepth) {
                 var entryProxy = createProxy(entry);
@@ -323,7 +323,8 @@
             selectElementContents: selectElementContents,
             escapeSpecialRegexCharacter: escapeSpecialRegexCharacter,
             Event: Event,
-            objectEquals: objectEquals
+            objectEquals: objectEquals,
+            createProxy: createProxy
 
             //findTreeNodes: findTreeNodes,
             //findTreeNodeById: findTreeNodeById,

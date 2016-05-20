@@ -37,6 +37,7 @@
             options = options || {};
             var config = $.extend({
                 template: TrivialComponents.image2LinesTemplate,
+                templateProperty: "template",
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 entries: null,
                 queryFunction: null, // defined below...
@@ -69,7 +70,7 @@
                         var entry = entries[i];
                         var $entry;
                         if (!entry._trEntryElement) {
-                            var html = Mustache.render(config.template, entry);
+                            var html = Mustache.render(entry[config.templateProperty] || config.template, entry);
                             $entry = $(html).addClass("tr-listbox-entry filterable-item");
                         } else {
                             $entry = entry._trEntryElement;
@@ -97,18 +98,10 @@
                 $entryList.appendTo($listBox);
             }
 
-            function updateEntries(newEntries, highlightDirection) {
-                highlightedEntry = null;
+            function updateEntries(newEntries) {
+                setHighlightedEntry(null);
                 entries = newEntries;
                 updateEntryElements(entries);
-
-                if (entries.length > 0) {
-                    if (typeof highlightDirection != 'undefined') {
-                        highlightNextEntry(highlightDirection);
-                    }
-                } else {
-                    setHighlightedEntry(null);
-                }
             }
 
             function minimallyScrollTo($entryWrapper) {
@@ -183,6 +176,7 @@
                 }
             };
             this.selectEntry = selectEntry;
+            this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
             this.highlightNextMatchingEntry = highlightNextEntry;
             this.getHighlightedEntry = function () {

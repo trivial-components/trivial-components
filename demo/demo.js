@@ -1223,5 +1223,10 @@ function createDemoTreeNodes() {
         id: 4, displayValue: "Contacts",
         imageUrl: "img/icons/contacts.png",
         isLeaf: true
+    }, {
+        id: 5, displayValue: "Custom Template Node",
+        imageUrl: "img/icons/contacts.png",
+        isLeaf: true,
+        template: "<div>Custom template</div>"
     }]
 }

@@ -267,8 +267,10 @@ include exclude forcer:
             editingMode: 'readonly'
         });
 
+        var listBoxEntries = createEntries(10);
+        listBoxEntries[1].template = "<div>custom template for entry {{id}}</div>";
         $('#listBox').TrivialListBox({
-            entries: createEntries(10)
+            entries: listBoxEntries
         });
 
         $('#zeroConfigList').TrivialList({

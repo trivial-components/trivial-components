@@ -44,6 +44,7 @@
                 },
                 expandedProperty: 'expanded',
                 templates: [TrivialComponents.iconSingleLineTemplate],
+                templateProperty: "template",
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
@@ -78,7 +79,7 @@
             }
 
             function createEntryDisplay(entry, depth) {
-                return $(Mustache.render(config.templates[Math.min(config.templates.length - 1, depth)], entry));
+                return $(Mustache.render(entry[config.templateProperty] || config.templates[Math.min(config.templates.length - 1, depth)], entry));
             }
 
             function createEntryElement(entry, depth) {
@@ -208,7 +209,7 @@
                 }
             }
 
-            function updateEntries(newEntries, highlightDirection) {  // TODO remove hightlightDirection - no more needed!
+            function updateEntries(newEntries) {
                 highlightedEntry = null;
                 entries = newEntries;
 
