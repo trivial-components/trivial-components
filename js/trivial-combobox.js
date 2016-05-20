@@ -149,6 +149,10 @@
                         var highlightedEntry = listBox.getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
                             selectEntry(highlightedEntry, true);
+                        } else if (!$editor.val()) {
+                            selectEntry(null, true);
+                        } else if (config.allowFreeText) {
+                            selectEntry(me.getSelectedEntry(), true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -175,11 +179,13 @@
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (e.which == keyCodes.enter) {
-                        if (isDropDownOpen || editorContainsFreeText()) {
+                        if (isEditorVisible || editorContainsFreeText()) {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = listBox.getHighlightedEntry();
                             if (isDropDownOpen && highlightedEntry) {
                                 selectEntry(highlightedEntry, true);
+                            } else if (!$editor.val()) {
+                                selectEntry(null, true);
                             } else if (config.allowFreeText) {
                                 selectEntry(me.getSelectedEntry(), true);
                             }
@@ -201,7 +207,15 @@
                             $editor.select();
                         }
                         openDropDown();
-                        query(1);
+
+                        setTimeout(function() { // We need the new editor value (after the keydown event). Therefore setTimeout().
+                            if ($editor.val()) {
+                                query(1);
+                            } else {
+                                query(0);
+                                listBox.setHighlightedEntry(null);
+                            }
+                        })
                     }
                 })
                 .keyup(function (e) {
@@ -262,9 +276,9 @@
 
             function query(highlightDirection) {
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-                setTimeout(function (completeInputString) {
-                    completeInputString = completeInputString || $editor.val();
+                setTimeout(function () {
                     var queryString = getNonSelectedEditorValue();
+                    var completeInputString = $editor.val();
                     if (lastQueryString !== queryString || lastCompleteInputQueryString !== completeInputString) {
                         if ($spinners.length === 0) {
                             var $spinner = $(config.spinnerTemplate).appendTo($dropDown);
@@ -294,8 +308,7 @@
                     }
                     selectedEntry = null;
                     var $selectedEntry = $(Mustache.render(config.emptyEntryTemplate, config.emptyEntry))
-                        .addClass("tr-combobox-entry")
-                        .addClass("empty");
+                        .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 } else {
                     if (config.valueProperty) {
@@ -434,7 +447,6 @@
             $comboBox[0].trivialComboBox = this;
 
             function updateEntries(newEntries, highlightDirection) {
-                highlightDirection = highlightDirection === undefined ? 1 : highlightDirection;
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();
@@ -444,7 +456,11 @@
 
                 listBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
-                listBox.highlightNextEntry(highlightDirection);
+                if (highlightDirection) {
+                    listBox.highlightNextEntry(highlightDirection);
+                } else {
+                    listBox.setHighlightedEntry(null);
+                }
 
                 autoCompleteIfPossible(config.autoCompleteDelay);
 

@@ -152,6 +152,10 @@
                         var highlightedEntry = treeBox.getHighlightedEntry();
                         if (isDropDownOpen && highlightedEntry) {
                             selectEntry(highlightedEntry, true);
+                        } else if (!$editor.val()) {
+                            selectEntry(null, true);
+                        } else if (config.allowFreeText) {
+                            selectEntry(me.getSelectedEntry(), true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -184,12 +188,14 @@
                             autoCompleteIfPossible(config.autoCompleteDelay);
                         }
                         return false; // some browsers move the caret to the beginning on up key
-                    } else if (isDropDownOpen && e.which == keyCodes.enter) {
-                        if (isDropDownOpen || editorContainsFreeText()) {
+                    } else if (e.which == keyCodes.enter) {
+                        if (isEditorVisible || editorContainsFreeText()) {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = treeBox.getHighlightedEntry();
                             if (isDropDownOpen && highlightedEntry) {
                                 selectEntry(highlightedEntry, true);
+                            } else if (!$editor.val()) {
+                                selectEntry(null, true);
                             } else if (config.allowFreeText) {
                                 selectEntry(me.getSelectedEntry(), true);
                             }
@@ -211,11 +217,19 @@
                             $editor.select();
                         }
                         openDropDown();
-                        query(1);
+
+                        setTimeout(function() { // We need the new editor value (after the keydown event). Therefore setTimeout().
+                            if ($editor.val()) {
+                                query(1);
+                            } else {
+                                query(0);
+                                treeBox.setHighlightedEntry(null);
+                            }
+                        })
                     }
                 })
                 .keyup(function (e) {
-                    if (!TrivialComponents.isModifierKey(e) && e.which != keyCodes.enter && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                    if (!TrivialComponents.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
                         selectEntry(null, false);
                     }
                 })
@@ -304,8 +318,7 @@
                     }
                     selectedEntry = null;
                     var $selectedEntry = $(Mustache.render(config.emptyEntryTemplate, config.emptyEntry))
-                        .addClass("tr-combobox-entry")
-                        .addClass("empty");
+                        .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                 } else {
                     if (config.valueProperty) {
@@ -452,8 +465,10 @@
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
                 if (nonSelectedEditorValue.length > 0) {
                     treeBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
-                    treeBox.highlightNextMatchingEntry(highlightDirection);
-                } else {
+                    if (highlightDirection) {
+                        treeBox.highlightNextMatchingEntry(highlightDirection);
+                    }
+                } else if (highlightDirection) {
                     treeBox.highlightNextEntry(highlightDirection);
                 }
 
