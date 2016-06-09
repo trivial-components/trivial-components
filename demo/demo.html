@@ -180,8 +180,12 @@ include exclude forcer:
 <script>
     $(function () {
 
+        var defaultFilteringEntries = createEntries();
+        defaultFilteringEntries[2].displayValue = "ASDF";
+        defaultFilteringEntries[2].template = "<div>custom entry template: {{id}}</div>";
+        defaultFilteringEntries[2].selectedEntryTemplate = "<div>custom SELECTED entry template: {{id}}</div>";
         var defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
-            entries: createEntries(),
+            entries: defaultFilteringEntries,
             emptyEntry: {
                 displayValue: "Please select..."
             }
