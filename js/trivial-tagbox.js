@@ -45,6 +45,9 @@
                 selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+                templateProperty: "template",
+                selectedEntryTemplateProperty: "selectedEntryTemplate",
+                finalEntryProperty: "finalEntry", // this property determines if the tag is completed after selection of the entry. If not, the next tag will be appended to this one.
                 entries: null,
                 selectedEntries: [],
                 maxSelectedEntries: null,
@@ -425,7 +428,7 @@
                 selectedEntries.splice($editor.index(), 0, tag);
                 $originalInput.val(calculateOriginalInputValue());
 
-                var $entry = $(Mustache.render(config.selectedEntryTemplate, tag));
+                var $entry = $(Mustache.render(tag[config.selectedEntryTemplateProperty] || config.selectedEntryTemplate, tag));
                 var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
                 $tagWrapper.append($entry).insertBefore($editor);
                 tag._trEntryElement = $tagWrapper;
