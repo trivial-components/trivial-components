@@ -359,7 +359,7 @@
                 $editor
                     .css({
                         "width": Math.min($editorArea[0].offsetWidth, $trigger ? $trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
-                        "height": ($editorArea.height()) + "px"
+                        "height": ($editorArea[0].offsetHeight) + "px"
                     })
                     .position({
                         my: "left top",

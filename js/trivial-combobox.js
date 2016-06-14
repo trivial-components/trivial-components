@@ -210,7 +210,7 @@
                         }
                         openDropDown();
 
-                        setTimeout(function() { // We need the new editor value (after the keydown event). Therefore setTimeout().
+                        setTimeout(function () { // We need the new editor value (after the keydown event). Therefore setTimeout().
                             if ($editor.val()) {
                                 query(1);
                             } else {
@@ -349,7 +349,7 @@
                 $editor
                     .css({
                         "width": Math.min($editorArea[0].offsetWidth, $trigger ? $trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
-                        "height": ($editorArea.height()) + "px"
+                        "height": ($editorArea[0].offsetHeight) + "px"
                     })
                     .position({
                         my: "left top",
@@ -479,14 +479,14 @@
                     return selectedEntryToReturn;
                 }
             };
-            this.selectEntry = function(entry, muteEvent) {
+            this.selectEntry = function (entry, muteEvent) {
                 selectEntry(entry, true, muteEvent);
             };
             this.focus = function () {
                 showEditor();
                 $editor.select();
             };
-            this.getDropDown = function() {
+            this.getDropDown = function () {
                 return $dropDown;
             };
             this.destroy = function () {
