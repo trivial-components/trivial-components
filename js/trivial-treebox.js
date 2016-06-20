@@ -173,10 +173,19 @@
                     minimallyScrollTo(node._trEntryElement);
                 }
 
+                var childrenWrapper = node._trEntryElement.find("> .tr-tree-entry-children-wrapper");
                 if (expanded) {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideDown(animate ? config.animationDuration : 0);
+                    if (animate) {
+                        childrenWrapper.slideDown(config.animationDuration);
+                    } else {
+                        childrenWrapper.show();
+                    }
                 } else {
-                    node._trEntryElement.find("> .tr-tree-entry-children-wrapper").slideUp(animate ? config.animationDuration : 0);
+                    if (animate) {
+                        childrenWrapper.slideUp(config.animationDuration);
+                    } else {
+                        childrenWrapper.hide();
+                    }
                 }
 
                 if (!!wasExpanded != !!expanded) {
