@@ -162,7 +162,7 @@ gulp.task('tar', ['prepare-dist'], function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('size-report',  function () {
+gulp.task('size-report', ["js-bundle"],  function () {
     return gulp.src(['dist/js/bundle/trivial-components.min.js', 'dist/css/trivial-components.min.css'
         //,  'bower_components/moment/min/moment-with-locales.min.js',
         //'dist/lib/jquery.min.js',

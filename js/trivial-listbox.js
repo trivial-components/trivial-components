@@ -56,6 +56,17 @@
             var highlightedEntry = null;
 
             var $listBox = $('<div class="tr-listbox"/>').appendTo($container);
+            $listBox.on("mousedown", ".tr-listbox-entry", function(e) {
+                selectEntry($(this).data("entry"), e);
+            }).on("mouseup", ".tr-listbox-entry", function(e) {
+                $listBox.trigger("mouseup", e);
+            }).on("mouseenter", ".tr-listbox-entry", function(e) {
+                setHighlightedEntry($(this).data("entry"));
+            }).on("mouseleave", ".tr-listbox-entry", function(e) {
+                if (!$(e.toElement).is('.tr-listbox-entry')) {
+                    setHighlightedEntry(null);
+                }
+            });
             var $entryList = $('<div class="tr-listbox-entry-list"></div>').appendTo($listBox);
 
             if (entries) { // if config.entries was set...
@@ -75,22 +86,9 @@
                         } else {
                             $entry = entry._trEntryElement;
                         }
-                        $entry.appendTo($entryList);
+                        $entry.appendTo($entryList)
+                            .data("entry", entry);
                         entry._trEntryElement = $entry;
-                        (function (entry) {
-                            $entry.mousedown(function (e) {
-                                $listBox.trigger("mousedown", e);
-                                selectEntry(entry, e);
-                            }).mouseup(function (e) {
-                                $listBox.trigger("mouseup", e);
-                            }).mouseenter(function () {
-                                setHighlightedEntry(entry);
-                            }).mouseleave(function (e) {
-                                if (!$(e.toElement).is('.tr-listbox-entry')) {
-                                    setHighlightedEntry(null);
-                                }
-                            });
-                        })(entry);
                     }
                 } else {
                     $entryList.append(config.noEntriesTemplate);
