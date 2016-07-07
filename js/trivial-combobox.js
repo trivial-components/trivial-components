@@ -81,7 +81,7 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
-            var listBoxDirty = false;
+            var listBoxDirty = true;
 
             var $spinners = $();
             var $originalInput = $(originalInput);
@@ -398,7 +398,9 @@
 
             function openDropDown() {
                 if (dropdownNeeded) {
-                    updateListBoxEntries();
+                    if (listBoxDirty) {
+                        updateListBoxEntries();
+                    }
                     $comboBox.addClass("open");
                     repositionDropDown();
                     isDropDownOpen = true;

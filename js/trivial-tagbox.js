@@ -80,6 +80,7 @@
                 var blurCausedByClickInsideComponent = false;
                 var autoCompleteTimeoutId = -1;
                 var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+                var listBoxDirty = true;
 
                 var $spinners = $();
                 var $originalInput = $(originalInput).addClass("tr-original-input");
@@ -273,7 +274,9 @@
                     }
                 });
 
-                listBox = $dropDown.TrivialListBox(config);
+                var configWithoutEntries = $.extend({}, config);
+                configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
+                listBox = $dropDown.TrivialListBox(configWithoutEntries);
                 listBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
                     if (selectedEntry) {
                         selectEntry(selectedEntry, true);
@@ -324,11 +327,20 @@
                     selectEntry(config.selectedEntries[i], true);
                 }
 
+                function updateListBoxEntries() {
+                    listBox.updateEntries(entries);
+                    listBoxDirty = false;
+                }
+
                 function updateEntries(newEntries, highlightDirection) {
                     entries = newEntries;
                     $spinners.remove();
                     $spinners = $();
-                    listBox.updateEntries(newEntries);
+                    if (isDropDownOpen) {
+                        updateListBoxEntries();
+                    } else {
+                        listBoxDirty = true;
+                    }
 
                     var nonSelectedEditorValue = getNonSelectedEditorValue();
 
@@ -451,6 +463,9 @@
 
                 function openDropDown() {
                     if (dropdownNeeded) {
+                        if (listBoxDirty) {
+                            updateListBoxEntries();
+                        }
                         $tagBox.addClass("open");
                         $dropDown.show();
                         repositionDropDown();
