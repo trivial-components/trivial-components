@@ -81,6 +81,7 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var listBoxDirty = false;
 
             var $spinners = $();
             var $originalInput = $(originalInput);
@@ -255,7 +256,9 @@
                 }
             });
 
-            listBox = $dropDown.TrivialListBox(config);
+            var configWithoutEntries = $.extend({}, config);
+            configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
+            listBox = $dropDown.TrivialListBox(configWithoutEntries);
             listBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
                 if (selectedEntry) {
                     selectEntry(selectedEntry, true, TrivialComponents.objectEquals(selectedEntry, lastCommittedValue));
@@ -395,6 +398,7 @@
 
             function openDropDown() {
                 if (dropdownNeeded) {
+                    updateListBoxEntries();
                     $comboBox.addClass("open");
                     repositionDropDown();
                     isDropDownOpen = true;
@@ -442,11 +446,20 @@
             this.$ = $comboBox;
             $comboBox[0].trivialComboBox = this;
 
+            function updateListBoxEntries() {
+                listBox.updateEntries(entries);
+                listBoxDirty = false;
+            }
+
             function updateEntries(newEntries, highlightDirection) {
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();
-                listBox.updateEntries(newEntries);
+                if (isDropDownOpen) {
+                    updateListBoxEntries();
+                } else {
+                    listBoxDirty = true;
+                }
 
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
 

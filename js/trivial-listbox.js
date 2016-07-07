@@ -97,6 +97,9 @@
             }
 
             function updateEntries(newEntries) {
+                if (newEntries == null) {
+                    newEntries = [];
+                }
                 setHighlightedEntry(null);
                 entries = newEntries;
                 updateEntryElements(entries);
