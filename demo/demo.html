@@ -24,6 +24,7 @@
     <script src="../js/trivial-unitbox.js"></script>
     <script src="../js/trivial-calendarbox.js"></script>
     <script src="../js/trivial-calendarcombobox.js"></script>
+    <script src="../js/trivial-datetimefield.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -159,6 +160,11 @@ include exclude forcer:
     <input id="unitBoxLeft">
     <h5>long single line template:</h5>
     <input id="unitBoxSingleLineTemplate">
+</div>
+
+<div style="width: 300px">
+    <h3>dateTimeField</h3>
+    <div id="dateTimeField"></div>
 </div>
 
 <div style="width: 300px">
@@ -514,6 +520,8 @@ include exclude forcer:
             entries: createCurrencyEntries(),
             template: TrivialComponents.currencySingleLineLongTemplate
         });
+
+        dateTimeField = $('#dateTimeField').TrivialDateTimeField({});
 
         calendarBox = $('#calendarBox').TrivialCalendarBox({
             selectedDate: moment(),

@@ -87,6 +87,12 @@
             var focusGoesToOtherEditor = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var calendarBoxInitialized = false;
+
+            var MODE_CALENDAR = 'calendar';
+            var MODE_DATE_LIST = 'dateList';
+            var MODE_TIME_LIST = 'timeList';
+            var dropDownMode = MODE_CALENDAR;
 
             var $originalInput = $(originalInput).addClass("tr-original-input");
             var $dateTimeField = $('<div class="tr-datetimefield tr-input-wrapper"/>')
@@ -102,13 +108,13 @@
 
             $dateIconWrapper.click(function () {
                 $activeEditor = $dateEditor;
-                setActiveBox(calendarBox);
+                setDropDownMode(MODE_CALENDAR);
                 openDropDown();
                 TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
             });
             $timeIconWrapper.click(function () {
                 $activeEditor = $timeEditor;
-                setActiveBox(calendarBox);
+                setDropDownMode(MODE_CALENDAR);
                 TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
             });
 
@@ -132,8 +138,8 @@
                         closeDropDown();
                     } else {
                         setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
+                            setDropDownMode(MODE_CALENDAR);
                             calendarBox.setSelectedDate(dateValue ? dateValue.moment : moment());
-                            setActiveBox(calendarBox);
                             $activeEditor = $dateEditor;
                             TrivialComponents.selectElementContents($dateEditor[0], 0, $dateEditor.text().length);
                             openDropDown();
@@ -170,38 +176,42 @@
                     closeDropDown();
                 }
             });
-            calendarBox = $('<div class="calendarbox">').appendTo($dropDown).TrivialCalendarBox({
-                firstDayOfWeek: 1,
-                mode: 'date' // 'date', 'time', 'datetime'
-            });
-            calendarBox.setKeyboardNavigationState('month');
-            calendarBox.onChange.addListener(function (changedUnit, selectedDate) {
-                setDate(createDateComboBoxEntry(selectedDate, config.dateFormat));
-                if (changedUnit === 'day') {
-                    closeDropDown();
-                    $activeEditor = $timeEditor;
-                    TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
-                    fireChangeEvents();
-                }
-            });
+            var $calendarBox = $('<div class="calendarbox">').appendTo($dropDown);
 
             var $activeEditor;
-            var activeBox;
 
-            function setActiveBox(newActiveBox) {
-                activeBox = newActiveBox;
-                calendarBox.$.toggle(newActiveBox === calendarBox);
-                dateListBox.$.toggle(newActiveBox === dateListBox);
-                timeListBox.$.toggle(newActiveBox === timeListBox);
-            }
-
-            var currentMode; // one of 'date', 'time', 'calendarbox'
-            function setCurrentMode(mode) {
-                currentMode = mode;
+            function setDropDownMode(mode) {
+                dropDownMode = mode;
+                if (!calendarBoxInitialized && mode === MODE_CALENDAR) {
+                    calendarBox = $calendarBox.TrivialCalendarBox({
+                        firstDayOfWeek: 1,
+                        mode: 'date' // 'date', 'time', 'datetime'
+                    });
+                    calendarBox.setKeyboardNavigationState('month');
+                    calendarBox.onChange.addListener(function (changedUnit, selectedDate) {
+                        setDate(createDateComboBoxEntry(selectedDate, config.dateFormat));
+                        if (changedUnit === 'day') {
+                            closeDropDown();
+                            $activeEditor = $timeEditor;
+                            TrivialComponents.selectElementContents($timeEditor[0], 0, $timeEditor.text().length);
+                            fireChangeEvents();
+                        }
+                    });
+                    calendarBoxInitialized = true;
+                }
+                calendarBoxInitialized && calendarBox.$.toggle(mode === MODE_CALENDAR );
+                dateListBox.$.toggle(mode === MODE_DATE_LIST);
+                timeListBox.$.toggle(mode === MODE_TIME_LIST);
             }
 
             function getActiveBox() {
-                return activeBox;
+                if (dropDownMode === MODE_CALENDAR) {
+                    return calendarBox;
+                } else if (dropDownMode === MODE_DATE_LIST) {
+                    return dateListBox;
+                } else {
+                    return timeListBox;
+                }
             }
 
             function getActiveEditor() {
@@ -209,10 +219,9 @@
             }
 
             $activeEditor = $dateEditor;
-            setActiveBox(calendarBox);
 
             function selectHighlightedListBoxEntry () {
-                if (activeBox === dateListBox || activeBox === timeListBox) {
+                if (dropDownMode === MODE_DATE_LIST || dropDownMode === MODE_TIME_LIST) {
                     var highlightedEntry = getActiveBox().getHighlightedEntry();
                     if (isDropDownOpen && highlightedEntry) {
                         if (getActiveEditor() === $dateEditor) {
@@ -260,11 +269,11 @@
                         getActiveEditor().select();
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
-                            setActiveBox(this === $dateEditor[0] ? dateListBox : timeListBox);
+                            setDropDownMode(this === $dateEditor[0] ? MODE_DATE_LIST : MODE_TIME_LIST);
                             query(direction);
                             openDropDown();
                         } else {
-                            if (getActiveBox() !== calendarBox) {
+                            if (dropDownMode !== MODE_CALENDAR) {
                                 getActiveBox().navigate(direction === 1 ? 'down' : 'up');
                                 autoCompleteIfPossible(config.autoCompleteDelay);
                             }
@@ -285,7 +294,7 @@
                         }
                         closeDropDown();
                     } else {
-                        setActiveBox(this === $dateEditor[0] ? dateListBox : timeListBox);
+                        setDropDownMode(this === $dateEditor[0] ? MODE_DATE_LIST : MODE_TIME_LIST);
                         query(1);
                         openDropDown();
                     }
@@ -459,7 +468,7 @@
             }
 
             function autoCompleteIfPossible(delay) {
-                if (config.autoComplete && (getActiveBox() === dateListBox || getActiveBox() === timeListBox)) {
+                if (config.autoComplete && (dropDownMode === MODE_DATE_LIST || dropDownMode === MODE_TIME_LIST)) {
                     clearTimeout(autoCompleteTimeoutId);
 
                     var listBox = getActiveBox();
