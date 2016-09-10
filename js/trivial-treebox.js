@@ -317,7 +317,7 @@
                 markSelectedEntry(entry);
                 setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
                 fireChangeEvents(entry);
-                if (config.openOnSelection) {
+                if (entry && config.openOnSelection) {
                     setNodeExpanded(entry, true, true);
                 }
             }
