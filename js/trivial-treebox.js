@@ -54,7 +54,10 @@
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
                 },
-                animationDuration: 70
+                animationDuration: 70,
+                showExpanders: true,
+                openOnSelection: false, // open expandable nodes when they are selected
+                enforceSingleExpandedPath: false // only one path is expanded at any time
             };
             var config = $.extend(defaultOptions, options);
 
@@ -66,6 +69,7 @@
             var highlightedEntry = null;
 
             var $componentWrapper = $('<div class="tr-treebox"/>').appendTo($container);
+            $componentWrapper.toggleClass("hide-expanders", !config.showExpanders);
             var $tree = $('<div class="tr-tree-entryTree"></div>').appendTo($componentWrapper);
 
             if (entries) { // if config.entries was set...
@@ -153,6 +157,22 @@
 
             function setNodeExpanded(node, expanded, animate) {
                 var wasExpanded = node[config.expandedProperty];
+
+                if (expanded && config.enforceSingleExpandedPath) {
+                    var currentlyExpandedNodes = findEntries(function (n) {
+                        return !!(n[config.expandedProperty]);
+                    });
+                    var newExpandedPath = findPathToFirstMatchingNode(function (n) {
+                        return n === node;
+                    });
+                    for (var i = 0; i < currentlyExpandedNodes.length; i++) {
+                        var currentlyExpandedNode = currentlyExpandedNodes[i];
+                        if (newExpandedPath.indexOf(currentlyExpandedNode) === -1) {
+                            setNodeExpanded(currentlyExpandedNode, false, true);
+                        }
+                    }
+                }
+
                 node[config.expandedProperty] = !!expanded;
                 node._trEntryElement.toggleClass("expanded", !!expanded);
 
@@ -252,6 +272,34 @@
                 return matchingEntries;
             }
 
+            function findPathToFirstMatchingNode(predicateFunction) {
+                function searchInSubTree(node, path) {
+                    if (predicateFunction.call(this, node, path)) {
+                        path.push(node);
+                        return path;
+                    }
+                    if (node[config.childrenProperty]) {
+                        var newPath = path.slice();
+                        newPath.push(node);
+                        for (var i = 0; i < node[config.childrenProperty].length; i++) {
+                            var child = node[config.childrenProperty][i];
+                            var result = searchInSubTree(child, newPath);
+                            if (result) {
+                                return result;
+                            }
+                        }
+                    }
+                }
+
+                for (var i = 0; i < entries.length; i++) {
+                    var rootEntry = entries[i];
+                    var path = searchInSubTree(rootEntry, []);
+                    if (path) {
+                        return path;
+                    }
+                }
+            }
+
             function findEntryById(id) {
                 return findEntries(function (entry) {
                     return entry[config.valueProperty] == id
@@ -269,6 +317,9 @@
                 markSelectedEntry(entry);
                 setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
                 fireChangeEvents(entry);
+                if (config.openOnSelection) {
+                    setNodeExpanded(entry, true, true);
+                }
             }
 
             function minimallyScrollTo($entryWrapper) {

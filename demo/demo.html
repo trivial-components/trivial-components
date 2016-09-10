@@ -112,6 +112,9 @@
 
 <div id="treeBoxContainer" style="border: 1px solid black;"></div>
 
+<h4>Trivial TreeBox with special settings</h4>
+<div id="singleSelectionTreeBoxContainer" style="border: 1px solid black;"></div>
+
 <h4>Trivial TreeComboBox</h4>
 
 <div style="width: 350px">
@@ -354,6 +357,19 @@ include exclude forcer:
                     callback(createDemoTreeNodes())
                 }, 1000);
             }
+        });
+        $('#singleSelectionTreeBoxContainer').TrivialTreeBox({
+            templates: [TrivialComponents.icon2LinesTemplate],
+            entries: createDemoTreeNodes(),
+            selectedEntryId: 2,
+            lazyChildrenQueryFunction: function (node, callback) {
+                setTimeout(function () {
+                    callback(createDemoTreeNodes())
+                }, 1000);
+            },
+            showExpanders                 : false,
+            openOnSelection               : true,
+            enforceSingleExpandedPath     : true
         });
 
         var trivialTreeComboBox = $('#treeComboBox').TrivialTreeComboBox({
