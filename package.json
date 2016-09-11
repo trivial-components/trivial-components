@@ -1,14 +1,13 @@
 {
-  "name": "trivial-combobox",
+  "name": "trivial-components",
   "version": "0.0.1",
-  "description": "A combobox the way you always wanted it.",
-  "main": "trivial-combobox.js",
+  "description": "UI components the way you always wanted them.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/trivial-components/trivial-combobox.git"
+    "url": "https://github.com/trivial-components/trivial-components.git"
   },
   "keywords": [
     "combobox",
@@ -25,9 +24,9 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/trivial-components/trivial-combobox/issues"
+    "url": "https://github.com/trivial-components/trivial-components/issues"
   },
-  "homepage": "https://github.com/trivial-components/trivial-combobox",
+  "homepage": "http://trivial-components.github.io/trivial-components/",
   "devDependencies": {
     "autoprefixer-core": "5.x",
     "bower": "1.x",
