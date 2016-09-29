@@ -45,6 +45,7 @@
                     selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
                     spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                     noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
+                    textHighlightingEntryLimit: 100,
                     templateProperty: "template",
                     selectedEntryTemplateProperty: "selectedEntryTemplate",
                     finalEntryProperty: "finalEntry", // this property determines if the tag is completed after selection of the entry. If not, the next tag will be appended to this one.
@@ -279,7 +280,7 @@
                 listBox = $dropDown.TrivialListBox(configWithoutEntries);
                 listBox.onSelectedEntryChanged.addListener(function (selectedEntry) {
                     if (selectedEntry) {
-                        selectEntry(selectedEntry, true);
+                        selectEntry(selectedEntry);
                         listBox.selectEntry(null);
                         closeDropDown();
                     }
@@ -390,6 +391,7 @@
 
                 function fireChangeEvents(entries) {
                     $originalInput.trigger("change");
+                    console.log("onSelectedEntryChanged");
                     me.onSelectedEntryChanged.fire(entries);
                 }
 
@@ -434,6 +436,8 @@
 
                     if (!muteEvent) {
                         fireChangeEvents(me.getSelectedEntries());
+                    } else {
+                        console.log("event muted!");
                     }
                 }
 

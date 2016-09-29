@@ -125,13 +125,15 @@
                 me.onSelectedEntryChanged.fire(selectedEntry, originalEvent);
             }
 
-            function selectEntry(entry, originalEvent) {
+            function selectEntry(entry, originalEvent, muteEvent) {
                 selectedEntry = entry;
                 $entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
                 if (entry != null) {
                     selectedEntry._trEntryElement.addClass("tr-selected-entry");
                 }
-                fireChangeEvents(selectedEntry, originalEvent);
+                if (!muteEvent) {
+                    fireChangeEvents(selectedEntry, originalEvent);
+                }
             }
 
             function highlightNextEntry(direction) {
@@ -176,7 +178,9 @@
                     return null;
                 }
             };
-            this.selectEntry = selectEntry;
+            this.selectEntry = function (entry, originalEvent) {
+                selectEntry(entry, originalEvent, true);
+            };
             this.setHighlightedEntry = setHighlightedEntry;
             this.highlightNextEntry = highlightNextEntry;
             this.highlightNextMatchingEntry = highlightNextEntry;
