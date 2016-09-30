@@ -391,7 +391,6 @@
 
                 function fireChangeEvents(entries) {
                     $originalInput.trigger("change");
-                    console.log("onSelectedEntryChanged");
                     me.onSelectedEntryChanged.fire(entries);
                 }
 
@@ -436,8 +435,6 @@
 
                     if (!muteEvent) {
                         fireChangeEvents(me.getSelectedEntries());
-                    } else {
-                        console.log("event muted!");
                     }
                 }
 
