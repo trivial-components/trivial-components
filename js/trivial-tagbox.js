@@ -40,7 +40,6 @@
                 var config = $.extend({
                     valueProperty: 'displayValue',
                     valueSeparator: ',',
-                    inputTextProperty: 'displayValue',
                     template: TrivialComponents.image2LinesTemplate,
                     selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
                     spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
@@ -55,9 +54,23 @@
                     queryFunction: null, // defined below...
                     autoComplete: true,
                     autoCompleteDelay: 0,
+                    autoCompleteFunction: function (editorText, matchedEntry) {
+                        for (propertyName in matchedEntry) {
+                            var propertyValue = matchedEntry[propertyName];
+                            if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                return propertyValue;
+                            }
+                        }
+                        return null;
+                    },
                     allowFreeText: true,
                     freeTextSeparators: [',', ';'],
-                    freeTextEntryValues: {_isFreeTextEntry: true},
+                    freeTextEntryFactory: function (freeText) {
+                        var newEntry = {
+                            displayValue: freeText,
+                            _isFreeTextEntry: true
+                        };
+                    },
                     showTrigger: true,
                     distinct: true,
                     matchingOptions: {
@@ -136,9 +149,7 @@
                             entries = null;
                             closeDropDown();
                             if (config.allowFreeText && $editor.text().trim().length > 0) {
-                                var entry = $.extend({}, config.freeTextEntryValues);
-                                entry[config.inputTextProperty] = $editor.text();
-                                selectEntry(entry);
+                                selectEntry(config.freeTextEntryFactory($editor.text()));
                             }
                             $editor.text("");
                             //fireChangeEvents(me.getSelectedEntries());
@@ -199,9 +210,7 @@
                                 selectEntry(highlightedEntry);
                                 entries = null;
                             } else if (config.allowFreeText && $editor.text().trim().length > 0) {
-                                var entry = $.extend({}, config.freeTextEntryValues);
-                                entry[config.inputTextProperty] = $editor.text();
-                                selectEntry(entry);
+                                selectEntry(config.freeTextEntryFactory($editor.text()));
                             }
                             closeDropDown();
                         } else if (e.which == keyCodes.escape) {
@@ -229,9 +238,7 @@
                                 for (var i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
                                     var value = tagValuesEnteredByUser[i].trim();
                                     if (value.length > 0) {
-                                        var entry = {};
-                                        entry[config.inputTextProperty] = value;
-                                        selectEntry(entry);
+                                        selectEntry(config.freeTextEntryFactory($editor.text()));
                                     }
                                     $editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
                                     TrivialComponents.selectElementContents($editor[0], $editor.text().length, $editor.text().length);
@@ -502,24 +509,18 @@
 
                         var highlightedEntry = listBox.getHighlightedEntry();
                         if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
-                            var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                            if (autoCompletingEntryDisplayValue) {
-                                autoCompleteTimeoutId = setTimeout(function () {
-                                    var oldEditorValue = getNonSelectedEditorValue();
-                                    var newEditorValue;
-                                    if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                                        newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                                    } else {
-                                        newEditorValue = getNonSelectedEditorValue();
-                                    }
-                                    $editor.text(newEditorValue.replace(' ', String.fromCharCode(160))); // I have to replace whitespaces by 160 because text() trims whitespaces...
+                            autoCompleteTimeoutId = setTimeout(function () {
+                                var currentEditorValue = getNonSelectedEditorValue();
+                                var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry);
+                                if (autoCompleteString) {
+                                    $editor.text(autoCompleteString.replace(' ', String.fromCharCode(160))); // I have to replace whitespaces by 160 because text() trims whitespaces...
                                     repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
                                     // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
                                     if ($editor.is(":focus")) {
-                                        TrivialComponents.selectElementContents($editor[0], oldEditorValue.length, newEditorValue.length);
+                                        TrivialComponents.selectElementContents($editor[0], currentEditorValue.length, autoCompleteString.length);
                                     }
-                                }, delay || 0);
-                            }
+                                }
+                            }, delay || 0);
                         }
                         doNoAutoCompleteBecauseBackspaceWasPressed = false;
                     }

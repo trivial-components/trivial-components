@@ -40,7 +40,6 @@
             var _selectedEntryTemplate = options.selectedEntryTemplate || options.template || TrivialComponents.image2LinesTemplate;
             var config = $.extend({
                 valueProperty: null,
-                inputTextProperty: 'displayValue',
                 template: TrivialComponents.image2LinesTemplate,
                 selectedEntryTemplate: _selectedEntryTemplate,
                 templateProperty: "template",
@@ -55,8 +54,29 @@
                 queryFunction: null, // defined below...
                 autoComplete: true,
                 autoCompleteDelay: 0,
-                allowFreeText: false,
-                freeTextEntryValues: {_isFreeTextEntry: true},
+                entryToEditorTextFunction: function (entry) {
+                    return entry["displayValue"];
+                },
+                autoCompleteFunction: function (editorText, matchedEntry) {
+                    if (editorText) {
+                        for (propertyName in matchedEntry) {
+                            var propertyValue = matchedEntry[propertyName];
+                            if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                return propertyValue.toString();
+                            }
+                        }
+                        return null;
+                    } else {
+                        return config.entryToEditorTextFunction(matchedEntry);
+                    }
+                },
+                allowFreeText: true,
+                freeTextEntryFactory: function (freeText) {
+                    var newEntry = {
+                        displayValue: freeText,
+                        _isFreeTextEntry: true
+                    };
+                },
                 showTrigger: true,
                 matchingOptions: {
                     matchingMode: 'contains',
@@ -222,7 +242,7 @@
                     }
                 })
                 .keyup(function (e) {
-                    if (!TrivialComponents.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && isEntrySelected() && $editor.val() !== selectedEntry[config.inputTextProperty]) {
+                    if (!TrivialComponents.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && isEntrySelected() && $editor.val() !== config.entryToEditorTextFunction(selectedEntry)) {
                         selectEntry(null, false);
                     }
                 })
@@ -324,7 +344,7 @@
                     var $selectedEntry = $(Mustache.render(selectedEntry[config.selectedEntryTemplateProperty] || config.selectedEntryTemplate, entry))
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
-                    $editor.val(entry[config.inputTextProperty]);
+                    $editor.val(config.entryToEditorTextFunction(entry));
                 }
                 if (commit) {
                     lastCommittedValue = entry;
@@ -420,26 +440,19 @@
             function autoCompleteIfPossible(delay) {
                 if (config.autoComplete) {
                     clearTimeout(autoCompleteTimeoutId);
-
                     var highlightedEntry = listBox.getHighlightedEntry();
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
-                        var autoCompletingEntryDisplayValue = highlightedEntry[config.inputTextProperty];
-                        if (autoCompletingEntryDisplayValue) {
-                            autoCompleteTimeoutId = setTimeout(function () {
-                                var oldEditorValue = getNonSelectedEditorValue();
-                                var newEditorValue;
-                                if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
-                                    newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
-                                } else {
-                                    newEditorValue = getNonSelectedEditorValue();
-                                }
-                                $editor.val(newEditorValue);
+                        autoCompleteTimeoutId = setTimeout(function () {
+                            var currentEditorValue = getNonSelectedEditorValue();
+                            var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry);
+                            if (autoCompleteString) {
+                                $editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
                                 // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
                                 if ($editor.is(":focus")) {
-                                    $editor[0].setSelectionRange(oldEditorValue.length, newEditorValue.length);
+                                    $editor[0].setSelectionRange(currentEditorValue.length, autoCompleteString.length);
                                 }
-                            }, delay || 0);
-                        }
+                            }
+                        }, delay || 0);
                     }
                     doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 }
@@ -485,9 +498,7 @@
                 if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
                     return null;
                 } else if (selectedEntry == null && config.allowFreeText) {
-                    var fakeEntry = $.extend({}, config.freeTextEntryValues);
-                    fakeEntry[config.inputTextProperty] = $editor.val();
-                    return fakeEntry;
+                    return config.freeTextEntryFactory(editor.val());
                 } else {
                     var selectedEntryToReturn = jQuery.extend({}, selectedEntry);
                     selectedEntryToReturn._trEntryElement = undefined;
