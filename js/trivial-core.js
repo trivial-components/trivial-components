@@ -216,6 +216,49 @@
             }
         };
 
+        var customTreeQueryFunctionFactory = function (topLevelEntries, childrenPropertyName, expandedPropertyName, customNodeMatchingFunction) {
+
+            function findMatchingEntriesAndTheirAncestors(entry, queryString, nodeDepth) {
+                var entryProxy = createProxy(entry);
+                entryProxy[childrenPropertyName] = [];
+                entryProxy[expandedPropertyName] = false;
+                if (entry[childrenPropertyName]) {
+                    for (var i = 0; i < entry[childrenPropertyName].length; i++) {
+                        var child = entry[childrenPropertyName][i];
+                        var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
+                        if (childProxy) {
+                            entryProxy[childrenPropertyName].push(childProxy);
+                            entryProxy[expandedPropertyName] = true;
+                        }
+                    }
+                }
+                var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
+                var matchesItself = customNodeMatchingFunction(entry, queryString, nodeDepth);
+                if (matchesItself && !hasMatchingChildren) {
+                    // still make it expandable!
+                    entryProxy[childrenPropertyName] = entry[childrenPropertyName];
+                }
+                return matchesItself || hasMatchingChildren ? entryProxy : null;
+            }
+
+            return function (queryString, additionalQueryParameters, resultCallback) {
+                if (!queryString) {
+                    resultCallback(topLevelEntries);
+                } else {
+                    var matchingEntries = [];
+                    for (var i = 0; i < topLevelEntries.length; i++) {
+                        var topLevelEntry = topLevelEntries[i];
+                        var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
+                        if (entryProxy) {
+                            matchingEntries.push(entryProxy);
+                        }
+                    }
+                    resultCallback(matchingEntries);
+                }
+            }
+        };
+
+
         function registerJqueryPlugin(componentConstructor, componentName, cssClass) {
             var jsApiName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
             var plainJqueryName = componentName.toLowerCase();
@@ -318,6 +361,7 @@
             keyCodes: keyCodes,
             defaultListQueryFunctionFactory: defaultListQueryFunctionFactory,
             defaultTreeQueryFunctionFactory: defaultTreeQueryFunctionFactory,
+            customTreeQueryFunctionFactory: customTreeQueryFunctionFactory,
             isModifierKey: isModifierKey,
             registerJqueryPlugin: registerJqueryPlugin,
             selectElementContents: selectElementContents,

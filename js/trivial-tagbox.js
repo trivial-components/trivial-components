@@ -54,14 +54,18 @@
                     queryFunction: null, // defined below...
                     autoComplete: true,
                     autoCompleteDelay: 0,
-                    autoCompleteFunction: function (editorText, matchedEntry) {
-                        for (propertyName in matchedEntry) {
-                            var propertyValue = matchedEntry[propertyName];
-                            if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
-                                return propertyValue;
+                    autoCompleteFunction: function (editorText, entry) {
+                        if (editorText) {
+                            for (propertyName in entry) {
+                                var propertyValue = entry[propertyName];
+                                if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                    return propertyValue.toString();
+                                }
                             }
+                            return null;
+                        } else {
+                            return null;
                         }
-                        return null;
                     },
                     allowFreeText: true,
                     freeTextSeparators: [',', ';'],
@@ -519,6 +523,8 @@
                                     if ($editor.is(":focus")) {
                                         TrivialComponents.selectElementContents($editor[0], currentEditorValue.length, autoCompleteString.length);
                                     }
+                                } else {
+                                    $editor.val(getNonSelectedEditorValue());
                                 }
                             }, delay || 0);
                         }

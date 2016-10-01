@@ -57,17 +57,17 @@
                 entryToEditorTextFunction: function (entry) {
                     return entry["displayValue"];
                 },
-                autoCompleteFunction: function (editorText, matchedEntry) {
+                autoCompleteFunction: function (editorText, entry) {
                     if (editorText) {
-                        for (propertyName in matchedEntry) {
-                            var propertyValue = matchedEntry[propertyName];
+                        for (propertyName in entry) {
+                            var propertyValue = entry[propertyName];
                             if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
                                 return propertyValue.toString();
                             }
                         }
                         return null;
                     } else {
-                        return config.entryToEditorTextFunction(matchedEntry);
+                        return config.entryToEditorTextFunction(entry);
                     }
                 },
                 allowFreeText: true,
@@ -455,6 +455,8 @@
                                 if ($editor.is(":focus")) {
                                     $editor[0].setSelectionRange(currentEditorValue.length, autoCompleteString.length);
                                 }
+                            } else {
+                                $editor.val(getNonSelectedEditorValue());
                             }
                         }, delay || 0);
                     }
