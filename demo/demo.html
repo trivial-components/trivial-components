@@ -57,6 +57,9 @@
     <h5>No trigger</h5>
     <input id="noTriggerComboBox" tabindex="12">
 
+    <h5>showDropDownOnResults = true</h5>
+    <input id="showDropDownOnResultsOnlyComboBox">
+
     <h5>disabled and readonly</h5>
     <input id="disabledComboBox">
     <input id="readonlyComboBox">
@@ -101,6 +104,12 @@
 <div style="width: 600px;">
     <input id="noDropdownTagBox">
 </div>
+
+<h5>showDropDownOnResults = true</h5>
+<div style="width: 600px;">
+    <input id="showDropDownOnResultsOnlyTagBox">
+</div>
+
 <h5>disabled and reaonly</h5>
 <div style="width: 600px;">
     <input id="disabledTagBox">
@@ -271,6 +280,19 @@ include exclude forcer:
             showTrigger: false
         });
 
+        var showDropDownOnResultsOnlyComboBoxEntries = createEntries();
+        $('#showDropDownOnResultsOnlyComboBox').TrivialComboBox({
+            entries: showDropDownOnResultsOnlyComboBoxEntries,
+            queryFunction: function (queryString, additionalQueryParameters, resultCallback) {
+                setTimeout(function () {
+                    resultCallback(showDropDownOnResultsOnlyComboBoxEntries.filter(function (entry) {
+                        return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
+                    }));
+                }, 500);
+            },
+            showDropDownOnResultsOnly: true
+        });
+
         $('#disabledComboBox').TrivialComboBox({
             selectedEntry: createEntries(1)[0],
             editingMode: 'disabled'
@@ -335,6 +357,19 @@ include exclude forcer:
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             allowFreeText: true,
             showTrigger: false
+        });
+
+        var showDropDownOnResultsOnlyTagBoxEntries =  createEntries()
+        $('#showDropDownOnResultsOnlyTagBox').TrivialTagBox({
+            entries: showDropDownOnResultsOnlyTagBoxEntries,
+            queryFunction: function (queryString, additionalQueryParameters, resultCallback) {
+                setTimeout(function () {
+                    resultCallback(showDropDownOnResultsOnlyTagBoxEntries.filter(function (entry) {
+                        return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
+                    }));
+                }, 500);
+            },
+            showDropDownOnResultsOnly: true
         });
 
         $('#disabledTagBox').TrivialTagBox({

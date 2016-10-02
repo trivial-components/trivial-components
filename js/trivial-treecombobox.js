@@ -86,7 +86,8 @@
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 expandedProperty: 'expanded',
-                editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
+                editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
+                showDropDownOnResultsOnly: false
             }, options);
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.templates, config.matchingOptions, config.childrenProperty, config.expandedProperty);
@@ -122,9 +123,7 @@
                             showEditor();
                             $editor.select();
                             openDropDown();
-                            if (entries == null) {
-                                query();
-                            }
+                            query();
                         });
                     }
                 });
@@ -204,7 +203,9 @@
                         var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!isDropDownOpen) {
                             query(direction);
-                            openDropDown();
+                            if (!config.showDropDownOnResultsOnly) {
+                                openDropDown();
+                            }
                         } else {
                             treeBox.highlightNextEntry(direction);
                             autoCompleteIfPossible(config.autoCompleteDelay);
@@ -238,7 +239,9 @@
                             showEditor();
                             $editor.select();
                         }
-                        openDropDown();
+                        if (!config.showDropDownOnResultsOnly) {
+                            openDropDown();
+                        }
 
                         setTimeout(function () { // We need the new editor value (after the keydown event). Therefore setTimeout().
                             if ($editor.val()) {
@@ -256,10 +259,10 @@
                     }
                 })
                 .mousedown(function () {
-                    openDropDown();
-                    if (entries == null) {
-                        query();
+                    if (!config.showDropDownOnResultsOnly) {
+                        openDropDown();
                     }
+                    query();
                 });
 
             if ($originalInput.attr("tabindex")) {
@@ -300,10 +303,10 @@
             $selectedEntryWrapper.click(function () {
                 showEditor();
                 $editor.select();
-                openDropDown();
-                if (entries == null) {
-                    query();
+                if (!config.showDropDownOnResultsOnly) {
+                    openDropDown();
                 }
+                query();
             });
 
             function query(highlightDirection) {
@@ -321,9 +324,14 @@
                             currentlySelectedEntry: selectedEntry
                         }, function (newEntries) {
                             updateEntries(newEntries, highlightDirection);
+                            if (config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && $editor.is(":focus")) {
+                                openDropDown();
+                            }
                         });
                         lastQueryString = queryString;
                         lastCompleteInputQueryString = completeInputString;
+                    } else {
+                        openDropDown();
                     }
                 }, 0);
             }
@@ -448,15 +456,10 @@
                     if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                         autoCompleteTimeoutId = setTimeout(function () {
                             var currentEditorValue = getNonSelectedEditorValue();
-                            var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry);
-                            if (autoCompleteString) {
-                                $editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
-                                // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
-                                if ($editor.is(":focus")) {
-                                    $editor[0].setSelectionRange(currentEditorValue.length, autoCompleteString.length);
-                                }
-                            } else {
-                                $editor.val(getNonSelectedEditorValue());
+                            var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
+                            $editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
+                            if ($editor.is(":focus")) {
+                                $editor[0].setSelectionRange(currentEditorValue.length, autoCompleteString.length);
                             }
                         }, delay || 0);
                     }

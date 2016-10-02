@@ -82,7 +82,8 @@
                         ignoreCase: true,
                         maxLevenshteinDistance: 2
                     },
-                    editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
+                    editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
+                    showDropDownOnResultsOnly: false
                 }, options);
 
                 config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
@@ -117,9 +118,7 @@
                             setTimeout(function () { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
                                 $editor.select();
                                 openDropDown();
-                                if (entries == null) {
-                                    query();
-                                }
+                                query();
                             });
                         }
                     });
@@ -202,7 +201,9 @@
                             var direction = e.which == keyCodes.up_arrow ? -1 : 1;
                             if (!isDropDownOpen) {
                                 query(direction);
-                                openDropDown();
+                                if (!config.showDropDownOnResultsOnly) {
+                                    openDropDown();
+                                }
                             } else {
                                 listBox.highlightNextEntry(direction);
                                 autoCompleteIfPossible(config.autoCompleteDelay);
@@ -221,7 +222,9 @@
                             closeDropDown();
                             $editor.text("");
                         } else {
-                            openDropDown();
+                            if (!config.showDropDownOnResultsOnly) {
+                                openDropDown();
+                            }
                             query(1);
                         }
                     })
@@ -253,10 +256,10 @@
                         }
                     })
                     .mousedown(function () {
-                        openDropDown();
-                        if (entries == null) {
-                            query();
+                        if (!config.showDropDownOnResultsOnly) {
+                            openDropDown();
                         }
+                        query();
                     });
 
 
@@ -300,10 +303,10 @@
                 selectEntry(config.selectedEntry, true, true);
 
                 $tagArea.click(function (e) {
-                    openDropDown();
-                    if (entries == null) {
-                        query();
+                    if (!config.showDropDownOnResultsOnly) {
+                        openDropDown();
                     }
+                    query();
 
                     // find the tag in the same row as the click with the smallest distance to the click
                     var $tagWithSmallestDistance = null;
@@ -393,6 +396,9 @@
                             }
                             config.queryFunction(queryString, {}, function (newEntries) {
                                 updateEntries(newEntries, highlightDirection);
+                                if (config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && $editor.is(":focus")) {
+                                    openDropDown();
+                                }
                             });
                             lastQueryString = queryString;
                             lastCompleteInputQueryString = completeInputString;
@@ -510,21 +516,15 @@
                 function autoCompleteIfPossible(delay) {
                     if (config.autoComplete) {
                         clearTimeout(autoCompleteTimeoutId);
-
                         var highlightedEntry = listBox.getHighlightedEntry();
                         if (highlightedEntry && !doNoAutoCompleteBecauseBackspaceWasPressed) {
                             autoCompleteTimeoutId = setTimeout(function () {
                                 var currentEditorValue = getNonSelectedEditorValue();
-                                var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry);
-                                if (autoCompleteString) {
-                                    $editor.text(autoCompleteString.replace(' ', String.fromCharCode(160))); // I have to replace whitespaces by 160 because text() trims whitespaces...
-                                    repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
-                                    // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
-                                    if ($editor.is(":focus")) {
-                                        TrivialComponents.selectElementContents($editor[0], currentEditorValue.length, autoCompleteString.length);
-                                    }
-                                } else {
-                                    $editor.val(getNonSelectedEditorValue());
+                                var autoCompleteString = config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
+                                $editor.text(currentEditorValue + autoCompleteString.replace(' ', String.fromCharCode(160)).substr(currentEditorValue.length)); // I have to replace whitespaces by 160 because text() trims whitespaces...
+                                repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
+                                if ($editor.is(":focus")) {
+                                    TrivialComponents.selectElementContents($editor[0], currentEditorValue.length, autoCompleteString.length);
                                 }
                             }, delay || 0);
                         }
