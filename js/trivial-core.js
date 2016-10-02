@@ -94,7 +94,7 @@
         function wrapEntryTemplateWithDefaultTagWrapperTemplate(entryTemplate) {
             return ('<div class="tr-tagbox-default-wrapper-template">' +
             '<div class="tr-tagbox-tag-content">##entryTemplate##</div>' +
-            '<div class="tr-tagbox-tag-remove-button"></div>' +
+            '<div class="tr-remove-button"></div>' +
             '</div>').replace("##entryTemplate##", entryTemplate);
         }
 

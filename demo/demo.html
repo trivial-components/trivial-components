@@ -207,7 +207,8 @@ include exclude forcer:
             entries: defaultFilteringEntries,
             emptyEntry: {
                 displayValue: "Please select..."
-            }
+            },
+            showClearButton: true
         });
         defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
@@ -340,7 +341,7 @@ include exclude forcer:
             '     </div>' +
             '   </div>' +
             '</div>' +
-            '<div class="tr-tagbox-tag-remove-button"></div>' +
+            '<div class="tr-remove-button"></div>' +
             '</div>',
             showTrigger: false,
             distinct: false
@@ -417,7 +418,8 @@ include exclude forcer:
                     callback(createDemoTreeNodes())
                 }, 1000);
             },
-            animationDuration: 200
+            animationDuration: 200,
+            showClearButton: true
         });
         trivialTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("trivialTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))

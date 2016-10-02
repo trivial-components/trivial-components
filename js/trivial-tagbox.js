@@ -442,7 +442,7 @@
                     tag._trEntryElement = $tagWrapper;
 
                     if (config.editingMode == "editable") {
-                        $entry.find('.tr-tagbox-tag-remove-button').click(function (e) {
+                        $entry.find('.tr-remove-button').click(function (e) {
                             removeTag(tag);
                             return false;
                         });

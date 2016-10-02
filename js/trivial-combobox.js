@@ -77,6 +77,7 @@
                         _isFreeTextEntry: true
                     };
                 },
+                showClearButton: false,
                 showTrigger: true,
                 matchingOptions: {
                     matchingMode: 'contains',
@@ -110,6 +111,12 @@
                 .addClass(config.editingMode)
                 .insertAfter($originalInput);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($comboBox);
+            if (config.showClearButton) {
+                var $clearButton = $('<div class="tr-remove-button">').appendTo($comboBox);
+                $clearButton.mousedown(function () {
+                    selectEntry(null);
+                });
+            }
             if (config.showTrigger) {
                 var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo($comboBox);
                 $trigger.mousedown(function () {
@@ -357,6 +364,9 @@
                     if (!muteEvent) {
                         fireChangeEvents(entry);
                     }
+                }
+                if ($clearButton) {
+                    $clearButton.toggle(entry != null);
                 }
                 if (isEditorVisible) {
                     showEditor(); // reposition editor

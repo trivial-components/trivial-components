@@ -138,6 +138,11 @@
     box-sizing: border-box;
   }
 
+  .tr-remove-button {
+    align-self: center;
+    margin: 3px;
+  }
+
   .tr-trigger {
     order: 9999999;
     flex: 0 0 20px;
@@ -166,6 +171,10 @@
   &.disabled {
     background-color: @tr-button-bg;
 
+    .tr-remove-button {
+      display: none !important;
+    }
+
     .tr-trigger:hover {
       background-color: inherit;
     }
@@ -183,6 +192,10 @@
     border-color: transparent;
     box-shadow: none;
 
+    .tr-remove-button {
+      display: none !important;
+    }
+
     .tr-trigger {
       display: none;
     }
@@ -194,5 +207,25 @@
 
   input::-ms-clear { // hide ie's reset button
     display: none;
+  }
+}
+
+.tr-remove-button {
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  text-align: center;
+  background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAUklEQVQYV2NkgAAfBgaGLVA2MgUWZ4Qq2AyVAfFh4D+U4QsThAmAxE0YGBjOIClmxKYT2TqwPLIiYzQTQCaeRVeEbCXMNBSTCLoJ5E2ifIc3nADKqBCiWqOKtgAAAABJRU5ErkJggg==);
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: .5;
+
+  .tr-input-wrapper.disabled &,
+  .tr-input-wrapper.readonly & {
+    display: none;
+  }
+
+  &:hover {
+    opacity: 1;
   }
 }
