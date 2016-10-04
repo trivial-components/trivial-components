@@ -70,7 +70,7 @@
                     allowFreeText: true,
                     freeTextSeparators: [',', ';'],
                     freeTextEntryFactory: function (freeText) {
-                        var newEntry = {
+                        return {
                             displayValue: freeText,
                             _isFreeTextEntry: true
                         };
