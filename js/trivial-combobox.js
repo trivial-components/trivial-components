@@ -70,7 +70,7 @@
                         return config.entryToEditorTextFunction(entry);
                     }
                 },
-                allowFreeText: true,
+                allowFreeText: false,
                 freeTextEntryFactory: function (freeText) {
                     return {
                         displayValue: freeText,

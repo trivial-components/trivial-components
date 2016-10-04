@@ -67,7 +67,7 @@
                             return null;
                         }
                     },
-                    allowFreeText: true,
+                    allowFreeText: false,
                     freeTextSeparators: [',', ';'],
                     freeTextEntryFactory: function (freeText) {
                         return {
@@ -237,6 +237,8 @@
                             if (editorValueBeforeCursor.length > 0) {
 
                                 function splitStringBySeparatorChars(s, separatorChars) {
+                                    console.log(s);
+                                    console.log(s.split(new RegExp("[" + TrivialComponents.escapeSpecialRegexCharacter(separatorChars.join()) + "]")))
                                     return s.split(new RegExp("[" + TrivialComponents.escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
                                 }
 
@@ -245,7 +247,7 @@
                                 for (var i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
                                     var value = tagValuesEnteredByUser[i].trim();
                                     if (value.length > 0) {
-                                        selectEntry(config.freeTextEntryFactory($editor.text()));
+                                        selectEntry(config.freeTextEntryFactory(value));
                                     }
                                     $editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
                                     TrivialComponents.selectElementContents($editor[0], $editor.text().length, $editor.text().length);
