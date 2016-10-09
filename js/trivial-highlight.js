@@ -36,7 +36,10 @@
     $.trivialMatch = function (text, searchString, options) {
 
         if (!searchString) {
-            throw "searchString may not be empty!";
+            return [{
+                start: 0,
+                length: text.length
+            }];
         }
 
         var options = $.extend({
