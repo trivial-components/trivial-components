@@ -487,21 +487,27 @@
                 treeBox.updateEntries(newEntries);
 
                 var nonSelectedEditorValue = getNonSelectedEditorValue();
-                if (nonSelectedEditorValue.length > 0) {
-                    treeBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
-                    if (highlightDirection) {
-                        treeBox.highlightNextMatchingEntry(highlightDirection);
-                    }
-                } else if (highlightDirection == null) {
+
+                treeBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
+
+                if (highlightDirection == null) {
                     if (selectedEntry) {
                         treeBox.setHighlightedEntry(null);
                     } else {
-                        treeBox.highlightNextEntry(1);
+                        if (nonSelectedEditorValue.length > 0) {
+                            treeBox.highlightNextMatchingEntry(1);
+                        } else {
+                            treeBox.highlightNextEntry(1);
+                        }
                     }
                 } else if (highlightDirection === 0) {
                     treeBox.setHighlightedEntry(null)
                 } else {
-                    treeBox.highlightNextEntry(highlightDirection);
+                    if (nonSelectedEditorValue.length > 0) {
+                        treeBox.highlightNextMatchingEntry(1);
+                    } else {
+                        treeBox.highlightNextEntry(1);
+                    }
                 }
 
                 autoCompleteIfPossible(config.autoCompleteDelay);
