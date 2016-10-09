@@ -492,7 +492,15 @@
                     if (highlightDirection) {
                         treeBox.highlightNextMatchingEntry(highlightDirection);
                     }
-                } else if (highlightDirection) {
+                } else if (highlightDirection == null) {
+                    if (selectedEntry) {
+                        treeBox.setHighlightedEntry(null);
+                    } else {
+                        treeBox.highlightNextEntry(1);
+                    }
+                } else if (highlightDirection === 0) {
+                    treeBox.setHighlightedEntry(null)
+                } else {
                     treeBox.highlightNextEntry(highlightDirection);
                 }
 

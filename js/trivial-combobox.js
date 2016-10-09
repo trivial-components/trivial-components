@@ -493,10 +493,16 @@
 
                 listBox.highlightTextMatches(newEntries.length <= config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
-                if (highlightDirection) {
-                    listBox.highlightNextEntry(highlightDirection);
+                if (highlightDirection == null) {
+                    if (selectedEntry) {
+                        listBox.setHighlightedEntry(null);
+                    } else {
+                        listBox.highlightNextEntry(1);
+                    }
+                } else if (highlightDirection === 0) {
+                    listBox.setHighlightedEntry(null)
                 } else {
-                    listBox.setHighlightedEntry(null);
+                    listBox.highlightNextEntry(highlightDirection);
                 }
 
                 autoCompleteIfPossible(config.autoCompleteDelay);
