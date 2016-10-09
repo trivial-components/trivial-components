@@ -198,7 +198,7 @@
                     if (animate) {
                         childrenWrapper.slideDown(config.animationDuration);
                     } else {
-                        childrenWrapper.show();
+                        childrenWrapper.css("display", "block"); // show() does not do this if the node is not attached
                     }
                 } else {
                     if (animate) {
