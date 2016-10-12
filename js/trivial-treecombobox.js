@@ -116,7 +116,8 @@
             if (config.showClearButton) {
                 var $clearButton = $('<div class="tr-remove-button">').appendTo($treeComboBox);
                 $clearButton.mousedown(function () {
-                    selectEntry(null);
+                    $editor.val("");
+                    selectEntry(null, true);
                 });
             }
             if (config.showTrigger) {
