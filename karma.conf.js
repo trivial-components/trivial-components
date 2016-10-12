@@ -16,6 +16,7 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             'bower_components/jquery/dist/jquery.js',
+            'bower_components/jquery-ui/ui/version.js',
             'bower_components/jquery-ui/ui/position.js',
             'bower_components/mustache/mustache.js',
             'bower_components/levenshtein/lib/levenshtein.js',
