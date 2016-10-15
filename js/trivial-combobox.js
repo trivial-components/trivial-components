@@ -39,15 +39,15 @@
             options = options || {};
             var config = $.extend({
                 valueProperty: null,
-                entryRenderFunction: function (entry) {
+                entryRenderingFunction: function (entry) {
                     var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
-                selectedEntryRenderFunction: function (entry) {
+                selectedEntryRenderingFunction: function (entry) {
                     if (entry && entry.selectedEntryTemplate) {
                         return Mustache.render(entry.selectedEntryTemplate, entry)
                     } else {
-                        return config.entryRenderFunction(entry);
+                        return config.entryRenderingFunction(entry);
                     }
                 },
                 selectedEntry: undefined,
@@ -353,7 +353,7 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(config.selectedEntryRenderFunction(config.emptyEntry))
+                    var $selectedEntry = $(config.selectedEntryRenderingFunction(config.emptyEntry))
                         .addClass("tr-combobox-entry")
                         .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);
@@ -362,7 +362,7 @@
                         $originalInput.val(entry[config.valueProperty]);
                     }
                     selectedEntry = entry;
-                    var $selectedEntry = $(config.selectedEntryRenderFunction(entry))
+                    var $selectedEntry = $(config.selectedEntryRenderingFunction(entry))
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(config.entryToEditorTextFunction(entry));

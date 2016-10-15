@@ -40,15 +40,15 @@
                 var config = $.extend({
                     valueProperty: 'displayValue',
                     valueSeparator: ',',
-                    entryRenderFunction: function (entry) {
+                    entryRenderingFunction: function (entry) {
                         var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
                         return Mustache.render(template, entry);
                     },
-                    selectedEntryRenderFunction: function (entry) {
+                    selectedEntryRenderingFunction: function (entry) {
                         if (entry && entry.selectedEntryTemplate) {
                             return Mustache.render(entry.selectedEntryTemplate, entry)
                         } else {
-                            return TrivialComponents.wrapWithDefaultTagWrapper(config.entryRenderFunction(entry));
+                            return TrivialComponents.wrapWithDefaultTagWrapper(config.entryRenderingFunction(entry));
                         }
                     },
                     spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
@@ -445,7 +445,7 @@
                     selectedEntries.splice($editor.index(), 0, tag);
                     $originalInput.val(calculateOriginalInputValue());
 
-                    var $entry = $(config.selectedEntryRenderFunction(tag));
+                    var $entry = $(config.selectedEntryRenderingFunction(tag));
                     var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
                     $tagWrapper.append($entry).insertBefore($editor);
                     tag._trEntryElement = $tagWrapper;

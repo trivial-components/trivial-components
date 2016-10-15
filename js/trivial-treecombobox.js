@@ -39,16 +39,16 @@
             options = options || {};
             var config = $.extend({
                 valueProperty: 'id',
-                entryRenderFunction: function (entry, depth) {
+                entryRenderingFunction: function (entry, depth) {
                     var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
                     var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
-                selectedEntryRenderFunction: function (entry) {
+                selectedEntryRenderingFunction: function (entry) {
                     if (entry && entry.selectedEntryTemplate) {
                         return Mustache.render(entry.selectedEntryTemplate, entry)
                     } else {
-                        return config.entryRenderFunction(entry, 0);
+                        return config.entryRenderingFunction(entry, 0);
                     }
                 },
                 selectedEntry: null,
@@ -363,7 +363,7 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(config.selectedEntryRenderFunction(config.emptyEntry))
+                    var $selectedEntry = $(config.selectedEntryRenderingFunction(config.emptyEntry))
                         .addClass("tr-combobox-entry")
                         .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);
@@ -372,7 +372,7 @@
                         $originalInput.val(entry[config.valueProperty]);
                     }
                     selectedEntry = entry;
-                    var $selectedEntry = $(config.selectedEntryRenderFunction(entry))
+                    var $selectedEntry = $(config.selectedEntryRenderingFunction(entry))
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(config.entryToEditorTextFunction(entry));

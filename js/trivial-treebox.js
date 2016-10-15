@@ -43,7 +43,7 @@
                     resultCallback(node.children || []);
                 },
                 expandedProperty: 'expanded',
-                entryRenderFunction: function (entry, depth) {
+                entryRenderingFunction: function (entry, depth) {
                     var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
                     var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
@@ -96,7 +96,7 @@
                 }
                 var $expander = $('<div class="tr-tree-expander"></div>')
                     .appendTo($entryAndExpanderWrapper);
-                var $entry = $(config.entryRenderFunction(entry, depth));
+                var $entry = $(config.entryRenderingFunction(entry, depth));
                 $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
                 if (entry[config.valueProperty] === selectedEntryId) {
