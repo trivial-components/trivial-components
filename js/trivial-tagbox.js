@@ -41,11 +41,11 @@
                     valueProperty: 'displayValue',
                     valueSeparator: ',',
                     entryRenderingFunction: function (entry) {
-                        var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                        var template = entry.template || TrivialComponents.image2LinesTemplate;
                         return Mustache.render(template, entry);
                     },
                     selectedEntryRenderingFunction: function (entry) {
-                        if (entry && entry.selectedEntryTemplate) {
+                        if (entry.selectedEntryTemplate) {
                             return Mustache.render(entry.selectedEntryTemplate, entry)
                         } else {
                             return TrivialComponents.wrapWithDefaultTagWrapper(config.entryRenderingFunction(entry));

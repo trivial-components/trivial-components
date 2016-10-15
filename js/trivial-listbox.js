@@ -37,7 +37,7 @@
             options = options || {};
             var config = $.extend({
                 entryRenderingFunction: function (entry) {
-                    var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                    var template = entry.template || TrivialComponents.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
