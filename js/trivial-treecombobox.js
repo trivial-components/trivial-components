@@ -41,7 +41,7 @@
                 valueProperty: 'id',
                 entryRenderingFunction: function (entry, depth) {
                     var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
-                    var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                    var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: function (entry) {
