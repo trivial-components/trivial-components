@@ -43,8 +43,11 @@
                     resultCallback(node.children || []);
                 },
                 expandedProperty: 'expanded',
-                templates: [TrivialComponents.iconSingleLineTemplate],
-                templateProperty: "template",
+                entryRenderFunction: function (entry, depth) {
+                    var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
+                    var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                    return Mustache.render(template, entry);
+                },
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
@@ -82,10 +85,6 @@
                 return (entry[config.childrenProperty] == null || entry[config.childrenProperty].length == 0) && !entry[config.lazyChildrenFlagProperty];
             }
 
-            function createEntryDisplay(entry, depth) {
-                return $(Mustache.render(entry[config.templateProperty] || config.templates[Math.min(config.templates.length - 1, depth)], entry));
-            }
-
             function createEntryElement(entry, depth) {
                 var leaf = isLeaf(entry);
                 var $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>');
@@ -97,7 +96,7 @@
                 }
                 var $expander = $('<div class="tr-tree-expander"></div>')
                     .appendTo($entryAndExpanderWrapper);
-                var $entry = createEntryDisplay(entry, depth);
+                var $entry = $(config.entryRenderFunction(entry, depth));
                 $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
                 if (entry[config.valueProperty] === selectedEntryId) {

@@ -30,6 +30,9 @@
 </head>
 <body>
 
+<h1 style="color: red">This demo is not yet up to date.</h1>
+The API has significantly changed but this demo has not been reworked, yet.
+
 <form>
 
 <div style="width: 400px">
@@ -199,12 +202,8 @@ include exclude forcer:
 <script>
     $(function () {
 
-        var defaultFilteringEntries = createEntries();
-        defaultFilteringEntries[2].displayValue = "ASDF";
-        defaultFilteringEntries[2].template = "<div>custom entry template: {{id}}</div>";
-        defaultFilteringEntries[2].selectedEntryTemplate = "<div>custom SELECTED entry template: {{id}}</div>";
         var defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
-            entries: defaultFilteringEntries,
+            entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
@@ -528,13 +527,7 @@ include exclude forcer:
             queryFunction: TrivialComponents.defaultTreeQueryFunctionFactory(entries, {
                 matchingMode: 'contains',
                 ignoreCase: true
-            }, "children", "expanded", function (node, depth) {
-                if (depth === 0) {
-                    return true;
-                } else {
-                    return;
-                }
-            })
+            }, "children", "expanded")
         });
 
         $('#noSearchFieldTree').TrivialTree({

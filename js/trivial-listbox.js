@@ -36,8 +36,10 @@
 
             options = options || {};
             var config = $.extend({
-                template: TrivialComponents.image2LinesTemplate,
-                templateProperty: "template",
+                entryRenderFunction: function (entry) {
+                    var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                    return Mustache.render(template, entry);
+                },
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 entries: null,
                 queryFunction: null, // defined below...
@@ -81,7 +83,7 @@
                         var entry = entries[i];
                         var $entry;
                         if (!entry._trEntryElement) {
-                            var html = Mustache.render(entry[config.templateProperty] || config.template, entry);
+                            var html = config.entryRenderFunction(entry);
                             $entry = $(html).addClass("tr-listbox-entry filterable-item");
                         } else {
                             $entry = entry._trEntryElement;

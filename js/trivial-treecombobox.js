@@ -37,20 +37,28 @@
             var me = this;
 
             options = options || {};
-            var _selectedEntryTemplate = options.selectedEntryTemplate || (options.templates && options.templates.length > 0 && options.templates[0]) || TrivialComponents.icon2LinesTemplate;
             var config = $.extend({
                 valueProperty: 'id',
-                templates: [TrivialComponents.iconSingleLineTemplate],
-                selectedEntryTemplate: _selectedEntryTemplate,
-                templateProperty: "template",
-                selectedEntryTemplateProperty: "selectedEntryTemplate",
+                entryRenderFunction: function (entry, depth) {
+                    var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
+                    var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                    return Mustache.render(template, entry);
+                },
+                selectedEntryRenderFunction: function (entry) {
+                    if (entry && entry.selectedEntryTemplate) {
+                        return Mustache.render(entry.selectedEntryTemplate, entry)
+                    } else {
+                        return config.entryRenderFunction(entry, 0);
+                    }
+                },
                 selectedEntry: null,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 entries: null,
-                emptyEntryTemplate: options.emptyEntryTemplate || _selectedEntryTemplate,
-                emptyEntry: {},
+                emptyEntry: {
+                    _isEmptyEntry: true
+                },
                 queryFunction: null, // defined below...
                 autoComplete: true,
                 autoCompleteDelay: 0,
@@ -91,8 +99,8 @@
                 showDropDownOnResultsOnly: false
             }, options);
 
-            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.templates, config.matchingOptions, config.childrenProperty, config.expandedProperty);
-
+            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries
+                    || [], TrivialComponents.defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], config.matchingOptions), config.childrenProperty, config.expandedProperty);
             this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var treeBox;
@@ -355,7 +363,7 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(config.emptyEntry[config.selectedEntryTemplateProperty] || config.emptyEntryTemplate, config.emptyEntry))
+                    var $selectedEntry = $(config.selectedEntryRenderFunction(config.emptyEntry))
                         .addClass("tr-combobox-entry")
                         .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);
@@ -364,7 +372,7 @@
                         $originalInput.val(entry[config.valueProperty]);
                     }
                     selectedEntry = entry;
-                    var $selectedEntry = $(Mustache.render(selectedEntry[config.selectedEntryTemplateProperty] || config.selectedEntryTemplate, entry))
+                    var $selectedEntry = $(config.selectedEntryRenderFunction(entry))
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(config.entryToEditorTextFunction(entry));

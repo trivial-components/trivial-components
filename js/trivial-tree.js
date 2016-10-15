@@ -46,7 +46,11 @@
                     resultCallback([])
                 },
                 expandedProperty: 'expanded',
-                templates: [TrivialComponents.iconSingleLineTemplate],
+                entryRenderFunction: function (entry, depth) {
+                    var defaultTemplates = [TrivialComponents.icon2LinesTemplate, TrivialComponents.iconSingleLineTemplate];
+                    var template = (entry && entry.template) || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                    return Mustache.render(template, entry);
+                },
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
@@ -63,7 +67,8 @@
                 }
             };
             var config = $.extend(defaultOptions, options);
-            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries || [], config.templates, config.matchingOptions, config.childrenProperty, config.expandedProperty);
+            config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries
+                    || [], TrivialComponents.defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], config.matchingOptions), config.childrenProperty, config.expandedProperty);
 
             this.onSelectedEntryChanged = new TrivialComponents.Event();
             this.onNodeExpansionStateChanged = new TrivialComponents.Event();

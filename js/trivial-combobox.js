@@ -37,20 +37,27 @@
             var me = this;
 
             options = options || {};
-            var _selectedEntryTemplate = options.selectedEntryTemplate || options.template || TrivialComponents.image2LinesTemplate;
             var config = $.extend({
                 valueProperty: null,
-                template: TrivialComponents.image2LinesTemplate,
-                selectedEntryTemplate: _selectedEntryTemplate,
-                templateProperty: "template",
-                selectedEntryTemplateProperty: "selectedEntryTemplate",
+                entryRenderFunction: function (entry) {
+                    var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                    return Mustache.render(template, entry);
+                },
+                selectedEntryRenderFunction: function (entry) {
+                    if (entry && entry.selectedEntryTemplate) {
+                        return Mustache.render(entry.selectedEntryTemplate, entry)
+                    } else {
+                        return config.entryRenderFunction(entry);
+                    }
+                },
                 selectedEntry: undefined,
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 entries: null,
-                emptyEntryTemplate: options.emptyEntryTemplate || _selectedEntryTemplate,
-                emptyEntry: {},
+                emptyEntry: {
+                    _isEmptyEntry: true
+                },
                 queryFunction: null, // defined below...
                 autoComplete: true,
                 autoCompleteDelay: 0,
@@ -346,7 +353,7 @@
                         $originalInput.val("");
                     }
                     selectedEntry = null;
-                    var $selectedEntry = $(Mustache.render(config.emptyEntry[config.selectedEntryTemplateProperty] || config.emptyEntryTemplate, config.emptyEntry))
+                    var $selectedEntry = $(config.selectedEntryRenderFunction(config.emptyEntry))
                         .addClass("tr-combobox-entry")
                         .addClass("empty");
                     $selectedEntryWrapper.empty().append($selectedEntry);
@@ -355,7 +362,7 @@
                         $originalInput.val(entry[config.valueProperty]);
                     }
                     selectedEntry = entry;
-                    var $selectedEntry = $(Mustache.render(selectedEntry[config.selectedEntryTemplateProperty] || config.selectedEntryTemplate, entry))
+                    var $selectedEntry = $(config.selectedEntryRenderFunction(entry))
                         .addClass("tr-combobox-entry");
                     $selectedEntryWrapper.empty().append($selectedEntry);
                     $editor.val(config.entryToEditorTextFunction(entry));

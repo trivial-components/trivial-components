@@ -40,13 +40,20 @@
                 var config = $.extend({
                     valueProperty: 'displayValue',
                     valueSeparator: ',',
-                    template: TrivialComponents.image2LinesTemplate,
-                    selectedEntryTemplate: options.template ? TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(options.template) : TrivialComponents.wrapEntryTemplateWithDefaultTagWrapperTemplate(TrivialComponents.image2LinesTemplate),
+                    entryRenderFunction: function (entry) {
+                        var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                        return Mustache.render(template, entry);
+                    },
+                    selectedEntryRenderFunction: function (entry) {
+                        if (entry && entry.selectedEntryTemplate) {
+                            return Mustache.render(entry.selectedEntryTemplate, entry)
+                        } else {
+                            return TrivialComponents.wrapWithDefaultTagWrapper(config.entryRenderFunction(entry));
+                        }
+                    },
                     spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                     noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                     textHighlightingEntryLimit: 100,
-                    templateProperty: "template",
-                    selectedEntryTemplateProperty: "selectedEntryTemplate",
                     finalEntryProperty: "finalEntry", // this property determines if the tag is completed after selection of the entry. If not, the next tag will be appended to this one.
                     entries: null,
                     selectedEntries: [],
@@ -438,7 +445,7 @@
                     selectedEntries.splice($editor.index(), 0, tag);
                     $originalInput.val(calculateOriginalInputValue());
 
-                    var $entry = $(Mustache.render(tag[config.selectedEntryTemplateProperty] || config.selectedEntryTemplate, tag));
+                    var $entry = $(config.selectedEntryRenderFunction(tag));
                     var $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
                     $tagWrapper.append($entry).insertBefore($editor);
                     tag._trEntryElement = $tagWrapper;

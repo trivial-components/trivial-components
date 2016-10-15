@@ -37,7 +37,10 @@
             options = options || {};
             var config = $.extend({
                 valueProperty: null,
-                template: TrivialComponents.image2LinesTemplate,
+                entryRenderFunction: function (entry) {
+                    var template = (entry && entry.template) || TrivialComponents.image2LinesTemplate;
+                    return Mustache.render(template, entry);
+                },
                 spinnerTemplate: TrivialComponents.defaultSpinnerTemplate,
                 noEntriesTemplate: TrivialComponents.defaultNoEntriesTemplate,
                 entries: null,
@@ -143,7 +146,7 @@
                 if (entries.length > 0) {
                     for (var i = 0; i < entries.length; i++) {
                         var entry = entries[i];
-                        var html = Mustache.render(config.template, entry);
+                        var html = config.entryRenderFunction(entry);
                         var $entry = $(html).addClass("tr-list-entry filterable-item").appendTo($entryList);
                         entry._trEntryElement = $entry;
                         (function (entry) {

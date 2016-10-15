@@ -91,11 +91,11 @@
             '  </div>' +
             '</div>';
 
-        function wrapEntryTemplateWithDefaultTagWrapperTemplate(entryTemplate) {
+        function wrapWithDefaultTagWrapper(entryTemplate) {
             return ('<div class="tr-tagbox-default-wrapper-template">' +
-            '<div class="tr-tagbox-tag-content">##entryTemplate##</div>' +
+            '<div class="tr-tagbox-tag-content">##entryHtml##</div>' +
             '<div class="tr-remove-button"></div>' +
-            '</div>').replace("##entryTemplate##", entryTemplate);
+            '</div>').replace("##entryHtml##", entryTemplate);
         }
 
         var keyCodes = {
@@ -126,10 +126,10 @@
             scroll_lock: 145,
             specialKeys: [8, 9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 91, 92, 93, 144, 145],
             numberKeys: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
-            isSpecialKey: function(keyCode) {
+            isSpecialKey: function (keyCode) {
                 return this.specialKeys.indexOf(keyCode) != -1;
             },
-            isDigitKey: function(keyCode) {
+            isDigitKey: function (keyCode) {
                 return this.numberKeys.indexOf(keyCode) != -1;
             }
         };
@@ -157,14 +157,24 @@
             }
         };
 
-        var createProxy = function(delegate) {
+        var createProxy = function (delegate) {
             var proxyConstructor = function () {
             };
             proxyConstructor.prototype = delegate;
             return new proxyConstructor();
         };
 
-        var defaultTreeQueryFunctionFactory = function (topLevelEntries, entryTemplates, matchingOptions, childrenPropertyName, expandedPropertyName) {
+        var defaultEntryMatchingFunctionFactory = function(searchedPropertyNames, matchingOptions) {
+            return function (entry, queryString, depth) {
+                return searchedPropertyNames
+                    .some(function (propertyName) {
+                        var value = entry[propertyName];
+                        return value != null && $.trivialMatch(value.toString(), queryString, matchingOptions).length > 0
+                    });
+            };
+        };
+
+        var defaultTreeQueryFunctionFactory = function (topLevelEntries, entryMatchingFunction, childrenPropertyName, expandedPropertyName) {
 
             function findMatchingEntriesAndTheirAncestors(entry, queryString, nodeDepth) {
                 var entryProxy = createProxy(entry);
@@ -181,22 +191,12 @@
                     }
                 }
                 var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
-                var matchesItself = entryMatches(entry, queryString, nodeDepth);
+                var matchesItself = entryMatchingFunction(entry, queryString, nodeDepth);
                 if (matchesItself && !hasMatchingChildren) {
                     // still make it expandable!
                     entryProxy[childrenPropertyName] = entry[childrenPropertyName];
                 }
                 return matchesItself || hasMatchingChildren ? entryProxy : null;
-            }
-
-            function entryMatches(entry, queryString, nodeDepth) {
-                if (!queryString) {
-                    return true;
-                } else {
-                    var entryHtml = Mustache.render(entryTemplates[Math.min(entryTemplates.length - 1, nodeDepth)], entry);
-                    entry._entryText = entryHtml.replace(/<.*?>/g, "").replace(/\s{2,}/g, ' ');
-                    return $.trivialMatch(entry._entryText, queryString, matchingOptions).length > 0;
-                }
             }
 
             return function (queryString, additionalQueryParameters, resultCallback) {
@@ -332,18 +332,40 @@
         // see http://stackoverflow.com/a/27014537/524913
         function objectEquals(x, y) {
             'use strict';
-            if (x === null || x === undefined || y === null || y === undefined) { return x === y; }
-            if (x.constructor !== y.constructor) { return false; }
-            if (x instanceof Function) { return x === y; }
-            if (x instanceof RegExp) { return x === y; }
-            if (x === y || x.valueOf() === y.valueOf()) { return true; }
-            if (Array.isArray(x) && x.length !== y.length) { return false; }
-            if (x instanceof Date) { return false; }
-            if (!(x instanceof Object)) { return false; }
-            if (!(y instanceof Object)) { return false; }
+            if (x === null || x === undefined || y === null || y === undefined) {
+                return x === y;
+            }
+            if (x.constructor !== y.constructor) {
+                return false;
+            }
+            if (x instanceof Function) {
+                return x === y;
+            }
+            if (x instanceof RegExp) {
+                return x === y;
+            }
+            if (x === y || x.valueOf() === y.valueOf()) {
+                return true;
+            }
+            if (Array.isArray(x) && x.length !== y.length) {
+                return false;
+            }
+            if (x instanceof Date) {
+                return false;
+            }
+            if (!(x instanceof Object)) {
+                return false;
+            }
+            if (!(y instanceof Object)) {
+                return false;
+            }
             var p = Object.keys(x);
-            return Object.keys(y).every(function (i) { return p.indexOf(i) !== -1; }) &&
-                p.every(function (i) { return objectEquals(x[i], y[i]); });
+            return Object.keys(y).every(function (i) {
+                    return p.indexOf(i) !== -1;
+                }) &&
+                p.every(function (i) {
+                    return objectEquals(x[i], y[i]);
+                });
         }
 
         return {
@@ -357,8 +379,9 @@
             currency2LineTemplate: currency2LineTemplate,
             defaultSpinnerTemplate: '<div class="tr-default-spinner"><div class="spinner"></div><div>Fetching data...</div></div>',
             defaultNoEntriesTemplate: '<div class="tr-default-no-data-display"><div>No matching entries...</div></div>',
-            wrapEntryTemplateWithDefaultTagWrapperTemplate: wrapEntryTemplateWithDefaultTagWrapperTemplate,
+            wrapWithDefaultTagWrapper: wrapWithDefaultTagWrapper,
             keyCodes: keyCodes,
+            defaultEntryMatchingFunctionFactory: defaultEntryMatchingFunctionFactory,
             defaultListQueryFunctionFactory: defaultListQueryFunctionFactory,
             defaultTreeQueryFunctionFactory: defaultTreeQueryFunctionFactory,
             customTreeQueryFunctionFactory: customTreeQueryFunctionFactory,
