@@ -98,6 +98,8 @@
             config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
 
             this.onSelectedEntryChanged = new TrivialComponents.Event();
+            this.onFocus = new TrivialComponents.Event();
+            this.onBlur = new TrivialComponents.Event();
 
             var listBox;
             var isDropDownOpen = false;
@@ -156,6 +158,8 @@
                     if (blurCausedByClickInsideComponent) {
                         // do nothing!
                     } else {
+                        $originalInput.triggerHandler('focus');
+                        me.onFocus.fire();
                         $comboBox.addClass('focus');
                         showEditor();
                     }
@@ -164,6 +168,8 @@
                     if (blurCausedByClickInsideComponent) {
                         $editor.focus();
                     } else {
+                        $originalInput.triggerHandler('blur');
+                        me.onBlur.fire();
                         $comboBox.removeClass('focus');
                         if (editorContainsFreeText()) {
                             if (!TrivialComponents.objectEquals(me.getSelectedEntry(), lastCommittedValue)) {

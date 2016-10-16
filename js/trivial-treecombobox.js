@@ -101,7 +101,10 @@
 
             config.queryFunction = config.queryFunction || TrivialComponents.defaultTreeQueryFunctionFactory(config.entries
                     || [], TrivialComponents.defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], config.matchingOptions), config.childrenProperty, config.expandedProperty);
+
             this.onSelectedEntryChanged = new TrivialComponents.Event();
+            this.onFocus = new TrivialComponents.Event();
+            this.onBlur = new TrivialComponents.Event();
 
             var treeBox;
             var isDropDownOpen = false;
@@ -159,6 +162,8 @@
                     if (blurCausedByClickInsideComponent) {
                         // do nothing!
                     } else {
+                        $originalInput.triggerHandler('focus');
+                        me.onFocus.fire();
                         $treeComboBox.addClass('focus');
                         showEditor();
                     }
@@ -167,6 +172,8 @@
                     if (blurCausedByClickInsideComponent) {
                         $editor.focus();
                     } else {
+                        $originalInput.triggerHandler('blur');
+                        me.onBlur.fire();
                         $treeComboBox.removeClass('focus');
                         if (editorContainsFreeText()) {
                             if (!TrivialComponents.objectEquals(me.getSelectedEntry(), lastCommittedValue)) {

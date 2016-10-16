@@ -204,15 +204,32 @@ include exclude forcer:
 
         window.demo = {};
 
-        demo.defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
+        var $defaultFilteringComboBox = $('#defaultFilteringComboBox');
+        demo.defaultFilteringCombobox = $defaultFilteringComboBox.TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
-            showClearButton: true
+            showClearButton: true,
+            valueProperty: "displayValue"
         });
         demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+        });
+        demo.defaultFilteringCombobox.onFocus.addListener(function() {
+            console.log("defaultFilteringCombobox focus");
+        });
+        demo.defaultFilteringCombobox.onBlur.addListener(function() {
+            console.log("defaultFilteringCombobox blur");
+        });
+        $defaultFilteringComboBox.change(function() {
+            console.log("#defaultFilteringComboBox change")
+        });
+        $defaultFilteringComboBox.focus(function() {
+            console.log("#defaultFilteringComboBox focus")
+        });
+        $defaultFilteringComboBox.blur(function() {
+            console.log("#defaultFilteringComboBox blur")
         });
 
         demo.emptyEntryTemplateFilteringCombobox = $('#emptyEntryTemplateFilteringCombobox').TrivialComboBox({
@@ -315,11 +332,27 @@ include exclude forcer:
             entries: createEntries()
         });
 
-        demo.zeroConfigTagBox = $('#zeroConfigTagBox').TrivialTagBox({
+        var $zeroConfigTagBox = $('#zeroConfigTagBox');
+        demo.zeroConfigTagBox = $zeroConfigTagBox.TrivialTagBox({
             entries: createEntries()
         });
         demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(entries) {
-            console.log("trivialTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
+            console.log("zeroConfigTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
+        });
+        demo.zeroConfigTagBox.onFocus.addListener(function() {
+            console.log("zeroConfigTagBox focus");
+        });
+        demo.zeroConfigTagBox.onBlur.addListener(function() {
+            console.log("zeroConfigTagBox blur");
+        });
+        $zeroConfigTagBox.change(function() {
+            console.log("#zeroConfigTagBox change")
+        });
+        $zeroConfigTagBox.focus(function() {
+            console.log("#zeroConfigTagBox focus")
+        });
+        $zeroConfigTagBox.blur(function() {
+            console.log("#zeroConfigTagBox blur")
         });
 
         demo.customTemplateTagBox1 = $('#customTemplateTagBox1').TrivialTagBox({
@@ -410,7 +443,8 @@ include exclude forcer:
             enforceSingleExpandedPath     : true
         });
 
-        demo.treeComboBox = $('#treeComboBox').TrivialTreeComboBox({
+        var $treeComboBox = $('#treeComboBox');
+        demo.treeComboBox = $treeComboBox.TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[0],
@@ -423,8 +457,25 @@ include exclude forcer:
             showClearButton: true
         });
         demo.treeComboBox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("trivialTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+            console.log("treeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
+        demo.treeComboBox.onFocus.addListener(function() {
+            console.log("treeComboBox focus");
+        });
+        demo.treeComboBox.onBlur.addListener(function() {
+            console.log("treeComboBox blur");
+        });
+        $treeComboBox.change(function() {
+            console.log("#treeComboBox change")
+        });
+        $treeComboBox.focus(function() {
+            console.log("#treeComboBox focus")
+        });
+        $treeComboBox.blur(function() {
+            console.log("#treeComboBox blur")
+        });
+
+
         demo.freeTextTreeComboBox = $('#freeTextTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),

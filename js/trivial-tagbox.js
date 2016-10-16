@@ -96,6 +96,8 @@
                 config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
 
                 this.onSelectedEntryChanged = new TrivialComponents.Event();
+                this.onFocus = new TrivialComponents.Event();
+                this.onBlur = new TrivialComponents.Event();
 
                 var listBox;
                 var isDropDownOpen = false;
@@ -143,6 +145,8 @@
                         if (blurCausedByClickInsideComponent) {
                             // do nothing!
                         } else {
+                            $originalInput.triggerHandler('focus');
+                            me.onFocus.fire();
                             $tagBox.addClass('focus');
                         }
                         setTimeout(function () { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
@@ -153,6 +157,8 @@
                         if (blurCausedByClickInsideComponent) {
                             $editor.focus();
                         } else {
+                            $originalInput.triggerHandler('blur');
+                            me.onBlur.fire();
                             $tagBox.removeClass('focus');
                             entries = null;
                             closeDropDown();
