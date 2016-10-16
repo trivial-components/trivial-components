@@ -202,40 +202,42 @@ include exclude forcer:
 <script>
     $(function () {
 
-        var defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
+        window.demo = {};
+
+        demo.defaultFilteringCombobox = $('#defaultFilteringComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
             showClearButton: true
         });
-        defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        var emptyEntryTemplateFilteringCombobox = $('#emptyEntryTemplateFilteringCombobox').TrivialComboBox({
+        demo.emptyEntryTemplateFilteringCombobox = $('#emptyEntryTemplateFilteringCombobox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
             emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
         });
-        emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTemplateFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        var freeTextComboBox = $('#freeTextComboBox').TrivialComboBox({
+        demo.freeTextComboBox = $('#freeTextComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
             },
             allowFreeText: true
         });
-        freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        $('#noAutoCompleteComboBox').TrivialComboBox({
+        demo.noAutoCompleteComboBox = $('#noAutoCompleteComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
@@ -243,7 +245,7 @@ include exclude forcer:
             autoComplete: false
         });
 
-        $('#iconSingleLineComboBox').TrivialComboBox({
+        demo.iconSingleLineComboBox = $('#iconSingleLineComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
@@ -251,7 +253,7 @@ include exclude forcer:
             template: TrivialComponents.iconSingleLineTemplate
         });
 
-        $('#customFilteringComboBox').trivialcombobox({
+        demo.customFilteringComboBox = $('#customFilteringComboBox').trivialcombobox({
             entries: createEntries(),
             emptyEntry: {
                 imageUrl: "-",
@@ -267,7 +269,7 @@ include exclude forcer:
             selectedEntryTemplate: TrivialComponents.singleLineTemplate
         });
 
-        $('#separateOriginalInputComboBox').TrivialComboBox({
+        demo.separateOriginalInputComboBox = $('#separateOriginalInputComboBox').TrivialComboBox({
             entries: createEntries(),
             emptyEntry: {
                 displayValue: "Please select..."
@@ -281,7 +283,7 @@ include exclude forcer:
         });
 
         var showDropDownOnResultsOnlyComboBoxEntries = createEntries();
-        $('#showDropDownOnResultsOnlyComboBox').TrivialComboBox({
+        demo.showDropDownOnResultsOnlyComboBox = $('#showDropDownOnResultsOnlyComboBox').TrivialComboBox({
             entries: showDropDownOnResultsOnlyComboBoxEntries,
             queryFunction: function (queryString, additionalQueryParameters, resultCallback) {
                 setTimeout(function () {
@@ -293,41 +295,41 @@ include exclude forcer:
             showDropDownOnResultsOnly: true
         });
 
-        $('#disabledComboBox').TrivialComboBox({
+        demo.disabledComboBox = $('#disabledComboBox').TrivialComboBox({
             selectedEntry: createEntries(1)[0],
             editingMode: 'disabled'
         });
 
-        $('#readonlyComboBox').TrivialComboBox({
+        demo.readonlyComboBox = $('#readonlyComboBox').TrivialComboBox({
             selectedEntry: createEntries(1)[0],
             editingMode: 'readonly'
         });
 
         var listBoxEntries = createEntries(10);
         listBoxEntries[1].template = "<div>custom template for entry {{id}}</div>";
-        $('#listBox').TrivialListBox({
+        demo.listBox = $('#listBox').TrivialListBox({
             entries: listBoxEntries
         });
 
-        $('#zeroConfigList').TrivialList({
+        demo.zeroConfigList = $('#zeroConfigList').TrivialList({
             entries: createEntries()
         });
 
-        var trivialTagBox = $('#zeroConfigTagBox').TrivialTagBox({
+        demo.zeroConfigTagBox = $('#zeroConfigTagBox').TrivialTagBox({
             entries: createEntries()
         });
-        trivialTagBox.onSelectedEntryChanged.addListener(function(entries) {
+        demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(entries) {
             console.log("trivialTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
         });
 
-        $('#customTemplateTagBox1').TrivialTagBox({
+        demo.customTemplateTagBox1 = $('#customTemplateTagBox1').TrivialTagBox({
             entries: createEntries(),
             selectedEntries: createEntries(2),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             showTrigger: false
         });
 
-        $('#customTemplateTagBox2').TrivialTagBox({
+        demo.customTemplateTagBox2 = $('#customTemplateTagBox2').TrivialTagBox({
             entries: createEntries(),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntryTemplate: '<div class="tr-tagbox-default-wrapper-template" style="background-color: {{statusColor}}; border: 1px solid {{statusColor}}">' +
@@ -346,21 +348,21 @@ include exclude forcer:
             distinct: false
         });
 
-        $('#maxSelectedEntriesTagBox').TrivialTagBox({
+        demo.maxSelectedEntriesTagBox = $('#maxSelectedEntriesTagBox').TrivialTagBox({
             entries: createEntries(),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             maxSelectedEntries: 2,
             allowFreeText: true
         });
 
-        $('#noDropdownTagBox').TrivialTagBox({
+        demo.noDropdownTagBox = $('#noDropdownTagBox').TrivialTagBox({
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             allowFreeText: true,
             showTrigger: false
         });
 
         var showDropDownOnResultsOnlyTagBoxEntries =  createEntries()
-        $('#showDropDownOnResultsOnlyTagBox').TrivialTagBox({
+        demo.showDropDownOnResultsOnlyTagBox = $('#showDropDownOnResultsOnlyTagBox').TrivialTagBox({
             entries: showDropDownOnResultsOnlyTagBoxEntries,
             queryFunction: function (queryString, additionalQueryParameters, resultCallback) {
                 setTimeout(function () {
@@ -372,19 +374,19 @@ include exclude forcer:
             showDropDownOnResultsOnly: true
         });
 
-        $('#disabledTagBox').TrivialTagBox({
+        demo.disabledTagBox = $('#disabledTagBox').TrivialTagBox({
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntries: createEntries(2),
             editingMode: 'disabled'
         });
 
-        $('#readonlyTagBox').TrivialTagBox({
+        demo.readonlyTagBox = $('#readonlyTagBox').TrivialTagBox({
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntries: createEntries(2),
             editingMode: 'readonly'
         });
 
-        $('#treeBoxContainer').TrivialTreeBox({
+        demo.treeBoxContainer = $('#treeBoxContainer').TrivialTreeBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntryId: 2,
@@ -394,7 +396,7 @@ include exclude forcer:
                 }, 1000);
             }
         });
-        $('#singleSelectionTreeBoxContainer').TrivialTreeBox({
+        demo.singleSelectionTreeBoxContainer = $('#singleSelectionTreeBoxContainer').TrivialTreeBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntryId: 2,
@@ -408,7 +410,7 @@ include exclude forcer:
             enforceSingleExpandedPath     : true
         });
 
-        var trivialTreeComboBox = $('#treeComboBox').TrivialTreeComboBox({
+        demo.treeComboBox = $('#treeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[0],
@@ -420,10 +422,10 @@ include exclude forcer:
             animationDuration: 200,
             showClearButton: true
         });
-        trivialTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.treeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("trivialTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
-        var freeTextTreeComboBox = $('#freeTextTreeComboBox').TrivialTreeComboBox({
+        demo.freeTextTreeComboBox = $('#freeTextTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[0],
@@ -435,25 +437,25 @@ include exclude forcer:
             allowFreeText: true,
             animationDuration: 0
         });
-        freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        $('#disabledTreeComboBox').TrivialTreeComboBox({
+        demo.disabledTreeComboBox = $('#disabledTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[1],
             editingMode: 'disabled'
         });
 
-        $('#readonlyTreeComboBox').TrivialTreeComboBox({
+        demo.readonlyTreeComboBox = $('#readonlyTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntry: createDemoTreeNodes()[2],
             editingMode: 'readonly'
         });
 
-        var emptyEntryTemplateTreeComboBox = $('#emptyEntryTemplateTreeComboBox').TrivialTreeComboBox({
+        demo.emptyEntryTemplateTreeComboBox =  $('#emptyEntryTemplateTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>Please choose ...</i></div>',
@@ -464,11 +466,11 @@ include exclude forcer:
             },
             animationDuration: 200
         });
-        emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        var emptyEntryTreeComboBox = $('#emptyEntryTreeComboBox').TrivialTreeComboBox({
+        demo.separateOriginalInputComboBox = $('#emptyEntryTreeComboBox').TrivialTreeComboBox({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             emptyEntry: {
@@ -485,11 +487,11 @@ include exclude forcer:
             },
             animationDuration: 200
         });
-        emptyEntryTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.separateOriginalInputComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        var zeroConfigTree = $('#zeroConfigTree').TrivialTree({
+        demo.zeroConfigTree = $('#zeroConfigTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
 //            selectedEntryId: 2,
@@ -500,14 +502,14 @@ include exclude forcer:
             },
             searchBarMode: 'always-visible'
         });
-        zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
+        demo.zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
             console.log("onSelectedEntryChanged " + (node ? node.id : "null"))
         });
-        zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
+        demo.zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
             console.log("onNodeExpansionStateChanged " + node.id)
         });
 
-        $('#onDemandSearchFieldTree').TrivialTree({
+        demo.onDemandSearchFieldTree = $('#onDemandSearchFieldTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             directSelectionViaArrowKeys: true,
@@ -521,7 +523,7 @@ include exclude forcer:
         });
 
         var entries = createDemoTreeNodes();
-        $('#includeExcludeForcerTree').TrivialTree({
+        demo.includeExcludeForcerTree = $('#includeExcludeForcerTree').TrivialTree({
             entries: entries,
             searchBarMode: 'always-visible',
             queryFunction: TrivialComponents.defaultTreeQueryFunctionFactory(entries, {
@@ -530,7 +532,7 @@ include exclude forcer:
             }, "children", "expanded")
         });
 
-        $('#noSearchFieldTree').TrivialTree({
+        demo.noSearchFieldTree = $('#noSearchFieldTree').TrivialTree({
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             selectedEntryId: 2,
@@ -543,7 +545,7 @@ include exclude forcer:
             searchBarMode: 'none'
         });
 
-        var trivialUnitBox = $('#unitBox').TrivialUnitBox({
+        demo.unitBox = $('#unitBox').TrivialUnitBox({
             entries: createCurrencyEntries(),
             emptyEntry: {
                 code: '...'
@@ -555,26 +557,26 @@ include exclude forcer:
             thousandsSeparator: '.',
             allowNullAmount: true
         });
-        trivialUnitBox.onChange.addListener(function (data) {
+        demo.unitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);
             console.log("trivialUnitBox.unit: " + data.unit);
         });
-        $('#unitBoxLeft').TrivialUnitBox({
+        demo.unitBoxLeft = $('#unitBoxLeft').TrivialUnitBox({
             entries: createCurrencyEntries(),
             unitDisplayPosition: 'left'
         });
-        $('#unitBoxSingleLineTemplate').TrivialUnitBox({
+        demo.unitBoxSingleLineTemplate = $('#unitBoxSingleLineTemplate').TrivialUnitBox({
             entries: createCurrencyEntries(),
             template: TrivialComponents.currencySingleLineLongTemplate
         });
 
-        dateTimeField = $('#dateTimeField').TrivialDateTimeField({});
+        demo.dateTimeField = $('#dateTimeField').TrivialDateTimeField({});
 
-        calendarBox = $('#calendarBox').TrivialCalendarBox({
+        demo.calendarBox = $('#calendarBox').TrivialCalendarBox({
             selectedDate: moment(),
             firstDayOfWeek: 1
         });
-        calendarComboBox = $('#calendarComboBox').TrivialCalendarComboBox({
+        demo.calendarComboBox = $('#calendarComboBox').TrivialCalendarComboBox({
             selectedDate: moment(),
             firstDayOfWeek: 1
         });

@@ -107,11 +107,11 @@
                 var autoCompleteTimeoutId = -1;
                 var doNoAutoCompleteBecauseBackspaceWasPressed = false;
                 var listBoxDirty = true;
+                var editingMode;
 
                 var $spinners = $();
                 var $originalInput = $(originalInput).addClass("tr-original-input");
                 var $tagBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
-                    .addClass(config.editingMode)
                     .insertAfter($originalInput);
                 $originalInput.appendTo($tagBox);
                 var $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo($tagBox);
@@ -134,10 +134,8 @@
                     .scroll(function (e) {
                         return false;
                     });
-                var dropdownNeeded = config.editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
-                if (dropdownNeeded) {
-                    $dropDown.appendTo("body");
-                }
+                var $dropDownTargetElement = $("body");
+                setEditingMode(config.editingMode);
                 var $editor = $('<span contenteditable="true" class="tagbox-editor" autocomplete="off"></span>');
 
                 $editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
@@ -489,7 +487,7 @@
                 var repositionDropDownScheduler = null;
 
                 function openDropDown() {
-                    if (dropdownNeeded) {
+                    if (isDropDownNeeded()) {
                         if (listBoxDirty) {
                             updateListBoxEntries();
                         }
@@ -541,6 +539,18 @@
                     }
                 }
 
+                function isDropDownNeeded() {
+                    return editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
+                }
+
+                function setEditingMode(newEditingMode) {
+                    editingMode = newEditingMode;
+                    $tagBox.removeClass("editable readonly disabled").addClass(editingMode);
+                    if (isDropDownNeeded()) {
+                        $dropDown.appendTo($dropDownTargetElement);
+                    }
+                }
+
                 this.$ = $tagBox;
                 $tagBox[0].trivialTagBox = this;
 
@@ -569,6 +579,7 @@
                     $editor.focus();
                     TrivialComponents.selectElementContents($editor[0], 0, $editor.text().length);
                 };
+                this.setEditingMode = setEditingMode;
                 this.destroy = function () {
                     $originalInput.removeClass('tr-original-input').insertBefore($tagBox);
                     $tagBox.remove();

@@ -114,11 +114,11 @@
             var blurCausedByClickInsideComponent = false;
             var autoCompleteTimeoutId = -1;
             var doNoAutoCompleteBecauseBackspaceWasPressed = false;
+            var editingMode;
 
             var $spinners = $();
             var $originalInput = $(originalInput);
             var $treeComboBox = $('<div class="tr-treecombobox tr-combobox tr-input-wrapper"/>')
-                .addClass(config.editingMode)
                 .insertAfter($originalInput);
             var $selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo($treeComboBox);
             if (config.showClearButton) {
@@ -148,10 +148,8 @@
                 .scroll(function (e) {
                     return false;
                 });
-            var dropdownNeeded = config.editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
-            if (dropdownNeeded) {
-                $dropDown.appendTo("body");
-            }
+            var $dropDownTargetElement = $("body");
+            setEditingMode(config.editingMode);
             var $editor;
             $originalInput.addClass("tr-original-input");
             $editor = $('<input type="text" autocomplete="off"/>');
@@ -451,7 +449,7 @@
             };
 
             function openDropDown() {
-                if (dropdownNeeded) {
+                if (isDropDownNeeded()) {
                     $treeComboBox.addClass("open");
                     repositionDropDown();
                     isDropDownOpen = true;
@@ -526,6 +524,18 @@
                 }
             }
 
+            function isDropDownNeeded() {
+                return editingMode == 'editable' && (config.entries && config.entries.length > 0 || options.queryFunction || config.showTrigger);
+            }
+
+            function setEditingMode(newEditingMode) {
+                editingMode = newEditingMode;
+                $treeComboBox.removeClass("editable readonly disabled").addClass(editingMode);
+                if (isDropDownNeeded()) {
+                    $dropDown.appendTo($dropDownTargetElement);
+                }
+            }
+
             this.updateEntries = updateEntries;
             this.getSelectedEntry = function () {
                 if (selectedEntry == null && (!config.allowFreeText || !$editor.val())) {
@@ -551,6 +561,7 @@
             this.getDropDown = function () {
                 return $dropDown;
             };
+            this.setEditingMode = setEditingMode;
             this.destroy = function () {
                 $originalInput.removeClass('tr-original-input').insertBefore($treeComboBox);
                 $treeComboBox.remove();
