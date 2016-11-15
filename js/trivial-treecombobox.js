@@ -495,6 +495,8 @@
             $treeComboBox[0].trivialTreeComboBox = this;
 
             function updateEntries(newEntries, highlightDirection) {
+                blurCausedByClickInsideComponent = false; // if the entries are updated as a reaction of a user selecting an entry, there is no mouseup or mouseout event. Therefore, we must ensure that this flag is unset.
+
                 entries = newEntries;
                 $spinners.remove();
                 $spinners = $();
