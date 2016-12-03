@@ -25,6 +25,7 @@ var karma = require('karma').server;
 var header = require('gulp-header');
 var sizereport = require('gulp-sizereport');
 var ts = require('gulp-typescript');
+var gulpTypings = require("gulp-typings");
 
 gulp.task('clean', function () {
     del(['dist']);
@@ -163,14 +164,8 @@ gulp.task('tar', ['prepare-dist'], function () {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('size-report', ["js-bundle"],  function () {
-    return gulp.src(['dist/js/bundle/trivial-components.min.js', 'dist/css/trivial-components.min.css'
-        //,  'bower_components/moment/min/moment-with-locales.min.js',
-        //'dist/lib/jquery.min.js',
-        //'dist/lib/jquery.position.min.js',
-        //'dist/lib/levenshtein.min.js',
-        //'dist/lib/mustache.min.js'
-    ])
+gulp.task('size-report', ["js-bundle"], function () {
+    return gulp.src(['dist/js/bundle/trivial-components.min.js', 'dist/css/trivial-components.min.css'])
         .pipe(sizereport({
             gzip: true,
             'trivial-components.min.js': {
@@ -201,9 +196,14 @@ gulp.task('watch-js', function () {
 
 var tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('typescript', function() {
+gulp.task('typescript', ['install-typings'], function () {
     var tsResult = tsProject.src()
         .pipe(tsProject());
 
     return tsResult.js.pipe(gulp.dest('dist/js/ts-single'));
+});
+
+gulp.task("install-typings", function () {
+    return gulp.src("./typings.json")
+        .pipe(gulpTypings());
 });

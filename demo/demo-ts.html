@@ -26,6 +26,7 @@
     <script src="../dist/js/ts-single/TrivialTreeComboBox.js"></script>
     <script src="../dist/js/ts-single/TrivialTree.js"></script>
     <script src="../dist/js/ts-single/TrivialUnitBox.js"></script>
+    <script src="../dist/js/ts-single/TrivialCalendarBox.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -588,12 +589,13 @@ no search field:
             template: TrivialComponents.currencySingleLineLongTemplate
         });
 
-        demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
-
         demo.calendarBox = new TrivialComponents.TrivialCalendarBox('#calendarBox', {
             selectedDate: moment(),
             firstDayOfWeek: 1
         });
+
+        demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
+
         demo.calendarComboBox = new TrivialComponents.TrivialCalendarComboBox('#calendarComboBox', {
             selectedDate: moment(),
             firstDayOfWeek: 1

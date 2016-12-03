@@ -65,7 +65,9 @@
     "@types/jqueryui": "1.x",
     "@types/mustache": "^0.8.29",
     "gulp-typescript": "^3.1.2",
+    "gulp-typings": "^2.0.4",
     "jquery": "^3.1.1",
-    "typescript": "^2.0.3"
+    "typescript": "^2.0.3",
+    "typings": "^2.0.0"
   }
 }

@@ -4,6 +4,7 @@ node/
 node_modules/
 dist/
 demo/css/
+typings/
 tmp/
 
 ### NetBeans template
