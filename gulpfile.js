@@ -24,6 +24,7 @@ var stripDebug = require('gulp-strip-debug');
 var karma = require('karma').server;
 var header = require('gulp-header');
 var sizereport = require('gulp-sizereport');
+var ts = require('gulp-typescript');
 
 gulp.task('clean', function () {
     del(['dist']);
@@ -196,4 +197,13 @@ gulp.task('watch', function () {
 
 gulp.task('watch-js', function () {
     gulp.watch(['js/*.js'], ['js-bundle']);
+});
+
+var tsProject = ts.createProject('tsconfig.json');
+
+gulp.task('typescript', function() {
+    var tsResult = tsProject.src()
+        .pipe(tsProject());
+
+    return tsResult.js.pipe(gulp.dest('dist/js/ts-single'));
 });
