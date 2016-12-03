@@ -400,7 +400,7 @@ module TrivialComponents {
         }
 
 
-        public revealSelectedEntry(animate: boolean) {
+        public revealSelectedEntry(animate: boolean = false) {
             var selectedEntry = this.getSelectedEntry();
             if (!selectedEntry) {
                 return;
