@@ -183,5 +183,9 @@ module TrivialComponents {
                 this.highlightNextEntry(1);
             }
         }
+
+        get $() {
+            return this.$listBox;
+        }
     }
 }

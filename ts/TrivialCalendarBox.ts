@@ -29,8 +29,6 @@ module TrivialComponents {
 
         private config: any; // TODO config type
 
-        private $: JQuery;  // TODO remove!
-
         private keyboardNavigationState: TimeUnit;
         private keyboardNavCssClass: string;
         private selectedDate: Moment;
@@ -129,8 +127,6 @@ module TrivialComponents {
                 this.updateMonthDisplay(moment());
                 this.updateClockDisplay(moment());
             }
-
-            this.$ = this.$calendarBox;
         }
 
         private static getDaysForCalendarDisplay(dateInMonthDoBeDisplayed: Moment, firstDayOfWeek: WeekDay) {
@@ -338,5 +334,9 @@ module TrivialComponents {
         public navigate(direction: NavigationDirection) { // returns true if effectively navigated, false if nothing has changed
             this.navigateByUnit(this.keyboardNavigationState, direction);
         };
+
+        get $() {
+            return this.$calendarBox;
+        }
     }
 }
