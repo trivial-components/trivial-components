@@ -135,24 +135,24 @@ module TrivialComponents {
                 this.$activeEditor = this.$dateEditor;
                 this.setDropDownMode(Mode.MODE_CALENDAR);
                 this.openDropDown();
-                TrivialCore.selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
+                selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
             });
             this.$timeIconWrapper.click(() => {
                 this.$activeEditor = this.$timeEditor;
                 this.setDropDownMode(Mode.MODE_CALENDAR);
-                TrivialCore.selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
+                selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
             });
 
             this.$dateEditor.focus(() => {
                 this.$activeEditor = this.$dateEditor;
                 if (!this.blurCausedByClickInsideComponent || this.focusGoesToOtherEditor) {
-                    TrivialCore.selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
+                    selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
                 }
             });
             this.$timeEditor.focus(() => {
                 this.$activeEditor = this.$timeEditor;
                 if (!this.blurCausedByClickInsideComponent || this.focusGoesToOtherEditor) {
-                    TrivialCore.selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
+                    selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
                 }
             });
 
@@ -166,7 +166,7 @@ module TrivialComponents {
                             this.setDropDownMode(Mode.MODE_CALENDAR);
                             this.calendarBox.setSelectedDate(this.dateValue ? this.dateValue.moment : moment());
                             this.$activeEditor = this.$dateEditor;
-                            TrivialCore.selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
+                            selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
                             this.openDropDown();
                         });
                     }
@@ -235,10 +235,10 @@ module TrivialComponents {
                         } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                             if (this.getActiveEditor() === this.$timeEditor && e.which == keyCodes.left_arrow && window.getSelection().focusOffset === 0) {
                                 e.preventDefault();
-                                TrivialCore.selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
+                                selectElementContents(this.$dateEditor[0], 0, this.$dateEditor.text().length);
                             } else if (this.getActiveEditor() === this.$dateEditor && e.which == keyCodes.right_arrow && window.getSelection().focusOffset === this.$dateEditor.text().length) {
                                 e.preventDefault();
-                                TrivialCore.selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
+                                selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
                             }
                             return; // let the user navigate freely left and right...
                         }
@@ -265,14 +265,14 @@ module TrivialComponents {
                             if (this.isDropDownOpen) {
                                 e.preventDefault(); // do not submit form
                                 this.selectHighlightedListBoxEntry();
-                                TrivialCore.selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
+                                selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
                                 this.closeDropDown();
                             }
                         } else if (e.which == keyCodes.escape) {
                             e.preventDefault(); // prevent ie from doing its text field magic...
                             if (this.isDropDownOpen) {
                                 this.updateDisplay();
-                                TrivialCore.selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
+                                selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
                             }
                             this.closeDropDown();
                         } else {
@@ -329,7 +329,7 @@ module TrivialComponents {
                     if (changedUnit === 'day') {
                         this.closeDropDown();
                         this.$activeEditor = this.$timeEditor;
-                        TrivialCore.selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
+                        selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
                         this.fireChangeEvents();
                     }
                 });
@@ -522,7 +522,7 @@ module TrivialComponents {
                             this.getActiveEditor().text(newEditorValue);
                             // $editor[0].offsetHeight;  // we need this to guarantee that the editor has been updated...
                             if (this.getActiveEditor().is(":focus")) {
-                                TrivialCore.selectElementContents(this.getActiveEditor()[0], oldEditorValue.length, newEditorValue.length);
+                                selectElementContents(this.getActiveEditor()[0], oldEditorValue.length, newEditorValue.length);
                             }
                         }, delay || 0);
                     }
@@ -551,7 +551,7 @@ module TrivialComponents {
         }
 
         public focus() {
-            TrivialCore.selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
+            selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
         }
 
         public destroy() {

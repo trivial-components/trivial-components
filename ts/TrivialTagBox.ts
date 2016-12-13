@@ -55,18 +55,18 @@ module TrivialComponents {
                 valueProperty: 'displayValue',
                 valueSeparator: ',',
                 entryRenderingFunction: (entry: any) => {
-                    var template = entry.template || TrivialCore.image2LinesTemplate;
+                    var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: any) => {
                     if (entry.selectedEntryTemplate) {
                         return Mustache.render(entry.selectedEntryTemplate, entry)
                     } else {
-                        return TrivialCore.wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
+                        return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
                     }
                 },
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 finalEntryProperty: "finalEntry", // TODO function here... this property determines if the tag is completed after selection of the entry. If not, the next tag will be appended to this one.
                 entries: null,
@@ -110,7 +110,7 @@ module TrivialComponents {
             }, options);
 
             if (!this.config.queryFunction) {
-                this.config.queryFunction = TrivialCore.defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+                this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
                 this.config.queryFunction.isDefaultQueryFunction = true;
             }
 
@@ -245,9 +245,7 @@ module TrivialComponents {
                 })
                 .keyup((e) => {
                     function splitStringBySeparatorChars(s: string, separatorChars: string[]) {
-                        // console.log(s);
-                        // console.log(s.split(new RegExp("[" + TrivialCore.escapeSpecialRegexCharacter(separatorChars.join()) + "]")));
-                        return s.split(new RegExp("[" + TrivialCore.escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
+                        return s.split(new RegExp("[" + escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
                     }
 
                     if (this.$editor.find('*').length > 0) {
@@ -264,7 +262,7 @@ module TrivialComponents {
                                     this.selectEntry(this.config.freeTextEntryFactory(value));
                                 }
                                 this.$editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
-                                TrivialCore.selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
+                                selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
                                 this.entries = null;
                                 this.closeDropDown();
                             }
@@ -543,7 +541,7 @@ module TrivialComponents {
                         this.$editor.text(currentEditorValue + autoCompleteString.replace(' ', String.fromCharCode(160)).substr(currentEditorValue.length)); // I have to replace whitespaces by 160 because text() trims whitespaces...
                         this.repositionDropDown(); // the auto-complete might cause a line-break, so the dropdown would cover the editor...
                         if (this.$editor.is(":focus")) {
-                            TrivialCore.selectElementContents(this.$editor[0], currentEditorValue.length, autoCompleteString.length);
+                            selectElementContents(this.$editor[0], currentEditorValue.length, autoCompleteString.length);
                         }
                     }, delay || 0);
                 }
@@ -586,7 +584,7 @@ module TrivialComponents {
 
         public focus() {
             this.$editor.focus();
-            TrivialCore.selectElementContents(this.$editor[0], 0, this.$editor.text().length);
+            selectElementContents(this.$editor[0], 0, this.$editor.text().length);
         };
 
         public destroy() {

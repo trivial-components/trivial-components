@@ -55,7 +55,7 @@ module TrivialComponents {
             this.config = $.extend({
                 valueProperty: null,
                 entryRenderingFunction: (entry: any) => {
-                    var template = entry.template || TrivialCore.image2LinesTemplate;
+                    var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: any) => {
@@ -66,8 +66,8 @@ module TrivialComponents {
                     }
                 },
                 selectedEntry: undefined,
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 entries: null,
                 emptyEntry: {
@@ -113,7 +113,7 @@ module TrivialComponents {
             }, options);
 
             if (!this.config.queryFunction) {
-                this.config.queryFunction = TrivialCore.defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+                this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
                 this.config.queryFunction.isDefaultQueryFunction = true;
             }
 
@@ -177,7 +177,7 @@ module TrivialComponents {
                         this.onBlur.fire();
                         this.$comboBox.removeClass('focus');
                         if (this.editorContainsFreeText()) {
-                            if (!TrivialCore.objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
+                            if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
                                 this.selectEntry(this.getSelectedEntry(), true);
                             }
                         } else {
@@ -308,7 +308,7 @@ module TrivialComponents {
             this.listBox = new TrivialListBox(this.$dropDown, configWithoutEntries);
             this.listBox.onSelectedEntryChanged.addListener((selectedEntry: any) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry, true, TrivialCore.objectEquals(selectedEntry, this.lastCommittedValue));
+                    this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.listBox.selectEntry(null);
                     this.closeDropDown();
                 }

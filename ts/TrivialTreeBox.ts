@@ -41,12 +41,12 @@ module TrivialComponents {
                 },
                 expandedProperty: 'expanded',
                 entryRenderingFunction: function (entry: any, depth: number) {
-                    var defaultTemplates = [TrivialCore.icon2LinesTemplate, TrivialCore.iconSingleLineTemplate];
+                    var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
                     var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 entries: null,
                 selectedEntryId: null,
                 matchingOptions: {

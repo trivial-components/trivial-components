@@ -32,10 +32,10 @@ module TrivialComponents {
         constructor($container: JQuery|Element|string, options: any = {} /*TODO config type*/) {
             this.config = $.extend({
                 entryRenderingFunction: function (entry: any) {
-                    var template = entry.template || TrivialCore.image2LinesTemplate;
+                    var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
                 entries: null,
                 queryFunction: null, // defined below...
                 textHighlightingEntryLimit: 100,

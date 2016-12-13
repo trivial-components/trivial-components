@@ -49,17 +49,17 @@ module TrivialComponents {
                 unitDisplayPosition: 'right', // right or left
                 allowNullAmount: true,
                 entryRenderingFunction: (entry: any) => {
-                    var template = entry.template || TrivialCore.currency2LineTemplate;
+                    var template = entry.template || DEFAULT_TEMPLATES.currency2LineTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: any) => {
-                    var template = entry.selectedEntryTemplate || TrivialCore.currencySingleLineShortTemplate;
+                    var template = entry.selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
                     return Mustache.render(template, entry);
                 },
                 amount: null,
                 selectedEntry: undefined,
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 entries: null,
                 emptyEntry: {
                     code: '...'
@@ -75,7 +75,7 @@ module TrivialComponents {
                 }
             }, options);
 
-            this.config.queryFunction = this.config.queryFunction || TrivialCore.defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+            this.config.queryFunction = this.config.queryFunction || defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
 
             this.entries = this.config.entries;
 

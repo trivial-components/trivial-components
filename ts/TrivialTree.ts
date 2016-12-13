@@ -47,12 +47,12 @@ module TrivialComponents {
                 },
                 expandedProperty: 'expanded',
                 entryRenderingFunction: (entry: any, depth: number) => {
-                    var defaultTemplates = [TrivialCore.icon2LinesTemplate, TrivialCore.iconSingleLineTemplate];
+                    var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
                     var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 entries: null,
                 selectedEntryId: null,
                 matchingOptions: {
@@ -66,8 +66,8 @@ module TrivialComponents {
                     toManyVisibleItemsThreshold: 75
                 }
             }, options);
-            this.config.queryFunction = this.config.queryFunction || TrivialCore.defaultTreeQueryFunctionFactory(this.config.entries
-                    || [], TrivialCore.defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
+            this.config.queryFunction = this.config.queryFunction || defaultTreeQueryFunctionFactory(this.config.entries
+                    || [], defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
 
             this.onSelectedEntryChanged = new TrivialEvent();
             this.onNodeExpansionStateChanged = new TrivialEvent();

@@ -51,7 +51,7 @@ module TrivialComponents {
             this.config = $.extend({
                 valueProperty: 'id',
                 entryRenderingFunction: (entry: any, depth: number) => {
-                    var defaultTemplates = [TrivialCore.icon2LinesTemplate, TrivialCore.iconSingleLineTemplate];
+                    var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
                     var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
@@ -63,8 +63,8 @@ module TrivialComponents {
                     }
                 },
                 selectedEntry: null,
-                spinnerTemplate: TrivialCore.defaultSpinnerTemplate,
-                noEntriesTemplate: TrivialCore.defaultNoEntriesTemplate,
+                spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 textHighlightingEntryLimit: 100,
                 entries: null,
                 emptyEntry: {
@@ -110,8 +110,8 @@ module TrivialComponents {
                 showDropDownOnResultsOnly: false
             }, options);
 
-            this.config.queryFunction = this.config.queryFunction || TrivialCore.defaultTreeQueryFunctionFactory(this.config.entries
-                    || [], TrivialCore.defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
+            this.config.queryFunction = this.config.queryFunction || defaultTreeQueryFunctionFactory(this.config.entries
+                    || [], defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
 
             this.$originalInput = $(originalInput);
             this.$treeComboBox = $('<div class="tr-treecombobox tr-combobox tr-input-wrapper"/>')
@@ -168,7 +168,7 @@ module TrivialComponents {
                         this.onBlur.fire();
                         this.$treeComboBox.removeClass('focus');
                         if (this.editorContainsFreeText()) {
-                            if (!TrivialCore.objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
+                            if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
                                 this.selectEntry(this.getSelectedEntry(), true);
                             }
                         } else {
@@ -306,7 +306,7 @@ module TrivialComponents {
             this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
             this.treeBox.onSelectedEntryChanged.addListener((selectedEntry) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry, true, TrivialCore.objectEquals(selectedEntry, this.lastCommittedValue));
+                    this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.treeBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }

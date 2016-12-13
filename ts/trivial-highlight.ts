@@ -65,11 +65,11 @@ module TrivialComponents {
 
                 if (searchString && searchString !== '') {
                     $this.contents().filter(function () {
-                        return this.nodeType == 3 && TrivialComponents.TrivialCore.trivialMatch(this.nodeValue, searchString, options).length > 0;
+                        return this.nodeType == 3 && trivialMatch(this.nodeValue, searchString, options).length > 0;
                     }).replaceWith(function () {
                         var oldNodeValue = (this.nodeValue || "");
                         var newNodeValue = "";
-                        var matches = TrivialComponents.TrivialCore.trivialMatch(this.nodeValue, searchString, options);
+                        var matches = trivialMatch(this.nodeValue, searchString, options);
                         var oldMatchEnd = 0;
                         for (var i = 0; i < matches.length; i++) {
                             var match = matches[i];
