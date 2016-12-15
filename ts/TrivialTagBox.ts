@@ -1,7 +1,7 @@
-/*
+/*!
  Trivial Components (https://github.com/trivial-components/trivial-components)
 
- Copyright 2015 Yann Massard (https://github.com/yamass) and other contributors
+ Copyright 2016 Yann Massard (https://github.com/yamass) and other contributors
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-
 module TrivialComponents {
 
     export class TrivialTagBox {

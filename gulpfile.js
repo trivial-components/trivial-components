@@ -1,10 +1,43 @@
+/*!
+ *
+ *  Copyright 2016 Yann Massard (https://github.com/yamass) and other contributors
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+var copyrightHeader = "/*!\n"
+    + "*\n"
+    + "*  Copyright 2016 Yann Massard (https://github.com/yamass) and other contributors\n"
+    + "*\n"
+    + "*  Licensed under the Apache License, Version 2.0 (the \"License\");\n"
+    + "*  you may not use this file except in compliance with the License.\n"
+    + "*  You may obtain a copy of the License at\n"
+    + "*\n"
+    + "*  http://www.apache.org/licenses/LICENSE-2.0\n"
+    + "*\n"
+    + "*  Unless required by applicable law or agreed to in writing, software\n"
+    + "*  distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+    + "*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+    + "*  See the License for the specific language governing permissions and\n"
+    + "*  limitations under the License.\n"
+    + "*\n"
+    + "*/\n";
 var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
 var gulp = require('gulp');
-var gutil = require('gulp-util');
 var bower = require('gulp-bower');
 var less = require('gulp-less');
-var minifyCSS = require('gulp-minify-css');
 var mirror = require('gulp-mirror');
 var rename = require('gulp-rename');
 var pipe = require('multipipe');
@@ -23,6 +56,9 @@ var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
 var karma = require('karma').server;
 var header = require('gulp-header');
+var strip = require('gulp-strip-comments');
+var stripCssComments = require('gulp-strip-css-comments');
+
 var sizereport = require('gulp-sizereport');
 var ts = require('gulp-typescript');
 var gulpTypings = require("gulp-typings");
@@ -61,29 +97,16 @@ gulp.task('copyLibs2dist', ['bower'], function () {
         .pipe(gulp.dest('./dist/lib'));
 });
 
-gulp.task('copyLess2dist', function () {
-    return gulp.src(['less/*', "!less/demo.less"])
-        .pipe(rename(function (path) {
-            if (path.basename.indexOf('position') === 0) {
-                path.basename = "jquery." + path.basename;
-            }
-        }))
-        .pipe(gulp.dest('./dist/less'));
-});
-
 function compileLess(src, dest) {
     return gulp.src(src)
         .pipe(sourcemaps.init())
         .pipe(less())
-        .pipe(postcss([autoprefixer({browsers: ['> 2%']})]))
-        .pipe(mirror(
-            pipe(
-                rename(function (path) {
-                    path.basename += ".sourcemaps";
-                }),
-                pipe(sourcemaps.write())
-            )
-        ))
+        .pipe(postcss([
+            require('autoprefixer')({browsers: ['> 2%']})
+        ]))
+        .pipe(stripCssComments())
+        .pipe(header(copyrightHeader))
+        .pipe(pipe(sourcemaps.write('.')))
         .pipe(gulp.dest(dest))
         .pipe(livereload());
 }
@@ -100,36 +123,35 @@ gulp.task('less-demo', ['bower'], function () {
     return compileLess(['demo/less/demo.less'], 'demo/css');
 });
 
-gulp.task('minifyCss', ['less', 'less-bootstrap'], function () {
+gulp.task('minify-css', ['less', 'less-bootstrap'], function () {
     return gulp.src(["dist/css/*.css", "!dist/css/*.min.css", "!dist/css/*.sourcemaps.css"])
         .pipe(rename(function (path) {
             path.basename += ".min"
         }))
-        .pipe(minifyCSS())
+        .pipe(postcss([
+            require('cssnano')
+        ]))
         .pipe(header(minCopyrightHeader))
         .pipe(gulp.dest("dist/css"));
 });
 
 
-gulp.task('js-single', function () {
-    return gulp.src(['js/*.js'])
+gulp.task('js-single', ['typescript'], function () {
+    return gulp.src(['dist/js/TrivialCore.js', 'dist/js/*.js', '!*.min.*', '!*.map'])
         .pipe(stripDebug())
-        .pipe(mirror(
-            pipe(
-                rename(function (path) {
-                    path.basename += ".min";
-                }),
-                uglify(),
-                header(minCopyrightHeader)
-            )
-        ))
-        .pipe(gulp.dest('./dist/js/single'));
+        .pipe(rename(function (path) {
+            path.basename += ".min";
+        }))
+        .pipe(uglify())
+        .pipe(header(minCopyrightHeader))
 });
 
-gulp.task('js-bundle', function () {
-    return gulp.src(['js/trivial-core.js', 'js/*.js'])
+gulp.task('js-bundle', ['js-single', 'typescript'], function () {
+    return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js'])
         .pipe(stripDebug())
+        .pipe(strip())
         .pipe(concat('trivial-components.js'))
+        .pipe(header(copyrightHeader))
         .pipe(mirror(
             pipe(
                 rename(function (path) {
@@ -149,22 +171,21 @@ gulp.task('test', ['bower'], function (done) {
     }, done);
 });
 
-gulp.task('prepare-dist', ['test', 'bower', 'less', 'less-bootstrap', 'minifyCss', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'copyLibs2dist']);
 
 gulp.task('zip', ["prepare-dist"], function () {
-    return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
+    return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
         .pipe(zip('trivial-components.zip'))
         .pipe(gulp.dest('dist'));
 });
-
 gulp.task('tar', ['prepare-dist'], function () {
-    return gulp.src(['dist/**/*', "!dist/*.gz", "!dist/*.zip"])
+    return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
         .pipe(tar('trivial-components.tar'))
         .pipe(gzip())
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('size-report', ["js-bundle"], function () {
+gulp.task('size-report', ["js-bundle", "minify-css"], function () {
     return gulp.src(['dist/js/bundle/trivial-components.min.js', 'dist/css/trivial-components.min.css'])
         .pipe(sizereport({
             gzip: true,
@@ -199,8 +220,6 @@ var tsProject = ts.createProject('tsconfig.json');
 gulp.task('typescript', ['install-typings'], function () {
     var tsResult = tsProject.src()
         .pipe(tsProject());
-
-    return tsResult.js.pipe(gulp.dest('dist/js/ts-single'));
 });
 
 gulp.task("install-typings", function () {
