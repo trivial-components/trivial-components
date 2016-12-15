@@ -58,10 +58,10 @@ var karma = require('karma').server;
 var header = require('gulp-header');
 var strip = require('gulp-strip-comments');
 var stripCssComments = require('gulp-strip-css-comments');
-
 var sizereport = require('gulp-sizereport');
 var ts = require('gulp-typescript');
 var gulpTypings = require("gulp-typings");
+var release = require('gulp-github-release');
 
 gulp.task('clean', function () {
     del(['dist']);
@@ -225,4 +225,15 @@ gulp.task('typescript', ['install-typings'], function () {
 gulp.task("install-typings", function () {
     return gulp.src("./typings.json")
         .pipe(gulpTypings());
+});
+
+gulp.task('release', function(){
+    gulp.src(['trivial-components.tar.gz'])
+        .pipe(release({
+            tag: 'v0.1.0',                      // if missing, the version will be extracted from manifest and prepended by a 'v'
+            name: 'v0.1.0',     // if missing, it will be the same as the tag
+            notes: 'Migrated to typescript!',                // if missing it will be left undefined
+            prerelease: false,                  // if missing it's false
+            manifest: require('./package.json') // package.json from which default values will be extracted if they're missing
+        }));
 });
