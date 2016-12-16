@@ -228,12 +228,12 @@ gulp.task("install-typings", function () {
 });
 
 gulp.task('release', function(){
-    gulp.src(['trivial-components.tar.gz'])
+    gulp.src('trivial-components.tar.gz')
         .pipe(release({
             tag: 'v0.1.0',                      // if missing, the version will be extracted from manifest and prepended by a 'v'
             name: 'v0.1.0',     // if missing, it will be the same as the tag
             notes: 'Migrated to typescript!',                // if missing it will be left undefined
-            prerelease: false,                  // if missing it's false
+            prerelease: true,                  // if missing it's false
             manifest: require('./package.json') // package.json from which default values will be extracted if they're missing
         }));
 });

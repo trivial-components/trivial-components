@@ -31,21 +31,20 @@
     <script src="../bower_components/levenshtein/lib/levenshtein.js"></script>
     <script src="../bower_components/moment/moment.js"></script>
     <script src="../bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
-    <script src="../dist/js/ts-single/TrivialCore.js"></script>
-    <script src="../dist/js/ts-single/trivial-highlight.js"></script>
-    <script src="../dist/js/ts-single/trivial-minimallyScrollTo.js"></script>
-    <script src="../dist/js/ts-single/TrivialEvent.js"></script>
-    <script src="../dist/js/ts-single/EditingMode.js"></script>
-    <script src="../dist/js/ts-single/KeyCodes.js"></script>
-    <script src="../dist/js/ts-single/TrivialComboBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialListBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialTagBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialTreeBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialTreeComboBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialTree.js"></script>
-    <script src="../dist/js/ts-single/TrivialUnitBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialCalendarBox.js"></script>
-    <script src="../dist/js/ts-single/TrivialDateTimeField.js"></script>
+    <script src="../dist/js/single/TrivialCore.js"></script>
+    <script src="../dist/js/single/trivial-highlight.js"></script>
+    <script src="../dist/js/single/trivial-minimallyScrollTo.js"></script>
+    <script src="../dist/js/single/TrivialEvent.js"></script>
+    <script src="../dist/js/single/KeyCodes.js"></script>
+    <script src="../dist/js/single/TrivialComboBox.js"></script>
+    <script src="../dist/js/single/TrivialListBox.js"></script>
+    <script src="../dist/js/single/TrivialTagBox.js"></script>
+    <script src="../dist/js/single/TrivialTreeBox.js"></script>
+    <script src="../dist/js/single/TrivialTreeComboBox.js"></script>
+    <script src="../dist/js/single/TrivialTree.js"></script>
+    <script src="../dist/js/single/TrivialUnitBox.js"></script>
+    <script src="../dist/js/single/TrivialCalendarBox.js"></script>
+    <script src="../dist/js/single/TrivialDateTimeField.js"></script>
     <script src="demo.js"></script>
 </head>
 <body>
@@ -195,11 +194,6 @@ no search field:
 <div style="width: 300px">
     <h3>CalendarBox</h3>
     <div id="calendarBox"></div>
-</div>
-
-<div style="width: 300px">
-    <h3>CalendarComboBox</h3>
-    <input id="calendarComboBox" tabindex="14"/>
 </div>
 
 
@@ -614,11 +608,6 @@ no search field:
         });
 
         demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
-
-        demo.calendarComboBox = new TrivialComponents.TrivialCalendarComboBox('#calendarComboBox', {
-            selectedDate: moment(),
-            firstDayOfWeek: 1
-        });
 
         $destroyAllButton = $('#destroyAllButton').click(function() {
             $('.tr-combobox').TrivialComboBox().forEach(function(c) {c.destroy()});
