@@ -35,6 +35,9 @@ var copyrightHeader = "/*!\n"
     + "*/\n";
 var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
+var VERSION = '0.1.0';
+var RELEASE_NOTES = 'Migrated to typescript!';
+
 var gulp = require('gulp');
 var bower = require('gulp-bower');
 var less = require('gulp-less');
@@ -177,11 +180,17 @@ gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
         .pipe(zip('trivial-components.zip'))
+        .pipe(rename(function (path) {
+            path.basename += '-' + VERSION;
+        }))
         .pipe(gulp.dest('dist'));
 });
 gulp.task('tar', ['prepare-dist'], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
         .pipe(tar('trivial-components.tar'))
+        .pipe(rename(function (path) {
+            path.basename += '-' + VERSION;
+        }))
         .pipe(gzip())
         .pipe(gulp.dest('dist'));
 });
@@ -205,7 +214,7 @@ gulp.task('size-report', ["js-bundle", "minify-css"], function () {
         }));
 });
 
-gulp.task('default', ['prepare-dist', "zip", "tar", "less-demo", "size-report"]);
+gulp.task('default', ['zip', 'tar', "less-demo", "size-report"]);
 
 gulp.task('watch', function () {
     livereload.listen();
@@ -229,13 +238,13 @@ gulp.task("install-typings", function () {
         .pipe(gulpTypings());
 });
 
-gulp.task('release', function(){
-    return gulp.src(['dist/trivial-components.zip', 'dist/trivial-components.tar.gz'])
+gulp.task('release', ['default'], function () {
+    return gulp.src(['dist/trivial-components-' + VERSION + '.zip', 'dist/trivial-components-' + VERSION + '.tar.gz'])
         .pipe(release({
-            tag: 'v0.1.0',                      // if missing, the version will be extracted from manifest and prepended by a 'v'
-            name: 'v0.1.0',     // if missing, it will be the same as the tag
-            notes: 'Migrated to typescript!',                // if missing it will be left undefined
-            prerelease: true,                  // if missing it's false
-            manifest: require('./package.json') // package.json from which default values will be extracted if they're missing
+            tag: 'v' + VERSION,
+            name: VERSION,
+            notes: RELEASE_NOTES,
+            prerelease: true,
+            manifest: require('./package.json')
         }));
 });
