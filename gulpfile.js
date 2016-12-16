@@ -64,7 +64,7 @@ var gulpTypings = require("gulp-typings");
 var release = require('gulp-github-release');
 
 gulp.task('clean', function () {
-    del(['dist']);
+    return del(['dist']);
 });
 
 gulp.task('bower', function () {
@@ -137,17 +137,18 @@ gulp.task('minify-css', ['less', 'less-bootstrap'], function () {
 
 
 gulp.task('js-single', ['typescript'], function () {
-    return gulp.src(['dist/js/TrivialCore.js', 'dist/js/*.js', '!*.min.*', '!*.map'])
+    return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js', '!**/*.min.*'])
         .pipe(stripDebug())
         .pipe(rename(function (path) {
             path.basename += ".min";
         }))
         .pipe(uglify())
         .pipe(header(minCopyrightHeader))
+        .pipe(gulp.dest('./dist/js/single'));
 });
 
-gulp.task('js-bundle', ['js-single', 'typescript'], function () {
-    return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js'])
+gulp.task('js-bundle', ['js-single'], function () {
+    return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js', '!**/*.min.js'])
         .pipe(stripDebug())
         .pipe(strip())
         .pipe(concat('trivial-components.js'))
@@ -190,16 +191,16 @@ gulp.task('size-report', ["js-bundle", "minify-css"], function () {
         .pipe(sizereport({
             gzip: true,
             'trivial-components.min.js': {
-                'maxSize': 45000,
-                'maxGzippedSize': 10000
+                'maxSize': 100000,
+                'maxGzippedSize': 20000
             },
             'trivial-components.min.css': {
-                'maxSize': 17000,
-                'maxGzippedSize': 3000
+                'maxSize': 25000,
+                'maxGzippedSize': 5000
             },
             '*': {
-                maxTotalSize: 60000,
-                maxTotalGzippedSize: 12000
+                maxTotalSize: 125000,
+                maxTotalGzippedSize: 25000
             }
         }));
 });
@@ -218,8 +219,9 @@ gulp.task('watch-js', function () {
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('typescript', ['install-typings'], function () {
-    var tsResult = tsProject.src()
-        .pipe(tsProject());
+    return tsProject.src()
+        .pipe(tsProject())
+        .js.pipe(gulp.dest("dist/js/single"));
 });
 
 gulp.task("install-typings", function () {
@@ -228,7 +230,7 @@ gulp.task("install-typings", function () {
 });
 
 gulp.task('release', function(){
-    gulp.src('trivial-components.tar.gz')
+    return gulp.src(['dist/trivial-components.zip', 'dist/trivial-components.tar.gz'])
         .pipe(release({
             tag: 'v0.1.0',                      // if missing, the version will be extracted from manifest and prepended by a 'v'
             name: 'v0.1.0',     // if missing, it will be the same as the tag
