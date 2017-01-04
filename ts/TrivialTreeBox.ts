@@ -33,7 +33,7 @@ module TrivialComponents {
 
         constructor($container: JQuery|Element|string, options: any = {} /*TODO config type*/) {
             this.config = $.extend({
-                valueProperty: 'id',
+                valueFunction: (entry:any) => entry ? entry.id : null,
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 lazyChildrenQueryFunction: function (node: any, resultCallback: Function) {
@@ -92,7 +92,7 @@ module TrivialComponents {
             var $entry = $(this.config.entryRenderingFunction(entry, depth));
             $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
-            if (entry[this.config.valueProperty] === this.selectedEntryId) {
+            if (this.config.valueFunction(entry) === this.selectedEntryId) {
                 $entryAndExpanderWrapper.addClass("tr-selected-entry");
             }
 
@@ -294,7 +294,7 @@ module TrivialComponents {
 
         private findEntryById(id: number) {
             return this.findEntries((entry) =>  {
-                return entry[this.config.valueProperty] == id
+                return this.config.valueFunction(entry) == id
             })[0];
         }
 
@@ -305,7 +305,7 @@ module TrivialComponents {
         }
 
         public setSelectedEntry(entry: any) {
-            this.selectedEntryId = entry ? entry[this.config.valueProperty] : null;
+            this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
             this.markSelectedEntry(entry);
             this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
             this.fireChangeEvents(entry);
@@ -457,7 +457,7 @@ module TrivialComponents {
         };
 
         public updateNode(node: any) {
-            var oldNode = this.findEntryById(node.id);
+            var oldNode = this.findEntryById(this.config.valueFunction(node));
             var parent = this.findParentNode(oldNode);
             if (parent) {
                 parent[this.config.childrenProperty][parent[this.config.childrenProperty].indexOf(oldNode)] = node;

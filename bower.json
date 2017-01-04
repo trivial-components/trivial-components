@@ -23,7 +23,6 @@
     "mustache": "1.x"
   },
   "devDependencies": {
-    "bootstrap": "~3.3.5",
     "normalize.css": "latest"
   },
   "description": "UI components the way you always wanted them.",

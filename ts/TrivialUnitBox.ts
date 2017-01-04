@@ -49,11 +49,11 @@ module TrivialComponents {
                 unitDisplayPosition: 'right', // right or left
                 allowNullAmount: true,
                 entryRenderingFunction: (entry: any) => {
-                    var template = entry.template || DEFAULT_TEMPLATES.currency2LineTemplate;
+                    const template = entry.template || DEFAULT_TEMPLATES.currency2LineTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: any) => {
-                    var template = entry.selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
+                    const template = entry.selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
                     return Mustache.render(template, entry);
                 },
                 amount: null,
@@ -127,7 +127,7 @@ module TrivialComponents {
                     if (keyCodes.isModifierKey(e)) {
                         return;
                     } else if (e.which == keyCodes.tab) {
-                        var highlightedEntry = this.listBox.getHighlightedEntry();
+                        const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
                             this.selectEntry(highlightedEntry);
                         }
@@ -136,7 +136,7 @@ module TrivialComponents {
                     }
 
                     if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                        var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                        const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (this.isDropDownOpen) {
                             this.listBox.highlightNextEntry(direction);
                         } else {
@@ -152,15 +152,15 @@ module TrivialComponents {
                         this.closeDropDown();
                         this.cleanupEditorValue();
                     } else if (!e.shiftKey && keyCodes.numberKeys.indexOf(e.which) != -1) {
-                        var numberPart = this.getEditorValueNumberPart();
-                        var numberPartDecimalSeparatorIndex = numberPart.indexOf(this.config.decimalSeparator);
-                        var maxDecimalDigitsReached = numberPartDecimalSeparatorIndex != -1 && numberPart.length - (numberPartDecimalSeparatorIndex + 1) >= this.config.decimalPrecision;
+                        const numberPart = this.getEditorValueNumberPart();
+                        const numberPartDecimalSeparatorIndex = numberPart.indexOf(this.config.decimalSeparator);
+                        const maxDecimalDigitsReached = numberPartDecimalSeparatorIndex != -1 && numberPart.length - (numberPartDecimalSeparatorIndex + 1) >= this.config.decimalPrecision;
 
-                        var editorValue = this.$editor.val();
-                        var decimalSeparatorIndex = editorValue.indexOf(this.config.decimalSeparator);
-                        var selectionStart = (this.$editor[0] as any).selectionStart;
-                        var selectionEnd = (this.$editor[0] as any).selectionEnd;
-                        var wouldAddAnotherDigit = decimalSeparatorIndex !== -1 && selectionEnd > decimalSeparatorIndex && selectionStart === selectionEnd;
+                        const editorValue = this.$editor.val();
+                        const decimalSeparatorIndex = editorValue.indexOf(this.config.decimalSeparator);
+                        const selectionStart = (this.$editor[0] as any).selectionStart;
+                        const selectionEnd = (this.$editor[0] as any).selectionEnd;
+                        const wouldAddAnotherDigit = decimalSeparatorIndex !== -1 && selectionEnd > decimalSeparatorIndex && selectionStart === selectionEnd;
                         if (maxDecimalDigitsReached && wouldAddAnotherDigit) {
                             if (/^\d$/.test(editorValue[selectionEnd])) {
                                 this.$editor.val(editorValue.substring(0, selectionEnd) + editorValue.substring(selectionEnd + 1)); // override the following digit
@@ -178,7 +178,7 @@ module TrivialComponents {
                         && e.which != keyCodes.delete) {
                         return; // ignore
                     }
-                    var hasDoubleDecimalSeparator = new RegExp("(?:\\" + this.config.decimalSeparator + ".*)" + "\\" + this.config.decimalSeparator, "g").test(this.$editor.val());
+                    const hasDoubleDecimalSeparator = new RegExp("(?:\\" + this.config.decimalSeparator + ".*)" + "\\" + this.config.decimalSeparator, "g").test(this.$editor.val());
                     if (hasDoubleDecimalSeparator) {
                         this.cleanupEditorValue();
                         (this.$editor[0] as any).setSelectionRange(this.$editor.val().length - this.config.decimalPrecision, this.$editor.val().length - this.config.decimalPrecision);
@@ -242,11 +242,11 @@ module TrivialComponents {
         }
 
         private getEditorValueNumberPart(fillupDecimals?: boolean): string {
-            var rawNumber = this.$editor.val().match(this.numberRegex).join('');
-            var decimalDeparatorIndex = rawNumber.indexOf(this.config.decimalSeparator);
+            const rawNumber = this.$editor.val().match(this.numberRegex).join('');
+            const decimalDeparatorIndex = rawNumber.indexOf(this.config.decimalSeparator);
 
-            var integerPart: string;
-            var fractionalPart: string;
+            let integerPart: string;
+            let fractionalPart: string;
             if (decimalDeparatorIndex !== -1) {
                 integerPart = rawNumber.substring(0, decimalDeparatorIndex);
                 fractionalPart = rawNumber.substring(decimalDeparatorIndex + 1, rawNumber.length).replace(/\D/g, '');
@@ -266,7 +266,7 @@ module TrivialComponents {
         }
 
         private query(highlightDirection?: HighlightDirection) {
-            var $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+            const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
             this.$spinners = this.$spinners.add($spinner);
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
@@ -274,7 +274,7 @@ module TrivialComponents {
                 this.config.queryFunction(this.getQueryString(), (newEntries: any[]) => {
                     this.updateEntries(newEntries);
 
-                    var queryString = this.getQueryString();
+                    const queryString = this.getQueryString();
                     if (queryString.length > 0) {
                         this.listBox.highlightTextMatches(queryString);
                     }
@@ -304,13 +304,13 @@ module TrivialComponents {
         private selectEntry(entry: any, doNotFireEvents?: boolean) {
             if (entry == null) {
                 this.selectedEntry = null;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
+                const $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
                     .addClass("tr-combobox-entry")
                     .addClass("empty");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
             } else {
                 this.selectedEntry = entry;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+                const $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
                     .addClass("tr-combobox-entry");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
             }
@@ -335,13 +335,13 @@ module TrivialComponents {
             if (integerNumber == null || isNaN(integerNumber)) {
                 return "";
             }
-            var amountAsString = "" + integerNumber;
+            const amountAsString = "" + integerNumber;
             if (amountAsString.length <= precision) {
                 return 0 + decimalSeparator + new Array(precision - amountAsString.length + 1).join("0") + amountAsString;
             } else {
-                var integerPart = amountAsString.substring(0, amountAsString.length - precision);
-                var formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
-                var fractionalPart = amountAsString.substr(amountAsString.length - precision, precision);
+                const integerPart = amountAsString.substring(0, amountAsString.length - precision);
+                const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator); // see http://stackoverflow.com/a/2901298/524913
+                const fractionalPart = amountAsString.substr(amountAsString.length - precision, precision);
                 return formattedIntegerPart + decimalSeparator + fractionalPart;
             }
         }
@@ -392,7 +392,7 @@ module TrivialComponents {
         }
 
         public getAmount() {
-            var editorValueNumberPart = this.getEditorValueNumberPart(false);
+            const editorValueNumberPart = this.getEditorValueNumberPart(false);
             if (editorValueNumberPart.length === 0 && this.config.allowNullAmount) {
                 return null;
             } else {
@@ -418,7 +418,7 @@ module TrivialComponents {
             if (this.selectedEntry == null) {
                 return null;
             } else {
-                var selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
+                const selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
                 selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             }

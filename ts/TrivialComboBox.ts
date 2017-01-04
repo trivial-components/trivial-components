@@ -53,7 +53,7 @@ module TrivialComponents {
 
         constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
             this.config = $.extend({
-                valueProperty: null,
+                valueFunction: (entry:any) => entry ? entry.id : null,
                 entryRenderingFunction: (entry: any) => {
                     var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
@@ -361,20 +361,16 @@ module TrivialComponents {
 
         public selectEntry(entry: any, commit?: boolean, muteEvent?: boolean) {
             if (entry == null) {
-                if (this.config.valueProperty) {
-                    this.$originalInput.val("");
-                }
+                this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
+                let $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
                     .addClass("tr-combobox-entry")
                     .addClass("empty");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
             } else {
-                if (this.config.valueProperty) {
-                    this.$originalInput.val(entry[this.config.valueProperty]);
-                }
+                this.$originalInput.val(this.config.valueFunction(entry));
                 this.selectedEntry = entry;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+                let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
                     .addClass("tr-combobox-entry");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
                 this.$editor.val(this.config.entryToEditorTextFunction(entry));

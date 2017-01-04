@@ -49,7 +49,7 @@ module TrivialComponents {
 
         constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
             this.config = $.extend({
-                valueProperty: 'id',
+                valueFunction: (entry:any) => entry ? entry.id : null,
                 entryRenderingFunction: (entry: any, depth: number) => {
                     var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
                     var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
@@ -358,20 +358,16 @@ module TrivialComponents {
 
         private selectEntry(entry: any, commit?: boolean, muteEvent?: boolean) {
             if (entry == null) {
-                if (this.config.valueProperty) {
-                    this.$originalInput.val("");
-                }
+                this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
+                let $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
                     .addClass("tr-combobox-entry")
                     .addClass("empty");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
             } else {
-                if (this.config.valueProperty) {
-                    this.$originalInput.val(entry[this.config.valueProperty]);
-                }
+                this.$originalInput.val(this.config.valueFunction(entry));
                 this.selectedEntry = entry;
-                var $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+                let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
                     .addClass("tr-combobox-entry");
                 this.$selectedEntryWrapper.empty().append($selectedEntry);
                 this.$editor.val(this.config.entryToEditorTextFunction(entry));

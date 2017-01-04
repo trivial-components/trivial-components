@@ -221,8 +221,8 @@ gulp.task('watch', function () {
     gulp.watch(['less/*.less', 'demo/less/*.less'], ["less-demo", 'less', 'less-bootstrap']);
 });
 
-gulp.task('watch-js', function () {
-    gulp.watch(['js/*.js'], ['js-bundle']);
+gulp.task('watch-ts', function () {
+    gulp.watch(['ts/*.ts'], ['js-bundle']);
 });
 
 var tsProject = ts.createProject('tsconfig.json');

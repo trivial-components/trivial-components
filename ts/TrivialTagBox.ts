@@ -51,7 +51,7 @@ module TrivialComponents {
         constructor(originalInput: JQuery|Element|string, options: any /*TODO config type*/) {
             options = options || {};
             this.config = $.extend({
-                valueProperty: 'displayValue',
+                valueFunction: (entry:any) => entry ? entry.id : null,
                 valueSeparator: ',',
                 entryRenderingFunction: (entry: any) => {
                     var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
@@ -432,7 +432,7 @@ module TrivialComponents {
         private calculateOriginalInputValue() {
             return this.selectedEntries
                 .map((entry) => {
-                    return entry[this.config.valueProperty]
+                    return this.config.valueFunction(entry)
                 })
                 .join(this.config.valueSeparator);
         }
@@ -445,8 +445,8 @@ module TrivialComponents {
                 return; // no more entries allowed
             }
             if (this.config.distinct && this.selectedEntries.map((entry: any) => {
-                    return entry[this.config.valueProperty]
-                }).indexOf(entry[this.config.valueProperty]) != -1) {
+                    return this.config.valueFunction(entry)
+                }).indexOf(this.config.valueFunction(entry)) != -1) {
                 return; // entry already selected
             }
 

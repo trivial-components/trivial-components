@@ -38,7 +38,7 @@ module TrivialComponents {
 
         constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
             this.config = $.extend({
-                valueProperty: 'id',
+                valueFunction: (entry:any) => entry ? entry.id : null,
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 searchBarMode: 'show-if-filled', // none, show-if-filled, always-visible
@@ -99,7 +99,7 @@ module TrivialComponents {
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                 } else if (e.which == keyCodes.enter) {
-                    this.treeBox.setSelectedEntry(this.treeBox.getHighlightedEntry()[this.config.valueProperty]);
+                    this.treeBox.setSelectedEntry(this.treeBox.getHighlightedEntry());
                 } else if (e.which == keyCodes.escape) {
                     this.$editor.val("");
                     this.query();
@@ -248,13 +248,13 @@ module TrivialComponents {
 
         private findEntryById(id:number) {
             return this.findEntries((entry: any) => {
-                return entry[this.config.valueProperty] == id
+                return this.config.valueFunction(entry) == id
             })[0];
         }
 
         private selectEntry(entry: any) {
-            this.selectedEntryId = entry ? entry[this.config.valueProperty] : null;
-            this.$originalInput.val(entry ? entry[this.config.valueProperty] : null);
+            this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
+            this.$originalInput.val(entry ? this.config.valueFunction(entry) : null);
             this.fireChangeEvents(entry);
         }
 

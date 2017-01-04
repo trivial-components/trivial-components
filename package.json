@@ -1,20 +1,18 @@
 {
   "name": "trivial-components",
-  "version": "0.9.0",
+  "version": "0.1.0",
   "description": "UI components the way you always wanted them.",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "url": "https://github.com/trivial-components/trivial-components.git",
     "type": "git"
   },
   "keywords": [
+    "trivial",
     "combobox",
-    "dropdown",
-    "component"
+    "component",
+    "ui"
   ],
-  "author": "The trivial-components team",
+  "author": "Yann Massard and others (see commits)",
   "contributors": [
     {
       "name": "Yann Massard",
@@ -27,7 +25,8 @@
     "url": "https://github.com/trivial-components/trivial-components/issues"
   },
   "homepage": "http://trivial-components.github.io/trivial-components/",
-  "dependencies": {
+  "main": "TrivialComponents",
+  "devDependencies": {
     "@types/jquery": "^2.0.34",
     "@types/jqueryui": "^1.11.31",
     "@types/mustache": "^0.8.29",
@@ -70,5 +69,6 @@
     "multipipe": "^1.0.2",
     "typescript": "^2.1.4",
     "typings": "^2.0.0"
-  }
+  },
+  "dependencies": {}
 }

@@ -72,9 +72,8 @@ The API has significantly changed but this demo has not been reworked, yet.
     <small>Filtering is done by custom code, e.g. on the server side.</small>
     <input id="customFilteringComboBox">
 
-    <h5>Separate original input</h5>
-    <small>The original input is filled with the "valueProperty" of the selected entry (or "" if no entry is selected).</small>
-    <input id="separateOriginalInputComboBox">
+    <h5>valueFunction = additionalInfo</h5>
+    <input id="valueFunctionComboBox">
 
     <h5>No trigger</h5>
     <input id="noTriggerComboBox" tabindex="12">
@@ -212,8 +211,7 @@ no search field:
             emptyEntry: {
                 displayValue: "Please select..."
             },
-            showClearButton: true,
-            valueProperty: "displayValue"
+            showClearButton: true
         });
         demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
@@ -288,12 +286,14 @@ no search field:
             selectedEntryTemplate: TrivialComponents.singleLineTemplate
         });
 
-        demo.separateOriginalInputComboBox = new TrivialComponents.TrivialComboBox('#separateOriginalInputComboBox', {
+        demo.valueFunctionComboBox = new TrivialComponents.TrivialComboBox('#valueFunctionComboBox', {
             entries: createEntries(),
             emptyEntry: {
-                displayValue: "Please select..."
+                displayValue: "Please select and see value of originalInput..."
             },
-            valueProperty: 'additionalInfo'
+            valueFunction: function(entry) {
+                return entry ? entry.additionalInfo : null;
+            }
         });
 
         demo.noTriggerComboBox = new TrivialComponents.TrivialComboBox('#noTriggerComboBox', {
@@ -512,7 +512,7 @@ no search field:
             console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
-        demo.separateOriginalInputComboBox = new TrivialComponents.TrivialTreeComboBox('#emptyEntryTreeComboBox', {
+        demo.valueFunctionComboBox = new TrivialComponents.TrivialTreeComboBox('#emptyEntryTreeComboBox', {
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
             emptyEntry: {
@@ -529,7 +529,7 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.separateOriginalInputComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
