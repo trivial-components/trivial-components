@@ -50,17 +50,24 @@ module TrivialComponents {
 
         private config: any; // TODO config type
 
-        private dateIconTemplate = '<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">'
-            + '<g id="layer1">'
-            + '<rect class="calendar-symbol-page-background" x="90" y="90" width="360" height="400" ry="3.8"></rect>'
-            + '<rect class="calendar-symbol-color" x="90" y="90" width="360" height="100" ry="3.5"></rect>'
-            + '<rect class="calendar-symbol-page" x="90" y="90" width="360" height="400" ry="3.8"></rect>'
-            + '<rect class="calendar-symbol-ring" x="140" y="30" width="40" height="120" ry="30.8"></rect>'
-            + '<rect class="calendar-symbol-ring" x="250" y="30" width="40" height="120" ry="30.8"></rect>'
-            + '<rect class="calendar-symbol-ring" x="360" y="30" width="40" height="120" ry="30.8"></rect>'
-            + '<text class="calendar-symbol-date" x="270" y="415" text-anchor="middle">{{weekDay}}</text>'
-            + '</g>'
-            + '</svg>';
+        private dateIconTemplate = `<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">
+        <defs>
+            <linearGradient id="Gradient1" x1="0" x2="0" y1="0" y2="1">
+                <stop class="calendar-symbol-ring-gradient-stop1" offset="0%"/>
+                <stop class="calendar-symbol-ring-gradient-stop2" offset="50%"/>
+                <stop class="calendar-symbol-ring-gradient-stop3" offset="100%"/>
+            </linearGradient>
+        </defs>        
+        <g id="layer1">
+            <rect class="calendar-symbol-page-background" x="90" y="90" width="360" height="400" ry="3.8"></rect>
+            <rect class="calendar-symbol-color" x="90" y="90" width="360" height="100" ry="3.5"></rect>
+            <rect class="calendar-symbol-page" x="90" y="90" width="360" height="395" ry="3.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="140" y="30" width="40" height="120" ry="30.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="250" y="30" width="40" height="120" ry="30.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="360" y="30" width="40" height="120" ry="30.8"></rect>
+            <text class="calendar-symbol-date" x="270" y="415" text-anchor="middle">{{weekDay}}</text>
+        </g>
+    </svg>`;
         private dateTemplate = '<div class="tr-template-icon-single-line">'
             + this.dateIconTemplate
             + '<div class="content-wrapper tr-editor-area">{{displayString}}</div>'

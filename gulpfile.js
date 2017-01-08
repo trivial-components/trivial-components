@@ -35,7 +35,7 @@ var copyrightHeader = "/*!\n"
     + "*/\n";
 var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
-var VERSION = '0.1.0';
+var VERSION = '0.1.1';
 var RELEASE_NOTES = 'Migrated to typescript!';
 
 var gulp = require('gulp');

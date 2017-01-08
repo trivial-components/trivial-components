@@ -183,6 +183,10 @@ no search field:
     <input id="unitBoxLeft">
     <h5>long single line template:</h5>
     <input id="unitBoxSingleLineTemplate">
+    <h5>readonly:</h5>
+    <input id="readonlyUnitBox">
+    <h5>disbabled:</h5>
+    <input id="disabledUnitBox">
 </div>
 
 <div style="width: 300px">
@@ -600,6 +604,18 @@ no search field:
         demo.unitBoxSingleLineTemplate = new TrivialComponents.TrivialUnitBox('#unitBoxSingleLineTemplate', {
             entries: createCurrencyEntries(),
             template: TrivialComponents.currencySingleLineLongTemplate
+        });
+        demo.readonlyUnitBox = new TrivialComponents.TrivialUnitBox('#readonlyUnitBox', {
+            entries: createCurrencyEntries(),
+            editingMode: 'readonly',
+            amount: 123456789,
+            selectedEntry: createCurrencyEntries()[0]
+        });
+        demo.disabledUnitBox = new TrivialComponents.TrivialUnitBox('#disabledUnitBox', {
+            entries: createCurrencyEntries(),
+            editingMode: 'disabled',
+            amount: 123456789,
+            selectedEntry: createCurrencyEntries()[0]
         });
 
         demo.calendarBox = new TrivialComponents.TrivialCalendarBox('#calendarBox', {

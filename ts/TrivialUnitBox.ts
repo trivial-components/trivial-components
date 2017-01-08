@@ -34,10 +34,12 @@ module TrivialComponents {
         private $spinners: JQuery = $();
         private $originalInput: JQuery;
         private $editor: JQuery;
+        private $dropDownTargetElement: JQuery;
         private $unitBox: JQuery;
         private $selectedEntryAndTriggerWrapper: JQuery;
         private $selectedEntryWrapper: JQuery;
         private $dropDown: JQuery;
+        private editingMode: EditingMode;
 
         constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
             this.config = $.extend({
@@ -72,7 +74,8 @@ module TrivialComponents {
                     matchingMode: 'prefix-word',
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
-                }
+                },
+                editingMode: 'editable', // one of 'editable', 'disabled' and 'readonly'
             }, options);
 
             this.config.queryFunction = this.config.queryFunction || defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
@@ -94,7 +97,7 @@ module TrivialComponents {
             this.$selectedEntryAndTriggerWrapper.mousedown(() => {
                 if (this.isDropDownOpen) {
                     this.closeDropDown();
-                } else {
+                } else if (this.editingMode === "editable") {
                     setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
                         this.openDropDown();
                         this.query();
@@ -102,11 +105,19 @@ module TrivialComponents {
                 }
                 this.$editor.focus();
             });
-            this.$dropDown = $('<div class="tr-dropdown"></div>').appendTo("body");
-
+            this.$dropDown = $('<div class="tr-dropdown"></div>')
+                .scroll(() => {
+                    return false;
+                });
+            this.$dropDownTargetElement = $("body");
+            this.setEditingMode(this.config.editingMode);
 
             this.$editor.prependTo(this.$unitBox).addClass("tr-unitbox-editor tr-editor")
                 .focus(() => {
+                    if (this.editingMode !== "editable") {
+                        this.$editor.blur(); // must not get focus!
+                        return false;
+                    }
                     if (this.blurCausedByClickInsideComponent) {
                         // do nothing!
                     } else {
@@ -316,6 +327,9 @@ module TrivialComponents {
             }
             this.cleanupEditorValue();
             this.updateOriginalInputValue();
+            if (!this.$editor.is(":focus")) {
+                this.formatEditorValue();
+            }
             if (!doNotFireEvents) {
                 this.fireSelectedEntryChangedEvent();
             }
@@ -397,6 +411,20 @@ module TrivialComponents {
                 return null;
             } else {
                 return parseInt(this.getEditorValueNumberPart(true).replace(/\D/g, ""));
+            }
+        }
+
+        private isDropDownNeeded() {
+            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.config.queryFunction.isDefaultQueryFunction || this.config.showTrigger);
+        }
+
+        public setEditingMode(newEditingMode: EditingMode) {
+            this.editingMode = newEditingMode;
+            this.$unitBox.removeClass("editable readonly disabled").addClass(this.editingMode);
+            this.$editor.prop("readonly", newEditingMode !== "editable");
+            this.$editor.attr("tabindex", newEditingMode === "editable" ? <string> this.$originalInput.attr("tabindex") : "-1");
+            if (this.isDropDownNeeded()) {
+                this.$dropDown.appendTo(this.$dropDownTargetElement);
             }
         }
 

@@ -16,50 +16,79 @@
  *
  */
 .tr-unitbox {
-   min-height: @tr-input-min-height;
+  min-height: @tr-input-min-height;
+  align-items: stretch;
 
-   .tr-unitbox-editor {
-     flex: 1 1 0;
-     border: none;
-     padding: 0 6px 0 4px;
-     text-align: right;
-     outline: none;
-     background-color: transparent;
-     font-family: @tr-editor-font-family;
-     font-size: @tr-editor-font-size;
-   }
+  .tr-unitbox-editor {
+    flex: 1 1 0px;
+    border: none;
+    padding: 0 6px 0 4px;
+    text-align: right;
+    outline: none;
+    background-color: transparent;
+    font-family: @tr-editor-font-family;
+    font-size: @tr-editor-font-size;
+  }
 
-   .tr-unitbox-selected-entry-and-trigger-wrapper {
-     flex: 0 0 auto;
-     display: flex;
+  .tr-unitbox-editor,
+  .tr-unitbox-selected-entry-and-trigger-wrapper {
+    min-height: @tr-input-min-height - 2px; // IE 11 does not stretch items correctly if the (min-)height is defined by the containing element
+  }
 
-     background-color: @tr-button-bg;
-     cursor: default;
+  .tr-unitbox-selected-entry-and-trigger-wrapper {
+    flex: 0 0 auto;
+    display: flex;
 
-     &:hover, .tr-unitbox.open & {
-       background-color: @tr-button-bg-active;
-     }
+    background-color: @tr-button-bg;
+    cursor: default;
 
-     .tr-unitbox-selected-entry-wrapper {
-       flex: 0 0 auto;
-       display: flex;
-       align-items: center;
-     }
-     .tr-trigger {
-       border-left: none;
-       background-color: transparent;
-     }
-   }
+    &:hover, .tr-unitbox.open & {
+      background-color: @tr-button-bg-active;
+    }
 
-   &.unit-display-left {
-     flex-direction: row-reverse;
+    .tr-unitbox-selected-entry-wrapper {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+    }
+    .tr-trigger {
+      border-left: none;
+      background-color: transparent;
+    }
+  }
 
-     .tr-unitbox-selected-entry-and-trigger-wrapper {
-       border-right: @tr-border;
-     }
-   }
+  &.unit-display-left {
+    flex-direction: row-reverse;
 
-   &.unit-display-right .tr-unitbox-selected-entry-and-trigger-wrapper {
-     border-left: @tr-border;
-   }
- }
+    .tr-unitbox-selected-entry-and-trigger-wrapper {
+      border-right: @tr-border;
+    }
+  }
+
+  &.unit-display-right .tr-unitbox-selected-entry-and-trigger-wrapper {
+    border-left: @tr-border;
+  }
+
+  &.readonly,
+  &.disabled {
+    .tr-unitbox-editor {
+      display: block;
+    }
+    .tr-trigger:hover {
+      background-color: transparent;
+    }
+    .tr-unitbox-selected-entry-and-trigger-wrapper:hover {
+      background-color: inherit;
+    }
+  }
+
+  &.readonly {
+    .tr-unitbox-editor {
+      padding: 0;
+    }
+    .tr-unitbox-selected-entry-and-trigger-wrapper {
+      border: none;
+      background-color: transparent;
+    }
+  }
+}
