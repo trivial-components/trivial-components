@@ -237,7 +237,11 @@ module TrivialComponents {
         range.setStart(domElement, start);
         range.setEnd(domElement, end);
         var sel = window.getSelection();
-        sel.removeAllRanges();
+        try {
+            sel.removeAllRanges();
+        } catch(e) {
+            // ignore (ie 11 problem, can be ignored even in ie 11)
+        }
         sel.addRange(range);
     }
 
