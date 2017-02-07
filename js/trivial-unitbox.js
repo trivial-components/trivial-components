@@ -69,7 +69,6 @@
             config.queryFunction = config.queryFunction || TrivialComponents.defaultListQueryFunctionFactory(config.entries || [], config.matchingOptions);
 
             this.onChange = new TrivialComponents.Event();
-            this.onSelectedEntryChanged = new TrivialComponents.Event();
 
             var listBox;
             var isDropDownOpen = false;
@@ -285,10 +284,6 @@
                 });
             }
 
-            function fireSelectedEntryChangedEvent() {
-                me.onSelectedEntryChanged.fire(selectedEntry);
-            }
-
             function fireChangeEvents() {
                 $originalInput.trigger("change");
                 me.onChange.fire({
@@ -315,7 +310,7 @@
                 cleanupEditorValue();
                 updateOriginalInputValue();
                 if (!doNotFireEvents) {
-                    fireSelectedEntryChangedEvent();
+                    fireChangeEvents();
                 }
             }
 
