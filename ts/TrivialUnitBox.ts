@@ -263,7 +263,7 @@ module TrivialComponents {
             });
 
             this.listBox = new TrivialListBox(this.$dropDown, this.config);
-            this.listBox.onSelectedEntryChanged.addListener((listBox: TrivialListBox<U>, selectedEntry: U) => {
+            this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry, false);
                     this.listBox.selectEntry(null);

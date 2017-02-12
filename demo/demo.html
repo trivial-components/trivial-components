@@ -214,7 +214,7 @@ no search field:
             },
             showClearButton: true
         });
-        demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(combobox, entry) {
+        demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
         demo.defaultFilteringCombobox.onFocus.addListener(function() {
@@ -240,7 +240,7 @@ no search field:
             },
             emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
         });
-        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTemplateFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -251,7 +251,7 @@ no search field:
             },
             allowFreeText: true
         });
-        demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -334,7 +334,7 @@ no search field:
         demo.zeroConfigTagBox = new TrivialComponents.TrivialTagComboBox('#zeroConfigTagBox', {
             entries: createEntries()
         });
-        demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(component, entries) {
+        demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(entries) {
             console.log("zeroConfigTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
         });
         demo.zeroConfigTagBox.onFocus.addListener(function() {
@@ -448,7 +448,7 @@ no search field:
             animationDuration: 200,
             showClearButton: true
         });
-        demo.treeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.treeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("treeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
         demo.treeComboBox.onFocus.addListener(function() {
@@ -480,7 +480,7 @@ no search field:
             allowFreeText: true,
             animationDuration: 0
         });
-        demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -509,7 +509,7 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -530,7 +530,7 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
+        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(entry) {
             console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -545,10 +545,10 @@ no search field:
             },
             searchBarMode: 'always-visible'
         });
-        demo.zeroConfigTree.onSelectedEntryChanged.addListener(function(component, node) {
+        demo.zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
             console.log("onSelectedEntryChanged " + (node ? node.id : "null"))
         });
-        demo.zeroConfigTree.onNodeExpansionStateChanged.addListener(function(component, node) {
+        demo.zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
             console.log("onNodeExpansionStateChanged " + node.id)
         });
 
@@ -590,7 +590,7 @@ no search field:
             thousandsSeparator: '.',
             allowNullAmount: true
         });
-        demo.unitBox.onChange.addListener(function (component, data) {
+        demo.unitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);
             console.log("trivialUnitBox.unit: " + data.unit);
         });

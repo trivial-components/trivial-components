@@ -170,7 +170,7 @@ module TrivialComponents {
             }
 
             this.treeBox = new TrivialComponents.TrivialTreeBox(this.$tree, this.config);
-            this.treeBox.onNodeExpansionStateChanged.addListener((treeBox: TrivialTreeBox<E>, node: E)=> {
+            this.treeBox.onNodeExpansionStateChanged.addListener((node: E)=> {
                 this.onNodeExpansionStateChanged.fire(node);
             });
             this.treeBox.onSelectedEntryChanged.addListener(() => {

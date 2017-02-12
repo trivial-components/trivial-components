@@ -17,7 +17,7 @@
  */
 module TrivialComponents {
 
-    export type TrivialEventListener<EO> = (eventSource?: any, eventObject?: EO) => void;
+    export type TrivialEventListener<EO> = (eventObject?: EO, eventSource?: any, originalEvent?: Event) => void;
 
     export class TrivialEvent<EO> {
         private listeners:TrivialEventListener<EO>[] = [];
@@ -38,7 +38,7 @@ module TrivialComponents {
 
         public fire(eventObject?: EO, originalEvent?: any) {
             for (let i = 0; i < this.listeners.length; i++) {
-                this.listeners[i].call(this.listeners[i], this.eventSource, eventObject, originalEvent);
+                this.listeners[i].call(this.listeners[i], eventObject, this.eventSource, originalEvent);
             }
         };
     }

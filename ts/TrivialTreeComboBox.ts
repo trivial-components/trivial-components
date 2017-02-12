@@ -329,7 +329,7 @@ module TrivialComponents {
                 });
 
             this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
-            this.treeBox.onSelectedEntryChanged.addListener((treeBox: TrivialTreeBox<E>, selectedEntry: E) => {
+            this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.treeBox.setSelectedEntry(null);

@@ -205,7 +205,7 @@ module TrivialComponents {
                     return Mustache.render(this.dateTemplate, entry);
                 }
             });
-            this.dateListBox.onSelectedEntryChanged.addListener((dateListBox: TrivialListBox<DateComboBoxEntry>, selectedEntry: DateComboBoxEntry) => {
+            this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry: DateComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setDate(selectedEntry, selectedEntry.displayString != (this.dateValue && this.dateValue.displayString));
                     this.dateListBox.selectEntry(null);
@@ -218,7 +218,7 @@ module TrivialComponents {
                     return Mustache.render(this.timeTemplate, entry);
                 }
             });
-            this.timeListBox.onSelectedEntryChanged.addListener((dateListBox: TrivialListBox<TimeComboBoxEntry>, selectedEntry: TimeComboBoxEntry) => {
+            this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry: TimeComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setTime(selectedEntry, selectedEntry.displayString != (this.timeValue && this.timeValue.displayString));
                     this.dateListBox.selectEntry(null);
@@ -342,7 +342,7 @@ module TrivialComponents {
                     mode: 'date' // 'date', 'time', 'datetime'
                 });
                 this.calendarBox.setKeyboardNavigationState('month');
-                this.calendarBox.onChange.addListener((calendarBox: TrivialCalendarBox, {value, timeUnitEdited}) => {
+                this.calendarBox.onChange.addListener(({value, timeUnitEdited}) => {
                     this.setDate(TrivialDateTimeField.createDateComboBoxEntry(value, this.config.dateFormat));
                     if (timeUnitEdited === 'day') {
                         this.closeDropDown();

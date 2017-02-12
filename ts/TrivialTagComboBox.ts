@@ -326,7 +326,7 @@ module TrivialComponents {
             const configWithoutEntries = $.extend({}, this.config);
             configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
             this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
-            this.listBox.onSelectedEntryChanged.addListener((listBox: TrivialListBox<E>, selectedEntry: E) => {
+            this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry);
                     this.listBox.selectEntry(null);
