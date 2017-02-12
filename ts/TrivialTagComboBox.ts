@@ -253,6 +253,7 @@ module TrivialComponents {
                             this.selectEntry(this.config.freeTextEntryFactory(this.$editor.text()));
                         }
                         this.closeDropDown();
+                        e.preventDefault(); // prevent the new line to be added to the editor!
                     } else if (e.which == keyCodes.escape) {
                         this.closeDropDown();
                         this.$editor.text("");
@@ -314,12 +315,12 @@ module TrivialComponents {
             }).mouseup(() => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
-                    this.blurCausedByClickInsideComponent = false;
+                    setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
                 }
             }).mouseout(() => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
-                    this.blurCausedByClickInsideComponent = false;
+                    setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
                 }
             });
 
