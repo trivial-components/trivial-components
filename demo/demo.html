@@ -38,7 +38,7 @@
     <script src="../dist/js/single/KeyCodes.js"></script>
     <script src="../dist/js/single/TrivialComboBox.js"></script>
     <script src="../dist/js/single/TrivialListBox.js"></script>
-    <script src="../dist/js/single/TrivialTagBox.js"></script>
+    <script src="../dist/js/single/TrivialTagComboBox.js"></script>
     <script src="../dist/js/single/TrivialTreeBox.js"></script>
     <script src="../dist/js/single/TrivialTreeComboBox.js"></script>
     <script src="../dist/js/single/TrivialTree.js"></script>
@@ -48,9 +48,6 @@
     <script src="demo.js"></script>
 </head>
 <body>
-
-<h1 style="color: red">This demo is not yet up to date.</h1>
-The API has significantly changed but this demo has not been reworked, yet.
 
 <form>
 
@@ -217,7 +214,7 @@ no search field:
             },
             showClearButton: true
         });
-        demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(combobox, entry) {
             console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
         demo.defaultFilteringCombobox.onFocus.addListener(function() {
@@ -243,7 +240,7 @@ no search field:
             },
             emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
         });
-        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("emptyEntryTemplateFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -254,7 +251,7 @@ no search field:
             },
             allowFreeText: true
         });
-        demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -334,10 +331,10 @@ no search field:
             entries: listBoxEntries
         });
 
-        demo.zeroConfigTagBox = new TrivialComponents.TrivialTagBox('#zeroConfigTagBox', {
+        demo.zeroConfigTagBox = new TrivialComponents.TrivialTagComboBox('#zeroConfigTagBox', {
             entries: createEntries()
         });
-        demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(entries) {
+        demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(component, entries) {
             console.log("zeroConfigTagBox onSelectedEntryChanged " + entries.map(function(e){return e.displayValue}).join(", "))
         });
         demo.zeroConfigTagBox.onFocus.addListener(function() {
@@ -350,14 +347,14 @@ no search field:
             console.log("#zeroConfigTagBox change")
         });
 
-        demo.customTemplateTagBox = new TrivialComponents.TrivialTagBox('#customTemplateTagBox1', {
+        demo.customTemplateTagBox = new TrivialComponents.TrivialTagComboBox('#customTemplateTagBox1', {
             entries: createEntries(),
             selectedEntries: createEntries(2),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             showTrigger: false
         });
 
-        demo.customTemplateTagBox = new TrivialComponents.TrivialTagBox('#customTemplateTagBox2', {
+        demo.customTemplateTagBox = new TrivialComponents.TrivialTagComboBox('#customTemplateTagBox2', {
             entries: createEntries(),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntryTemplate: '<div class="tr-tagbox-default-wrapper-template" style="background-color: {{statusColor}}; border: 1px solid {{statusColor}}">' +
@@ -376,21 +373,21 @@ no search field:
             distinct: false
         });
 
-        demo.maxSelectedEntriesTagBox = new TrivialComponents.TrivialTagBox('#maxSelectedEntriesTagBox', {
+        demo.maxSelectedEntriesTagBox = new TrivialComponents.TrivialTagComboBox('#maxSelectedEntriesTagBox', {
             entries: createEntries(),
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             maxSelectedEntries: 2,
             allowFreeText: true
         });
 
-        demo.noDropdownTagBox = new TrivialComponents.TrivialTagBox('#noDropdownTagBox', {
+        demo.noDropdownTagBox = new TrivialComponents.TrivialTagComboBox('#noDropdownTagBox', {
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             allowFreeText: true,
             showTrigger: false
         });
 
-        var showDropDownOnResultsOnlyTagBoxEntries =  createEntries()
-        demo.showDropDownOnResultsOnlyTagBox = new TrivialComponents.TrivialTagBox('#showDropDownOnResultsOnlyTagBox', {
+        var showDropDownOnResultsOnlyTagBoxEntries =  createEntries();
+        demo.showDropDownOnResultsOnlyTagBox = new TrivialComponents.TrivialTagComboBox('#showDropDownOnResultsOnlyTagBox', {
             entries: showDropDownOnResultsOnlyTagBoxEntries,
             queryFunction: function (queryString, resultCallback) {
                 setTimeout(function () {
@@ -402,13 +399,13 @@ no search field:
             showDropDownOnResultsOnly: true
         });
 
-        demo.disabledTagBox = new TrivialComponents.TrivialTagBox('#disabledTagBox', {
+        demo.disabledTagBox = new TrivialComponents.TrivialTagComboBox('#disabledTagBox', {
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntries: createEntries(2),
             editingMode: 'disabled'
         });
 
-        demo.readonlyTagBox = new TrivialComponents.TrivialTagBox('#readonlyTagBox', {
+        demo.readonlyTagBox = new TrivialComponents.TrivialTagComboBox('#readonlyTagBox', {
             template: TrivialComponents.roundImage2LinesColorBubbleTemplate,
             selectedEntries: createEntries(2),
             editingMode: 'readonly'
@@ -451,7 +448,7 @@ no search field:
             animationDuration: 200,
             showClearButton: true
         });
-        demo.treeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.treeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("treeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
         demo.treeComboBox.onFocus.addListener(function() {
@@ -483,7 +480,7 @@ no search field:
             allowFreeText: true,
             animationDuration: 0
         });
-        demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -512,7 +509,7 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -533,7 +530,7 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(entry) {
+        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(component, entry) {
             console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
@@ -548,10 +545,10 @@ no search field:
             },
             searchBarMode: 'always-visible'
         });
-        demo.zeroConfigTree.onSelectedEntryChanged.addListener(function(node) {
+        demo.zeroConfigTree.onSelectedEntryChanged.addListener(function(component, node) {
             console.log("onSelectedEntryChanged " + (node ? node.id : "null"))
         });
-        demo.zeroConfigTree.onNodeExpansionStateChanged.addListener(function(node) {
+        demo.zeroConfigTree.onNodeExpansionStateChanged.addListener(function(component, node) {
             console.log("onNodeExpansionStateChanged " + node.id)
         });
 
@@ -593,7 +590,7 @@ no search field:
             thousandsSeparator: '.',
             allowNullAmount: true
         });
-        demo.unitBox.onChange.addListener(function (data) {
+        demo.unitBox.onChange.addListener(function (component, data) {
             console.log("trivialUnitBox.amount: " + data.amount);
             console.log("trivialUnitBox.unit: " + data.unit);
         });
@@ -627,7 +624,7 @@ no search field:
 
         $destroyAllButton = $('#destroyAllButton').click(function() {
             $('.tr-combobox').TrivialComboBox().forEach(function(c) {c.destroy()});
-            $('.tr-tagbox').TrivialTagBox().forEach(function(c) {c.destroy()});
+            $('.tr-tagbox').TrivialTagComboBox().forEach(function(c) {c.destroy()});
             $('.tr-tree').TrivialTree().forEach(function(c) {c.destroy()});
             $('.tr-treecombobox').TrivialTreeComboBox().forEach(function(c) {c.destroy()});
             $('.tr-unitbox').TrivialUnitBox().forEach(function(c) {c.destroy()});

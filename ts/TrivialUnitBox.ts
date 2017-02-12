@@ -17,18 +17,44 @@
  */
 module TrivialComponents {
 
-    export class TrivialUnitBox {
+    export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
+        unitValueProperty?: string,
+        unitIdProperty?: string,
+        decimalPrecision?: number,
+        decimalSeparator?: string,
+        thousandsSeparator?: string,
+        unitDisplayPosition?: 'left' | 'right',
+        allowNullAmount?: boolean,
+        selectedEntryRenderingFunction?: (entry: U) => string,
+        amount?: number,
+        noEntriesTemplate?: string,
+        emptyEntry?: U | any,
+        queryFunction?: QueryFunction<U>,
+        queryOnNonNumberCharacters?: boolean,
+        openDropdownOnEditorClick?: boolean,
+        showTrigger?: boolean,
+        editingMode?: EditingMode
+    }
 
-        private config: any;
+    export type TrivialUnitBoxChangeEvent<U> = {
+        unit: string,
+        unitEntry: U,
+        amount: number,
+        amountAsFloatingPointNumber: number
+    }
 
-        public readonly onChange = new TrivialEvent();
-        public readonly onSelectedEntryChanged = new TrivialEvent();
+    export class TrivialUnitBox<U> {
+
+        private config: TrivialUnitBoxConfig<U>;
+
+        public readonly onChange = new TrivialEvent<TrivialUnitBoxChangeEvent<U>>(this);
+        public readonly onSelectedEntryChanged = new TrivialEvent<U>(this);
 
         private $: JQuery;
-        private listBox: TrivialListBox;
+        private listBox: TrivialListBox<U>;
         private isDropDownOpen = false;
-        private entries: any[];
-        private selectedEntry: any;
+        private entries: U[];
+        private selectedEntry: U;
         private blurCausedByClickInsideComponent = false;
         private numberRegex: RegExp;
         private $spinners: JQuery = $();
@@ -40,9 +66,10 @@ module TrivialComponents {
         private $selectedEntryWrapper: JQuery;
         private $dropDown: JQuery;
         private editingMode: EditingMode;
+        private usingDefaultQueryFunction: boolean;
 
-        constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
-            this.config = $.extend({
+        constructor(originalInput: JQuery|Element|string, options: TrivialUnitBoxConfig<U> = {}) {
+            this.config = $.extend(<TrivialUnitBoxConfig<U>> {
                 unitValueProperty: 'code',
                 unitIdProperty: 'code',
                 decimalPrecision: 2,
@@ -50,12 +77,12 @@ module TrivialComponents {
                 thousandsSeparator: ',',
                 unitDisplayPosition: 'right', // right or left
                 allowNullAmount: true,
-                entryRenderingFunction: (entry: any) => {
-                    const template = entry.template || DEFAULT_TEMPLATES.currency2LineTemplate;
+                entryRenderingFunction: (entry: U) => {
+                    const template = (entry as any).template || DEFAULT_TEMPLATES.currency2LineTemplate;
                     return Mustache.render(template, entry);
                 },
-                selectedEntryRenderingFunction: (entry: any) => {
-                    const template = entry.selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
+                selectedEntryRenderingFunction: (entry: U) => {
+                    const template = (entry as any).selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
                     return Mustache.render(template, entry);
                 },
                 amount: null,
@@ -78,7 +105,10 @@ module TrivialComponents {
                 editingMode: 'editable', // one of 'editable', 'disabled' and 'readonly'
             }, options);
 
-            this.config.queryFunction = this.config.queryFunction || defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+            if (!this.config.queryFunction) {
+                this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+                this.usingDefaultQueryFunction = true;
+            }
 
             this.entries = this.config.entries;
 
@@ -233,7 +263,7 @@ module TrivialComponents {
             });
 
             this.listBox = new TrivialListBox(this.$dropDown, this.config);
-            this.listBox.onSelectedEntryChanged.addListener((selectedEntry) => {
+            this.listBox.onSelectedEntryChanged.addListener((listBox: TrivialListBox<U>, selectedEntry: U) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry, false);
                     this.listBox.selectEntry(null);
@@ -282,7 +312,7 @@ module TrivialComponents {
 
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(() => {
-                this.config.queryFunction(this.getQueryString(), (newEntries: any[]) => {
+                this.config.queryFunction(this.getQueryString(), (newEntries: U[]) => {
                     this.updateEntries(newEntries);
 
                     const queryString = this.getQueryString();
@@ -312,7 +342,7 @@ module TrivialComponents {
             });
         }
 
-        private selectEntry(entry: any, doNotFireEvents?: boolean) {
+        private selectEntry(entry: U, doNotFireEvents?: boolean) {
             if (entry == null) {
                 this.selectedEntry = null;
                 const $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
@@ -415,7 +445,7 @@ module TrivialComponents {
         }
 
         private isDropDownNeeded() {
-            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.config.queryFunction.isDefaultQueryFunction || this.config.showTrigger);
+            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
         }
 
         public setEditingMode(newEditingMode: EditingMode) {
@@ -429,13 +459,13 @@ module TrivialComponents {
         }
 
         private selectUnit(unitIdentifier: string) {
-            this.selectEntry(this.entries.filter((entry) => {
+            this.selectEntry(this.entries.filter((entry: U) => {
                 return entry[this.config.unitIdProperty] === unitIdentifier;
             })[0], true);
         }
 
 
-        private updateEntries(newEntries: any[]) {
+        private updateEntries(newEntries: U[]) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();

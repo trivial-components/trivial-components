@@ -6,7 +6,8 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "outDir": "dist/js/single",
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true
   },
   "include": [
     "ts/**/*",

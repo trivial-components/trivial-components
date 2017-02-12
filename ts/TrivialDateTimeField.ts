@@ -27,6 +27,7 @@ module TrivialComponents {
     }
 
     type DatePart = {moment: Moment, ymdOrder: string};
+
     type DateComboBoxEntry = {
         moment: Moment,
         day: number,
@@ -35,6 +36,7 @@ module TrivialComponents {
         year: number,
         displayString: string
     }
+
     type TimeComboBoxEntry = {
         hour: number,
         minute: number,
@@ -46,9 +48,18 @@ module TrivialComponents {
         isNight: boolean
     };
 
+    export interface TrivialDateTimeFieldConfig {
+        dateFormat?: string,
+        timeFormat?: string,
+        autoComplete?: boolean,
+        autoCompleteDelay?: number,
+        showTrigger?: boolean,
+        editingMode?: EditingMode
+    }
+
     export class TrivialDateTimeField {
 
-        private config: any; // TODO config type
+        private config: TrivialDateTimeFieldConfig;
 
         private dateIconTemplate = `<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">
         <defs>
@@ -84,10 +95,10 @@ module TrivialComponents {
             '  <div class="content-wrapper tr-editor-area">{{displayString}}</div>' +
             '</div>';
 
-        public readonly onChange = new TrivialEvent();
+        public readonly onChange = new TrivialEvent<Moment>(this);
 
-        private dateListBox: TrivialListBox;
-        private timeListBox: TrivialListBox;
+        private dateListBox: TrivialListBox<DateComboBoxEntry>;
+        private timeListBox: TrivialListBox<TimeComboBoxEntry>;
         private calendarBox: TrivialCalendarBox;
         private isDropDownOpen = false;
 
@@ -115,9 +126,9 @@ module TrivialComponents {
         private $calendarBox: JQuery;
         private $activeEditor: JQuery;
 
-        constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
+        constructor(originalInput: JQuery|Element|string, options: TrivialDateTimeFieldConfig = {}) {
             options = options || {};
-            this.config = $.extend({
+            this.config = $.extend(<TrivialDateTimeFieldConfig> {
                 dateFormat: "MM/DD/YYYY",
                 timeFormat: "HH:mm",
                 autoComplete: true,
@@ -164,7 +175,7 @@ module TrivialComponents {
             });
 
             if (this.config.showTrigger) {
-                var $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$dateTimeField);
+                const $trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$dateTimeField);
                 $trigger.mousedown(() => {
                     if (this.isDropDownOpen) {
                         this.closeDropDown();
@@ -194,7 +205,7 @@ module TrivialComponents {
                     return Mustache.render(this.dateTemplate, entry);
                 }
             });
-            this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry) => {
+            this.dateListBox.onSelectedEntryChanged.addListener((dateListBox: TrivialListBox<DateComboBoxEntry>, selectedEntry: DateComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setDate(selectedEntry, selectedEntry.displayString != (this.dateValue && this.dateValue.displayString));
                     this.dateListBox.selectEntry(null);
@@ -207,7 +218,7 @@ module TrivialComponents {
                     return Mustache.render(this.timeTemplate, entry);
                 }
             });
-            this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry) => {
+            this.timeListBox.onSelectedEntryChanged.addListener((dateListBox: TrivialListBox<TimeComboBoxEntry>, selectedEntry: TimeComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setTime(selectedEntry, selectedEntry.displayString != (this.timeValue && this.timeValue.displayString));
                     this.dateListBox.selectEntry(null);
@@ -256,7 +267,7 @@ module TrivialComponents {
 
                         if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                             this.getActiveEditor().select();
-                            var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                            const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                             if (this.isDropDownOpen) {
                                 this.setDropDownMode(e.currentTarget === this.$dateEditor[0] ? Mode.MODE_DATE_LIST : Mode.MODE_TIME_LIST);
                                 this.query(direction);
@@ -331,9 +342,9 @@ module TrivialComponents {
                     mode: 'date' // 'date', 'time', 'datetime'
                 });
                 this.calendarBox.setKeyboardNavigationState('month');
-                this.calendarBox.onChange.addListener((changedUnit, selectedDate) => {
-                    this.setDate(TrivialDateTimeField.createDateComboBoxEntry(selectedDate, this.config.dateFormat));
-                    if (changedUnit === 'day') {
+                this.calendarBox.onChange.addListener((calendarBox: TrivialCalendarBox, {value, timeUnitEdited}) => {
+                    this.setDate(TrivialDateTimeField.createDateComboBoxEntry(value, this.config.dateFormat));
+                    if (timeUnitEdited === 'day') {
                         this.closeDropDown();
                         this.$activeEditor = this.$timeEditor;
                         selectElementContents(this.$timeEditor[0], 0, this.$timeEditor.text().length);
@@ -364,7 +375,7 @@ module TrivialComponents {
 
         private selectHighlightedListBoxEntry() {
             if (this.dropDownMode === Mode.MODE_DATE_LIST || this.dropDownMode === Mode.MODE_TIME_LIST) {
-                var highlightedEntry = this.getActiveBox().getHighlightedEntry();
+                const highlightedEntry = this.getActiveBox().getHighlightedEntry();
                 if (this.isDropDownOpen && highlightedEntry) {
                     if (this.getActiveEditor() === this.$dateEditor) {
                         this.setDate(highlightedEntry, true);
@@ -379,7 +390,7 @@ module TrivialComponents {
         private query(highlightDirection: HighlightDirection) {
             // call queryprivate asynchronously to be sure the editor has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(() => {
-                var queryString = this.getNonSelectedEditorValue();
+                const queryString = this.getNonSelectedEditorValue();
                 if (this.getActiveEditor() === this.$dateEditor) {
                     TrivialDateTimeField.dateQueryFunction(queryString, (newEntries: any[]) => {
                         this.updateEntries(newEntries, highlightDirection);
@@ -500,8 +511,8 @@ module TrivialComponents {
         }
 
         private getNonSelectedEditorValue() {
-            var editorText = this.getActiveEditor().text().replace(String.fromCharCode(160), " ");
-            var selection = window.getSelection();
+            const editorText = this.getActiveEditor().text().replace(String.fromCharCode(160), " ");
+            const selection = window.getSelection();
             if (selection.anchorOffset != selection.focusOffset) {
                 return editorText.substring(0, Math.min(selection.anchorOffset, selection.focusOffset));
             } else {
@@ -513,14 +524,14 @@ module TrivialComponents {
             if (this.config.autoComplete && (this.dropDownMode === Mode.MODE_DATE_LIST || this.dropDownMode === Mode.MODE_TIME_LIST)) {
                 clearTimeout(this.autoCompleteTimeoutId);
 
-                var listBox = this.getActiveBox();
-                var highlightedEntry = listBox.getHighlightedEntry();
+                const listBox = this.getActiveBox();
+                const highlightedEntry = listBox.getHighlightedEntry();
                 if (highlightedEntry && this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    var autoCompletingEntryDisplayValue = highlightedEntry.displayString;
+                    const autoCompletingEntryDisplayValue = highlightedEntry.displayString;
                     if (autoCompletingEntryDisplayValue) {
                         this.autoCompleteTimeoutId = setTimeout(() => {
-                            var oldEditorValue = this.getNonSelectedEditorValue();
-                            var newEditorValue: string;
+                            const oldEditorValue = this.getNonSelectedEditorValue();
+                            let newEditorValue: string;
                             if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {
                                 newEditorValue = oldEditorValue + autoCompletingEntryDisplayValue.substr(oldEditorValue.length);
                             } else {
@@ -539,14 +550,12 @@ module TrivialComponents {
         }
 
         private updateEntries(newEntries: any[], highlightDirection: HighlightDirection) {
-            var listBox = this.getActiveBox();
+            const listBox = this.getActiveBox();
 
             highlightDirection = highlightDirection === undefined ? 1 : highlightDirection;
             listBox.updateEntries(newEntries);
 
-            var nonSelectedEditorValue = this.getNonSelectedEditorValue();
-
-            listBox.highlightTextMatches(newEntries.length <= this.config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
+            listBox.highlightTextMatches(this.getNonSelectedEditorValue());
 
             listBox.highlightNextEntry(highlightDirection);
 
@@ -571,9 +580,9 @@ module TrivialComponents {
 // ====================== static DATE functions =========================
 
         private static dateQueryFunction(searchString: string, resultCallback: Function, dateFormat: string) {
-            var suggestions: DatePart[];
+            let suggestions: DatePart[];
             if (searchString.match(/[^\d]/)) {
-                var fragments = searchString.split(/[^\d]/).filter((f) => {
+                const fragments = searchString.split(/[^\d]/).filter((f) => {
                     return !!f
                 });
                 suggestions = TrivialDateTimeField.createSuggestionsForFragments(fragments, moment());
@@ -582,7 +591,7 @@ module TrivialComponents {
             }
 
             // remove duplicates
-            var seenMoments: Moment[] = [];
+            const seenMoments: Moment[] = [];
             suggestions = suggestions.filter((s) => {
                 if (seenMoments.filter((seenMoment) => {
                         return s.moment.isSame(seenMoment, 'day');
@@ -595,7 +604,7 @@ module TrivialComponents {
             });
 
             // sort by relevance
-            var preferredYmdOrder = TrivialDateTimeField.dateFormatToYmdOrder(dateFormat);
+            const preferredYmdOrder = TrivialDateTimeField.dateFormatToYmdOrder(dateFormat);
             suggestions.sort((a, b) => {
                 if (preferredYmdOrder.indexOf(a.ymdOrder) === -1 && preferredYmdOrder.indexOf(b.ymdOrder) !== -1) {
                     return 1;
@@ -606,7 +615,7 @@ module TrivialComponents {
                 } else if (a.ymdOrder !== b.ymdOrder) {
                     return new Levenshtein(a.ymdOrder, preferredYmdOrder).distance - new Levenshtein(b.ymdOrder, preferredYmdOrder).distance;
                 } else {
-                    var today = moment();
+                    const today = moment();
                     return a.moment.diff(today, 'days') - b.moment.diff(today, 'days'); // nearer is better
                 }
             });
@@ -629,7 +638,7 @@ module TrivialComponents {
         }
 
         private static dateFormatToYmdOrder(dateFormat: string) {
-            var ymdIndexes: {[ymd: string]: number} = {
+            const ymdIndexes: {[ymd: string]: number} = {
                 D: dateFormat.indexOf("D"),
                 M: dateFormat.indexOf("M"),
                 Y: dateFormat.indexOf("Y")
@@ -645,8 +654,8 @@ module TrivialComponents {
 
         private static generateSuggestionsForDigitsOnlyInput(input: string, today: Moment): DatePart[] {
             if (!input) {
-                var result: DatePart[] = [];
-                for (var i = 0; i < 7; i++) {
+                const result: DatePart[] = [];
+                for (let i = 0; i < 7; i++) {
                     result.push(TrivialDateTimeField.createDateParts(moment(today).add(i, "day"), ""));
                 }
                 return result;
@@ -654,9 +663,9 @@ module TrivialComponents {
                 return [];
             }
 
-            var suggestions: DatePart[] = [];
-            for (var i = 1; i <= input.length; i++) {
-                for (var j = Math.min(input.length, i + 1); j <= input.length; j - i === 2 ? j += 2 : j++) {
+            let suggestions: DatePart[] = [];
+            for (let i = 1; i <= input.length; i++) {
+                for (let j = Math.min(input.length, i + 1); j <= input.length; j - i === 2 ? j += 2 : j++) {
                     suggestions = suggestions.concat(TrivialDateTimeField.createSuggestionsForFragments([input.substring(0, i), input.substring(i, j), input.substring(j, input.length)], today));
                 }
             }
@@ -670,9 +679,9 @@ module TrivialComponents {
             };
 
             let numberToYear = (n: number) => {
-                var shortYear = today.year() % 100;
-                var yearSuggestionBoundary = (shortYear + 20) % 100; // suggest 20 years into the future and 80 year backwards
-                var currentCentury = Math.floor(today.year() / 100) * 100;
+                const shortYear = today.year() % 100;
+                const yearSuggestionBoundary = (shortYear + 20) % 100; // suggest 20 years into the future and 80 year backwards
+                const currentCentury = Math.floor(today.year() / 100) * 100;
                 if (n < yearSuggestionBoundary) {
                     return currentCentury + n;
                 } else if (n < 100) {
@@ -684,22 +693,23 @@ module TrivialComponents {
                 }
             };
 
-            var s1 = fragments[0], s2 = fragments[1], s3 = fragments[2];
-            var n1 = parseInt(s1), n2 = parseInt(s2), n3 = parseInt(s3);
-            var suggestions: DatePart[] = [];
+            const s1 = fragments[0];
+            let s2 = fragments[1], s3 = fragments[2];
+            const n1 = parseInt(s1), n2 = parseInt(s2), n3 = parseInt(s3);
+            const suggestions: DatePart[] = [];
 
             if (s1 && !s2 && !s3) {
-                var momentInCurrentMonth = moment([today.year(), today.month(), s1]);
+                const momentInCurrentMonth = moment([today.year(), today.month(), s1]);
                 if (momentInCurrentMonth.isValid() && todayOrFuture(momentInCurrentMonth)) {
                     suggestions.push(TrivialDateTimeField.createDateParts(momentInCurrentMonth, "D"));
                 } else {
-                    var momentInNextMonth = moment([today.year() + (today.month() == 11 ? 1 : 0), (today.month() + 1) % 12, s1]);
+                    const momentInNextMonth = moment([today.year() + (today.month() == 11 ? 1 : 0), (today.month() + 1) % 12, s1]);
                     if (momentInNextMonth.isValid()) {
                         suggestions.push(TrivialDateTimeField.createDateParts(momentInNextMonth, "D"));
                     }
                 }
             } else if (s1 && s2 && !s3) {
-                var mom: Moment;
+                let mom: Moment;
                 mom = moment([moment().year(), n1 - 1, s2]);
                 if (mom.isValid() && todayOrFuture(mom)) {
                     suggestions.push(TrivialDateTimeField.createDateParts(mom, "MD"));
@@ -719,7 +729,7 @@ module TrivialComponents {
                     }
                 }
             } else { // s1 && s2 && s3
-                var mom: Moment;
+                let mom: Moment;
                 mom = moment([numberToYear(n1), n2 - 1, s3]);
                 if (mom.isValid()) {
                     suggestions.push(TrivialDateTimeField.createDateParts(mom, "YMD"));
@@ -752,22 +762,22 @@ module TrivialComponents {
 // ================ static TIME functions =======================
 
         private static timeQueryFunction(searchString: string, resultCallback: Function, timeFormat: string) {
-            var suggestedValues: TimeComboBoxEntry[] = [];
+            let suggestedValues: TimeComboBoxEntry[] = [];
 
-            var match = searchString.match(/[^\d]/);
-            var colonIndex = match != null ? match.index : null;
+            const match = searchString.match(/[^\d]/);
+            const colonIndex = match != null ? match.index : null;
             if (colonIndex !== null) {
-                var hourString = searchString.substring(0, colonIndex);
-                var minuteString = searchString.substring(colonIndex + 1);
+                const hourString = searchString.substring(0, colonIndex);
+                const minuteString = searchString.substring(colonIndex + 1);
                 suggestedValues = suggestedValues.concat(TrivialDateTimeField.createTimeComboBoxEntries(TrivialDateTimeField.createHourSuggestions(hourString), TrivialDateTimeField.createMinuteSuggestions(minuteString), timeFormat));
             } else if (searchString.length > 0) { // is a number!
                 if (searchString.length >= 2) {
-                    var hourString = searchString.substr(0, 2);
-                    var minuteString = searchString.substring(2, searchString.length);
+                    const hourString = searchString.substr(0, 2);
+                    const minuteString = searchString.substring(2, searchString.length);
                     suggestedValues = suggestedValues.concat(TrivialDateTimeField.createTimeComboBoxEntries(TrivialDateTimeField.createHourSuggestions(hourString), TrivialDateTimeField.createMinuteSuggestions(minuteString), timeFormat));
                 }
-                var hourString = searchString.substr(0, 1);
-                var minuteString = searchString.substring(1, searchString.length);
+                const hourString = searchString.substr(0, 1);
+                const minuteString = searchString.substring(1, searchString.length);
                 if (minuteString.length <= 2) {
                     suggestedValues = suggestedValues.concat(TrivialDateTimeField.createTimeComboBoxEntries(TrivialDateTimeField.createHourSuggestions(hourString), TrivialDateTimeField.createMinuteSuggestions(minuteString), timeFormat));
                 }
@@ -779,15 +789,15 @@ module TrivialComponents {
         }
 
         private static intRange(fromInclusive: number, toInclusive: number) {
-            var ints: number[] = [];
-            for (var i = fromInclusive; i <= toInclusive; i++) {
+            const ints: number[] = [];
+            for (let i = fromInclusive; i <= toInclusive; i++) {
                 ints.push(i)
             }
             return ints;
         }
 
         private static pad(num: number, size: number) {
-            var s: string = num + "";
+            let s: string = num + "";
             while (s.length < size) s = "0" + s;
             return s;
         }
@@ -806,11 +816,11 @@ module TrivialComponents {
         }
 
         private static createTimeComboBoxEntries(hourValues: number[], minuteValues: number[], timeFormat: string) {
-            var entries: TimeComboBoxEntry[] = [];
-            for (var i = 0; i < hourValues.length; i++) {
-                var hour = hourValues[i];
-                for (var j = 0; j < minuteValues.length; j++) {
-                    var minute = minuteValues[j];
+            const entries: TimeComboBoxEntry[] = [];
+            for (let i = 0; i < hourValues.length; i++) {
+                const hour = hourValues[i];
+                for (let j = 0; j < minuteValues.length; j++) {
+                    const minute = minuteValues[j];
                     entries.push(TrivialDateTimeField.createTimeComboBoxEntry(hour, minute, timeFormat));
                 }
             }
@@ -818,7 +828,7 @@ module TrivialComponents {
         }
 
         private static createMinuteSuggestions(minuteString: string) {
-            var m = parseInt(minuteString);
+            const m = parseInt(minuteString);
             if (isNaN(m)) {
                 return [0];
             } else if (minuteString.length > 1) {
@@ -831,7 +841,7 @@ module TrivialComponents {
         }
 
         private static createHourSuggestions(hourString: string) {
-            var h = parseInt(hourString);
+            const h = parseInt(hourString);
             if (isNaN(h)) {
                 return TrivialDateTimeField.intRange(1, 24);
                 //} else if (h < 10) {

@@ -17,47 +17,65 @@
  */
 module TrivialComponents {
 
-    export class TrivialTreeComboBox {
+
+    export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
+        selectedEntryRenderingFunction?: (entry: E) => string,
+        textHighlightingEntryLimit?: number,
+        emptyEntry?: E | any,
+        queryFunction?: QueryFunction<E>,
+        autoComplete?: boolean,
+        autoCompleteDelay?: number,
+        entryToEditorTextFunction?: (entry: E) => string,
+        autoCompleteFunction?: (editorText: string, entry: E) => string,
+        allowFreeText?: boolean,
+        freeTextEntryFactory?: (freeText: string) => E | any,
+        showClearButton?: boolean,
+        showTrigger?: boolean,
+        editingMode?: EditingMode,
+        showDropDownOnResultsOnly?: boolean
+    }
+
+    export class TrivialTreeComboBox<E> {
 
         private $: JQuery;
         private $treeComboBox: JQuery;
         private $dropDown: JQuery;
         private $dropDownTargetElement: JQuery;
-        private config: any;
+        private config: TrivialTreeComboBoxConfig<E>;
         private $editor: JQuery;
-        private treeBox: TrivialTreeBox;
+        private treeBox: TrivialTreeBox<E>;
         private isDropDownOpen = false;
         private isEditorVisible = false;
         private lastQueryString: string = null;
         private lastCompleteInputQueryString: string = null;
-        private selectedEntry: any = null;
-        private lastCommittedValue: any = null;
+        private selectedEntry: E = null;
+        private lastCommittedValue: E = null;
         private blurCausedByClickInsideComponent = false;
         private autoCompleteTimeoutId = -1;
         private doNoAutoCompleteBecauseBackspaceWasPressed = false;
         private editingMode: EditingMode;
+        private usingDefaultQueryFunction: boolean = false;
         private $originalInput: JQuery;
         private $selectedEntryWrapper: JQuery;
         private $clearButton: JQuery;
         private $trigger: JQuery;
-
         private $spinners = $();
 
-        public readonly onSelectedEntryChanged = new TrivialEvent();
-        public readonly onFocus = new TrivialEvent();
-        public readonly onBlur = new TrivialEvent();
+        public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
+        public readonly onFocus = new TrivialEvent<void>(this);
+        public readonly onBlur = new TrivialEvent<void>(this);
 
-        constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
-            this.config = $.extend({
-                valueFunction: (entry:any) => entry ? entry.id : null,
-                entryRenderingFunction: (entry: any, depth: number) => {
-                    var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                    var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+        constructor(originalInput: JQuery|Element|string, options: TrivialTreeComboBoxConfig<E> = {}) {
+            this.config = $.extend(<TrivialTreeComboBoxConfig<E>> {
+                valueFunction: (entry: E) => entry ? (entry as any).id : null,
+                entryRenderingFunction: (entry: E, depth: number) => {
+                    const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
+                    const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
-                selectedEntryRenderingFunction: (entry: any) => {
-                    if (entry.selectedEntryTemplate) {
-                        return Mustache.render(entry.selectedEntryTemplate, entry)
+                selectedEntryRenderingFunction: (entry: E) => {
+                    if ((entry as any).selectedEntryTemplate) {
+                        return Mustache.render((entry as any).selectedEntryTemplate, entry)
                     } else {
                         return this.config.entryRenderingFunction(entry, 0);
                     }
@@ -73,15 +91,15 @@ module TrivialComponents {
                 queryFunction: null, // defined below...
                 autoComplete: true,
                 autoCompleteDelay: 0,
-                entryToEditorTextFunction: (entry: any) => {
-                    return entry["displayValue"];
+                entryToEditorTextFunction: (entry: E) => {
+                    return (entry as any)["displayValue"];
                 },
-                autoCompleteFunction: (editorText: string, entry: any) => {
+                autoCompleteFunction: (editorText: string, entry: E) => {
                     if (editorText) {
                         for (let propertyName in entry) {
-                            var propertyValue = entry[propertyName];
-                            if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
-                                return propertyValue.toString();
+                            const propertyValue = entry[propertyName];
+                            if (propertyValue && (propertyValue as any).toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                return (propertyValue as any).toString();
                             }
                         }
                         return null;
@@ -110,8 +128,15 @@ module TrivialComponents {
                 showDropDownOnResultsOnly: false
             }, options);
 
-            this.config.queryFunction = this.config.queryFunction || defaultTreeQueryFunctionFactory(this.config.entries
-                    || [], defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
+            if (!this.config.queryFunction) {
+                this.config.queryFunction = defaultTreeQueryFunctionFactory(
+                    this.config.entries || [],
+                    defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions),
+                    this.config.childrenProperty,
+                    this.config.expandedProperty
+                );
+                this.usingDefaultQueryFunction = true;
+            }
 
             this.$originalInput = $(originalInput);
             this.$treeComboBox = $('<div class="tr-treecombobox tr-combobox tr-input-wrapper"/>')
@@ -195,7 +220,7 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         if (this.isDropDownOpen) {
                             // expand the currently highlighted node.
-                            var changedExpandedState = this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
+                            const changedExpandedState = this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                             if (changedExpandedState) {
                                 return false;
                             }
@@ -213,7 +238,7 @@ module TrivialComponents {
                             this.$editor.select();
                             this.showEditor();
                         }
-                        var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                        const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!this.isDropDownOpen) {
                             this.query(direction);
                             if (!this.config.showDropDownOnResultsOnly) {
@@ -304,7 +329,7 @@ module TrivialComponents {
                 });
 
             this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
-            this.treeBox.onSelectedEntryChanged.addListener((selectedEntry) => {
+            this.treeBox.onSelectedEntryChanged.addListener((treeBox: TrivialTreeBox<E>, selectedEntry: E) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.treeBox.setSelectedEntry(null);
@@ -330,14 +355,14 @@ module TrivialComponents {
         private query(highlightDirection?: HighlightDirection) {
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(() => {
-                var queryString = this.getNonSelectedEditorValue();
-                var completeInputString = this.$editor.val();
+                const queryString = this.getNonSelectedEditorValue();
+                const completeInputString = this.$editor.val();
                 if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
                     if (this.$spinners.length === 0) {
-                        var $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                        const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
                         this.$spinners = this.$spinners.add($spinner);
                     }
-                    this.config.queryFunction(queryString, (newEntries: any[]) => {
+                    this.config.queryFunction(queryString, (newEntries: E[]) => {
                         this.updateEntries(newEntries, highlightDirection);
                         if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
                             this.openDropDown();
@@ -351,12 +376,12 @@ module TrivialComponents {
             }, 0);
         }
 
-        private fireChangeEvents(entry: any) {
+        private fireChangeEvents(entry: E) {
             this.$originalInput.trigger("change");
             this.onSelectedEntryChanged.fire(entry);
         }
 
-        private selectEntry(entry: any, commit?: boolean, muteEvent?: boolean) {
+        private selectEntry(entry: E, commit?: boolean, muteEvent?: boolean) {
             if (entry == null) {
                 this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
@@ -394,7 +419,7 @@ module TrivialComponents {
         }
 
         private showEditor() {
-            var $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
+            let $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
             if ($editorArea.length === 0) {
                 $editorArea = this.$selectedEntryWrapper;
             }
@@ -466,11 +491,11 @@ module TrivialComponents {
         private autoCompleteIfPossible(delay: number) {
             if (this.config.autoComplete) {
                 clearTimeout(this.autoCompleteTimeoutId);
-                var highlightedEntry = this.treeBox.getHighlightedEntry();
+                const highlightedEntry = this.treeBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
                     this.autoCompleteTimeoutId = setTimeout(() => {
-                        var currentEditorValue = this.getNonSelectedEditorValue();
-                        var autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
+                        const currentEditorValue = this.getNonSelectedEditorValue();
+                        const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
                         if (this.$editor.is(":focus")) {
                             (this.$editor[0] as any).setSelectionRange(currentEditorValue.length, autoCompleteString.length);
@@ -482,12 +507,12 @@ module TrivialComponents {
         }
 
 
-        private updateEntries(newEntries: any[], highlightDirection: HighlightDirection) {
+        private updateEntries(newEntries: E[], highlightDirection: HighlightDirection) {
             this.$spinners.remove();
             this.$spinners = $();
             this.treeBox.updateEntries(newEntries);
 
-            var nonSelectedEditorValue = this.getNonSelectedEditorValue();
+            const nonSelectedEditorValue = this.getNonSelectedEditorValue();
 
             this.treeBox.highlightTextMatches(newEntries.length <= this.config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
@@ -519,7 +544,7 @@ module TrivialComponents {
         }
 
         private isDropDownNeeded() {
-            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.config.queryFunction.isDefaultQueryFunction || this.config.showTrigger);
+            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
         }
 
         private setEditingMode(newEditingMode: EditingMode) {
@@ -536,17 +561,17 @@ module TrivialComponents {
             } else if (this.selectedEntry == null && this.config.allowFreeText) {
                 return this.config.freeTextEntryFactory(this.$editor.val());
             } else {
-                var selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
+                const selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
                 selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             }
         }
 
-        public updateChildren(parentNodeId: any, children: any[]) {
+        public updateChildren(parentNodeId: any, children: E[]) {
             this.treeBox.updateChildren(parentNodeId, children);
         }
 
-        public updateNode(node: any) {
+        public updateNode(node: E) {
             this.treeBox.updateNode(node);
         }
 

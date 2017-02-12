@@ -17,16 +17,28 @@
  */
 module TrivialComponents {
 
-    export class TrivialTree {
+    export type SearchBarMode = 'none' | 'show-if-filled' | 'always-visible';
 
-        private config: any;
+    export interface TrivialTreeConfig<E> extends TrivialTreeBoxConfig<E> {
+        queryFunction?: QueryFunction<E>,
+        searchBarMode?: SearchBarMode,
+        directSelectionViaArrowKeys?: boolean,
+        performanceOptimizationSettings?: {
+            toManyVisibleItemsRenderDelay: number,
+            toManyVisibleItemsThreshold: number
+        }
+    }
 
-        public readonly onSelectedEntryChanged = new TrivialEvent();
-        public readonly onNodeExpansionStateChanged = new TrivialEvent();
+    export class TrivialTree<E> {
 
-        private treeBox: TrivialTreeBox;
-        private entries: any[];
-        private selectedEntryId: number;
+        private config: TrivialTreeConfig<E>;
+
+        public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
+        public readonly onNodeExpansionStateChanged = new TrivialEvent<E>(this);
+
+        private treeBox: TrivialTreeBox<E>;
+        private entries: E[];
+        private selectedEntryId: any;
 
         private $:JQuery;
         private $spinners = $();
@@ -36,24 +48,25 @@ module TrivialComponents {
         private $editor: JQuery;
         private processUpdateTimer: number;
 
-        constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
-            this.config = $.extend({
-                valueFunction: (entry:any) => entry ? entry.id : null,
+        constructor(originalInput: JQuery|Element|string, options: TrivialTreeConfig<E> = {}) {
+            this.config = $.extend(<TrivialTreeConfig<E>> {
+                valueFunction: (entry:E) => entry ? entry.id : null,
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
-                searchBarMode: 'show-if-filled', // none, show-if-filled, always-visible
-                lazyChildrenQueryFunction: (node: any, resultCallback: Function) => {
+                searchBarMode: 'show-if-filled',
+                lazyChildrenQueryFunction: (node: E, resultCallback: Function) => {
                     resultCallback([])
                 },
                 expandedProperty: 'expanded',
-                entryRenderingFunction: (entry: any, depth: number) => {
-                    var defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                    var template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                entryRenderingFunction: (entry: E, depth: number) => {
+                    const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
+                    const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
                 spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
                 noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
                 entries: null,
+                queryFunction: null, // defined below...
                 selectedEntryId: null,
                 matchingOptions: {
                     matchingMode: 'contains',
@@ -66,18 +79,22 @@ module TrivialComponents {
                     toManyVisibleItemsThreshold: 75
                 }
             }, options);
-            this.config.queryFunction = this.config.queryFunction || defaultTreeQueryFunctionFactory(this.config.entries
-                    || [], defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions), this.config.childrenProperty, this.config.expandedProperty);
 
-            this.onSelectedEntryChanged = new TrivialEvent();
-            this.onNodeExpansionStateChanged = new TrivialEvent();
+            if (!this.config.queryFunction) {
+                this.config.queryFunction = defaultTreeQueryFunctionFactory(
+                    this.config.entries || [],
+                    defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions),
+                    this.config.childrenProperty,
+                    this.config.expandedProperty
+                );
+            }
 
             this.entries = this.config.entries;
 
             this.$originalInput = $(originalInput).addClass("tr-original-input");
             this.$componentWrapper = $('<div class="tr-tree" tabindex="0"/>').insertAfter(this.$originalInput);
             if (this.config.searchBarMode !== 'always-visible') {
-                this.$componentWrapper.addClass(this.config.showSearchField ? "" : "hide-searchfield");
+                this.$componentWrapper.addClass("hide-searchfield");
             }
             this.$componentWrapper.keydown((e:KeyboardEvent) => {
                 if (e.which == keyCodes.tab || keyCodes.isModifierKey(e)) {
@@ -87,7 +104,7 @@ module TrivialComponents {
                     this.$editor.focus();
                 }
                 if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                    var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                    const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (this.entries != null) {
                         if (this.config.directSelectionViaArrowKeys) {
                             this.treeBox.selectNextEntry(direction)
@@ -121,7 +138,7 @@ module TrivialComponents {
                 .keydown((e) => {
                     if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         // expand the currently highlighted node.
-                        var changedExpandedState = this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
+                        const changedExpandedState = this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
                         if (changedExpandedState) {
                             return false;
                         } else {
@@ -153,11 +170,11 @@ module TrivialComponents {
             }
 
             this.treeBox = new TrivialComponents.TrivialTreeBox(this.$tree, this.config);
-            this.treeBox.onNodeExpansionStateChanged.addListener((node: any)=> {
+            this.treeBox.onNodeExpansionStateChanged.addListener((treeBox: TrivialTreeBox<E>, node: E)=> {
                 this.onNodeExpansionStateChanged.fire(node);
             });
             this.treeBox.onSelectedEntryChanged.addListener(() => {
-                var selectedTreeBoxEntry = this.treeBox.getSelectedEntry();
+                const selectedTreeBoxEntry = this.treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
                     this.selectEntry(selectedTreeBoxEntry);
                 }
@@ -167,7 +184,7 @@ module TrivialComponents {
             this.$ = this.$componentWrapper;
         }
 
-        public updateEntries(newEntries: any[]) {
+        public updateEntries(newEntries: E[]) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
@@ -177,12 +194,12 @@ module TrivialComponents {
 
         private query(highlightDirection?: HighlightDirection) {
             if (this.config.searchBarMode === 'always-visible' || this.config.searchBarMode === 'show-if-filled') {
-                var $spinner = $(this.config.spinnerTemplate).appendTo(this.$tree);
+                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$tree);
                 this.$spinners = this.$spinners.add($spinner);
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
                 setTimeout(() => {
-                    this.config.queryFunction(this.$editor.val(), (newEntries: any[]) => {
+                    this.config.queryFunction(this.$editor.val(), (newEntries: E[]) => {
                         let processUpdate = () => {
                             this.updateEntries(newEntries);
                             if (this.$editor.val().length > 0) {
@@ -205,10 +222,10 @@ module TrivialComponents {
             }
         }
 
-        private countVisibleEntries(entries: any[]) {
-            let countVisibleChildrenAndSelf = (node: any) => {
+        private countVisibleEntries(entries: E[]) {
+            let countVisibleChildrenAndSelf = (node: E) => {
                 if (node[this.config.expandedProperty] && node[this.config.childrenProperty]) {
-                    return node[this.config.childrenProperty].map((entry: any) => {
+                    return node[this.config.childrenProperty].map((entry: E) => {
                             return countVisibleChildrenAndSelf(entry);
                         }).reduce((a:number, b:number) => {
                             return a + b;
@@ -218,47 +235,47 @@ module TrivialComponents {
                 }
             };
 
-            return entries.map((entry: any) => {
+            return entries.map((entry: E) => {
                 return countVisibleChildrenAndSelf(entry);
             }).reduce((a, b) => {
                 return a + b;
             }, 0);
         }
 
-        private findEntries(filterFunction: ((node: any) => boolean)) {
-            let findEntriesInSubTree = (node: any, listOfFoundEntries: any[]) => {
+        private findEntries(filterFunction: ((node: E) => boolean)) {
+            let findEntriesInSubTree = (node: E, listOfFoundEntries: E[]) => {
                 if (filterFunction.call(this, node)) {
                     listOfFoundEntries.push(node);
                 }
                 if (node[this.config.childrenProperty]) {
-                    for (var i = 0; i < node[this.config.childrenProperty].length; i++) {
-                        var child = node[this.config.childrenProperty][i];
+                    for (let i = 0; i < node[this.config.childrenProperty].length; i++) {
+                        const child = node[this.config.childrenProperty][i];
                         findEntriesInSubTree(child, listOfFoundEntries);
                     }
                 }
             };
 
-            var matchingEntries: any[] = [];
-            for (var i = 0; i < this.entries.length; i++) {
-                var rootEntry = this.entries[i];
+            const matchingEntries: E[] = [];
+            for (let i = 0; i < this.entries.length; i++) {
+                const rootEntry = this.entries[i];
                 findEntriesInSubTree(rootEntry, matchingEntries);
             }
             return matchingEntries;
         }
 
         private findEntryById(id:number) {
-            return this.findEntries((entry: any) => {
-                return this.config.valueFunction(entry) == id
+            return this.findEntries((entry: E) => {
+                return this.config.valueFunction(entry) === id.toString()
             })[0];
         }
 
-        private selectEntry(entry: any) {
+        private selectEntry(entry: E) {
             this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
             this.$originalInput.val(entry ? this.config.valueFunction(entry) : null);
             this.fireChangeEvents(entry);
         }
 
-        private fireChangeEvents(entry: any) {
+        private fireChangeEvents(entry: E) {
             this.$originalInput.trigger("change");
             this.$componentWrapper.trigger("change");
             this.onSelectedEntryChanged.fire(entry);
@@ -268,11 +285,11 @@ module TrivialComponents {
             this.treeBox.getSelectedEntry()
         };
 
-        public updateChildren(parentNodeId: any, children: any[]) {
+        public updateChildren(parentNodeId: any, children: E[]) {
             this.treeBox.updateChildren(parentNodeId, children)
         };
 
-        public updateNode(node: any) {
+        public updateNode(node: E) {
             this.treeBox.updateNode(node)
         };
 
@@ -280,12 +297,12 @@ module TrivialComponents {
             this.treeBox.removeNode(nodeId)
         };
 
-        public addNode(parentNodeId: number, node: any) {
+        public addNode(parentNodeId: number, node: E) {
             this.treeBox.addNode(parentNodeId, node)
         };
 
-        public selectNode(nodeId: number) {
-            this.treeBox.setSelectedEntry(nodeId);
+        public selectNodeById(nodeId: any) {
+            this.treeBox.setSelectedEntryById(nodeId);
         };
 
         public destroy() {

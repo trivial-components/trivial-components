@@ -17,25 +17,28 @@
  */
 module TrivialComponents {
 
-    export type TrivialEventListener = (...args:any[]) => void;
+    export type TrivialEventListener<EO> = (eventSource?: any, eventObject?: EO) => void;
 
-    export class TrivialEvent {
-        private listeners:TrivialEventListener[] = [];
+    export class TrivialEvent<EO> {
+        private listeners:TrivialEventListener<EO>[] = [];
 
-        public addListener(fn:TrivialEventListener) {
+        constructor(private eventSource: any) {
+        }
+
+        public addListener(fn:TrivialEventListener<EO>) {
             this.listeners.push(fn);
         };
 
-        public removeListener(fn:TrivialEventListener) {
-            var listenerIndex = this.listeners.indexOf(fn);
+        public removeListener(fn:TrivialEventListener<EO>) {
+            const listenerIndex = this.listeners.indexOf(fn);
             if (listenerIndex != -1) {
                 this.listeners.splice(listenerIndex, 1);
             }
         };
 
-        public fire(...args:any[]) {
-            for (var i = 0; i < this.listeners.length; i++) {
-                this.listeners[i].apply(this.listeners[i], args);
+        public fire(eventObject?: EO, originalEvent?: any) {
+            for (let i = 0; i < this.listeners.length; i++) {
+                this.listeners[i].call(this.listeners[i], this.eventSource, eventObject, originalEvent);
             }
         };
     }

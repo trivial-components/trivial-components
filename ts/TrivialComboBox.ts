@@ -18,9 +18,28 @@
 
 module TrivialComponents {
 
-    export class TrivialComboBox {
+    export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
+        valueFunction?: (entry: E) => string,
+        selectedEntryRenderingFunction?: (entry: E) => string,
+        noEntriesTemplate?: string,
+        textHighlightingEntryLimit?: number,
+        emptyEntry?: E | any,
+        queryFunction?: QueryFunction<E>,
+        autoComplete?: boolean,
+        autoCompleteDelay?: number,
+        entryToEditorTextFunction?: (entry: E) => string,
+        autoCompleteFunction?: (editorText: string, entry: E) => string,
+        allowFreeText?: boolean,
+        freeTextEntryFactory?: (freeText: string) => E | any,
+        showClearButton?: boolean,
+        showTrigger?: boolean,
+        editingMode?: EditingMode,
+        showDropDownOnResultsOnly?: boolean
+    }
 
-        private config: any; // TODO config type
+    export class TrivialComboBox<E> {
+
+        private config: TrivialComboBoxConfig<E>;
 
         private $: JQuery;
         private $spinners: JQuery = $();
@@ -33,34 +52,35 @@ module TrivialComponents {
         private $editor: JQuery;
         private $dropDownTargetElement:JQuery;
 
-        public readonly onSelectedEntryChanged = new TrivialEvent();
-        public readonly onFocus = new TrivialEvent();
-        public readonly onBlur = new TrivialEvent();
+        public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
+        public readonly onFocus = new TrivialEvent<void>(this);
+        public readonly onBlur = new TrivialEvent<void>(this);
 
-        private listBox: TrivialListBox;
+        private listBox: TrivialListBox<E>;
         private isDropDownOpen = false;
         private isEditorVisible = false;
         private lastQueryString: string = null;
         private lastCompleteInputQueryString: string = null;
-        private entries: any[];
-        private selectedEntry: any = null;
-        private lastCommittedValue: any = null;
+        private entries: E[];
+        private selectedEntry: E = null;
+        private lastCommittedValue: E = null;
         private blurCausedByClickInsideComponent = false;
         private autoCompleteTimeoutId = -1;
         private doNoAutoCompleteBecauseBackspaceWasPressed = false;
         private listBoxDirty = true;
         private editingMode: EditingMode;
+        private usingDefaultQueryFunction: boolean = false;
 
-        constructor(originalInput: JQuery|Element|string, options: any = {}/*TODO config type*/) {
-            this.config = $.extend({
-                valueFunction: (entry:any) => entry ? entry.id : null,
-                entryRenderingFunction: (entry: any) => {
-                    var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
+        constructor(originalInput: JQuery|Element|string, options: TrivialComboBoxConfig<E> = {}) {
+            this.config = $.extend(<TrivialComboBoxConfig<E>> {
+                valueFunction: (entry:E) => entry ? (entry as any).id : null,
+                entryRenderingFunction: (entry: E) => {
+                    const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
-                selectedEntryRenderingFunction: (entry: any) => {
-                    if (entry.selectedEntryTemplate) {
-                        return Mustache.render(entry.selectedEntryTemplate, entry)
+                selectedEntryRenderingFunction: (entry: E) => {
+                    if ((entry as any).selectedEntryTemplate) {
+                        return Mustache.render((entry as any).selectedEntryTemplate, entry)
                     } else {
                         return this.config.entryRenderingFunction(entry);
                     }
@@ -76,16 +96,16 @@ module TrivialComponents {
                 queryFunction: null, // defined below...
                 autoComplete: true,
                 autoCompleteDelay: 0,
-                entryToEditorTextFunction: (entry: any) => {
-                    return entry["displayValue"];
+                entryToEditorTextFunction: (entry: E) => {
+                    return (entry as any)["displayValue"];
                 },
-                autoCompleteFunction: (editorText: string, entry: any) => {
+                autoCompleteFunction: (editorText: string, entry: E) => {
                     if (editorText) {
                         for (let propertyName in entry) {
                             if (entry.hasOwnProperty(propertyName)) {
                                 let propertyValue = entry[propertyName];
-                                if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
-                                    return propertyValue.toString();
+                                if (propertyValue && (propertyValue as any).toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                    return (propertyValue as any).toString();
                                 }
                             }
                         }
@@ -114,9 +134,8 @@ module TrivialComponents {
 
             if (!this.config.queryFunction) {
                 this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
-                this.config.queryFunction.isDefaultQueryFunction = true;
+                this.usingDefaultQueryFunction = true;
             }
-
 
             this.entries = this.config.entries;
 
@@ -192,7 +211,7 @@ module TrivialComponents {
                     if (keyCodes.isModifierKey(e)) {
                         return;
                     } else if (e.which == keyCodes.tab) {
-                        var highlightedEntry = this.listBox.getHighlightedEntry();
+                        const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
                             this.selectEntry(highlightedEntry, true);
                         } else if (!this.$editor.val()) {
@@ -215,7 +234,7 @@ module TrivialComponents {
                             this.$editor.select();
                             this.showEditor();
                         }
-                        var direction = e.which == keyCodes.up_arrow ? -1 : 1;
+                        const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                         if (!this.isDropDownOpen) {
                             this.query(direction);
                             if (!this.config.showDropDownOnResultsOnly) {
@@ -229,7 +248,7 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.enter) {
                         if (this.isEditorVisible || this.editorContainsFreeText()) {
                             e.preventDefault(); // do not submit form
-                            var highlightedEntry = this.listBox.getHighlightedEntry();
+                            const highlightedEntry = this.listBox.getHighlightedEntry();
                             if (this.isDropDownOpen && highlightedEntry) {
                                 this.selectEntry(highlightedEntry, true);
                             } else if (!this.$editor.val()) {
@@ -303,10 +322,10 @@ module TrivialComponents {
                 }
             });
 
-            var configWithoutEntries = $.extend({}, this.config);
+            const configWithoutEntries = $.extend({}, this.config);
             configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
-            this.listBox = new TrivialListBox(this.$dropDown, configWithoutEntries);
-            this.listBox.onSelectedEntryChanged.addListener((selectedEntry: any) => {
+            this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
+            this.listBox.onSelectedEntryChanged.addListener((listBox: TrivialListBox<E>, selectedEntry: E) => {
                 if (selectedEntry) {
                     this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.listBox.selectEntry(null);
@@ -335,14 +354,14 @@ module TrivialComponents {
         private query(highlightDirection?: number) {
             // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
             setTimeout(() => {
-                var queryString = this.getNonSelectedEditorValue();
-                var completeInputString = this.$editor.val();
+                const queryString = this.getNonSelectedEditorValue();
+                const completeInputString = this.$editor.val();
                 if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
                     if (this.$spinners.length === 0) {
-                        var $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                        const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
                         this.$spinners = this.$spinners.add($spinner);
                     }
-                    this.config.queryFunction(queryString, (newEntries: any[]) => {
+                    this.config.queryFunction(queryString, (newEntries: E[]) => {
                         this.updateEntries(newEntries, highlightDirection);
                         if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
                             this.openDropDown();
@@ -354,12 +373,12 @@ module TrivialComponents {
             }, 0);
         }
 
-        private fireChangeEvents(entry: any) {
+        private fireChangeEvents(entry: E) {
             this.$originalInput.trigger("change");
             this.onSelectedEntryChanged.fire(entry);
         }
 
-        public selectEntry(entry: any, commit?: boolean, muteEvent?: boolean) {
+        public selectEntry(entry: E, commit?: boolean, muteEvent?: boolean) {
             if (entry == null) {
                 this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
@@ -397,7 +416,7 @@ module TrivialComponents {
         }
 
         private showEditor() {
-            var $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
+            let $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
             if ($editorArea.length === 0) {
                 $editorArea = this.$selectedEntryWrapper;
             }
@@ -472,11 +491,11 @@ module TrivialComponents {
         private autoCompleteIfPossible(delay:number) {
             if (this.config.autoComplete) {
                 clearTimeout(this.autoCompleteTimeoutId);
-                var highlightedEntry = this.listBox.getHighlightedEntry();
+                const highlightedEntry = this.listBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
                     this.autoCompleteTimeoutId = setTimeout(() => {
-                        var currentEditorValue = this.getNonSelectedEditorValue();
-                        var autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
+                        const currentEditorValue = this.getNonSelectedEditorValue();
+                        const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
                         if (this.$editor.is(":focus")) {
                             (this.$editor[0] as any).setSelectionRange(currentEditorValue.length, autoCompleteString.length);
@@ -493,7 +512,7 @@ module TrivialComponents {
         }
 
         private isDropDownNeeded() {
-            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.config.queryFunction.isDefaultQueryFunction || this.config.showTrigger);
+            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
         }
 
         public setEditingMode(newEditingMode:EditingMode) {
@@ -504,7 +523,7 @@ module TrivialComponents {
             }
         }
 
-        public updateEntries(newEntries:any[], highlightDirection:number) {
+        public updateEntries(newEntries:E[], highlightDirection:number) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
@@ -514,7 +533,7 @@ module TrivialComponents {
                 this.listBoxDirty = true;
             }
 
-            var nonSelectedEditorValue = this.getNonSelectedEditorValue();
+            const nonSelectedEditorValue = this.getNonSelectedEditorValue();
 
             this.listBox.highlightTextMatches(newEntries.length <= this.config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
@@ -538,13 +557,13 @@ module TrivialComponents {
         }
 
 
-        public getSelectedEntry() {
+        public getSelectedEntry(): E {
             if (this.selectedEntry == null && (!this.config.allowFreeText || !this.$editor.val())) {
                 return null;
             } else if (this.selectedEntry == null && this.config.allowFreeText) {
                 return this.config.freeTextEntryFactory(this.$editor.val());
             } else {
-                var selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
+                const selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
                 selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             }

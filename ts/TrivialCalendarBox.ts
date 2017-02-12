@@ -23,11 +23,18 @@ module TrivialComponents {
     export enum WeekDay {
         MONDAY = 1, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
     }
-    type TimeUnit = 'year'|'month'|'day'|'hour'|'minute';
+    export type TimeUnit = 'year'|'month'|'day'|'hour'|'minute';
+
+    export interface TrivialCalendarBoxConfig {
+        selectedDate?: Moment,
+        firstDayOfWeek?: WeekDay,
+        mode?: 'date' | 'time' | 'datetime',
+        highlightKeyboardNavigationState?: boolean
+    }
 
     export class TrivialCalendarBox {
 
-        private config: any; // TODO config type
+        private config: TrivialCalendarBoxConfig;
 
         private keyboardNavigationState: TimeUnit;
         private keyboardNavCssClass: string;
@@ -48,10 +55,11 @@ module TrivialComponents {
         private $digitalTimeMinuteDisplayWrapper: JQuery;
         private $digitalTimeMinuteDisplay: JQuery;
 
-        public readonly onChange = new TrivialEvent();
+        public readonly onChange = new TrivialEvent<{ value: Moment, timeUnitEdited: TimeUnit}>(this);
+        public readonly onOnEditingTimeUnitChange = new TrivialEvent<TimeUnit>(this);
 
-        constructor(private $container: JQuery|Element|string, options: any = {}/*TODO config type*/) {
-            this.config = $.extend({
+        constructor(private $container: JQuery|Element|string, options: TrivialCalendarBoxConfig = {}) {
+            this.config = $.extend(<TrivialCalendarBoxConfig> {
                 selectedDate: moment(),
                 firstDayOfWeek: WeekDay.MONDAY,
                 mode: 'datetime', // 'date', 'time', 'datetime',
@@ -130,11 +138,11 @@ module TrivialComponents {
         }
 
         private static getDaysForCalendarDisplay(dateInMonthDoBeDisplayed: Moment, firstDayOfWeek: WeekDay) {
-            var firstDayOfMonth = dateInMonthDoBeDisplayed.clone().utc().startOf('month').hour(12); // mid-day to prevent strange daylight-saving effects.
-            var firstDayToBeDisplayed = firstDayOfMonth.clone().isoWeekday(firstDayOfWeek <= firstDayOfMonth.isoWeekday() ? firstDayOfWeek : firstDayOfWeek - 7);
+            const firstDayOfMonth = dateInMonthDoBeDisplayed.clone().utc().startOf('month').hour(12); // mid-day to prevent strange daylight-saving effects.
+            const firstDayToBeDisplayed = firstDayOfMonth.clone().isoWeekday(firstDayOfWeek <= firstDayOfMonth.isoWeekday() ? firstDayOfWeek : firstDayOfWeek - 7);
 
-            var daysOfMonth: Moment[] = [];
-            for (var day = firstDayToBeDisplayed.clone(); daysOfMonth.length < 42; day.add(1, 'day')) {
+            const daysOfMonth: Moment[] = [];
+            for (const day = firstDayToBeDisplayed.clone(); daysOfMonth.length < 42; day.add(1, 'day')) {
                 daysOfMonth.push(day.clone());
             }
             return daysOfMonth;
@@ -146,17 +154,17 @@ module TrivialComponents {
             this.$monthTable.remove();
             this.$monthTable = $('<div class="month-table">').appendTo(this.$calendarDisplay);
 
-            var daysToBeDisplayed = TrivialComponents.TrivialCalendarBox.getDaysForCalendarDisplay(dateInMonthToBeDisplayed, 1);
+            const daysToBeDisplayed = TrivialComponents.TrivialCalendarBox.getDaysForCalendarDisplay(dateInMonthToBeDisplayed, 1);
 
-            var $tr = $('<tr>').appendTo(this.$monthTable);
-            for (var i = 0; i < 7; i++) {
+            let $tr = $('<tr>').appendTo(this.$monthTable);
+            for (let i = 0; i < 7; i++) {
                 $tr.append('<th>' + moment.weekdaysMin()[(this.config.firstDayOfWeek + i) % 7] + '</th>');
             }
-            for (var w = 0; w < daysToBeDisplayed.length / 7; w++) {
+            for (let w = 0; w < daysToBeDisplayed.length / 7; w++) {
                 $tr = $('<tr>').appendTo(this.$monthTable);
-                for (var d = 0; d < 7; d++) {
-                    var day = daysToBeDisplayed[w * 7 + d];
-                    var $td = $('<td>' + day.date() + '</td>');
+                for (let d = 0; d < 7; d++) {
+                    const day = daysToBeDisplayed[w * 7 + d];
+                    const $td = $('<td>' + day.date() + '</td>');
                     if (day.month() == dateInMonthToBeDisplayed.month()) {
                         $td.addClass('current-month');
                     } else {
@@ -182,9 +190,9 @@ module TrivialComponents {
 
         private updateClockDisplay(date: Moment) {
             this.$amPmText.text(date.hour() >= 12 ? 'pm' : 'am');
-            var minutesAngle = date.minute() * 6;
-            var hours = (date.hour() % 12) + date.minute() / 60;
-            var hourAngle = hours * 30;
+            const minutesAngle = date.minute() * 6;
+            const hours = (date.hour() % 12) + date.minute() / 60;
+            const hourAngle = hours * 30;
             this.$hourHand.attr("transform", "rotate(" + hourAngle + ",50,50)");
             this.$minuteHand.attr("transform", "rotate(" + minutesAngle + ",50,50)");
 
@@ -206,6 +214,7 @@ module TrivialComponents {
             this.selectedDate.year(year);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('year');
                 this.fireChangeEvents('year');
             }
         }
@@ -214,6 +223,7 @@ module TrivialComponents {
             this.selectedDate.month(month - 1);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('month');
                 this.fireChangeEvents('month');
             }
         }
@@ -222,6 +232,7 @@ module TrivialComponents {
             this.selectedDate.date(dayOfMonth);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('day');
                 this.fireChangeEvents('day');
             }
         }
@@ -231,6 +242,7 @@ module TrivialComponents {
             this.selectedDate.date(day);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('day');
                 this.fireChangeEvents('month');
                 this.fireChangeEvents('day');
             }
@@ -240,6 +252,7 @@ module TrivialComponents {
             this.selectedDate.hour(hour);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('hour');
                 this.fireChangeEvents('hour');
             }
         }
@@ -248,13 +261,17 @@ module TrivialComponents {
             this.selectedDate.minute(minute);
             this.updateDisplay();
             if (fireEvent) {
+                this.onOnEditingTimeUnitChange.fire('minute');
                 this.fireChangeEvents('minute');
             }
         }
 
-        private fireChangeEvents(type: TimeUnit) {
+        private fireChangeEvents(timeUnit: TimeUnit) {
             this.$calendarBox.trigger("change");
-            this.onChange.fire(type, this.getSelectedDate());
+            this.onChange.fire({
+                value: this.getSelectedDate(),
+                timeUnitEdited: timeUnit
+            });
         }
 
         public setKeyboardNavigationState(newKeyboardNavigationState: TimeUnit) {
@@ -286,13 +303,14 @@ module TrivialComponents {
             return this.selectedDate;
         };
 
-        private navigateByUnit(unit: TimeUnit, direction: NavigationDirection, fireEvent: boolean = false) { // returns true if effectively navigated, false if nothing has changed
+        private navigateByUnit(unit: TimeUnit, direction: NavigationDirection, fireEvent: boolean = false): boolean { // returns true if effectively navigated, false if nothing has changed
             if (unit == 'year') {
                 if (direction == 'down' || direction == 'left') {
                     this.setYear(this.selectedDate.year() - 1, fireEvent);
                 } else if (direction == 'up' || direction == 'right') {
                     this.setYear(this.selectedDate.year() + 1, fireEvent);
                 }
+                fireEvent && this.fireChangeEvents('year');
                 return true;
             } else if (unit == 'month') {
                 if (direction == 'down' || direction == 'left') {
@@ -300,6 +318,7 @@ module TrivialComponents {
                 } else if (direction == 'up' || direction == 'right') {
                     this.setMonth(this.selectedDate.month() + 2, fireEvent);
                 }
+                fireEvent && this.fireChangeEvents('month');
                 return true;
             } else if (unit == 'day') {
                 if (direction == 'down') {
@@ -312,7 +331,7 @@ module TrivialComponents {
                     this.selectedDate.dayOfYear(this.selectedDate.dayOfYear() + 1);
                 }
                 this.updateDisplay();
-                this.fireChangeEvents('day');
+                fireEvent && this.fireChangeEvents('day');
                 return true;
             } else if (unit == 'hour') {
                 if (direction == 'down' || direction == 'left') {
@@ -320,6 +339,7 @@ module TrivialComponents {
                 } else if (direction == 'up' || direction == 'right') {
                     this.setHour(this.selectedDate.hour() + 1, fireEvent);
                 }
+                fireEvent && this.fireChangeEvents('hour');
                 return true;
             } else if (unit == 'minute') {
                 if (direction == 'down' || direction == 'left') {
@@ -327,6 +347,7 @@ module TrivialComponents {
                 } else if (direction == 'up' || direction == 'right') {
                     this.setMinute(this.selectedDate.minute() - (this.selectedDate.minute() % 5) + 5, fireEvent);
                 }
+                fireEvent && this.fireChangeEvents('minute');
                 return true;
             }
         }

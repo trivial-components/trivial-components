@@ -17,28 +17,35 @@
  */
 module TrivialComponents {
 
-    export class TrivialListBox {
+    export interface TrivialListBoxConfig<E> {
+        entryRenderingFunction?: (entry: E) => string,
+        selectedEntry?: E,
+        spinnerTemplate?: string,
+        entries?: E[],
+        matchingOptions?: MatchingOptions
+    }
 
-        private config: any;
+    export class TrivialListBox<E> {
 
-        public readonly onSelectedEntryChanged = new TrivialEvent();
+        private config: TrivialListBoxConfig<E>;
+
+        public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
 
         private $listBox: JQuery;
         private $entryList: JQuery;
-        private entries: any[];
-        private highlightedEntry: any;
-        private selectedEntry: any;
+        private entries: E[];
+        private highlightedEntry: E;
+        private selectedEntry: E;
 
-        constructor($container: JQuery|Element|string, options: any = {} /*TODO config type*/) {
-            this.config = $.extend({
-                entryRenderingFunction: function (entry: any) {
-                    var template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
+        constructor($container: JQuery|Element|string, options: TrivialListBoxConfig<E> = {} ) {
+            this.config = $.extend(<TrivialListBoxConfig<E>> {
+                entryRenderingFunction: function (entry: E) {
+                    const template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
+                selectedEntry: null,
                 spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
                 entries: null,
-                queryFunction: null, // defined below...
-                textHighlightingEntryLimit: 100,
                 matchingOptions: {
                     matchingMode: 'contains',
                     ignoreCase: true,
@@ -70,15 +77,15 @@ module TrivialComponents {
             this.$listBox.data("trivialListBox", this);
         }
 
-        private updateEntryElements(entries: any[]) {
+        private updateEntryElements(entries: E[]) {
             this.$entryList.detach();
             this.$entryList.empty();
             if (entries.length > 0) {
-                for (var i = 0; i < entries.length; i++) {
-                    var entry = entries[i];
-                    var $entry: JQuery;
+                for (let i = 0; i < entries.length; i++) {
+                    const entry = entries[i];
+                    let $entry: JQuery;
                     if (!entry._trEntryElement) {
-                        var html = this.config.entryRenderingFunction(entry);
+                        const html = this.config.entryRenderingFunction(entry);
                         $entry = $(html).addClass("tr-listbox-entry filterable-item");
                     } else {
                         $entry = entry._trEntryElement;
@@ -93,7 +100,7 @@ module TrivialComponents {
             this.$entryList.appendTo(this.$listBox);
         }
 
-        public updateEntries(newEntries: any[]) {
+        public updateEntries(newEntries: E[]) {
             if (newEntries == null) {
                 newEntries = [];
             }
@@ -106,7 +113,7 @@ module TrivialComponents {
             this.$listBox.parent().minimallyScrollTo($entryWrapper);
         }
 
-        public setHighlightedEntry(entry: any) {
+        public setHighlightedEntry(entry: E) {
             if (entry !== this.highlightedEntry) {
                 this.highlightedEntry = entry;
                 this.$entryList.find('.tr-listbox-entry').removeClass('tr-highlighted-entry');
@@ -117,12 +124,12 @@ module TrivialComponents {
             }
         }
 
-        private fireChangeEvents(selectedEntry: any, originalEvent: Event) {
+        private fireChangeEvents(selectedEntry: E, originalEvent: Event) {
             this.$listBox.trigger("change");
             this.onSelectedEntryChanged.fire(selectedEntry, originalEvent);
         }
 
-        public selectEntry(entry: any, originalEvent?: Event, muteEvent = true) {
+        public selectEntry(entry: E, originalEvent?: Event, muteEvent = true) {
             this.selectedEntry = entry;
             this.$entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
             if (entry != null) {
@@ -134,14 +141,14 @@ module TrivialComponents {
         }
 
         public highlightNextEntry(direction: HighlightDirection) {
-            var newHighlightedEntry = this.getNextHighlightableEntry(direction);
+            const newHighlightedEntry = this.getNextHighlightableEntry(direction);
             if (newHighlightedEntry != null) {
                 this.setHighlightedEntry(newHighlightedEntry);
             }
         }
 
         private getNextHighlightableEntry(direction:HighlightDirection) {
-            var newHighlightedElementIndex:number;
+            let newHighlightedElementIndex: number;
             if (this.entries == null || this.entries.length == 0) {
                 return null;
             } else if (this.highlightedEntry == null && direction > 0) {
@@ -149,22 +156,22 @@ module TrivialComponents {
             } else if (this.highlightedEntry == null && direction < 0) {
                 newHighlightedElementIndex = this.entries.length + direction;
             } else {
-                var currentHighlightedElementIndex = this.entries.indexOf(this.highlightedEntry);
+                const currentHighlightedElementIndex = this.entries.indexOf(this.highlightedEntry);
                 newHighlightedElementIndex = (currentHighlightedElementIndex + this.entries.length + direction) % this.entries.length;
             }
             return this.entries[newHighlightedElementIndex];
         }
 
         public highlightTextMatches(searchString:string) {
-            for (var i = 0; i < this.entries.length; i++) {
-                var $entryElement = this.entries[i]._trEntryElement;
+            for (let i = 0; i < this.entries.length; i++) {
+                const $entryElement = this.entries[i]._trEntryElement;
                 $entryElement.trivialHighlight(searchString, this.config.matchingOptions);
             }
         }
 
         public getSelectedEntry() {
             if (this.selectedEntry) {
-                var selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
+                const selectedEntryToReturn = jQuery.extend({}, this.selectedEntry);
                 selectedEntryToReturn._trEntryElement = undefined;
                 return selectedEntryToReturn;
             } else {

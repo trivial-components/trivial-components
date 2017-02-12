@@ -38,6 +38,9 @@ module TrivialComponents {
 
     export type NavigationDirection = "up" | "left" | "down" | "right";
 
+    export type ResultCallback<E> = (entries: E[]) => void;
+    export type QueryFunction<E> = (queryString: string, resultCallback: ResultCallback<E>) => void;
+
     export const DEFAULT_TEMPLATES = {
         image2LinesTemplate: '<div class="tr-template-image-2-lines">' +
         '  <div class="img-wrapper" style="background-image: url({{imageUrl}})"></div>' +
@@ -109,12 +112,12 @@ module TrivialComponents {
         '</div>').replace("##entryHtml##", entryTemplate);
     }
 
-    export function defaultListQueryFunctionFactory(entries: any[], matchingOptions: MatchingOptions) {
-        function filterElements(queryString: string) {
-            var visibleEntries: any[] = [];
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var $entryElement = entry._trEntryElement;
+    export function defaultListQueryFunctionFactory<E>(entries: E[], matchingOptions: MatchingOptions): QueryFunction<E> {
+        function filterElements(queryString: string): E[] {
+            const visibleEntries: any[] = [];
+            for (let i = 0; i < entries.length; i++) {
+                const entry = entries[i];
+                const $entryElement = (entry as any)._trEntryElement;
                 if (!queryString || trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0) {
                     visibleEntries.push(entry);
                 }
@@ -122,13 +125,13 @@ module TrivialComponents {
             return visibleEntries;
         }
 
-        return function (queryString: string, resultCallback: Function) {
+        return function (queryString: string, resultCallback: ResultCallback<E>) {
             resultCallback(filterElements(queryString));
         }
     }
 
     export function createProxy(delegate: any): any {
-        var proxyConstructor = function () {
+        const proxyConstructor = function () {
         };
         proxyConstructor.prototype = delegate;
         let proxyConstructorTypescriptHack = proxyConstructor as any;
@@ -139,7 +142,7 @@ module TrivialComponents {
         return function (entry: any, queryString: string, depth: number) {
             return searchedPropertyNames
                 .some((propertyName: string) => {
-                    var value = entry[propertyName];
+                    const value = entry[propertyName];
                     return value != null && trivialMatch(value.toString(), queryString, matchingOptions).length > 0
                 });
         };
@@ -148,21 +151,21 @@ module TrivialComponents {
     export function defaultTreeQueryFunctionFactory(topLevelEntries: any[], entryMatchingFunction: Function, childrenPropertyName: string, expandedPropertyName: string) {
 
         function findMatchingEntriesAndTheirAncestors(entry: any, queryString: string, nodeDepth: number) {
-            var entryProxy = createProxy(entry);
+            const entryProxy = createProxy(entry);
             entryProxy[childrenPropertyName] = [];
             entryProxy[expandedPropertyName] = false;
             if (entry[childrenPropertyName]) {
-                for (var i = 0; i < entry[childrenPropertyName].length; i++) {
-                    var child = entry[childrenPropertyName][i];
-                    var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
+                for (let i = 0; i < entry[childrenPropertyName].length; i++) {
+                    const child = entry[childrenPropertyName][i];
+                    const childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
                     if (childProxy) {
                         entryProxy[childrenPropertyName].push(childProxy);
                         entryProxy[expandedPropertyName] = true;
                     }
                 }
             }
-            var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
-            var matchesItself = entryMatchingFunction(entry, queryString, nodeDepth);
+            let hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
+            const matchesItself = entryMatchingFunction(entry, queryString, nodeDepth);
             if (matchesItself && !hasMatchingChildren) {
                 // still make it expandable!
                 entryProxy[childrenPropertyName] = entry[childrenPropertyName];
@@ -174,10 +177,10 @@ module TrivialComponents {
             if (!queryString) {
                 resultCallback(topLevelEntries);
             } else {
-                var matchingEntries: any[] = [];
-                for (var i = 0; i < topLevelEntries.length; i++) {
-                    var topLevelEntry = topLevelEntries[i];
-                    var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
+                const matchingEntries: any[] = [];
+                for (let i = 0; i < topLevelEntries.length; i++) {
+                    const topLevelEntry = topLevelEntries[i];
+                    const entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
                     if (entryProxy) {
                         matchingEntries.push(entryProxy);
                     }
@@ -190,21 +193,21 @@ module TrivialComponents {
     export function customTreeQueryFunctionFactory(topLevelEntries: any[], childrenPropertyName: string, expandedPropertyName: string, customNodeMatchingFunction: (entry: any, queryString: string, nodeDepth: number) => boolean) {
 
         function findMatchingEntriesAndTheirAncestors(entry: any, queryString: string, nodeDepth: number) {
-            var entryProxy = createProxy(entry);
+            const entryProxy = createProxy(entry);
             entryProxy[childrenPropertyName] = [];
             entryProxy[expandedPropertyName] = false;
             if (entry[childrenPropertyName]) {
-                for (var i = 0; i < entry[childrenPropertyName].length; i++) {
-                    var child = entry[childrenPropertyName][i];
-                    var childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
+                for (let i = 0; i < entry[childrenPropertyName].length; i++) {
+                    const child = entry[childrenPropertyName][i];
+                    const childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
                     if (childProxy) {
                         entryProxy[childrenPropertyName].push(childProxy);
                         entryProxy[expandedPropertyName] = true;
                     }
                 }
             }
-            var hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
-            var matchesItself = customNodeMatchingFunction(entry, queryString, nodeDepth);
+            let hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
+            const matchesItself = customNodeMatchingFunction(entry, queryString, nodeDepth);
             if (matchesItself && !hasMatchingChildren) {
                 // still make it expandable!
                 entryProxy[childrenPropertyName] = entry[childrenPropertyName];
@@ -216,10 +219,10 @@ module TrivialComponents {
             if (!queryString) {
                 resultCallback(topLevelEntries);
             } else {
-                var matchingEntries: any[] = [];
-                for (var i = 0; i < topLevelEntries.length; i++) {
-                    var topLevelEntry = topLevelEntries[i];
-                    var entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
+                const matchingEntries: any[] = [];
+                for (let i = 0; i < topLevelEntries.length; i++) {
+                    const topLevelEntry = topLevelEntries[i];
+                    const entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
                     if (entryProxy) {
                         matchingEntries.push(entryProxy);
                     }
@@ -232,11 +235,11 @@ module TrivialComponents {
     export function selectElementContents(domElement: Node, start: number, end: number) {
         domElement = domElement.firstChild || domElement;
         end = end || start;
-        var range = document.createRange();
+        const range = document.createRange();
         //range.selectNodeContents(el);
         range.setStart(domElement, start);
         range.setEnd(domElement, end);
-        var sel = window.getSelection();
+        const sel = window.getSelection();
         try {
             sel.removeAllRanges();
         } catch(e) {
@@ -247,7 +250,7 @@ module TrivialComponents {
 
     export const escapeSpecialRegexCharacter = function (s: string) {
         return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-    }
+    };
 
     // see http://stackoverflow.com/a/27014537/524913
     export function objectEquals(x: any, y: any): boolean {
@@ -279,7 +282,7 @@ module TrivialComponents {
         if (!(y instanceof Object)) {
             return false;
         }
-        var p = Object.keys(x);
+        const p = Object.keys(x);
         return Object.keys(y).every(function (i) {
                 return p.indexOf(i) !== -1;
             }) &&
@@ -305,7 +308,7 @@ module TrivialComponents {
             }];
         }
 
-        var options = <MatchingOptions>$.extend({
+        options = <MatchingOptions>$.extend({
             matchingMode: 'contains',
             ignoreCase: true,
             maxLevenshteinDistance: 3
@@ -317,8 +320,8 @@ module TrivialComponents {
         }
 
         function findRegexMatches(regex: RegExp) {
-            var matches: Match[] = [];
-            var match: RegExpExecArray;
+            const matches: Match[] = [];
+            let match: RegExpExecArray;
             while (match = regex.exec(text)) {
                 matches.push({
                     start: match.index,
@@ -329,7 +332,7 @@ module TrivialComponents {
         }
 
         function findLevenshteinMatches(text: string, searchString: string) {
-            var levenshtein = new Levenshtein(text, searchString);
+            const levenshtein = new Levenshtein(text, searchString);
             //console.log('distance between "' + text + '" and "' + searchString + '" is ' + levenshtein.distance);
             if (levenshtein.distance <= options.maxLevenshteinDistance) {
                 return [{
