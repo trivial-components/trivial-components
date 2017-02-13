@@ -25,7 +25,8 @@
     "url": "https://github.com/trivial-components/trivial-components/issues"
   },
   "homepage": "http://trivial-components.github.io/trivial-components/",
-  "main": "TrivialComponents",
+  "main": "./dist/js/bundle/trivial-components.js",
+  "types": "./dist/js/bundle/trivial-components.d.ts",
   "devDependencies": {
     "@types/jquery": "^2.0.34",
     "@types/jqueryui": "^1.11.31",
@@ -68,7 +69,7 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "multipipe": "^1.0.2",
     "typescript": "^2.1.4",
-    "typings": "^2.0.0"
-  },
-  "dependencies": {}
+    "typings": "^2.0.0",
+    "merge-stream": "^1.0.1"
+  }
 }

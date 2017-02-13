@@ -40,7 +40,7 @@ module TrivialComponents {
         constructor($container: JQuery|Element|string, options: TrivialListBoxConfig<E> = {} ) {
             this.config = $.extend(<TrivialListBoxConfig<E>> {
                 entryRenderingFunction: function (entry: E) {
-                    const template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
+                    const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntry: null,

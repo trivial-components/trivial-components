@@ -65,6 +65,7 @@ var sizereport = require('gulp-sizereport');
 var ts = require('gulp-typescript');
 var gulpTypings = require("gulp-typings");
 var release = require('gulp-github-release');
+var merge = require('merge-stream');
 
 gulp.task('clean', function () {
     return del(['dist']);
@@ -139,7 +140,7 @@ gulp.task('minify-css', ['less', 'less-bootstrap'], function () {
 });
 
 
-gulp.task('js-single', ['typescript'], function () {
+gulp.task('js-single', ['typescript', 'typescript-declarations'], function () {
     return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js', '!**/*.min.*'])
         .pipe(stripDebug())
         .pipe(rename(function (path) {
@@ -168,6 +169,14 @@ gulp.task('js-bundle', ['js-single'], function () {
         .pipe(gulp.dest('./dist/js/bundle'))
 });
 
+gulp.task('ts-declarations-bundle', ['typescript-declarations'], function () {
+    return gulp.src(['dist/js/single/*.d.ts'])
+	    .pipe(strip())
+        .pipe(concat('trivial-components.d.ts'))
+        .pipe(header(copyrightHeader))
+        .pipe(gulp.dest('./dist/js/bundle'))
+});
+
 gulp.task('test', ['bower'], function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js',
@@ -175,7 +184,7 @@ gulp.task('test', ['bower'], function (done) {
     }, done);
 });
 
-gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'copyLibs2dist']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -233,12 +242,18 @@ gulp.task('typescript', ['install-typings'], function () {
         .js.pipe(gulp.dest("dist/js/single"));
 });
 
+gulp.task('typescript-declarations', ['typescript'], function () {
+	return tsProject.src()
+		.pipe(tsProject())
+		.pipe(gulp.dest("dist/js/single"));
+});
+
 gulp.task("install-typings", function () {
     return gulp.src("./typings.json")
         .pipe(gulpTypings());
 });
 
-gulp.task('release', ['default'], function () {
+gulp.task('github-release', ['default'], function () {
     return gulp.src(['dist/trivial-components-' + VERSION + '.zip', 'dist/trivial-components-' + VERSION + '.tar.gz'])
         .pipe(release({
             tag: 'v' + VERSION,
