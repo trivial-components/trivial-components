@@ -35,7 +35,7 @@ var copyrightHeader = "/*!\n"
     + "*/\n";
 var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
-var RELEASE_NOTES = 'Migrated to typescript!';
+var VERSION = require('./package.json').version;
 
 var gulp = require('gulp');
 var bower = require('gulp-bower');
@@ -258,7 +258,6 @@ gulp.task('github-release', ['default'], function () {
         .pipe(release({
             tag: 'v' + VERSION,
             name: VERSION,
-            notes: RELEASE_NOTES,
             prerelease: true,
             manifest: require('./package.json')
         }));
