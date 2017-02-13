@@ -35,7 +35,6 @@ var copyrightHeader = "/*!\n"
     + "*/\n";
 var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and others | Apache License, Version 2.0 (https://raw.githubusercontent.com/trivial-components/trivial-components/master/LICENSE) */\n";
 
-var VERSION = '0.1.1';
 var RELEASE_NOTES = 'Migrated to typescript!';
 
 var gulp = require('gulp');
@@ -254,6 +253,7 @@ gulp.task("install-typings", function () {
 });
 
 gulp.task('github-release', ['default'], function () {
+	var VERSION = require('./package.json').version;
     return gulp.src(['dist/trivial-components-' + VERSION + '.zip', 'dist/trivial-components-' + VERSION + '.tar.gz'])
         .pipe(release({
             tag: 'v' + VERSION,
