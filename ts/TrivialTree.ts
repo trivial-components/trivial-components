@@ -29,7 +29,7 @@ module TrivialComponents {
         }
     }
 
-    export class TrivialTree<E> {
+    export class TrivialTree<E> implements TrivialComponent{
 
         private config: TrivialTreeConfig<E>;
 
@@ -40,7 +40,6 @@ module TrivialComponents {
         private entries: E[];
         private selectedEntryId: any;
 
-        private $:JQuery;
         private $spinners = $();
         private $originalInput: JQuery;
         private $componentWrapper: JQuery;
@@ -181,7 +180,6 @@ module TrivialComponents {
             });
 
             this.selectEntry((this.config.selectedEntryId !== undefined && this.config.selectedEntryId !== null) ? this.findEntryById(this.config.selectedEntryId) : null);
-            this.$ = this.$componentWrapper;
         }
 
         public updateEntries(newEntries: E[]) {
@@ -309,5 +307,9 @@ module TrivialComponents {
             this.$originalInput.removeClass('tr-original-input').insertBefore(this.$componentWrapper);
             this.$componentWrapper.remove();
         };
+
+        getMainDomElement(): Element {
+            return this.$componentWrapper[0];
+        }
     }
 }

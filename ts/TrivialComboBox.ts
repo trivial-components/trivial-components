@@ -37,11 +37,10 @@ module TrivialComponents {
         showDropDownOnResultsOnly?: boolean
     }
 
-    export class TrivialComboBox<E> {
+    export class TrivialComboBox<E> implements TrivialComponent{
 
         private config: TrivialComboBoxConfig<E>;
 
-        private $: JQuery;
         private $spinners: JQuery = $();
         private $originalInput: JQuery;
         private $comboBox: JQuery;
@@ -347,7 +346,6 @@ module TrivialComponents {
 
             // ---
 
-            this.$ = this.$comboBox;
             this.$comboBox.data("trivialComboBox", this);
         }
 
@@ -583,6 +581,10 @@ module TrivialComponents {
             this.$comboBox.remove();
             this.$dropDown.remove();
         };
+
+        getMainDomElement(): Element {
+            return this.$comboBox[0];
+        }
 
     }
 

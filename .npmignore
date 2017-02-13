@@ -7,8 +7,8 @@ tmp/
 yarn-error.log
 test/
 demo/
-dist/trivial-components-0.1.0.tar.gz
-dist/trivial-components-0.1.0.zip
+dist/trivial-components-*.tar.gz
+dist/trivial-components-*.zip
 dist/lib/
 yarn.lock
 

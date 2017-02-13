@@ -36,7 +36,7 @@ module TrivialComponents {
         enforceSingleExpandedPath?: boolean // only one path is expanded at any time
     }
 
-    export class TrivialTreeBox<E> {
+    export class TrivialTreeBox<E> implements TrivialComponent {
 
         private config: TrivialTreeBoxConfig<E>;
 
@@ -514,5 +514,9 @@ module TrivialComponents {
                 .appendTo(parentNode._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
             parentNode._trEntryElement.addClass('has-children');
         };
+
+        getMainDomElement(): Element {
+            return this.$componentWrapper[0];
+        }
     }
 }

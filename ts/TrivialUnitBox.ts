@@ -43,14 +43,13 @@ module TrivialComponents {
         amountAsFloatingPointNumber: number
     }
 
-    export class TrivialUnitBox<U> {
+    export class TrivialUnitBox<U> implements TrivialComponent {
 
         private config: TrivialUnitBoxConfig<U>;
 
         public readonly onChange = new TrivialEvent<TrivialUnitBoxChangeEvent<U>>(this);
         public readonly onSelectedEntryChanged = new TrivialEvent<U>(this);
 
-        private $: JQuery;
         private listBox: TrivialListBox<U>;
         private isDropDownOpen = false;
         private entries: U[];
@@ -274,8 +273,6 @@ module TrivialComponents {
             this.$editor.val(this.config.amount || this.$originalInput.val());
             this.formatEditorValue();
             this.selectEntry(this.config.selectedEntry || null, true);
-
-            this.$ = this.$unitBox;
         }
 
         private getQueryString() {
@@ -508,5 +505,9 @@ module TrivialComponents {
             this.$unitBox.remove();
             this.$dropDown.remove();
         };
+
+        getMainDomElement(): Element {
+            return this.$unitBox[0];
+        }
     }
 }

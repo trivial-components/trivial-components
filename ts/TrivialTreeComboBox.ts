@@ -35,9 +35,8 @@ module TrivialComponents {
         showDropDownOnResultsOnly?: boolean
     }
 
-    export class TrivialTreeComboBox<E> {
+    export class TrivialTreeComboBox<E> implements TrivialComponent {
 
-        private $: JQuery;
         private $treeComboBox: JQuery;
         private $dropDown: JQuery;
         private $dropDownTargetElement: JQuery;
@@ -348,8 +347,6 @@ module TrivialComponents {
                 }
                 this.query();
             });
-
-            this.$ = this.$treeComboBox;
         }
 
         private query(highlightDirection?: HighlightDirection) {
@@ -593,6 +590,10 @@ module TrivialComponents {
             this.$treeComboBox.remove();
             this.$dropDown.remove();
         };
+
+        getMainDomElement(): Element {
+            return this.$treeComboBox[0];
+        }
     }
 
 }

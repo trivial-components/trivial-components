@@ -40,14 +40,13 @@ module TrivialComponents {
         maxSelectedEntries?: number
     }
 
-    export class TrivialTagComboBox<E> {
+    export class TrivialTagComboBox<E> implements TrivialComponent {
 
         private config: TrivialTagComboBoxConfig<E>;
 
-        private $: JQuery;
         private $spinners = $();
         private $originalInput: JQuery;
-        private $tagBox: JQuery;
+        private $tagComboBox: JQuery;
         private $dropDown: JQuery;
         private $trigger: JQuery;
         private $editor: JQuery;
@@ -137,12 +136,12 @@ module TrivialComponents {
             this.entries = this.config.entries;
 
             this.$originalInput = $(originalInput).addClass("tr-original-input");
-            this.$tagBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
+            this.$tagComboBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
                 .insertAfter(this.$originalInput);
-            this.$originalInput.appendTo(this.$tagBox);
-            const $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagBox);
+            this.$originalInput.appendTo(this.$tagComboBox);
+            const $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
             if (this.config.showTrigger) {
-                this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagBox);
+                this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagComboBox);
                 this.$trigger.mousedown(() => {
                     this.$editor.focus();
                     if (this.isDropDownOpen) {
@@ -171,7 +170,7 @@ module TrivialComponents {
                     } else {
                         this.$originalInput.triggerHandler('focus');
                         this.onFocus.fire();
-                        this.$tagBox.addClass('focus');
+                        this.$tagComboBox.addClass('focus');
                     }
                     setTimeout(() => { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
                         $tagArea.minimallyScrollTo(this.$editor);
@@ -183,7 +182,7 @@ module TrivialComponents {
                     } else {
                         this.$originalInput.triggerHandler('blur');
                         this.onBlur.fire();
-                        this.$tagBox.removeClass('focus');
+                        this.$tagComboBox.removeClass('focus');
                         this.entries = null;
                         this.closeDropDown();
                         if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
@@ -308,7 +307,7 @@ module TrivialComponents {
                 this.$editor.focus();
             }
 
-            this.$tagBox.add(this.$dropDown).mousedown(() => {
+            this.$tagComboBox.add(this.$dropDown).mousedown(() => {
                 if (this.$editor.is(":focus")) {
                     this.blurCausedByClickInsideComponent = true;
                 }
@@ -378,8 +377,7 @@ module TrivialComponents {
             }
 
             // ===
-            this.$ = this.$tagBox;
-            this.$tagBox.data("trivialTagComboBox", this);
+            this.$tagComboBox.data("trivialTagComboBox", this);
         }
 
         private updateListBoxEntries() {
@@ -491,14 +489,14 @@ module TrivialComponents {
             this.$dropDown.position({
                 my: "left top",
                 at: "left bottom",
-                of: this.$tagBox,
+                of: this.$tagComboBox,
                 collision: "flip",
                 using: (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
                     if (info.vertical === "top") {
-                        this.$tagBox.removeClass("dropdown-flipped");
+                        this.$tagComboBox.removeClass("dropdown-flipped");
                         this.$dropDown.removeClass("flipped");
                     } else {
-                        this.$tagBox.addClass("dropdown-flipped");
+                        this.$tagComboBox.addClass("dropdown-flipped");
                         this.$dropDown.addClass("flipped");
                     }
                     this.$dropDown.css({
@@ -506,7 +504,7 @@ module TrivialComponents {
                         top: calculatedPosition.top + 'px'
                     });
                 }
-            }).width(this.$tagBox.width());
+            }).width(this.$tagComboBox.width());
         }
 
         private openDropDown() {
@@ -514,7 +512,7 @@ module TrivialComponents {
                 if (this.listBoxDirty) {
                     this.updateListBoxEntries();
                 }
-                this.$tagBox.addClass("open");
+                this.$tagComboBox.addClass("open");
                 this.$dropDown.show();
                 this.repositionDropDown();
                 this.isDropDownOpen = true;
@@ -525,7 +523,7 @@ module TrivialComponents {
         }
 
         private closeDropDown() {
-            this.$tagBox.removeClass("open");
+            this.$tagComboBox.removeClass("open");
             this.$dropDown.hide();
             this.isDropDownOpen = false;
             if (this.repositionDropDownScheduler != null) {
@@ -568,7 +566,7 @@ module TrivialComponents {
 
         public setEditingMode(newEditingMode: EditingMode) {
             this.editingMode = newEditingMode;
-            this.$tagBox.removeClass("editable readonly disabled").addClass(this.editingMode);
+            this.$tagComboBox.removeClass("editable readonly disabled").addClass(this.editingMode);
             if (this.isDropDownNeeded()) {
                 this.$dropDown.appendTo(this.$dropDownTargetElement);
             }
@@ -601,10 +599,14 @@ module TrivialComponents {
         };
 
         public destroy() {
-            this.$originalInput.removeClass('tr-original-input').insertBefore(this.$tagBox);
-            this.$tagBox.remove();
+            this.$originalInput.removeClass('tr-original-input').insertBefore(this.$tagComboBox);
+            this.$tagComboBox.remove();
             this.$dropDown.remove();
         };
+
+        getMainDomElement(): Element {
+            return this.$tagComboBox[0];
+        }
 
     }
 }

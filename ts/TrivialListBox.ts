@@ -25,7 +25,7 @@ module TrivialComponents {
         matchingOptions?: MatchingOptions
     }
 
-    export class TrivialListBox<E> {
+    export class TrivialListBox<E> implements TrivialComponent {
 
         private config: TrivialListBoxConfig<E>;
 
@@ -191,8 +191,8 @@ module TrivialComponents {
             }
         }
 
-        get $() {
-            return this.$listBox;
+        getMainDomElement(): Element {
+            return this.$listBox[0];
         }
     }
 }

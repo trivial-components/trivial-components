@@ -57,7 +57,7 @@ module TrivialComponents {
         editingMode?: EditingMode
     }
 
-    export class TrivialDateTimeField {
+    export class TrivialDateTimeField implements TrivialComponent{
 
         private config: TrivialDateTimeFieldConfig;
 
@@ -353,9 +353,9 @@ module TrivialComponents {
                 });
                 this.calendarBoxInitialized = true;
             }
-            this.calendarBoxInitialized && this.calendarBox.$.toggle(mode === Mode.MODE_CALENDAR);
-            this.dateListBox.$.toggle(mode === Mode.MODE_DATE_LIST);
-            this.timeListBox.$.toggle(mode === Mode.MODE_TIME_LIST);
+            this.calendarBoxInitialized && $(this.calendarBox.getMainDomElement()).toggle(mode === Mode.MODE_CALENDAR);
+            $(this.dateListBox.getMainDomElement()).toggle(mode === Mode.MODE_DATE_LIST);
+            $(this.timeListBox.getMainDomElement()).toggle(mode === Mode.MODE_TIME_LIST);
         }
 
         private getActiveBox(): any /*TODO Navigateable*/ {
@@ -856,6 +856,10 @@ module TrivialComponents {
             } else {
                 return [];
             }
+        }
+
+        getMainDomElement(): Element {
+            return this.$dateTimeField[0];
         }
     }
 }

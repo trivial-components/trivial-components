@@ -32,7 +32,7 @@ module TrivialComponents {
         highlightKeyboardNavigationState?: boolean
     }
 
-    export class TrivialCalendarBox {
+    export class TrivialCalendarBox implements TrivialComponent {
 
         private config: TrivialCalendarBoxConfig;
 
@@ -356,8 +356,9 @@ module TrivialComponents {
             this.navigateByUnit(this.keyboardNavigationState, direction);
         };
 
-        get $() {
-            return this.$calendarBox;
+        getMainDomElement(): Element {
+            return this.$calendarBox[0];
         }
+
     }
 }
