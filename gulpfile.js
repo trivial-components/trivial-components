@@ -253,7 +253,6 @@ gulp.task("install-typings", function () {
 });
 
 gulp.task('github-release', ['default'], function () {
-	var VERSION = require('./package.json').version;
     return gulp.src(['dist/trivial-components-' + VERSION + '.zip', 'dist/trivial-components-' + VERSION + '.tar.gz'])
         .pipe(release({
             tag: 'v' + VERSION,
