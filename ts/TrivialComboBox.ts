@@ -148,7 +148,7 @@ module TrivialComponents {
                 this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$comboBox);
                 this.$clearButton.mousedown(() => {
                     this.$editor.val("");
-                    this.selectEntry(null, true);
+                    this.setSelectedEntry(null, true, true);
                 });
             }
             if (this.config.showTrigger) {
@@ -196,11 +196,11 @@ module TrivialComponents {
                         this.$comboBox.removeClass('focus');
                         if (this.editorContainsFreeText()) {
                             if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
-                                this.selectEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true, true);
                             }
                         } else {
                             this.$editor.val("");
-                            this.selectEntry(this.lastCommittedValue);
+                            this.setSelectedEntry(this.lastCommittedValue, false, true);
                         }
                         this.hideEditor();
                         this.closeDropDown();
@@ -212,11 +212,11 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.tab) {
                         const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.selectEntry(highlightedEntry, true);
+                            this.setSelectedEntry(highlightedEntry, true, true);
                         } else if (!this.$editor.val()) {
-                            this.selectEntry(null, true);
+                            this.setSelectedEntry(null, true, true);
                         } else if (this.config.allowFreeText) {
-                            this.selectEntry(this.getSelectedEntry(), true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -249,11 +249,11 @@ module TrivialComponents {
                             e.preventDefault(); // do not submit form
                             const highlightedEntry = this.listBox.getHighlightedEntry();
                             if (this.isDropDownOpen && highlightedEntry) {
-                                this.selectEntry(highlightedEntry, true);
+                                this.setSelectedEntry(highlightedEntry, true, true);
                             } else if (!this.$editor.val()) {
-                                this.selectEntry(null, true);
+                                this.setSelectedEntry(null, true, true);
                             } else if (this.config.allowFreeText) {
-                                this.selectEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true, true);
                             }
                             this.closeDropDown();
                             this.hideEditor();
@@ -264,7 +264,7 @@ module TrivialComponents {
                             this.hideEditor();
                             this.$editor.val("");
                             this.entries = null; // so we will query again when we combobox is re-focused
-                            this.selectEntry(this.lastCommittedValue, false);
+                            this.setSelectedEntry(this.lastCommittedValue, false, true);
                         }
                         this.closeDropDown();
                     } else {
@@ -288,7 +288,7 @@ module TrivialComponents {
                 })
                 .keyup((e: KeyboardEvent) => {
                     if (!keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry)) {
-                        this.selectEntry(null, false);
+                        this.setSelectedEntry(null, false, true);
                     }
                 })
                 .mousedown(() => {
@@ -326,14 +326,14 @@ module TrivialComponents {
             this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
             this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
-                    this.listBox.selectEntry(null);
+                    this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue));
+                    this.listBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
                 this.hideEditor();
             });
 
-            this.selectEntry(this.config.selectedEntry, true, true);
+            this.setSelectedEntry(this.config.selectedEntry, true, false);
 
             this.$selectedEntryWrapper.click(() => {
                 this.showEditor();
@@ -376,7 +376,7 @@ module TrivialComponents {
             this.onSelectedEntryChanged.fire(entry);
         }
 
-        public selectEntry(entry: E, commit?: boolean, muteEvent?: boolean) {
+        public setSelectedEntry(entry: E, commit = true, fireEvent = false) {
             if (entry == null) {
                 this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
@@ -394,7 +394,7 @@ module TrivialComponents {
             }
             if (commit) {
                 this.lastCommittedValue = entry;
-                if (!muteEvent) {
+                if (fireEvent) {
                     this.fireChangeEvents(entry);
                 }
             }
@@ -521,7 +521,7 @@ module TrivialComponents {
             }
         }
 
-        public updateEntries(newEntries:E[], highlightDirection:number) {
+        public updateEntries(newEntries:E[], highlightDirection?:number) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();

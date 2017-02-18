@@ -186,7 +186,7 @@ module TrivialComponents {
                         this.entries = null;
                         this.closeDropDown();
                         if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                            this.selectEntry(this.config.freeTextEntryFactory(this.$editor.text()));
+                            this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()));
                         }
                         this.$editor.text("");
                         //fireChangeEvents(me.getSelectedEntries());
@@ -198,7 +198,7 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.tab) {
                         const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.selectEntry(highlightedEntry);
+                            this.setSelectedEntry(highlightedEntry);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -246,10 +246,10 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.enter) {
                         const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry != null) {
-                            this.selectEntry(highlightedEntry);
+                            this.setSelectedEntry(highlightedEntry);
                             this.entries = null;
                         } else if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                            this.selectEntry(this.config.freeTextEntryFactory(this.$editor.text()));
+                            this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()));
                         }
                         this.closeDropDown();
                         e.preventDefault(); // prevent the new line to be added to the editor!
@@ -279,7 +279,7 @@ module TrivialComponents {
                             for (let i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
                                 const value = tagValuesEnteredByUser[i].trim();
                                 if (value.length > 0) {
-                                    this.selectEntry(this.config.freeTextEntryFactory(value));
+                                    this.setSelectedEntry(this.config.freeTextEntryFactory(value));
                                 }
                                 this.$editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
                                 selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
@@ -328,13 +328,13 @@ module TrivialComponents {
             this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
             this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry);
-                    this.listBox.selectEntry(null);
+                    this.setSelectedEntry(selectedEntry);
+                    this.listBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
             });
 
-            this.selectEntry(this.config.selectedEntry, true);
+            this.setSelectedEntry(this.config.selectedEntry, true);
 
             $tagArea.click((e) => {
                 if (!this.config.showDropDownOnResultsOnly) {
@@ -373,7 +373,7 @@ module TrivialComponents {
             });
 
             for (let i = 0; i < this.config.selectedEntries.length; i++) {
-                this.selectEntry(this.config.selectedEntries[i], true);
+                this.setSelectedEntry(this.config.selectedEntries[i], true);
             }
 
             // ===
@@ -385,7 +385,7 @@ module TrivialComponents {
             this.listBoxDirty = false;
         }
 
-        public updateEntries(newEntries: E[], highlightDirection: HighlightDirection) {
+        public updateEntries(newEntries: E[], highlightDirection?: HighlightDirection) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
@@ -449,7 +449,7 @@ module TrivialComponents {
             this.onSelectedEntryChanged.fire(entries);
         }
 
-        public selectEntry(entry: E, muteEvent?: boolean) {
+        public setSelectedEntry(entry: E, fireEvent = false) {
             if (entry == null) {
                 return; // do nothing
             }
@@ -480,7 +480,7 @@ module TrivialComponents {
 
             this.$editor.text("");
 
-            if (!muteEvent) {
+            if (fireEvent) {
                 this.fireChangeEvents(this.getSelectedEntries());
             }
         }
@@ -578,7 +578,7 @@ module TrivialComponents {
                 .forEach((e) => this.removeTag(e));
             if (entries) {
                 for (let i = 0; i < entries.length; i++) {
-                    this.selectEntry(entries[i], true);
+                    this.setSelectedEntry(entries[i], true);
                 }
             }
         }

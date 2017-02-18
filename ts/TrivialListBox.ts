@@ -56,7 +56,7 @@ module TrivialComponents {
             this.$listBox = $('<div class="tr-listbox"/>').appendTo($container);
             let me = this;
             this.$listBox.on("mousedown", ".tr-listbox-entry", function (e) {
-                me.selectEntry($(this).data("entry"), e, false);
+                me.setSelectedEntry($(this).data("entry"), e, true);
             }).on("mouseup", ".tr-listbox-entry", function (e) {
                 me.$listBox.trigger("mouseup", e);
             }).on("mouseenter", ".tr-listbox-entry", function (e) {
@@ -129,13 +129,13 @@ module TrivialComponents {
             this.onSelectedEntryChanged.fire(selectedEntry, originalEvent);
         }
 
-        public selectEntry(entry: E, originalEvent?: Event, muteEvent = true) {
+        public setSelectedEntry(entry: E, originalEvent?: Event, fireEvent = false) {
             this.selectedEntry = entry;
             this.$entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
             if (entry != null) {
                 this.selectedEntry._trEntryElement.addClass("tr-selected-entry");
             }
-            if (!muteEvent) {
+            if (fireEvent) {
                 this.fireChangeEvents(this.selectedEntry, originalEvent);
             }
         }

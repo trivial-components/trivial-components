@@ -175,11 +175,11 @@ module TrivialComponents {
             this.treeBox.onSelectedEntryChanged.addListener(() => {
                 const selectedTreeBoxEntry = this.treeBox.getSelectedEntry();
                 if (selectedTreeBoxEntry) {
-                    this.selectEntry(selectedTreeBoxEntry);
+                    this.setSelectedEntry(selectedTreeBoxEntry);
                 }
             });
 
-            this.selectEntry((this.config.selectedEntryId !== undefined && this.config.selectedEntryId !== null) ? this.findEntryById(this.config.selectedEntryId) : null);
+            this.setSelectedEntry((this.config.selectedEntryId !== undefined && this.config.selectedEntryId !== null) ? this.findEntryById(this.config.selectedEntryId) : null);
         }
 
         public updateEntries(newEntries: E[]) {
@@ -267,7 +267,7 @@ module TrivialComponents {
             })[0];
         }
 
-        private selectEntry(entry: E) {
+        private setSelectedEntry(entry: E) {
             this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
             this.$originalInput.val(entry ? this.config.valueFunction(entry) : null);
             this.fireChangeEvents(entry);

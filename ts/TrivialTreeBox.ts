@@ -25,10 +25,10 @@ module TrivialComponents {
         noEntriesTemplate?: string,
         entries?: E[],
         matchingOptions?: MatchingOptions,
-        childrenProperty?: "children", // TODO replace by getChildrenFunction: (entry: E) => E[]
-        lazyChildrenFlagProperty?: "hasLazyChildren",  // TODO replace by hasChildrenFunction: (entry: E) => boolean
+        childrenProperty?: string, // TODO replace by getChildrenFunction: (entry: E) => E[]
+        lazyChildrenFlagProperty?: string,  // TODO replace by hasChildrenFunction: (entry: E) => boolean
         lazyChildrenQueryFunction?: (node: E, resultCallback: ResultCallback<E>) => void, // TODO unify with getter/setter
-        expandedProperty?: 'expanded', // TODO replace by expandedPropertyGetter: (entry: E) => boolean, expandedPropertySetter: (entry: E, expanded: boolean) => void
+        expandedProperty?: string, // TODO replace by expandedPropertyGetter: (entry: E) => boolean, expandedPropertySetter: (entry: E, expanded: boolean) => void
         selectedEntryId?: any,
         animationDuration?: number,
         showExpanders?: boolean,

@@ -169,7 +169,7 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.tab) {
                         const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.selectEntry(highlightedEntry);
+                            this.setSelectedEntry(highlightedEntry);
                         }
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                         return; // let the user navigate freely left and right...
@@ -186,7 +186,7 @@ module TrivialComponents {
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (this.isDropDownOpen && e.which == keyCodes.enter) {
                         e.preventDefault(); // do not submit form
-                        this.selectEntry(this.listBox.getHighlightedEntry());
+                        this.setSelectedEntry(this.listBox.getHighlightedEntry());
                         this.closeDropDown();
                     } else if (e.which == keyCodes.escape) {
                         this.closeDropDown();
@@ -264,15 +264,15 @@ module TrivialComponents {
             this.listBox = new TrivialListBox(this.$dropDown, this.config);
             this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry, false);
-                    this.listBox.selectEntry(null);
+                    this.setSelectedEntry(selectedEntry, false);
+                    this.listBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
             });
 
             this.$editor.val(this.config.amount || this.$originalInput.val());
             this.formatEditorValue();
-            this.selectEntry(this.config.selectedEntry || null, true);
+            this.setSelectedEntry(this.config.selectedEntry || null, true);
         }
 
         private getQueryString() {
@@ -339,7 +339,7 @@ module TrivialComponents {
             });
         }
 
-        private selectEntry(entry: U, doNotFireEvents?: boolean) {
+        public setSelectedEntry(entry: U, doNotFireEvents?: boolean) {
             if (entry == null) {
                 this.selectedEntry = null;
                 const $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
@@ -456,20 +456,20 @@ module TrivialComponents {
         }
 
         private selectUnit(unitIdentifier: string) {
-            this.selectEntry(this.entries.filter((entry: U) => {
+            this.setSelectedEntry(this.entries.filter((entry: U) => {
                 return entry[this.config.unitIdProperty] === unitIdentifier;
             })[0], true);
         }
 
 
-        private updateEntries(newEntries: U[]) {
+        public updateEntries(newEntries: U[]) {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
             this.listBox.updateEntries(newEntries);
         }
 
-        public getSelectedUnit() {
+        public getSelectedEntry(): U {
             if (this.selectedEntry == null) {
                 return null;
             } else {

@@ -145,7 +145,7 @@ module TrivialComponents {
                 this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$treeComboBox);
                 this.$clearButton.mousedown(() => {
                     this.$editor.val("");
-                    this.selectEntry(null, true);
+                    this.setSelectedEntry(null, true);
                 });
             }
             if (this.config.showTrigger) {
@@ -193,11 +193,11 @@ module TrivialComponents {
                         this.$treeComboBox.removeClass('focus');
                         if (this.editorContainsFreeText()) {
                             if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
-                                this.selectEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true);
                             }
                         } else {
                             this.$editor.val("");
-                            this.selectEntry(this.lastCommittedValue);
+                            this.setSelectedEntry(this.lastCommittedValue);
                         }
                         this.hideEditor();
                         this.closeDropDown();
@@ -209,11 +209,11 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = this.treeBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.selectEntry(highlightedEntry, true);
+                            this.setSelectedEntry(highlightedEntry, true);
                         } else if (!this.$editor.val()) {
-                            this.selectEntry(null, true);
+                            this.setSelectedEntry(null, true);
                         } else if (this.config.allowFreeText) {
-                            this.selectEntry(this.getSelectedEntry(), true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -253,11 +253,11 @@ module TrivialComponents {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = this.treeBox.getHighlightedEntry();
                             if (this.isDropDownOpen && highlightedEntry) {
-                                this.selectEntry(highlightedEntry, true);
+                                this.setSelectedEntry(highlightedEntry, true);
                             } else if (!this.$editor.val()) {
-                                this.selectEntry(null, true);
+                                this.setSelectedEntry(null, true);
                             } else if (this.config.allowFreeText) {
-                                this.selectEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true);
                             }
                             this.closeDropDown();
                             this.hideEditor();
@@ -267,7 +267,7 @@ module TrivialComponents {
                         if (!(this.editorContainsFreeText() && this.isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
                             this.hideEditor();
                             this.$editor.val("");
-                            this.selectEntry(this.lastCommittedValue, false);
+                            this.setSelectedEntry(this.lastCommittedValue, false);
                         }
                         this.closeDropDown();
                     } else {
@@ -291,7 +291,7 @@ module TrivialComponents {
                 })
                 .keyup((e: KeyboardEvent) => {
                     if (!keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry)) {
-                        this.selectEntry(null, false);
+                        this.setSelectedEntry(null, false);
                     }
                 })
                 .mousedown(() => {
@@ -330,14 +330,14 @@ module TrivialComponents {
             this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
             this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
-                    this.selectEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
+                    this.setSelectedEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
                     this.treeBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
                 this.hideEditor();
             });
 
-            this.selectEntry(this.config.selectedEntry, true, true);
+            this.setSelectedEntry(this.config.selectedEntry, true, true);
 
             this.$selectedEntryWrapper.click(() => {
                 this.showEditor();
@@ -378,7 +378,7 @@ module TrivialComponents {
             this.onSelectedEntryChanged.fire(entry);
         }
 
-        private selectEntry(entry: E, commit?: boolean, muteEvent?: boolean) {
+        public setSelectedEntry(entry: E, commit?: boolean, fireEvent = false) {
             if (entry == null) {
                 this.$originalInput.val(this.config.valueFunction(null));
                 this.selectedEntry = null;
@@ -396,7 +396,7 @@ module TrivialComponents {
             }
             if (commit) {
                 this.lastCommittedValue = entry;
-                if (!muteEvent) {
+                if (fireEvent) {
                     this.fireChangeEvents(entry);
                 }
             }
@@ -504,7 +504,7 @@ module TrivialComponents {
         }
 
 
-        private updateEntries(newEntries: E[], highlightDirection: HighlightDirection) {
+        public updateEntries(newEntries: E[], highlightDirection?: HighlightDirection) {
             this.$spinners.remove();
             this.$spinners = $();
             this.treeBox.updateEntries(newEntries);
@@ -544,7 +544,7 @@ module TrivialComponents {
             return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
         }
 
-        private setEditingMode(newEditingMode: EditingMode) {
+        public setEditingMode(newEditingMode: EditingMode) {
             this.editingMode = newEditingMode;
             this.$treeComboBox.removeClass("editable readonly disabled").addClass(this.editingMode);
             if (this.isDropDownNeeded()) {

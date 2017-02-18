@@ -57,7 +57,7 @@ module TrivialComponents {
         editingMode?: EditingMode
     }
 
-    export class TrivialDateTimeField implements TrivialComponent{
+    export class TrivialDateTimeField implements TrivialComponent {
 
         private config: TrivialDateTimeFieldConfig;
 
@@ -208,7 +208,7 @@ module TrivialComponents {
             this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry: DateComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setDate(selectedEntry, selectedEntry.displayString != (this.dateValue && this.dateValue.displayString));
-                    this.dateListBox.selectEntry(null);
+                    this.dateListBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
             });
@@ -221,7 +221,7 @@ module TrivialComponents {
             this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry: TimeComboBoxEntry) => {
                 if (selectedEntry) {
                     this.setTime(selectedEntry, selectedEntry.displayString != (this.timeValue && this.timeValue.displayString));
-                    this.dateListBox.selectEntry(null);
+                    this.dateListBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
             });
@@ -403,7 +403,7 @@ module TrivialComponents {
             }, 0);
         }
 
-        private getValue() {
+        public getValue() {
             if (this.dateValue == null && this.timeValue == null) {
                 return null;
             } else if (this.dateValue == null) {
@@ -465,7 +465,7 @@ module TrivialComponents {
             }
         }
 
-        private setValue(mom: Moment) {
+        public setValue(mom: Moment) {
             this.setDate(mom && TrivialDateTimeField.createDateComboBoxEntry(mom, this.config.dateFormat));
             this.setTime(mom && TrivialDateTimeField.createTimeComboBoxEntry(mom.hour(), mom.minute(), this.config.timeFormat));
         }
