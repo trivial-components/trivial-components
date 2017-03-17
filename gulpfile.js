@@ -65,6 +65,7 @@ var ts = require('gulp-typescript');
 var gulpTypings = require("gulp-typings");
 var release = require('gulp-github-release');
 var merge = require('merge-stream');
+var spawn = require('child_process').spawn;
 
 gulp.task('clean', function () {
     return del(['dist']);
@@ -262,4 +263,8 @@ gulp.task('github-release', ['default'], function () {
             prerelease: true,
             manifest: require('./package.json')
         }));
+});
+
+gulp.task('npm-publish', ['default'], function (done) {
+	spawn('npm', ['publish'], { stdio: 'inherit' }).on('close', done);
 });
