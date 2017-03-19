@@ -223,15 +223,6 @@ no search field:
         demo.defaultFilteringCombobox.onBlur.addListener(function() {
             console.log("defaultFilteringCombobox blur");
         });
-        demo.defaultFilteringCombobox.$.change(function() {
-            console.log("#defaultFilteringComboBox change")
-        });
-        demo.defaultFilteringCombobox.$.focus(function() {
-            console.log("#defaultFilteringComboBox focus")
-        });
-        demo.defaultFilteringCombobox.$.blur(function() {
-            console.log("#defaultFilteringComboBox blur")
-        });
 
         demo.emptyEntryTemplateFilteringCombobox = new TrivialComponents.TrivialComboBox("#emptyEntryTemplateFilteringCombobox", {
             entries: createEntries(),
@@ -343,7 +334,7 @@ no search field:
         demo.zeroConfigTagBox.onBlur.addListener(function() {
             console.log("zeroConfigTagBox blur");
         });
-        demo.zeroConfigTagBox.$.change(function() {
+        $(demo.zeroConfigTagBox.getMainDomElement()).change(function() {
             console.log("#zeroConfigTagBox change")
         });
 
@@ -457,16 +448,6 @@ no search field:
         demo.treeComboBox.onBlur.addListener(function() {
             console.log("treeComboBox blur");
         });
-        $treeComboBox.change(function() {
-            console.log("#treeComboBox change")
-        });
-        $treeComboBox.focus(function() {
-            console.log("#treeComboBox focus")
-        });
-        $treeComboBox.blur(function() {
-            console.log("#treeComboBox blur")
-        });
-
 
         demo.freeTextTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#freeTextTreeComboBox', {
             templates: [TrivialComponents.icon2LinesTemplate],

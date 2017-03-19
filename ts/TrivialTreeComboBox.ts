@@ -145,7 +145,7 @@ module TrivialComponents {
                 this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$treeComboBox);
                 this.$clearButton.mousedown(() => {
                     this.$editor.val("");
-                    this.setSelectedEntry(null, true);
+                    this.setSelectedEntry(null, true, true);
                 });
             }
             if (this.config.showTrigger) {
@@ -193,7 +193,7 @@ module TrivialComponents {
                         this.$treeComboBox.removeClass('focus');
                         if (this.editorContainsFreeText()) {
                             if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
-                                this.setSelectedEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true, true);
                             }
                         } else {
                             this.$editor.val("");
@@ -209,11 +209,11 @@ module TrivialComponents {
                     } else if (e.which == keyCodes.tab) {
                         var highlightedEntry = this.treeBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.setSelectedEntry(highlightedEntry, true);
+                            this.setSelectedEntry(highlightedEntry, true, true);
                         } else if (!this.$editor.val()) {
-                            this.setSelectedEntry(null, true);
+                            this.setSelectedEntry(null, true, true);
                         } else if (this.config.allowFreeText) {
-                            this.setSelectedEntry(this.getSelectedEntry(), true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
                         }
                         return;
                     } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -253,11 +253,11 @@ module TrivialComponents {
                             e.preventDefault(); // do not submit form
                             var highlightedEntry = this.treeBox.getHighlightedEntry();
                             if (this.isDropDownOpen && highlightedEntry) {
-                                this.setSelectedEntry(highlightedEntry, true);
+                                this.setSelectedEntry(highlightedEntry, true, true);
                             } else if (!this.$editor.val()) {
-                                this.setSelectedEntry(null, true);
+                                this.setSelectedEntry(null, true, true);
                             } else if (this.config.allowFreeText) {
-                                this.setSelectedEntry(this.getSelectedEntry(), true);
+                                this.setSelectedEntry(this.getSelectedEntry(), true, true);
                             }
                             this.closeDropDown();
                             this.hideEditor();
@@ -330,7 +330,7 @@ module TrivialComponents {
             this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
             this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
                 if (selectedEntry) {
-                    this.setSelectedEntry(selectedEntry, true, objectEquals(selectedEntry, this.lastCommittedValue));
+                    this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue));
                     this.treeBox.setSelectedEntry(null);
                     this.closeDropDown();
                 }
