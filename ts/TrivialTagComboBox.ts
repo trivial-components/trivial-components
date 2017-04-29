@@ -73,14 +73,14 @@ module TrivialComponents {
         constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E>) {
             options = options || {};
             this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
-                valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
+                valueFunction: (entries:E[]) => entries.map(e => e._isFreeTextEntry ? e.displayValue : e.id).join(','),
                 entryRenderingFunction: (entry: E) => {
-                    const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
+                    const template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: E) => {
-                    if ((entry as any).selectedEntryTemplate) {
-                        return Mustache.render((entry as any).selectedEntryTemplate, entry)
+                    if (entry.selectedEntryTemplate) {
+                        return Mustache.render(entry.selectedEntryTemplate, entry)
                     } else {
                         return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
                     }
@@ -99,8 +99,8 @@ module TrivialComponents {
                         for (let propertyName in entry) {
                             if (entry.hasOwnProperty(propertyName)) {
                                 const propertyValue = entry[propertyName];
-                                if (propertyValue && (propertyValue as any).toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
-                                    return (propertyValue as any).toString();
+                                if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                    return propertyValue.toString();
                                 }
                             }
                         }
@@ -389,7 +389,7 @@ module TrivialComponents {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
-            if (this.isDropDownOpen || this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+            if (this.isDropDownOpen) {
                 this.updateListBoxEntries();
             } else {
                 this.listBoxDirty = true;
@@ -407,13 +407,9 @@ module TrivialComponents {
 
             this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-            if (this.isDropDownOpen || this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+            if (this.isDropDownOpen) {
                 this.openDropDown(); // only for repositioning!
             }
-        }
-
-        private shouldOpenDropDownDueToEntriesUpdate(newEntries: E[]) {
-            return this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus");
         }
 
         private removeTag(tagToBeRemoved: E) {
@@ -438,7 +434,7 @@ module TrivialComponents {
                     }
                     this.config.queryFunction(queryString, (newEntries: E[]) => {
                         this.updateEntries(newEntries, highlightDirection);
-                        if (this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+                        if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
                             this.openDropDown();
                         }
                     });
@@ -511,7 +507,7 @@ module TrivialComponents {
             }).width(this.$tagComboBox.width());
         }
 
-        private openDropDown() {
+        public openDropDown() {
             if (this.isDropDownNeeded()) {
                 if (this.listBoxDirty) {
                     this.updateListBoxEntries();

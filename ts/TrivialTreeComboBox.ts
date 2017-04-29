@@ -361,7 +361,7 @@ module TrivialComponents {
                     }
                     this.config.queryFunction(queryString, (newEntries: E[]) => {
                         this.updateEntries(newEntries, highlightDirection);
-                        if (this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+                        if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
                             this.openDropDown();
                         }
                     });
@@ -467,7 +467,7 @@ module TrivialComponents {
                 .width(this.$treeComboBox.width());
         };
 
-        private openDropDown() {
+        public openDropDown() {
             if (this.isDropDownNeeded()) {
                 this.$treeComboBox.addClass("open");
                 this.repositionDropDown();
@@ -535,15 +535,10 @@ module TrivialComponents {
 
             this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-            if (this.isDropDownOpen || this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+            if (this.isDropDownOpen) {
                 this.openDropDown(); // only for repositioning!
             }
         }
-
-        private shouldOpenDropDownDueToEntriesUpdate(newEntries: E[]) {
-            return this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus");
-        }
-
 
         private isDropDownNeeded() {
             return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);

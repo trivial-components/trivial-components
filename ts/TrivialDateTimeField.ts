@@ -496,7 +496,7 @@ module TrivialComponents {
                 );
         }
 
-        private openDropDown() {
+        public openDropDown() {
             if (this.dropdownNeeded) {
                 this.$dateTimeField.addClass("open");
                 this.repositionDropDown();

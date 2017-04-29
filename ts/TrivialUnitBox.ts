@@ -413,7 +413,7 @@ module TrivialComponents {
                 .width(this.$unitBox.width());
         };
 
-        private openDropDown() {
+        public openDropDown() {
             this.$unitBox.addClass("open");
             this.repositionDropDown();
             this.isDropDownOpen = true;

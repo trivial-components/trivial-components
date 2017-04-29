@@ -361,7 +361,7 @@ module TrivialComponents {
                     }
                     this.config.queryFunction(queryString, (newEntries: E[]) => {
                         this.updateEntries(newEntries, highlightDirection);
-                        if (this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+                        if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
                             this.openDropDown();
                         }
                     });
@@ -525,7 +525,7 @@ module TrivialComponents {
             this.entries = newEntries;
             this.$spinners.remove();
             this.$spinners = $();
-            if (this.isDropDownOpen || this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+            if (this.isDropDownOpen) {
                 this.updateListBoxEntries();
             } else {
                 this.listBoxDirty = true;
@@ -549,13 +549,9 @@ module TrivialComponents {
 
             this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-            if (this.isDropDownOpen || this.shouldOpenDropDownDueToEntriesUpdate(newEntries)) {
+            if (this.isDropDownOpen) {
                 this.openDropDown(); // only for repositioning!
             }
-        }
-
-        private shouldOpenDropDownDueToEntriesUpdate(newEntries: E[]) {
-            return this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus");
         }
 
 
