@@ -43,7 +43,6 @@ module TrivialComponents {
         private $spinners = $();
         private $originalInput: JQuery;
         private $componentWrapper: JQuery;
-        private $tree: JQuery;
         private $editor: JQuery;
         private processUpdateTimer: number;
 
@@ -124,7 +123,6 @@ module TrivialComponents {
                     this.query(1);
                 }
             });
-            this.$tree = $('<div class="tr-tree-entryTree"></div>').appendTo(this.$componentWrapper);
             this.$editor = $('<input type="text" class="tr-tree-editor tr-editor"/>')
                 .prependTo(this.$componentWrapper)
                 .attr("tabindex", this.$originalInput.attr("-1"))
@@ -168,7 +166,7 @@ module TrivialComponents {
                 this.$componentWrapper.focus();
             }
 
-            this.treeBox = new TrivialComponents.TrivialTreeBox(this.$tree, this.config);
+            this.treeBox = new TrivialComponents.TrivialTreeBox(this.$componentWrapper, this.config);
             this.treeBox.onNodeExpansionStateChanged.addListener((node: E)=> {
                 this.onNodeExpansionStateChanged.fire(node);
             });
@@ -192,7 +190,7 @@ module TrivialComponents {
 
         private query(highlightDirection?: HighlightDirection) {
             if (this.config.searchBarMode === 'always-visible' || this.config.searchBarMode === 'show-if-filled') {
-                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$tree);
+                const $spinner = $(this.config.spinnerTemplate).appendTo(this.treeBox.getMainDomElement());  
                 this.$spinners = this.$spinners.add($spinner);
 
                 // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
