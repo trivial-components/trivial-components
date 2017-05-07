@@ -401,4 +401,12 @@ module TrivialComponents {
             }
         });
     }
+
+    export function setTimeoutOrDoImmediately(f: Function, delay?: number): number {
+        if (delay != null) {
+            return window.setTimeout(f(), delay);
+        } else {
+            return void f();
+        }
+    }
 }

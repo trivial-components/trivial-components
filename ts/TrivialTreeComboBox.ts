@@ -17,7 +17,6 @@
  */
 module TrivialComponents {
 
-
     export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
         selectedEntryRenderingFunction?: (entry: E) => string,
         textHighlightingEntryLimit?: number,
@@ -165,7 +164,7 @@ module TrivialComponents {
                 });
             }
             this.$dropDown = $('<div class="tr-dropdown"></div>')
-                .scroll((e) => {
+                .scroll(() => {
                     return false;
                 });
             this.$dropDownTargetElement = $("body");
@@ -207,7 +206,7 @@ module TrivialComponents {
                     if (keyCodes.isModifierKey(e)) {
                         return;
                     } else if (e.which == keyCodes.tab) {
-                        var highlightedEntry = this.treeBox.getHighlightedEntry();
+                        let highlightedEntry = this.treeBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
                             this.setSelectedEntry(highlightedEntry, true, true);
                         } else if (!this.$editor.val()) {
@@ -228,6 +227,15 @@ module TrivialComponents {
                         return; // let the user navigate freely left and right...
                     }
 
+                    setTimeout(() => {
+                        // After the keystroke has taken effect to the editor, check if the editor content has changed and if yes, deselect the currently selected entry!
+                        let isNonIgnoredKey = !keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1;
+                        let editorValueDoesNotCorrespondToSelectedValue = this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry);
+                        if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.valueFunction(this.treeBox.getHighlightedEntry())) !== this.config.valueFunction(this.getSelectedEntry())) {
+                            this.setSelectedEntry(null, false);
+                        }
+                    });
+
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                         this.doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                     }
@@ -245,13 +253,13 @@ module TrivialComponents {
                             }
                         } else {
                             this.treeBox.highlightNextEntry(direction);
-                            this.autoCompleteIfPossible(this.config.autoCompleteDelay);
+                            this.autoCompleteIfPossible();
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (e.which == keyCodes.enter) {
                         if (this.isEditorVisible || this.editorContainsFreeText()) {
                             e.preventDefault(); // do not submit form
-                            var highlightedEntry = this.treeBox.getHighlightedEntry();
+                            let highlightedEntry = this.treeBox.getHighlightedEntry();
                             if (this.isDropDownOpen && highlightedEntry) {
                                 this.setSelectedEntry(highlightedEntry, true, true);
                             } else if (!this.$editor.val()) {
@@ -287,11 +295,6 @@ module TrivialComponents {
                                 this.treeBox.setHighlightedEntry(null);
                             }
                         })
-                    }
-                })
-                .keyup((e: KeyboardEvent) => {
-                    if (!keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry)) {
-                        this.setSelectedEntry(null, false);
                     }
                 })
                 .mousedown(() => {
@@ -337,7 +340,7 @@ module TrivialComponents {
                 this.hideEditor();
             });
 
-            this.setSelectedEntry(this.config.selectedEntry, true, true);
+            this.setSelectedEntry(this.config.selectedEntry, true, false);
 
             this.$selectedEntryWrapper.click(() => {
                 this.showEditor();
@@ -350,27 +353,24 @@ module TrivialComponents {
         }
 
         private query(highlightDirection?: HighlightDirection) {
-            // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-            setTimeout(() => {
-                const queryString = this.getNonSelectedEditorValue();
-                const completeInputString = this.$editor.val();
-                if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-                    if (this.$spinners.length === 0) {
-                        const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                        this.$spinners = this.$spinners.add($spinner);
-                    }
-                    this.config.queryFunction(queryString, (newEntries: E[]) => {
-                        this.updateEntries(newEntries, highlightDirection);
-                        if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                            this.openDropDown();
-                        }
-                    });
-                    this.lastQueryString = queryString;
-                    this.lastCompleteInputQueryString = completeInputString;
-                } else {
-                    this.openDropDown();
+            const queryString = this.getNonSelectedEditorValue();
+            const completeInputString = this.$editor.val();
+            if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
+                if (this.$spinners.length === 0) {
+                    const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                    this.$spinners = this.$spinners.add($spinner);
                 }
-            }, 0);
+                this.config.queryFunction(queryString, (newEntries: E[]) => {
+                    this.updateEntries(newEntries, highlightDirection);
+                    if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                        this.openDropDown();
+                    }
+                });
+                this.lastQueryString = queryString;
+                this.lastCompleteInputQueryString = completeInputString;
+            } else {
+                this.openDropDown();
+            }
         }
 
         private fireChangeEvents(entry: E) {
@@ -450,7 +450,7 @@ module TrivialComponents {
                     at: "left bottom",
                     of: this.$treeComboBox,
                     collision: "flip",
-                    using: (calculatedPosition: {left: number, top: number}, info: {vertical: string}) => {
+                    using: (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
                         if (info.vertical === "top") {
                             this.$treeComboBox.removeClass("dropdown-flipped");
                             this.$dropDown.removeClass("flipped");
@@ -485,19 +485,19 @@ module TrivialComponents {
             return this.$editor.val().substring(0, (this.$editor[0] as any).selectionStart);
         }
 
-        private autoCompleteIfPossible(delay: number) {
+        private autoCompleteIfPossible(delay?: number) {
             if (this.config.autoComplete) {
                 clearTimeout(this.autoCompleteTimeoutId);
                 const highlightedEntry = this.treeBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    this.autoCompleteTimeoutId = window.setTimeout(() => {
+                    this.autoCompleteTimeoutId = setTimeoutOrDoImmediately(() => {
                         const currentEditorValue = this.getNonSelectedEditorValue();
                         const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
                         if (this.$editor.is(":focus")) {
                             (this.$editor[0] as any).setSelectionRange(currentEditorValue.length, autoCompleteString.length);
                         }
-                    }, delay || 0);
+                    }, delay);
                 }
                 this.doNoAutoCompleteBecauseBackspaceWasPressed = false;
             }

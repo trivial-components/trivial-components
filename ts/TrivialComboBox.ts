@@ -15,10 +15,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-
-/**
- * Actual module comment.  sdafasfa
- */
 module TrivialComponents {
 
     export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
@@ -232,6 +228,15 @@ module TrivialComponents {
                         return; // let the user navigate freely left and right...
                     }
 
+                    setTimeout(() => {
+                        // After the keystroke has taken effect to the editor, check if the editor content has changed and if yes, deselect the currently selected entry!
+                        let isNonIgnoredKey = !keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1;
+                        let editorValueDoesNotCorrespondToSelectedValue = this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry);
+                        if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.valueFunction(this.listBox.getHighlightedEntry())) !== this.config.valueFunction(this.getSelectedEntry())) {
+                            this.setSelectedEntry(null, false);
+                        }
+                    });
+
                     if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                         this.doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
                     }
@@ -249,7 +254,7 @@ module TrivialComponents {
                             }
                         } else {
                             this.listBox.highlightNextEntry(direction);
-                            this.autoCompleteIfPossible(this.config.autoCompleteDelay);
+                            this.autoCompleteIfPossible();
                         }
                         return false; // some browsers move the caret to the beginning on up key
                     } else if (e.which == keyCodes.enter) {
@@ -294,11 +299,6 @@ module TrivialComponents {
                         })
                     }
                 })
-                .keyup((e: KeyboardEvent) => {
-                    if (!keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1 && this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry)) {
-                        this.setSelectedEntry(null, false, true);
-                    }
-                })
                 .mousedown(() => {
                     if (!this.config.showDropDownOnResultsOnly) {
                         this.openDropDown();
@@ -307,7 +307,7 @@ module TrivialComponents {
                 });
 
             if (this.$originalInput.attr("tabindex")) {
-                this.$editor.attr("tabindex", <string> this.$originalInput.attr("tabindex"));
+                this.$editor.attr("tabindex", this.$originalInput.attr("tabindex"));
             }
             if (this.$originalInput.attr("autofocus")) {
                 this.$editor.focus();
@@ -351,32 +351,27 @@ module TrivialComponents {
                 }
                 this.query();
             });
-
-            // ---
-
-            this.$comboBox.data("trivialComboBox", this);
         }
 
-        private query(highlightDirection?: number) {
-            // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-            setTimeout(() => {
-                const queryString = this.getNonSelectedEditorValue();
-                const completeInputString = this.$editor.val();
-                if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-                    if (this.$spinners.length === 0) {
-                        const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                        this.$spinners = this.$spinners.add($spinner);
-                    }
-                    this.config.queryFunction(queryString, (newEntries: E[]) => {
-                        this.updateEntries(newEntries, highlightDirection);
-                        if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                            this.openDropDown();
-                        }
-                    });
-                    this.lastQueryString = queryString;
-                    this.lastCompleteInputQueryString = completeInputString;
+        private query(highlightDirection?: HighlightDirection) {
+            const queryString = this.getNonSelectedEditorValue();
+            const completeInputString = this.$editor.val();
+            if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
+                if (this.$spinners.length === 0) {
+                    const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                    this.$spinners = this.$spinners.add($spinner);
                 }
-            }, 0);
+                this.config.queryFunction(queryString, (newEntries: E[]) => {
+                    this.updateEntries(newEntries, highlightDirection);
+                    if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                        this.openDropDown();
+                    }
+                });
+                this.lastQueryString = queryString;
+                this.lastCompleteInputQueryString = completeInputString;
+            } else {
+                this.openDropDown();
+            }
         }
 
         private fireChangeEvents(entry: E) {
@@ -494,19 +489,19 @@ module TrivialComponents {
             return this.$editor.val().substring(0, (this.$editor[0] as any).selectionStart);
         }
 
-        private autoCompleteIfPossible(delay:number) {
+        private autoCompleteIfPossible(delay?: number) {
             if (this.config.autoComplete) {
                 clearTimeout(this.autoCompleteTimeoutId);
                 const highlightedEntry = this.listBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    this.autoCompleteTimeoutId = window.setTimeout(() => {
+                    this.autoCompleteTimeoutId = setTimeoutOrDoImmediately(() => {
                         const currentEditorValue = this.getNonSelectedEditorValue();
                         const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
                         if (this.$editor.is(":focus")) {
                             (this.$editor[0] as any).setSelectionRange(currentEditorValue.length, autoCompleteString.length);
                         }
-                    }, delay || 0);
+                    }, delay);
                 }
                 this.doNoAutoCompleteBecauseBackspaceWasPressed = false;
             }
@@ -515,18 +510,6 @@ module TrivialComponents {
         private updateListBoxEntries() {
             this.listBox.updateEntries(this.entries);
             this.listBoxDirty = false;
-        }
-
-        private isDropDownNeeded() {
-            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
-        }
-
-        public setEditingMode(newEditingMode:EditingMode) {
-            this.editingMode = newEditingMode;
-            this.$comboBox.removeClass("editable readonly disabled").addClass(this.editingMode);
-            if (this.isDropDownNeeded()) {
-                this.$dropDown.appendTo(this.$dropDownTargetElement);
-            }
         }
 
         public updateEntries(newEntries:E[], highlightDirection?:number) {
@@ -562,6 +545,17 @@ module TrivialComponents {
             }
         }
 
+        private isDropDownNeeded() {
+            return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
+        }
+
+        public setEditingMode(newEditingMode:EditingMode) {
+            this.editingMode = newEditingMode;
+            this.$comboBox.removeClass("editable readonly disabled").addClass(this.editingMode);
+            if (this.isDropDownNeeded()) {
+                this.$dropDown.appendTo(this.$dropDownTargetElement);
+            }
+        }
 
         public getSelectedEntry(): E {
             if (this.selectedEntry == null && (!this.config.allowFreeText || !this.$editor.val())) {
