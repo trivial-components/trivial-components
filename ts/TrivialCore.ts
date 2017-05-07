@@ -25,7 +25,7 @@ module TrivialComponents {
     export type MatchingOptions = {
         matchingMode: 'contains' |'prefix' |'prefix-word' |'prefix-levenshtein' |'levenshtein',
         ignoreCase: boolean,
-        maxLevenshteinDistance: number
+        maxLevenshteinDistance?: number
     };
 
     export type Match = {
@@ -369,5 +369,36 @@ module TrivialComponents {
         } else {
             throw "unknown matchingMode: " + options.matchingMode;
         }
+    }
+
+    export function minimallyScrollTo(element: JQuery|Element|string, target: JQuery|Element|string) {
+        let $target = $(target);
+        $(element).each(function () {
+            const $this = $(this);
+
+            const viewPortMinY = $this.scrollTop();
+            const viewPortMaxY = viewPortMinY + $this.innerHeight();
+
+            const targetMinY = $($target).offset().top - $(this).offset().top + $this.scrollTop();
+            const targetMaxY = targetMinY + $target.height();
+
+            if (targetMinY < viewPortMinY) {
+                $this.scrollTop(targetMinY);
+            } else if (targetMaxY > viewPortMaxY) {
+                $this.scrollTop(Math.min(targetMinY, targetMaxY - $this.innerHeight()));
+            }
+
+            const viewPortMinX = $this.scrollLeft();
+            const viewPortMaxX = viewPortMinX + $this.innerWidth();
+
+            const targetMinX = $($target).offset().left - $(this).offset().left + $this.scrollLeft();
+            const targetMaxX = targetMinX + $target.width();
+
+            if (targetMinX < viewPortMinX) {
+                $this.scrollLeft(targetMinX);
+            } else if (targetMaxX > viewPortMaxX) {
+                $this.scrollLeft(Math.min(targetMinX, targetMaxX - $this.innerWidth()));
+            }
+        });
     }
 }

@@ -529,7 +529,7 @@ module TrivialComponents {
                 if (highlightedEntry && this.doNoAutoCompleteBecauseBackspaceWasPressed) {
                     const autoCompletingEntryDisplayValue = highlightedEntry.displayString;
                     if (autoCompletingEntryDisplayValue) {
-                        this.autoCompleteTimeoutId = setTimeout(() => {
+                        this.autoCompleteTimeoutId = window.setTimeout(() => {
                             const oldEditorValue = this.getNonSelectedEditorValue();
                             let newEditorValue: string;
                             if (autoCompletingEntryDisplayValue.toLowerCase().indexOf(oldEditorValue.toLowerCase()) === 0) {

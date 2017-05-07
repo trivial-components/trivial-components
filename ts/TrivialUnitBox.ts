@@ -332,7 +332,7 @@ module TrivialComponents {
         private fireChangeEvents() {
             this.$originalInput.trigger("change");
             this.onChange.fire({
-                unit: this.selectedEntry != null ? this.selectedEntry[this.config.unitValueProperty] : null,
+                unit: this.selectedEntry != null ? (this.selectedEntry as any)[this.config.unitValueProperty] : null,
                 unitEntry: this.selectedEntry,
                 amount: this.getAmount(),
                 amountAsFloatingPointNumber: parseFloat(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, this.config.thousandsSeparator))
@@ -427,9 +427,9 @@ module TrivialComponents {
 
         private updateOriginalInputValue() {
             if (this.config.unitDisplayPosition === 'left') {
-                this.$originalInput.val((this.selectedEntry ? this.selectedEntry[this.config.unitValueProperty] : '') + this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, ''));
+                this.$originalInput.val((this.selectedEntry ? (this.selectedEntry as any)[this.config.unitValueProperty] : '') + this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, ''));
             } else {
-                this.$originalInput.val(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, '') + (this.selectedEntry ? this.selectedEntry[this.config.unitValueProperty] : ''));
+                this.$originalInput.val(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, '') + (this.selectedEntry ? (this.selectedEntry as any)[this.config.unitValueProperty] : ''));
             }
         }
 
@@ -460,7 +460,7 @@ module TrivialComponents {
 
         private selectUnit(unitIdentifier: string) {
             this.setSelectedEntry(this.entries.filter((entry: U) => {
-                return entry[this.config.unitIdProperty] === unitIdentifier;
+                return (entry as any)[this.config.unitIdProperty] === unitIdentifier;
             })[0], false);
         }
 

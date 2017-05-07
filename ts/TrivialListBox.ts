@@ -22,7 +22,8 @@ module TrivialComponents {
         selectedEntry?: E,
         spinnerTemplate?: string,
         entries?: E[],
-        matchingOptions?: MatchingOptions
+        matchingOptions?: MatchingOptions,
+        noEntriesTemplate?: string
     }
 
     export class TrivialListBox<E> implements TrivialComponent {
@@ -50,7 +51,8 @@ module TrivialComponents {
                     matchingMode: 'contains',
                     ignoreCase: true,
                     maxLevenshteinDistance: 2
-                }
+                },
+                noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate
             }, options);
 
             this.$listBox = $('<div class="tr-listbox"/>').appendTo($container);
@@ -84,15 +86,15 @@ module TrivialComponents {
                 for (let i = 0; i < entries.length; i++) {
                     const entry = entries[i];
                     let $entry: JQuery;
-                    if (!entry._trEntryElement) {
+                    if (!(entry as any)._trEntryElement) {
                         const html = this.config.entryRenderingFunction(entry);
                         $entry = $(html).addClass("tr-listbox-entry filterable-item");
                     } else {
-                        $entry = entry._trEntryElement;
+                        $entry = (entry as any)._trEntryElement;
                     }
                     $entry.appendTo(this.$entryList)
                         .data("entry", entry);
-                    entry._trEntryElement = $entry;
+                    (entry as any)._trEntryElement = $entry;
                 }
             } else {
                 this.$entryList.append(this.config.noEntriesTemplate);
@@ -110,7 +112,7 @@ module TrivialComponents {
         }
 
         private minimallyScrollTo($entryWrapper: JQuery) {
-            this.$listBox.parent().minimallyScrollTo($entryWrapper);
+            TrivialComponents.minimallyScrollTo(this.$listBox.parent(), $entryWrapper);
         }
 
         public setHighlightedEntry(entry: E) {
@@ -118,8 +120,8 @@ module TrivialComponents {
                 this.highlightedEntry = entry;
                 this.$entryList.find('.tr-listbox-entry').removeClass('tr-highlighted-entry');
                 if (entry != null) {
-                    entry._trEntryElement.addClass('tr-highlighted-entry');
-                    this.minimallyScrollTo(entry._trEntryElement);
+                    (entry as any)._trEntryElement.addClass('tr-highlighted-entry');
+                    this.minimallyScrollTo((entry as any)._trEntryElement);
                 }
             }
         }
@@ -133,7 +135,7 @@ module TrivialComponents {
             this.selectedEntry = entry;
             this.$entryList.find(".tr-selected-entry").removeClass("tr-selected-entry");
             if (entry != null) {
-                this.selectedEntry._trEntryElement.addClass("tr-selected-entry");
+                (this.selectedEntry as any)._trEntryElement.addClass("tr-selected-entry");
             }
             if (fireEvent) {
                 this.fireChangeEvents(this.selectedEntry, originalEvent);
@@ -164,7 +166,7 @@ module TrivialComponents {
 
         public highlightTextMatches(searchString:string) {
             for (let i = 0; i < this.entries.length; i++) {
-                const $entryElement = this.entries[i]._trEntryElement;
+                const $entryElement = (this.entries[i] as any)._trEntryElement;
                 $entryElement.trivialHighlight(searchString, this.config.matchingOptions);
             }
         }

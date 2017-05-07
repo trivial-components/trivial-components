@@ -73,14 +73,14 @@ module TrivialComponents {
         constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E>) {
             options = options || {};
             this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
-                valueFunction: (entries:E[]) => entries.map(e => e._isFreeTextEntry ? e.displayValue : e.id).join(','),
+                valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
                 entryRenderingFunction: (entry: E) => {
-                    const template = entry.template || DEFAULT_TEMPLATES.image2LinesTemplate;
+                    const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
                     return Mustache.render(template, entry);
                 },
                 selectedEntryRenderingFunction: (entry: E) => {
-                    if (entry.selectedEntryTemplate) {
-                        return Mustache.render(entry.selectedEntryTemplate, entry)
+                    if ((entry as any).selectedEntryTemplate) {
+                        return Mustache.render((entry as any).selectedEntryTemplate, entry)
                     } else {
                         return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
                     }
@@ -99,8 +99,8 @@ module TrivialComponents {
                         for (let propertyName in entry) {
                             if (entry.hasOwnProperty(propertyName)) {
                                 const propertyValue = entry[propertyName];
-                                if (propertyValue && propertyValue.toString().toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
-                                    return propertyValue.toString();
+                                if (propertyValue && ("" + propertyValue).toLowerCase().indexOf(editorText.toLowerCase()) === 0) {
+                                    return "" + propertyValue;
                                 }
                             }
                         }
@@ -173,7 +173,7 @@ module TrivialComponents {
                         this.$tagComboBox.addClass('focus');
                     }
                     setTimeout(() => { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
-                        $tagArea.minimallyScrollTo(this.$editor);
+                        TrivialComponents.minimallyScrollTo($tagArea, this.$editor);
                     });
                 })
                 .blur(() => {
@@ -347,7 +347,7 @@ module TrivialComponents {
                 let smallestDistanceX = 1000000;
                 for (let i = 0; i < this.selectedEntries.length; i++) {
                     const selectedEntry = this.selectedEntries[i];
-                    const $tag = selectedEntry._trEntryElement;
+                    const $tag = (selectedEntry as any)._trEntryElement;
                     const tagBoundingRect = $tag[0].getBoundingClientRect();
                     const sameRow = e.clientY >= tagBoundingRect.top && e.clientY < tagBoundingRect.bottom;
                     const sameCol = e.clientX >= tagBoundingRect.left && e.clientX < tagBoundingRect.right;
@@ -417,7 +417,7 @@ module TrivialComponents {
             if (index > -1) {
                 this.selectedEntries.splice(index, 1);
             }
-            tagToBeRemoved._trEntryElement.remove();
+            (tagToBeRemoved as any)._trEntryElement.remove();
             this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
             this.fireChangeEvents(this.getSelectedEntries());
         }
@@ -518,7 +518,7 @@ module TrivialComponents {
                 this.isDropDownOpen = true;
             }
             if (this.repositionDropDownScheduler == null) {
-                this.repositionDropDownScheduler = setInterval(() => this.repositionDropDown(), 1000); // make sure that under no circumstances the dropdown is mal-positioned
+                this.repositionDropDownScheduler = window.setInterval(() => this.repositionDropDown(), 1000); // make sure that under no circumstances the dropdown is mal-positioned
             }
         }
 
@@ -546,7 +546,7 @@ module TrivialComponents {
                 clearTimeout(this.autoCompleteTimeoutId);
                 const highlightedEntry = this.listBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    this.autoCompleteTimeoutId = setTimeout(() => {
+                    this.autoCompleteTimeoutId = window.setTimeout(() => {
                         const currentEditorValue = this.getNonSelectedEditorValue();
                         const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.text(currentEditorValue + autoCompleteString.replace(' ', String.fromCharCode(160)).substr(currentEditorValue.length)); // I have to replace whitespaces by 160 because text() trims whitespaces...

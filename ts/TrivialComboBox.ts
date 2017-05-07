@@ -16,10 +16,15 @@
  limitations under the License.
  */
 
+/**
+ * Actual module comment.  sdafasfa
+ */
 module TrivialComponents {
 
     export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
+        /** The function used for calculating the value of the original input. */
         valueFunction?: (entry: E) => string,
+        /** The function used for rendering the selected entry. If not specified, this defaults to {@link entryRenderingFunction} */
         selectedEntryRenderingFunction?: (entry: E) => string,
         noEntriesTemplate?: string,
         textHighlightingEntryLimit?: number,
@@ -37,6 +42,9 @@ module TrivialComponents {
         showDropDownOnResultsOnly?: boolean
     }
 
+    /**
+     * A templateable combobox.
+     */
     export class TrivialComboBox<E> implements TrivialComponent{
 
         private config: TrivialComboBoxConfig<E>;
@@ -491,7 +499,7 @@ module TrivialComponents {
                 clearTimeout(this.autoCompleteTimeoutId);
                 const highlightedEntry = this.listBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    this.autoCompleteTimeoutId = setTimeout(() => {
+                    this.autoCompleteTimeoutId = window.setTimeout(() => {
                         const currentEditorValue = this.getNonSelectedEditorValue();
                         const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));

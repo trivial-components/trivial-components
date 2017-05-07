@@ -490,7 +490,7 @@ module TrivialComponents {
                 clearTimeout(this.autoCompleteTimeoutId);
                 const highlightedEntry = this.treeBox.getHighlightedEntry();
                 if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
-                    this.autoCompleteTimeoutId = setTimeout(() => {
+                    this.autoCompleteTimeoutId = window.setTimeout(() => {
                         const currentEditorValue = this.getNonSelectedEditorValue();
                         const autoCompleteString = this.config.autoCompleteFunction(currentEditorValue, highlightedEntry) || currentEditorValue;
                         this.$editor.val(currentEditorValue + autoCompleteString.substr(currentEditorValue.length));
@@ -572,7 +572,7 @@ module TrivialComponents {
             this.treeBox.updateNode(node);
         }
 
-        public removeNode(nodeId: number) {
+        public removeNode(nodeId: string) {
             this.treeBox.removeNode(nodeId);
         }
 

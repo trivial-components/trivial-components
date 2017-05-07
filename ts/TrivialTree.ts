@@ -49,7 +49,7 @@ module TrivialComponents {
 
         constructor(originalInput: JQuery|Element|string, options: TrivialTreeConfig<E> = {}) {
             this.config = $.extend(<TrivialTreeConfig<E>> {
-                valueFunction: (entry:E) => entry ? entry.id : null,
+                valueFunction: (entry:E) => entry ? (entry as any).id : null,
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 searchBarMode: 'show-if-filled',
@@ -213,7 +213,7 @@ module TrivialComponents {
                         if (this.countVisibleEntries(newEntries) < this.config.performanceOptimizationSettings.toManyVisibleItemsThreshold) {
                             processUpdate();
                         } else {
-                            this.processUpdateTimer = setTimeout(processUpdate, this.config.performanceOptimizationSettings.toManyVisibleItemsRenderDelay);
+                            this.processUpdateTimer = window.setTimeout(processUpdate, this.config.performanceOptimizationSettings.toManyVisibleItemsRenderDelay);
                         }
                     });
                 }, 0);
@@ -222,8 +222,8 @@ module TrivialComponents {
 
         private countVisibleEntries(entries: E[]) {
             let countVisibleChildrenAndSelf = (node: E) => {
-                if (node[this.config.expandedProperty] && node[this.config.childrenProperty]) {
-                    return node[this.config.childrenProperty].map((entry: E) => {
+                if ((node as any)[this.config.expandedProperty] && (node as any)[this.config.childrenProperty]) {
+                    return (node as any)[this.config.childrenProperty].map((entry: E) => {
                             return countVisibleChildrenAndSelf(entry);
                         }).reduce((a:number, b:number) => {
                             return a + b;
@@ -245,9 +245,9 @@ module TrivialComponents {
                 if (filterFunction.call(this, node)) {
                     listOfFoundEntries.push(node);
                 }
-                if (node[this.config.childrenProperty]) {
-                    for (let i = 0; i < node[this.config.childrenProperty].length; i++) {
-                        const child = node[this.config.childrenProperty][i];
+                if ((node as any)[this.config.childrenProperty]) {
+                    for (let i = 0; i < (node as any)[this.config.childrenProperty].length; i++) {
+                        const child = (node as any)[this.config.childrenProperty][i];
                         findEntriesInSubTree(child, listOfFoundEntries);
                     }
                 }
@@ -291,7 +291,7 @@ module TrivialComponents {
             this.treeBox.updateNode(node)
         };
 
-        public removeNode(nodeId: number) {
+        public removeNode(nodeId: string) {
             this.treeBox.removeNode(nodeId)
         };
 

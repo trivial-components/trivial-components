@@ -47,21 +47,21 @@ module TrivialComponents {
         private $tree: JQuery;
 
         private entries: E[];
-        private selectedEntryId: number;
+        private selectedEntryId: string;
         private highlightedEntry: E;
 
         constructor($container: JQuery|Element|string, options: TrivialTreeBoxConfig<E> = {}) {
             this.config = $.extend(<TrivialTreeBoxConfig<E>> {
-                valueFunction: (entry:E) => entry ? entry.id : null,
+                valueFunction: (entry:E) => entry ? (entry as any).id : null,
                 childrenProperty: "children",
                 lazyChildrenFlagProperty: "hasLazyChildren",
                 lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
-                    resultCallback(node.children || []);
+                    resultCallback((node as any).children || []);
                 },
                 expandedProperty: 'expanded',
                 entryRenderingFunction: function (entry: E, depth: number) {
                     const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                    const template = entry.template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                    const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                     return Mustache.render(template, entry);
                 },
                 spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
@@ -94,13 +94,13 @@ module TrivialComponents {
 
 
         private isLeaf(entry: E) {
-            return (entry[this.config.childrenProperty] == null || entry[this.config.childrenProperty].length == 0) && !entry[this.config.lazyChildrenFlagProperty];
+            return ((entry as any)[this.config.childrenProperty] == null || (entry as any)[this.config.childrenProperty].length == 0) && !(entry as any)[this.config.lazyChildrenFlagProperty];
         }
 
         private createEntryElement(entry: E, depth: number) {
             let leaf = this.isLeaf(entry);
             const $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>');
-            entry._trEntryElement = $outerEntryWrapper;
+            (entry as any)._trEntryElement = $outerEntryWrapper;
             const $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
 	            .appendTo($outerEntryWrapper);
             for (let k = 0; k < depth; k++) {
@@ -135,18 +135,18 @@ module TrivialComponents {
                 $expander.mousedown(() =>  {
                     return false;
                 }).click((e) =>  {
-                    this.setNodeExpanded(entry, !entry[this.config.expandedProperty], true);
+                    this.setNodeExpanded(entry, !(entry as any)[this.config.expandedProperty], true);
                 });
-                if (entry[this.config.childrenProperty]) {
-                    if (entry[this.config.expandedProperty]) {
-                        for (let i = 0; i < entry[this.config.childrenProperty].length; i++) {
-                            this.createEntryElement(entry[this.config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
+                if ((entry as any)[this.config.childrenProperty]) {
+                    if ((entry as any)[this.config.expandedProperty]) {
+                        for (let i = 0; i < (entry as any)[this.config.childrenProperty].length; i++) {
+                            this.createEntryElement((entry as any)[this.config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
                         }
                     }
-                } else if (entry[this.config.lazyChildrenFlagProperty]) {
+                } else if ((entry as any)[this.config.lazyChildrenFlagProperty]) {
                     $childrenWrapper.hide().append(this.config.spinnerTemplate).fadeIn();
                 }
-                this.setNodeExpanded(entry, entry[this.config.expandedProperty], false);
+                this.setNodeExpanded(entry, (entry as any)[this.config.expandedProperty], false);
             }
             return $outerEntryWrapper;
         }
@@ -167,11 +167,11 @@ module TrivialComponents {
 
 
         private setNodeExpanded(node: E, expanded: boolean, animate: boolean) {
-            let wasExpanded = node[this.config.expandedProperty];
+            let wasExpanded = (node as any)[this.config.expandedProperty];
 
             if (expanded && this.config.enforceSingleExpandedPath) {
                 const currentlyExpandedNodes = this.findEntries((n) => {
-                    return !!(n[this.config.expandedProperty]);
+                    return !!((n as any)[this.config.expandedProperty]);
                 });
                 const newExpandedPath = this.findPathToFirstMatchingNode((n) => {
                     return n === node;
@@ -184,16 +184,16 @@ module TrivialComponents {
                 }
             }
 
-            node[this.config.expandedProperty] = !!expanded;
-            node._trEntryElement.toggleClass("expanded", !!expanded);
+            (node as any)[this.config.expandedProperty] = !!expanded;
+            (node as any)._trEntryElement.toggleClass("expanded", !!expanded);
 
             let nodeHasUnrenderedChildren = (node: E) => {
-                return node[this.config.childrenProperty] && node[this.config.childrenProperty].some((child: E) =>  {
-                        return !child._trEntryElement || !jQuery.contains(document.documentElement, child._trEntryElement[0]);
+                return (node as any)[this.config.childrenProperty] && (node as any)[this.config.childrenProperty].some((child: E) =>  {
+                        return !(child as any)._trEntryElement || !jQuery.contains(document.documentElement, (child as any)._trEntryElement[0]);
                     });
             };
 
-            if (expanded && node[this.config.lazyChildrenFlagProperty] && !node[this.config.childrenProperty]) {
+            if (expanded && (node as any)[this.config.lazyChildrenFlagProperty] && !(node as any)[this.config.childrenProperty]) {
                 this.config.lazyChildrenQueryFunction(node, (children: E[]) =>  {
                     this.setChildren(node, children);
                 });
@@ -201,10 +201,10 @@ module TrivialComponents {
                 this.renderChildren(node);
             }
             if (expanded) {
-                this.minimallyScrollTo(node._trEntryElement);
+                this.minimallyScrollTo((node as any)._trEntryElement);
             }
 
-            const childrenWrapper = node._trEntryElement.find("> .tr-tree-entry-children-wrapper");
+            const childrenWrapper = (node as any)._trEntryElement.find("> .tr-tree-entry-children-wrapper");
             if (expanded) {
                 if (animate) {
                     childrenWrapper.slideDown(this.config.animationDuration);
@@ -225,19 +225,19 @@ module TrivialComponents {
         }
 
         private nodeDepth(node: E) {
-            return node ? parseInt(node._trEntryElement.attr('data-depth')) : 0;
+            return node ? parseInt((node as any)._trEntryElement.attr('data-depth')) : 0;
         }
 
         private setChildren(node: E, children: E[]) {
-            node[this.config.childrenProperty] = children;
-            node[this.config.lazyChildrenFlagProperty] = false;
+            (node as any)[this.config.childrenProperty] = children;
+            (node as any)[this.config.lazyChildrenFlagProperty] = false;
             this.renderChildren(node);
         }
 
         private renderChildren(node: E) {
-            const $childrenWrapper = node._trEntryElement.find('> .tr-tree-entry-children-wrapper');
+            const $childrenWrapper = (node as any)._trEntryElement.find('> .tr-tree-entry-children-wrapper');
             $childrenWrapper.empty();
-            const children = node[this.config.childrenProperty];
+            const children = (node as any)[this.config.childrenProperty];
             if (children && children.length > 0) {
                 const depth = this.nodeDepth(node);
                 for (let i = 0; i < children.length; i++) {
@@ -245,7 +245,7 @@ module TrivialComponents {
                     this.createEntryElement(child, depth + 1).appendTo($childrenWrapper);
                 }
             } else {
-                node._trEntryElement.removeClass('has-children expanded');
+                (node as any)._trEntryElement.removeClass('has-children expanded');
             }
         }
 
@@ -267,9 +267,9 @@ module TrivialComponents {
                 if (filterFunction.call(this, node)) {
                     listOfFoundEntries.push(node);
                 }
-                if (node[this.config.childrenProperty]) {
-                    for (let i = 0; i < node[this.config.childrenProperty].length; i++) {
-                        const child = node[this.config.childrenProperty][i];
+                if ((node as any)[this.config.childrenProperty]) {
+                    for (let i = 0; i < (node as any)[this.config.childrenProperty].length; i++) {
+                        const child = (node as any)[this.config.childrenProperty][i];
                         findEntriesInSubTree(child, listOfFoundEntries);
                     }
                 }
@@ -283,17 +283,17 @@ module TrivialComponents {
             return matchingEntries;
         }
 
-        private findPathToFirstMatchingNode(predicateFunction: ((node: E, path: any[]) => boolean)) {
-            let searchInSubTree = (node: E, path: any[]): E => {
+        private findPathToFirstMatchingNode(predicateFunction: ((node: E, path: any[]) => boolean)): E[] {
+            let searchInSubTree = (node: E, path: any[]): E[] => {
                 if (predicateFunction.call(this, node, path)) {
                     path.push(node);
                     return path;
                 }
-                if (node[this.config.childrenProperty]) {
+                if ((node as any)[this.config.childrenProperty]) {
                     const newPath = path.slice();
                     newPath.push(node);
-                    for (let i = 0; i < node[this.config.childrenProperty].length; i++) {
-                        const child = node[this.config.childrenProperty][i];
+                    for (let i = 0; i < (node as any)[this.config.childrenProperty].length; i++) {
+                        const child = (node as any)[this.config.childrenProperty][i];
                         const result = searchInSubTree(child, newPath);
                         if (result) {
                             return result;
@@ -304,22 +304,22 @@ module TrivialComponents {
 
             for (let i = 0; i < this.entries.length; i++) {
                 const rootEntry = this.entries[i];
-                var path = searchInSubTree(rootEntry, []);
+                let path = searchInSubTree(rootEntry, []);
                 if (path) {
                     return path;
                 }
             }
         }
 
-        private findEntryById(id: number) {
+        private findEntryById(id: string) {
             return this.findEntries((entry) =>  {
-                return this.config.valueFunction(entry) == id
+                return this.config.valueFunction(entry) === id
             })[0];
         }
 
         private findParentNode(childNode: E) {
             return this.findEntries((entry) =>  {
-                return entry[this.config.childrenProperty] && entry[this.config.childrenProperty].indexOf(childNode) != -1;
+                return (entry as any)[this.config.childrenProperty] && (entry as any)[this.config.childrenProperty].indexOf(childNode) != -1;
             })[0];
         }
 
@@ -338,13 +338,13 @@ module TrivialComponents {
         }
 
         private minimallyScrollTo($entryWrapper: JQuery) {
-            this.$componentWrapper.parent().minimallyScrollTo($entryWrapper);
+            TrivialComponents.minimallyScrollTo(this.$componentWrapper.parent(), $entryWrapper);
         }
 
         private markSelectedEntry(entry: E) {
             this.$tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
-            if (entry && entry._trEntryElement) {
-                const $entryWrapper = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
+            if (entry && (entry as any)._trEntryElement) {
+                const $entryWrapper = (entry as any)._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                 $entryWrapper.addClass("tr-selected-entry");
             }
         }
@@ -365,8 +365,8 @@ module TrivialComponents {
             if (entry !== this.highlightedEntry) {
                 this.highlightedEntry = entry;
                 this.$tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
-                if (entry != null && entry._trEntryElement) {
-                    const $entry = entry._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
+                if (entry != null && (entry as any)._trEntryElement) {
+                    const $entry = (entry as any)._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
                     $entry.addClass('tr-highlighted-entry');
                     this.minimallyScrollTo($entry);
                 } else {
@@ -381,13 +381,13 @@ module TrivialComponents {
         private getNextVisibleEntry(currentEntry: E, direction: HighlightDirection, onlyEntriesWithTextMatches: boolean = false) {
             let newSelectedElementIndex: number;
             const visibleEntriesAsList = this.findEntries((entry) => {
-                if (!entry._trEntryElement) {
+                if (!(entry as any)._trEntryElement) {
                     return false;
                 } else {
                     if (onlyEntriesWithTextMatches) {
-                        return entry._trEntryElement.is(':visible') && entry._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
+                        return (entry as any)._trEntryElement.is(':visible') && (entry as any)._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
                     } else {
-                        return entry._trEntryElement.is(':visible') || entry === currentEntry;
+                        return (entry as any)._trEntryElement.is(':visible') || entry === currentEntry;
                     }
                 }
             });
@@ -408,7 +408,7 @@ module TrivialComponents {
             this.$tree.detach();
             for (let i = 0; i < this.entries.length; i++) {
                 const entry = this.entries[i];
-                const $entryElement = entry._trEntryElement.find('.tr-tree-entry');
+                const $entryElement = (entry as any)._trEntryElement.find('.tr-tree-entry');
                 $entryElement.trivialHighlight(searchString, this.config.matchingOptions);
             }
             this.$tree.appendTo(this.$componentWrapper);
@@ -428,7 +428,7 @@ module TrivialComponents {
             while (currentEntry = this.findParentNode(currentEntry)) {
                 this.setNodeExpanded(currentEntry, true, animate);
             }
-            this.minimallyScrollTo(selectedEntry._trEntryElement);
+            this.minimallyScrollTo((selectedEntry as any)._trEntryElement);
         }
 
         public highlightNextEntry(direction: HighlightDirection) {
@@ -460,13 +460,13 @@ module TrivialComponents {
             if (!this.highlightedEntry || this.isLeaf(this.highlightedEntry)) {
                 return false;
             } else {
-                let wasExpanded = this.highlightedEntry[this.config.expandedProperty];
+                let wasExpanded = (this.highlightedEntry as any)[this.config.expandedProperty];
                 this.setNodeExpanded(this.highlightedEntry, expanded, true);
                 return !wasExpanded != !expanded;
             }
         }
 
-        public updateChildren(parentNodeId: E, children: E[]) {
+        public updateChildren(parentNodeId: string, children: E[]) {
             const node = this.findEntryById(parentNodeId);
             if (node) {
                 this.setChildren(node, children);
@@ -479,24 +479,24 @@ module TrivialComponents {
             const oldNode = this.findEntryById(this.config.valueFunction(node));
             const parent = this.findParentNode(oldNode);
             if (parent) {
-                parent[this.config.childrenProperty][parent[this.config.childrenProperty].indexOf(oldNode)] = node;
+                (parent as any)[this.config.childrenProperty][(parent as any)[this.config.childrenProperty].indexOf(oldNode)] = node;
             } else {
                 this.entries[this.entries.indexOf(oldNode)] = node;
             }
-            this.createEntryElement(node, this.nodeDepth(oldNode)).insertAfter(oldNode._trEntryElement);
-            oldNode._trEntryElement.remove();
+            this.createEntryElement(node, this.nodeDepth(oldNode)).insertAfter((oldNode as any)._trEntryElement);
+            (oldNode as any)._trEntryElement.remove();
         };
 
-        public removeNode(nodeId: number) {
+        public removeNode(nodeId: string) {
             const childNode = this.findEntryById(nodeId);
             if (childNode) {
                 const parentNode = this.findParentNode(childNode);
                 if (parentNode) {
-                    parentNode[this.config.childrenProperty].splice(parentNode[this.config.childrenProperty].indexOf(childNode), 1);
+                    (parentNode as any)[this.config.childrenProperty].splice((parentNode as any)[this.config.childrenProperty].indexOf(childNode), 1);
                 } else {
                     this.entries.splice(this.entries.indexOf(childNode), 1);
                 }
-                childNode._trEntryElement.remove();
+                (childNode as any)._trEntryElement.remove();
             }
         };
 
@@ -505,14 +505,14 @@ module TrivialComponents {
             if (this.isLeaf(parentNode)) {
                 console.error('The parent node is a leaf node, so you cannot add children to it!');
             }
-            if (!parentNode[this.config.childrenProperty]) {
-                parentNode[this.config.childrenProperty] = [];
+            if (!(parentNode as any)[this.config.childrenProperty]) {
+                (parentNode as any)[this.config.childrenProperty] = [];
             }
-            parentNode[this.config.childrenProperty].push(node);
+            (parentNode as any)[this.config.childrenProperty].push(node);
             const entryElement = this.createEntryElement(node, this.nodeDepth(parentNode) + 1);
             entryElement
-                .appendTo(parentNode._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
-            parentNode._trEntryElement.addClass('has-children');
+                .appendTo((parentNode as any)._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
+            (parentNode as any)._trEntryElement.addClass('has-children');
         };
 
         getMainDomElement(): Element {
