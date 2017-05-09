@@ -39,6 +39,7 @@ var VERSION = require('./package.json').version;
 
 var gulp = require('gulp');
 var bower = require('gulp-bower');
+var jest = require('jest-cli');
 var less = require('gulp-less');
 var mirror = require('gulp-mirror');
 var rename = require('gulp-rename');
@@ -48,6 +49,7 @@ var watch = require('gulp-watch');
 var plumber = require('gulp-plumber');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
+var path = require('path');
 var del = require('del');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
@@ -66,6 +68,7 @@ var gulpTypings = require("gulp-typings");
 var release = require('gulp-github-release');
 var merge = require('merge-stream');
 var spawn = require('child_process').spawn;
+var change = require('gulp-change');
 
 gulp.task('clean', function () {
     return del(['dist']);
@@ -140,7 +143,7 @@ gulp.task('minify-css', ['less', 'less-bootstrap'], function () {
 });
 
 
-gulp.task('js-single', ['typescript', 'typescript-declarations'], function () {
+gulp.task('js-single', ['typescript'], function () {
     return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js', '!**/*.min.*'])
         .pipe(stripDebug())
         .pipe(rename(function (path) {
@@ -169,7 +172,7 @@ gulp.task('js-bundle', ['js-single'], function () {
         .pipe(gulp.dest('./dist/js/bundle'))
 });
 
-gulp.task('ts-declarations-bundle', ['typescript-declarations'], function () {
+gulp.task('ts-declarations-bundle', ['typescript'], function () {
     return gulp.src(['dist/js/single/*.d.ts'])
 	    .pipe(strip())
         .pipe(concat('trivial-components.d.ts'))
@@ -177,14 +180,13 @@ gulp.task('ts-declarations-bundle', ['typescript-declarations'], function () {
         .pipe(gulp.dest('./dist/js/bundle'))
 });
 
-gulp.task('test', ['bower'], function (done) {
-    karma.start({
-        configFile: __dirname + '/karma.conf.js',
-        singleRun: true
-    }, done);
+gulp.task('test', function (done) {
+	jest.runCLI({ config: require('./package.json').jest }, ".", function(result) {
+		done(result.success ? undefined: 'There are test failures!');
+	});
 });
 
-gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'copyLibs2dist']);
+gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'copyLibs2dist', 'test']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -195,7 +197,7 @@ gulp.task('zip', ["prepare-dist"], function () {
         .pipe(gulp.dest('dist'));
 });
 gulp.task('tar', ['prepare-dist'], function () {
-    return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
+	return gulp.src(['README.md', 'LICENSE', 'less/*', 'ts/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
         .pipe(tar('trivial-components.tar'))
         .pipe(rename(function (path) {
             path.basename += '-' + VERSION;
@@ -231,21 +233,53 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-ts', function () {
-    gulp.watch(['ts/*.ts'], ['js-bundle']);
+	gulp.watch(['ts/*.ts'], ['js-single']);
 });
 
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('typescript', ['install-typings'], function () {
-    return tsProject.src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest("dist/js/single"));
-});
+	var tsResult = tsProject.src()
+		.pipe(sourcemaps.init())
+		.pipe(tsProject());
 
-gulp.task('typescript-declarations', ['typescript'], function () {
-	return tsProject.src()
-		.pipe(tsProject())
-		.pipe(gulp.dest("dist/js/single"));
+	return merge([ // Merge the two output streams, so this task is finished when the IO of both operations is done.
+		tsResult
+			.dts
+			.pipe(change(function (content) {
+				return content + '\n\nexport as namespace TrivialComponents;'
+			}))
+			.pipe(gulp.dest("dist/js/single")),
+		tsResult
+			.js
+			.pipe(sourcemaps.write('.', {
+				includeContent: false,
+				debug: true,
+				mapSources: function (filePath) {
+					return path.basename(filePath);
+				}
+			}))
+			.pipe(change(function (content) {
+				return content.replace(/else if \(typeof define === ['"]function['"] && define.amd\) {[\s\S]*?}/,
+					'$& else { ' +
+					'  window.TrivialComponents = window.TrivialComponents || {};' +
+					'  factory(function(name) {' +
+					'    if (name === "jquery") {' +
+					'      return jQuery;' +
+					'    } else if (name === "levenshtein") {' +
+					'      return Levenshtein;' +
+					'    } else if (name === "moment") {' +
+					'      return moment;' +
+					'    } else if (name === "mustache") {' +
+					'      return Mustache;' +
+					'    } else {' +
+					'      return window.TrivialComponents;' +
+					'    }' +
+					'  }, window.TrivialComponents);' +
+					'}')
+			}))
+			.pipe(gulp.dest("dist/js/single"))
+	]);
 });
 
 gulp.task("install-typings", function () {

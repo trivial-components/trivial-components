@@ -33,7 +33,6 @@
     <script src="../bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
     <script src="../dist/js/single/TrivialCore.js"></script>
     <script src="../dist/js/single/trivial-highlight.js"></script>
-    <script src="../dist/js/single/trivial-minimallyScrollTo.js"></script>
     <script src="../dist/js/single/TrivialEvent.js"></script>
     <script src="../dist/js/single/KeyCodes.js"></script>
     <script src="../dist/js/single/TrivialComboBox.js"></script>
@@ -265,7 +264,7 @@ no search field:
         demo.customFilteringComboBox = new TrivialComponents.TrivialComboBox('#customFilteringComboBox', {
             entries: createEntries(),
             emptyEntry: {
-                imageUrl: "-",
+                imageUrl: "",
                 additionalInfo: ""
             },
             queryFunction: function (queryString, resultCallback) {
@@ -604,12 +603,9 @@ no search field:
         demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
 
         $destroyAllButton = $('#destroyAllButton').click(function() {
-            $('.tr-combobox').TrivialComboBox().forEach(function(c) {c.destroy()});
-            $('.tr-tagbox').TrivialTagComboBox().forEach(function(c) {c.destroy()});
-            $('.tr-tree').TrivialTree().forEach(function(c) {c.destroy()});
-            $('.tr-treecombobox').TrivialTreeComboBox().forEach(function(c) {c.destroy()});
-            $('.tr-unitbox').TrivialUnitBox().forEach(function(c) {c.destroy()});
-            $('.tr-calendarcombobox').TrivialCalendarComboBox().destroy();
+            Object.keys(demo).forEach(function(key) {
+            	demo[key].destroy();
+            })
         });
     });
 </script>

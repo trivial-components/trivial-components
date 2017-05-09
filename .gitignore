@@ -9,6 +9,7 @@ dist/
 demo/css/
 typings/
 tmp/
+__test__/*.js
 
 ### NetBeans template
 nbproject/private/

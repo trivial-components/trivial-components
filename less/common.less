@@ -127,13 +127,17 @@
   border: @tr-border;
   border-top: none;
   border-radius: 0 0 @tr-border-radius @tr-border-radius;
-  min-height: 30px;
   z-index: 1;
 
   &.flipped {
     border-radius: @tr-border-radius @tr-border-radius 0 0;
     border-top: @tr-border;
     border-bottom: none;
+  }
+
+  > * {
+    // needs to be set on the content (e.g. listbox) so the dropdown component has the min size! Otherwise, the listbox will shrink down to zero, even if an empty template is to be displayed.
+    min-height: 30px;
   }
 }
 

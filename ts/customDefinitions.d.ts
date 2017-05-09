@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-declare var Levenshtein:{
-    new(s1:string, s2:string):{distance:number};
-};
+
+declare module "levenshtein" {
+    let Levenshtein: {
+        new(s1: string, s2: string): { distance: number };
+    };
+    export = Levenshtein;
+}
