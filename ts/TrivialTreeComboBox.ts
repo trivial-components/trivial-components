@@ -150,9 +150,9 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         this.$selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo(this.$treeComboBox);
         if (this.config.showClearButton) {
             this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$treeComboBox);
-            this.$clearButton.mousedown(() => {
+            this.$clearButton.mousedown((e) => {
                 this.$editor.val("");
-                this.setSelectedEntry(null, true, true);
+                this.setSelectedEntry(null, true, true, e);
             });
         }
         if (this.config.showTrigger) {
@@ -191,7 +191,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     this.showEditor();
                 }
             })
-            .blur(() => {
+            .blur((e) => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
                 } else {
@@ -200,11 +200,11 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     this.$treeComboBox.removeClass('focus');
                     if (this.editorContainsFreeText()) {
                         if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
-                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                         }
                     } else {
                         this.$editor.val("");
-                        this.setSelectedEntry(this.lastCommittedValue);
+                        this.setSelectedEntry(this.lastCommittedValue, false, false, e);
                     }
                     this.hideEditor();
                     this.closeDropDown();
@@ -216,11 +216,11 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                 } else if (e.which == keyCodes.tab) {
                     let highlightedEntry = this.treeBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry) {
-                        this.setSelectedEntry(highlightedEntry, true, true);
+                        this.setSelectedEntry(highlightedEntry, true, true, e);
                     } else if (!this.$editor.val()) {
-                        this.setSelectedEntry(null, true, true);
+                        this.setSelectedEntry(null, true, true, e);
                     } else if (this.config.allowFreeText) {
-                        this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                        this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -240,7 +240,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     let isNonIgnoredKey = !keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1;
                     let editorValueDoesNotCorrespondToSelectedValue = this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry);
                     if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.valueFunction(this.treeBox.getHighlightedEntry())) !== this.config.valueFunction(this.getSelectedEntry())) {
-                        this.setSelectedEntry(null, false);
+                        this.setSelectedEntry(null, false, false, e);
                     }
                 });
 
@@ -269,11 +269,11 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                         e.preventDefault(); // do not submit form
                         let highlightedEntry = this.treeBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.setSelectedEntry(highlightedEntry, true, true);
+                            this.setSelectedEntry(highlightedEntry, true, true, e);
                         } else if (!this.$editor.val()) {
-                            this.setSelectedEntry(null, true, true);
+                            this.setSelectedEntry(null, true, true, e);
                         } else if (this.config.allowFreeText) {
-                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                         }
                         this.closeDropDown();
                         this.hideEditor();
@@ -283,7 +283,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     if (!(this.editorContainsFreeText() && this.isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
                         this.hideEditor();
                         this.$editor.val("");
-                        this.setSelectedEntry(this.lastCommittedValue, false);
+                        this.setSelectedEntry(this.lastCommittedValue, false, false, e);
                     }
                     this.closeDropDown();
                 } else {
@@ -339,16 +339,16 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
             });
 
         this.treeBox = new TrivialTreeBox(this.$dropDown, this.config);
-        this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
+        this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource, originalEvent) => {
             if (selectedEntry) {
-                this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue));
+                this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue), originalEvent);
                 this.treeBox.setSelectedEntry(null);
                 this.closeDropDown();
             }
             this.hideEditor();
         });
 
-        this.setSelectedEntry(this.config.selectedEntry, true, false);
+        this.setSelectedEntry(this.config.selectedEntry, true, false, null);
 
         this.$selectedEntryWrapper.click(() => {
             this.showEditor();
@@ -381,12 +381,12 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         }
     }
 
-    private fireChangeEvents(entry: E) {
+    private fireChangeEvents(entry: E, originalEvent?: Event) {
         this.$originalInput.trigger("change");
-        this.onSelectedEntryChanged.fire(entry);
+        this.onSelectedEntryChanged.fire(entry, originalEvent);
     }
 
-    public setSelectedEntry(entry: E, commit?: boolean, fireEvent = false) {
+    public setSelectedEntry(entry: E, commit: boolean, fireEvent: boolean, originalEvent: Event) {
         if (entry == null) {
             this.$originalInput.val(this.config.valueFunction(null));
             this.selectedEntry = null;
@@ -405,7 +405,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         if (commit) {
             this.lastCommittedValue = entry;
             if (fireEvent) {
-                this.fireChangeEvents(entry);
+                this.fireChangeEvents(entry, originalEvent);
             }
         }
         if (this.$clearButton) {

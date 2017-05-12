@@ -184,7 +184,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     minimallyScrollTo($tagArea, this.$editor);
                 });
             })
-            .blur(() => {
+            .blur((e) => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
                 } else {
@@ -194,10 +194,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.entries = null;
                     this.closeDropDown();
                     if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()));
+                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);    
                     }
                     this.$editor.text("");
-                    //fireChangeEvents(me.getSelectedEntries());
                 }
             })
             .keydown((e: KeyboardEvent) => {
@@ -206,7 +205,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 } else if (e.which == keyCodes.tab) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry) {
-                        this.setSelectedEntry(highlightedEntry);
+                        this.setSelectedEntry(highlightedEntry, true, e);
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -228,7 +227,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     if (this.$editor.text() == "") {
                         const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
                         if (tagToBeRemoved) {
-                            this.removeTag(tagToBeRemoved);
+                            this.removeTag(tagToBeRemoved, e);
                             this.closeDropDown();
                         }
                     } else {
@@ -254,10 +253,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 } else if (e.which == keyCodes.enter) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry != null) {
-                        this.setSelectedEntry(highlightedEntry);
+                        this.setSelectedEntry(highlightedEntry, true, e);
                         this.entries = null;
                     } else if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()));
+                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), false, e);
                     }
                     this.closeDropDown();
                     e.preventDefault(); // prevent the new line to be added to the editor!
@@ -271,7 +270,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.query(1);
                 }
             })
-            .keyup(() => {
+            .keyup((e) => {
                 function splitStringBySeparatorChars(s: string, separatorChars: string[]) {
                     return s.split(new RegExp("[" + escapeSpecialRegexCharacter(separatorChars.join()) + "]"));
                 }
@@ -287,7 +286,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         for (let i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
                             const value = tagValuesEnteredByUser[i].trim();
                             if (value.length > 0) {
-                                this.setSelectedEntry(this.config.freeTextEntryFactory(value));
+                                this.setSelectedEntry(this.config.freeTextEntryFactory(value), true, e);
                             }
                             this.$editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
                             selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
@@ -334,15 +333,13 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         const configWithoutEntries = $.extend({}, this.config);
         configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
         this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
-        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
+        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
             if (selectedEntry) {
-                this.setSelectedEntry(selectedEntry);
+                this.setSelectedEntry(selectedEntry, true, originalEvent);
                 this.listBox.setSelectedEntry(null);
                 this.closeDropDown();
             }
         });
-
-        this.setSelectedEntry(this.config.selectedEntry, true);
 
         $tagArea.click((e) => {
             if (!this.config.showDropDownOnResultsOnly) {
@@ -380,9 +377,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.$editor.focus();
         });
 
-        for (let i = 0; i < this.config.selectedEntries.length; i++) {
-            this.setSelectedEntry(this.config.selectedEntries[i], true);
-        }
+        this.setSelectedEntries(this.config.selectedEntries);
 
         // ===
         this.$tagComboBox.data("trivialTagComboBox", this);
@@ -420,14 +415,14 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
     }
 
-    private removeTag(tagToBeRemoved: E) {
+    private removeTag(tagToBeRemoved: E, originalEvent?: Event) {
         const index = this.selectedEntries.indexOf(tagToBeRemoved);
         if (index > -1) {
             this.selectedEntries.splice(index, 1);
         }
         (tagToBeRemoved as any)._trEntryElement.remove();
         this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
-        this.fireChangeEvents(this.getSelectedEntries());
+        this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
     }
 
     private query(highlightDirection?: HighlightDirection) {
@@ -452,12 +447,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }, 0);
     }
 
-    private fireChangeEvents(entries: E[]) {
+    private fireChangeEvents(entries: E[], originalEvent: Event) {
         this.$originalInput.trigger("change");
-        this.onSelectedEntryChanged.fire(entries);
+        this.onSelectedEntryChanged.fire(entries, originalEvent);
     }
 
-    public setSelectedEntry(entry: E, fireEvent = false) {
+    private setSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event) {
         if (entry == null) {
             return; // do nothing
         }
@@ -489,7 +484,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$editor.text("");
 
         if (fireEvent) {
-            this.fireChangeEvents(this.getSelectedEntries());
+            this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
         }
     }
 
@@ -586,7 +581,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             .forEach((e) => this.removeTag(e));
         if (entries) {
             for (let i = 0; i < entries.length; i++) {
-                this.setSelectedEntry(entries[i], true);
+                this.setSelectedEntry(entries[i]);
             }
         }
     }

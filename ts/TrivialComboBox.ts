@@ -155,9 +155,9 @@ export class TrivialComboBox<E> implements TrivialComponent{
 
         if (this.config.showClearButton) {
             this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$comboBox);
-            this.$clearButton.mousedown(() => {
+            this.$clearButton.mousedown((e) => {
                 this.$editor.val("");
-                this.setSelectedEntry(null, true, true);
+                this.setSelectedEntry(null, true, true, e);
             });
         }
         if (this.config.showTrigger) {
@@ -196,7 +196,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
                     this.showEditor();
                 }
             })
-            .blur(() => {
+            .blur((e) => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
                 } else {
@@ -205,11 +205,11 @@ export class TrivialComboBox<E> implements TrivialComponent{
                     this.$comboBox.removeClass('focus');
                     if (this.editorContainsFreeText()) {
                         if (!objectEquals(this.getSelectedEntry(), this.lastCommittedValue)) {
-                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                         }
                     } else {
                         this.$editor.val("");
-                        this.setSelectedEntry(this.lastCommittedValue, false, true);
+                        this.setSelectedEntry(this.lastCommittedValue, false, true, e);
                     }
                     this.hideEditor();
                     this.closeDropDown();
@@ -221,11 +221,11 @@ export class TrivialComboBox<E> implements TrivialComponent{
                 } else if (e.which == keyCodes.tab) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry) {
-                        this.setSelectedEntry(highlightedEntry, true, true);
+                        this.setSelectedEntry(highlightedEntry, true, true, e);
                     } else if (!this.$editor.val()) {
                         this.setSelectedEntry(null, true, true);
                     } else if (this.config.allowFreeText) {
-                        this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                        this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -238,7 +238,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
                     let isNonIgnoredKey = !keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1;
                     let editorValueDoesNotCorrespondToSelectedValue = this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry);
                     if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.valueFunction(this.listBox.getHighlightedEntry())) !== this.config.valueFunction(this.getSelectedEntry())) {
-                        this.setSelectedEntry(null, false);
+                        this.setSelectedEntry(null, false, false, e);
                     }
                 });
 
@@ -267,11 +267,11 @@ export class TrivialComboBox<E> implements TrivialComponent{
                         e.preventDefault(); // do not submit form
                         const highlightedEntry = this.listBox.getHighlightedEntry();
                         if (this.isDropDownOpen && highlightedEntry) {
-                            this.setSelectedEntry(highlightedEntry, true, true);
+                            this.setSelectedEntry(highlightedEntry, true, true, e);
                         } else if (!this.$editor.val()) {
-                            this.setSelectedEntry(null, true, true);
+                            this.setSelectedEntry(null, true, true, e);
                         } else if (this.config.allowFreeText) {
-                            this.setSelectedEntry(this.getSelectedEntry(), true, true);
+                            this.setSelectedEntry(this.getSelectedEntry(), true, true, e);
                         }
                         this.closeDropDown();
                         this.hideEditor();
@@ -282,7 +282,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
                         this.hideEditor();
                         this.$editor.val("");
                         this.entries = null; // so we will query again when we combobox is re-focused
-                        this.setSelectedEntry(this.lastCommittedValue, false, true);
+                        this.setSelectedEntry(this.lastCommittedValue, false, true, e);
                     }
                     this.closeDropDown();
                 } else {
@@ -337,9 +337,9 @@ export class TrivialComboBox<E> implements TrivialComponent{
         const configWithoutEntries = $.extend({}, this.config);
         configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
         this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
-        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E) => {
+        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource, originalEvent) => {
             if (selectedEntry) {
-                this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue));
+                this.setSelectedEntry(selectedEntry, true, !objectEquals(selectedEntry, this.lastCommittedValue), originalEvent);
                 this.listBox.setSelectedEntry(null);
                 this.closeDropDown();
             }
@@ -379,12 +379,12 @@ export class TrivialComboBox<E> implements TrivialComponent{
         }
     }
 
-    private fireChangeEvents(entry: E) {
+    private fireChangeEvents(entry: E, originalEvent: Event) {
         this.$originalInput.trigger("change");
         this.onSelectedEntryChanged.fire(entry);
     }
 
-    public setSelectedEntry(entry: E, commit = true, fireEvent = false) {
+    public setSelectedEntry(entry: E, commit = true, fireEvent = false, originalEvent?: Event) {
         if (entry == null) {
             this.$originalInput.val(this.config.valueFunction(null));
             this.selectedEntry = null;
@@ -403,7 +403,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
         if (commit) {
             this.lastCommittedValue = entry;
             if (fireEvent) {
-                this.fireChangeEvents(entry);
+                this.fireChangeEvents(entry, originalEvent);
             }
         }
         if (this.$clearButton) {
