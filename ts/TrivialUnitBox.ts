@@ -424,10 +424,10 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         this.isDropDownOpen = true;
     }
 
-    private closeDropDown() {
-        // this.$unitBox.removeClass("open"); 
-        // this.$dropDown.hide();
-        // this.isDropDownOpen = false;
+    public closeDropDown() {
+        this.$unitBox.removeClass("open");
+        this.$dropDown.hide();
+        this.isDropDownOpen = false;
     }
 
     private updateOriginalInputValue() {

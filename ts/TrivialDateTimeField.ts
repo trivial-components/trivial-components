@@ -515,7 +515,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         }
     }
 
-    private closeDropDown() {
+    public closeDropDown() {
         this.$dateTimeField.removeClass("open");
         this.$dropDown.hide();
         this.isDropDownOpen = false;

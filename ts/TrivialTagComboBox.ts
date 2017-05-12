@@ -530,13 +530,13 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
     }
 
-    private closeDropDown() {
-        // this.$tagComboBox.removeClass("open");
-        // this.$dropDown.hide();
-        // this.isDropDownOpen = false;
-        // if (this.repositionDropDownScheduler != null) {
-        //     clearInterval(this.repositionDropDownScheduler);
-        // }
+    public closeDropDown() {
+        this.$tagComboBox.removeClass("open");
+        this.$dropDown.hide();
+        this.isDropDownOpen = false;
+        if (this.repositionDropDownScheduler != null) {
+            clearInterval(this.repositionDropDownScheduler);
+        }
     }
 
     private getNonSelectedEditorValue() {

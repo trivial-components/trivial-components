@@ -485,9 +485,9 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     public closeDropDown() {
-        // this.$comboBox.removeClass("open");
-        // this.$dropDown.hide();
-        // this.isDropDownOpen = false;
+        this.$comboBox.removeClass("open");
+        this.$dropDown.hide();
+        this.isDropDownOpen = false;
     }
 
     private getNonSelectedEditorValue() {

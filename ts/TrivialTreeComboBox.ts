@@ -483,10 +483,10 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         }
     }
 
-    private closeDropDown() {
-        // this.$treeComboBox.removeClass("open");
-        // this.$dropDown.hide();
-        // this.isDropDownOpen = false;
+    public closeDropDown() {
+        this.$treeComboBox.removeClass("open");
+        this.$dropDown.hide();
+        this.isDropDownOpen = false;
     }
 
     private getNonSelectedEditorValue() {

@@ -256,7 +256,7 @@ gulp.task('typescript', ['install-typings'], function () {
 				includeContent: false,
 				debug: true,
 				mapSources: function (filePath) {
-					return path.basename(filePath);
+					return "../../../ts/" + path.basename(filePath);
 				}
 			}))
 			.pipe(change(function (content) {
