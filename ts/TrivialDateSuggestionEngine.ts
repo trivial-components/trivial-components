@@ -26,9 +26,18 @@ export interface DateSuggestion {
 }
 export type YearMonthDayOrder = "YMD" | "YDM" | "MDY" | "MYD" | "DMY" | "DYM";
 
-export class TrivialDateSuggestionEngine {
+export interface Options {
+	preferredDateFormat?: string,
+}
 
-	constructor(private dateFormat: string) {
+export class TrivialDateSuggestionEngine {
+	private options: Options;
+
+	constructor(options: Options) {
+		this.options = {
+			preferredDateFormat: "YYYY-MM-DD",
+			...options
+		}
 	}
 
 	public generateSuggestions(searchString: string, now: Moment | Date): DateSuggestion[] {
@@ -41,10 +50,8 @@ export class TrivialDateSuggestionEngine {
 			suggestions = TrivialDateSuggestionEngine.generateSuggestionsForDigitsOnlyInput(searchString, now);
 		}
 
-		suggestions = this.removeDuplicates(suggestions);
-
 		// sort by relevance
-		let preferredYmdOrder: YearMonthDayOrder = TrivialDateSuggestionEngine.dateFormatToYmdOrder(this.dateFormat);
+		let preferredYmdOrder: YearMonthDayOrder = TrivialDateSuggestionEngine.dateFormatToYmdOrder(this.options.preferredDateFormat);
 		suggestions.sort(function (a, b) {
 			if (preferredYmdOrder.indexOf(a.ymdOrder) === -1 && preferredYmdOrder.indexOf(b.ymdOrder) !== -1) {
 				return 1;
@@ -56,6 +63,8 @@ export class TrivialDateSuggestionEngine {
 				return a.moment.diff(now, 'days') - b.moment.diff(now, 'days'); // nearer is better
 			}
 		});
+
+		suggestions = this.removeDuplicates(suggestions);
 
 		return suggestions;
 	}

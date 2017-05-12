@@ -343,6 +343,11 @@ export class TrivialDateTimeField implements TrivialComponent {
             this.focusGoesToOtherEditor = false;
         });
         this.$activeEditor = this.$dateEditor;
+
+        this.dateSuggestionEngine = new TrivialDateSuggestionEngine({
+            preferredDateFormat: this.config.dateFormat
+        });
+        this.timeSuggestionEngine = new TrivialTimeSuggestionEngine();
     }
 
     private setDropDownMode(mode: Mode) {

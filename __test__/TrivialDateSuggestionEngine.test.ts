@@ -26,7 +26,7 @@ function readableSuggestion(s) {
 
 describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 	it('returns suggestions for the next week if the input is empty', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("", moment("2015-01-27")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("", moment("2015-01-27")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-01-27"), ymdOrder: ""},
 			{moment: moment("2015-01-28"), ymdOrder: ""},
 			{moment: moment("2015-01-29"), ymdOrder: ""},
@@ -37,32 +37,32 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 		].map(readableSuggestion));
 	});
 	it('returns future day suggestions for a single digit input', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("2", moment("2015-01-01")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("2", moment("2015-01-01")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-01-02"), ymdOrder: "D"}
 		].map(readableSuggestion));
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("2", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("2", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-02-02"), ymdOrder: "D"}
 		].map(readableSuggestion));
 	});
 	it('returns day (!) and day-month suggestions if the input has 2 digits and is interpretable as day', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("14", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("14", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-01-14"), ymdOrder: "D"},
 			{moment: moment("2016-01-04"), ymdOrder: "MD"},
 			{moment: moment("2015-04-01"), ymdOrder: "DM"}
 		].map(readableSuggestion));
 	});
 	it('returns only day-month suggestions if the input has 2 digits and is NOT interpretable as day', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("94", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("94", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-09-04"), ymdOrder: "MD"},
 			{moment: moment("2015-04-09"), ymdOrder: "DM"},
 		].map(readableSuggestion));
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("94", moment("2015-10-01")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("94", moment("2015-10-01")).map(readableSuggestion)).toEqual([
 			{moment: moment("2016-09-04"), ymdOrder: "MD"},
 			{moment: moment("2016-04-09"), ymdOrder: "DM"},
 		].map(readableSuggestion));
 	});
 	it('returns day-month and day-month-year suggestions for 3-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-01-23"), ymdOrder: "MD"},
 			{moment: moment("2015-12-03"), ymdOrder: "MD"},
 			{moment: moment("2001-02-03"), ymdOrder: "YMD"},
@@ -73,7 +73,7 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 			{moment: moment("2003-01-02"), ymdOrder: "MDY"},
 			{moment: moment("2003-02-01"), ymdOrder: "DMY"},
 		].map(readableSuggestion));
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("193", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("193", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2001-09-03"), ymdOrder: "YMD"},
 			{moment: moment("2015-03-19"), ymdOrder: "DM"},
 			{moment: moment("2001-03-09"), ymdOrder: "YDM"},
@@ -82,7 +82,7 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 			{moment: moment("2009-01-03"), ymdOrder: "MYD"},
 			{moment: moment("2009-03-01"), ymdOrder: "DYM"},
 		].map(readableSuggestion));
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("789", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("789", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2007-08-09"), ymdOrder: "YMD"},
 			{moment: moment("2007-09-08"), ymdOrder: "YDM"},
 			{moment: moment("2008-07-09"), ymdOrder: "MYD"},
@@ -92,55 +92,38 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 		].map(readableSuggestion));
 	});
 	it('returns day-month and day-month-year suggestions for 4-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("1212", moment("2015-01-05")).map(readableSuggestion)).toEqual([
-			{moment: moment("2015-12-12"), ymdOrder: "MD"},
-			{moment: moment("2001-02-12"), ymdOrder: "YMD"},
-			{moment: moment("2001-02-21"), ymdOrder: "YDM"},
-			{moment: moment("2001-12-02"), ymdOrder: "YDM"},
-			{moment: moment("2002-01-12"), ymdOrder: "MYD"},
-			{moment: moment("2002-01-21"), ymdOrder: "MDY"},
-			{moment: moment("2002-12-01"), ymdOrder: "DYM"},
-			{moment: moment("2012-01-02"), ymdOrder: "MDY"},
-
-			{moment: moment("2012-02-01"), ymdOrder: "DMY"},
-			{moment: moment("2021-01-02"), ymdOrder: "MYD"},
-			{moment: moment("2021-02-01"), ymdOrder: "DYM"},
-		].map(readableSuggestion));
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("1212", moment("2015-01-05")).map(readableSuggestion))
+			.toEqual(["2015-12-12:MD", "2001-02-12:YMD", "2012-01-02:YMD", "2001-02-21:YDM", "2001-12-02:YDM", "2002-01-12:MYD", "2002-01-21:MDY", "2002-12-01:DYM", "2012-02-01:DMY", "2021-01-02:MYD", "2021-02-01:DYM"]);
 	});
 	it('returns and day-month-year suggestions for 5-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("MM-DD-YYYY").generateSuggestions("12123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
-			{moment: moment("2003-12-12"), ymdOrder: "MDY"},
-			{moment: moment("2023-01-21"), ymdOrder: "MDY"},
-			{moment: moment("2023-12-01"), ymdOrder: "MDY"},
-			{moment: moment("2001-12-23"), ymdOrder: "MYD"},
-			{moment: moment("2012-01-23"), ymdOrder: "YMD"},
-			{moment: moment("2012-03-12"), ymdOrder: "YDM"},
-			{moment: moment("2012-12-03"), ymdOrder: "YMD"},
-			{moment: moment("2021-01-23"), ymdOrder: "MYD"},
-			{moment: moment("2023-01-12"), ymdOrder: "DMY"},
-		].map(readableSuggestion));
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "MM-DD-YYYY"}).generateSuggestions("12123", moment("2015-01-05")).map(readableSuggestion))
+			.toEqual(["2003-12-12:MDY", "2023-01-21:MDY", "2023-12-01:MDY", "2001-12-23:MYD", "2012-01-23:YMD", "2012-03-12:YDM", "2012-12-03:MYD", "2021-01-23:MYD", "2023-01-12:DMY"]);
 	});
 	it('returns and day-month-year suggestions for 6-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("121423", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("121423", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2014-12-23"), ymdOrder: "MYD"},
 			{moment: moment("2023-12-14"), ymdOrder: "MDY"}
 		].map(readableSuggestion));
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("129923", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("129923", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("1999-12-23"), ymdOrder: "MYD"}
 		].map(readableSuggestion));
 	});
 	it('returns and day-month-year suggestions for 7-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("1211123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("1211123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2111-01-23"), ymdOrder: "MYD"}
 		].map(readableSuggestion));
 	});
 	it('returns and day-month-year suggestions for 8-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("10211123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("10211123", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2111-10-23"), ymdOrder: "MYD"}
 		].map(readableSuggestion));
 	});
 	it('returns an empty array for 9-digit inputs', function () {
-		expect(new TrivialDateSuggestionEngine("YYYY-MM-DD").generateSuggestions("102111232", moment("2015-01-05"))).toEqual([]);
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("102111232", moment("2015-01-05"))).toEqual([]);
+	});
+	it('suggests the right thing for 4417 ;-)', () => {
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "DD.MM.YYYY"}).generateSuggestions("4417", moment("2017-05-12")).map(readableSuggestion))
+			.toEqual(["2017-04-04:DMY", "1941-04-07:MYD", "1941-07-04:DYM", "1944-01-07:YMD", "1944-07-01:YDM", "2004-04-17:YMD"]);
 	});
 
 });
