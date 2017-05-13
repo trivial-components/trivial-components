@@ -1,6 +1,6 @@
 {
   "name": "trivial-components",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "UI components the way you always wanted them.",
   "repository": {
     "url": "https://github.com/trivial-components/trivial-components.git",
@@ -74,7 +74,7 @@
     "merge-stream": "^1.0.1",
     "multipipe": "^1.0.2",
     "ts-jest": "^20.0.0",
-    "typescript": "^2.1.4",
+    "typescript": "2.x",
     "typings": "^2.0.0"
   },
   "dependencies": {
@@ -87,7 +87,8 @@
     "levenshtein": "^1.0.5",
     "moment": "^2.18.1",
     "mustache": "^2.3.0",
-    "typedoc": "^0.6.0"
+    "typedoc": "^0.6.0",
+    "typescript": "^2.3.2"
   },
   "jest": {
     "transform": {

@@ -5860,13 +5860,13 @@ typedoc@^0.6.0:
     typedoc-default-themes "^0.4.2"
     typescript "2.2.2"
 
-typescript:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.4.tgz#b53b69fb841126acb1dd4b397d21daba87572251"
-
 typescript@2.2.2, typescript@^2.0.3, typescript@^2.1.4:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.2.2.tgz#606022508479b55ffa368b58fee963a03dfd7b0c"
+
+typescript@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.2.tgz#f0f045e196f69a72f06b25fd3bd39d01c3ce9984"
 
 typings:
   version "2.0.0"
