@@ -571,9 +571,6 @@ no search field:
             decimalSeparator: ',',
             thousandsSeparator: '.',
             allowNullAmount: true,
-            queryFunction: function(queryString) {
-            	console.log(queryString);
-            }
         });
         demo.unitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);
