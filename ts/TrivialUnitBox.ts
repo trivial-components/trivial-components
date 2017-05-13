@@ -54,6 +54,8 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
     public readonly onChange = new TrivialEvent<TrivialUnitBoxChangeEvent<U>>(this);
     public readonly onSelectedEntryChanged = new TrivialEvent<U>(this);
+    public readonly onFocus = new TrivialEvent<void>(this);
+    public readonly onBlur = new TrivialEvent<void>(this);
 
     private listBox: TrivialListBox<U>;
     private isDropDownOpen = false;
@@ -137,7 +139,6 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                     this.query();
                 });
             }
-            this.$editor.focus();
         });
         this.$dropDown = $('<div class="tr-dropdown"></div>')
             .scroll(() => {
@@ -155,14 +156,17 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                 if (this.blurCausedByClickInsideComponent) {
                     // do nothing!
                 } else {
+                    this.onFocus.fire();
                     this.$unitBox.addClass('focus');
                     this.cleanupEditorValue();
+                    this.$editor.select();
                 }
             })
             .blur(() => {
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
                 } else {
+                    this.onBlur.fire();
                     this.$unitBox.removeClass('focus');
                     this.formatEditorValue();
                     this.closeDropDown();

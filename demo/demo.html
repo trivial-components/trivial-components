@@ -570,13 +570,19 @@ no search field:
             }, decimalPrecision: 3,
             decimalSeparator: ',',
             thousandsSeparator: '.',
-            allowNullAmount: true,
+            allowNullAmount: true
         });
         demo.unitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);
             console.log("trivialUnitBox.unit: " + data.unit);
         });
-	    demo.unitBox.getEditor().addEventListener("keyup", function(e) {console.log("keyup: " + demo.unitBox.getEditor().value)});
+        demo.unitBox.onFocus.addListener(function (data) {
+        	console.log("unitbox focus");
+        });
+        demo.unitBox.onBlur.addListener(function (data) {
+        	console.log("unitbox blur");
+        });
+	    demo.unitBox.getEditor().addEventListener("unit box editor keyup", function(e) {console.log("keyup: " + demo.unitBox.getAmount() + " " + demo.unitBox.getSelectedEntry().code)});
 
 
         demo.unitBoxLeft = new TrivialComponents.TrivialUnitBox('#unitBoxLeft', {
