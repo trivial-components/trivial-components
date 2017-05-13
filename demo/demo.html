@@ -570,12 +570,18 @@ no search field:
             }, decimalPrecision: 3,
             decimalSeparator: ',',
             thousandsSeparator: '.',
-            allowNullAmount: true
+            allowNullAmount: true,
+            queryFunction: function(queryString) {
+            	console.log(queryString);
+            }
         });
         demo.unitBox.onChange.addListener(function (data) {
             console.log("trivialUnitBox.amount: " + data.amount);
             console.log("trivialUnitBox.unit: " + data.unit);
         });
+	    demo.unitBox.getEditor().addEventListener("keyup", function(e) {console.log("keyup: " + demo.unitBox.getEditor().value)});
+
+
         demo.unitBoxLeft = new TrivialComponents.TrivialUnitBox('#unitBoxLeft', {
             entries: createCurrencyEntries(),
             unitDisplayPosition: 'left'

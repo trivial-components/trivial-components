@@ -601,6 +601,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         selectElementContents(this.$editor[0], 0, this.$editor.text().length);
     };
 
+    public getEditor(): Element {
+        return this.$editor[0];
+    }
+
     public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$tagComboBox);
         this.$tagComboBox.remove();

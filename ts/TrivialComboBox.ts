@@ -381,7 +381,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
 
     private fireChangeEvents(entry: E, originalEvent: Event) {
         this.$originalInput.trigger("change");
-        this.onSelectedEntryChanged.fire(entry);
+        this.onSelectedEntryChanged.fire(entry, originalEvent);
     }
 
     public setSelectedEntry(entry: E, commit = true, fireEvent = false, originalEvent?: Event) {
@@ -578,6 +578,10 @@ export class TrivialComboBox<E> implements TrivialComponent{
         this.showEditor();
         this.$editor.select();
     };
+
+    public getEditor(): Element {
+        return this.$editor[0];
+    }
 
     public getDropDown() {
         return this.$dropDown;

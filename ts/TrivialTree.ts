@@ -109,7 +109,7 @@ export class TrivialTree<E> implements TrivialComponent{
                 const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                 if (this.entries != null) {
                     if (this.config.directSelectionViaArrowKeys) {
-                        this.treeBox.selectNextEntry(direction)
+                        this.treeBox.selectNextEntry(direction, e);
                     } else {
                         this.treeBox.highlightNextEntry(direction);
                     }
@@ -118,7 +118,7 @@ export class TrivialTree<E> implements TrivialComponent{
             } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                 this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
             } else if (e.which == keyCodes.enter) {
-                this.treeBox.setSelectedEntry(this.treeBox.getHighlightedEntry());
+                this.treeBox.setSelectedEntry(this.treeBox.getHighlightedEntry(), e);
             } else if (e.which == keyCodes.escape) {
                 this.$editor.val("");
                 this.query();
@@ -304,6 +304,10 @@ export class TrivialTree<E> implements TrivialComponent{
     public selectNodeById(nodeId: any) {
         this.treeBox.setSelectedEntryById(nodeId);
     };
+
+    public getEditor(): Element {
+        return this.$editor[0];
+    }
 
     public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$componentWrapper);

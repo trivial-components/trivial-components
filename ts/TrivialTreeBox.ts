@@ -327,18 +327,18 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         })[0];
     }
 
-    public setSelectedEntry(entry: E) {
+    public setSelectedEntry(entry: E, originalEvent?: Event) {
         this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
         this.markSelectedEntry(entry);
         this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
-        this.fireChangeEvents(entry);
+        this.fireChangeEvents(entry, originalEvent);
         if (entry && this.config.openOnSelection) {
             this.setNodeExpanded(entry, true, true);
         }
     }
 
     public setSelectedEntryById(nodeId: any) {
-        this.setSelectedEntry(this.findEntryById(nodeId));
+        this.setSelectedEntry(this.findEntryById(nodeId), null);
     }
 
     private minimallyScrollTo($entryWrapper: JQuery) {
@@ -353,15 +353,15 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         }
     }
 
-    private fireChangeEvents(entry: E) {
+    private fireChangeEvents(entry: E, originalEvent: Event) {
         this.$componentWrapper.trigger("change");
         this.onSelectedEntryChanged.fire(entry);
     }
 
-    public selectNextEntry(direction: HighlightDirection) {
+    public selectNextEntry(direction: HighlightDirection, originalEvent?: Event) {
         const nextVisibleEntry = this.getNextVisibleEntry(this.getSelectedEntry(), direction);
         if (nextVisibleEntry != null) {
-            this.setSelectedEntry(nextVisibleEntry);
+            this.setSelectedEntry(nextVisibleEntry, originalEvent);
         }
     }
 

@@ -386,7 +386,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         this.onSelectedEntryChanged.fire(entry, originalEvent);
     }
 
-    public setSelectedEntry(entry: E, commit: boolean, fireEvent: boolean, originalEvent: Event) {
+    public setSelectedEntry(entry: E, commit: boolean, fireEvent?: boolean, originalEvent?: Event) {
         if (entry == null) {
             this.$originalInput.val(this.config.valueFunction(null));
             this.selectedEntry = null;
@@ -588,6 +588,10 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         this.showEditor();
         this.$editor.select();
     };
+
+    public getEditor(): Element {
+        return this.$editor[0];
+    }
 
     public getDropDown() {
         return this.$dropDown;

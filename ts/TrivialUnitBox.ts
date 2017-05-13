@@ -174,7 +174,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                 } else if (e.which == keyCodes.tab) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry) {
-                        this.setSelectedEntry(highlightedEntry, true);
+                        this.setSelectedEntry(highlightedEntry, true, e);
                     }
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     return; // let the user navigate freely left and right...
@@ -191,7 +191,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                     return false; // some browsers move the caret to the beginning on up key
                 } else if (this.isDropDownOpen && e.which == keyCodes.enter) {
                     e.preventDefault(); // do not submit form
-                    this.setSelectedEntry(this.listBox.getHighlightedEntry(), true);
+                    this.setSelectedEntry(this.listBox.getHighlightedEntry(), true, e);
                     this.closeDropDown();
                 } else if (e.which == keyCodes.escape) {
                     this.closeDropDown();
@@ -235,6 +235,8 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                     } else {
                         this.closeDropDown();
                     }
+                } else {
+                    this.ensureDecimalInput();
                 }
             })
             .mousedown(() => {
@@ -244,9 +246,9 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                         this.query();
                     }
                 }
-            }).change(() => {
+            }).change((e) => {
                 this.updateOriginalInputValue();
-                this.fireChangeEvents();
+                this.fireChangeEvents(e);
             }
         );
 
@@ -267,9 +269,9 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         });
 
         this.listBox = new TrivialListBox(this.$dropDown, this.config);
-        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U) => {
+        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U, eventSource, originalEvent: Event) => {
             if (selectedEntry) {
-                this.setSelectedEntry(selectedEntry, true);
+                this.setSelectedEntry(selectedEntry, true, originalEvent);
                 this.listBox.setSelectedEntry(null);
                 this.closeDropDown();
             }
@@ -277,7 +279,31 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
         this.$editor.val(this.config.amount || this.$originalInput.val());
         this.formatEditorValue();
-        this.setSelectedEntry(this.config.selectedEntry || null, false);
+        this.setSelectedEntry(this.config.selectedEntry || null, false, null);
+    }
+
+    private ensureDecimalInput() {
+        const cursorPosition = (<HTMLInputElement>this.$editor[0]).selectionEnd;
+        const oldValue = this.$editor.val();
+
+        let newValue = oldValue.replace(new RegExp('[^\-0-9' + this.config.decimalSeparator + this.config.thousandsSeparator + ']', 'g'), '');
+        newValue = newValue.replace(/(\d*\.\d*)\./g, '$1'); // only one decimal separator!!
+        newValue = newValue.replace(/(.)-*/g, '$1'); // minus may only occure at the beginning
+
+        const decimalSeparatorIndex = newValue.indexOf(this.config.decimalSeparator);
+        if (decimalSeparatorIndex != -1 && newValue.length - decimalSeparatorIndex - 1 > this.config.decimalPrecision) {
+            newValue = newValue.substring(0, decimalSeparatorIndex + 1 + this.config.decimalPrecision);
+        }
+
+        if (oldValue !== newValue) {
+            this.$editor.val(newValue);
+            const newCursorPosition = Math.min(this.$editor.val().length, cursorPosition);
+            try {
+                (<HTMLInputElement>this.$editor[0]).setSelectionRange(newCursorPosition, newCursorPosition);
+            } catch (e) {
+                // IE throws an error when invoking setSelectionRange before the element is rendered...
+            }
+        }
     }
 
     private getQueryString() {
@@ -334,17 +360,17 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         this.onSelectedEntryChanged.fire(this.selectedEntry);
     }
 
-    private fireChangeEvents() {
+    private fireChangeEvents(originalEvent: Event) {
         this.$originalInput.trigger("change");
         this.onChange.fire({
             unit: this.selectedEntry != null ? (this.selectedEntry as any)[this.config.unitValueProperty] : null,
             unitEntry: this.selectedEntry,
             amount: this.getAmount(),
             amountAsFloatingPointNumber: parseFloat(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, this.config.thousandsSeparator))
-        });
+        }, originalEvent);
     }
 
-    public setSelectedEntry(entry: U, fireEvent?: boolean) {
+    public setSelectedEntry(entry: U, fireEvent?: boolean, originalEvent?: Event) {
         if (entry == null) {
             this.selectedEntry = null;
             const $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
@@ -364,7 +390,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         }
         if (fireEvent) {
             this.fireSelectedEntryChangedEvent();
-            this.fireChangeEvents();
+            this.fireChangeEvents(originalEvent);
         }
     }
 
@@ -466,7 +492,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     private selectUnit(unitIdentifier: string) {
         this.setSelectedEntry(this.entries.filter((entry: U) => {
             return (entry as any)[this.config.unitIdProperty] === unitIdentifier;
-        })[0], false);
+        })[0], false, null);
     }
 
 
@@ -506,13 +532,17 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
     public focus() {
         this.$editor.select();
-    };
+    }
+
+    public getEditor(): Element {
+        return this.$editor[0];
+    }
 
     public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$unitBox);
         this.$unitBox.remove();
         this.$dropDown.remove();
-    };
+    }
 
     getMainDomElement(): Element {
         return this.$unitBox[0];
