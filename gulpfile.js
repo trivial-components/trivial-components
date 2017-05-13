@@ -175,7 +175,14 @@ gulp.task('js-bundle', ['js-single'], function () {
 gulp.task('ts-declarations-bundle', ['typescript'], function () {
     return gulp.src(['dist/js/single/*.d.ts'])
 	    .pipe(strip())
-        .pipe(concat('trivial-components.d.ts'))
+        .pipe(concat('trivial-components-global.d.ts'))
+	    .pipe(change(function (content) {
+		    content = content.replace(/import .*\n?/g, '');
+		    content = content.replace(/export as namespace .*\n?/g, '');
+		    content = content.replace(/export declare /g, 'export ');
+		    content = 'declare namespace TrivialComponents {\n' + content + '\n}';
+		    return content;
+	    }))
         .pipe(header(copyrightHeader))
         .pipe(gulp.dest('./dist/js/bundle'))
 });
