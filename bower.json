@@ -17,7 +17,7 @@
   "dependencies": {
     "bootstrap": "latest",
     "google-code-prettify": "latest",
-    "trivial-components": "https://github.com/trivial-components/trivial-components.git#master",
-    "readmore": "~2.0.5"
+    "mustache": "1.x",
+    "jquery-ui": "1.x"
   }
 }

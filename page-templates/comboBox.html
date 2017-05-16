@@ -18,112 +18,18 @@
         @@include('includes/status-note.html', {"status": "beta"})
 
         <div class="row">
-            <div class="col-sm-5">
-                <h3>Options</h3>
-                <form id="config">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="showTrigger" name="showTrigger" checked="checked"> showTrigger
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="customQueryFunction" name="customQueryFunction"> use custom query function (1s delay)
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="autoComplete" name="autoComplete" checked> autoComplete
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="editingMode">editingMode</label>
-                        <input id="editingMode" name="editingMode"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
-                        <input class="form-control" id="autoCompleteDelay" name="autoCompleteDelay" type="number" value="0"/>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="freeTextEntryValues">freeTextEntryValues</label>
-                        <textarea class="form-control code showcase-textarea" id="freeTextEntryValues" name="freeTextEntryValues">{
-    "_isFreeTextEntry": true
-}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="valueProperty">valueProperty</label>
-                        <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputTextProperty">inputTextProperty</label>
-                        <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="matchingMode">matchingMode</label>
-                        <input id="matchingMode" name="matchingMode"/>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="ignoreCase" name="ignoreCase" checked="checked"> ignoreCase
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="selectedEntryTemplate">selectedEntryTemplate</label>
-                        <input id="selectedEntryTemplate" name="selectedEntryTemplate"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="template">template</label>
-                        <input id="template" name="template"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="spinnerTemplate">spinnerTemplate</label>
-                        <textarea class="form-control code showcase-textarea" id="spinnerTemplate" name="spinnerTemplate"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="noEntriesTemplate">noEntriesTemplate</label>
-                        <textarea class="form-control code showcase-textarea" id="noEntriesTemplate" name="noEntriesTemplate"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="entries">entries</label>
-                <textarea class="form-control code showcase-textarea" id="entries" name="entries">
-                </textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="selectedEntry">selectedEntry</label>
-                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">{
-    "displayValue": "Ami Nemitz",
-    "imageUrl": "https://avatars1.githubusercontent.com/u/271349?v=3&s=25",
-    "additionalInfo": "Magna gubergren sit",
-    "id": 2
-}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="emptyEntry">emptyEntry</label>
-                <textarea class="form-control code showcase-textarea" id="emptyEntry" name="emptyEntry">{
-    "displayValue": "Please select...",
-    "imageUrl": "-",
-    "additionalInfo": ""
-}</textarea>
-                    </div>
-                </form>
-            </div>
             <div class="col-sm-7">
+                <div id="code-editor" style="height:500px;border-right:1px solid #ddd;"></div>
+            </div>
+            <div class="col-sm-5">
                 <h3>Result</h3>
                 <div id="comboBoxWrapper"></div>
                 <h4>Original input value</h4>
                 <code id="originalInputValue"></code>
                 <h4>Selected entry</h4>
                 <pre id="selectedEntryDisplay" class="prettyprint lang-js"></pre>
-                <h3>Configuration</h3>
-                <pre id="configDisplay" class="prettyprint lang-js"></pre>
             </div>
         </div>
-
 
 
         <h3>Configuration Options<a class="anchor" id="configuration"></a></h3>
@@ -148,7 +54,9 @@
                     <td>allowFreeText</td>
                     <td>
                         Allow free text input.<br/>
-                        If <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. In this case, <code>getSelectedEntry()</code> returns a fake entry with the <code>[inputTextProperty]</code> property set.<br/>
+                        If
+                        <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. In this case,
+                        <code>getSelectedEntry()</code> returns a fake entry with the <code>[inputTextProperty]</code> property set.<br/>
                         If <code>false</code>, the user input will be deleted if he does not select a suggested entry.<br/>
                     </td>
                     <td><code>false</code></td>
@@ -218,7 +126,8 @@
                 </tr>
                 <tr>
                     <td>matchingOptions</td>
-                    <td>An object that defines how the entries in the dropdown should be matched and highlighted. Properties are <code>matchingMode</code>, <code>ignoreCase</code> and <code>maxLevenshteinDistance</code>, <br>
+                    <td>An object that defines how the entries in the dropdown should be matched and highlighted. Properties are
+                        <code>matchingMode</code>, <code>ignoreCase</code> and <code>maxLevenshteinDistance</code>, <br>
                         Possible values for <code>matchingMode</code>:
                         <ul>
                             <li><code>'contains'</code></li>
@@ -241,155 +150,48 @@
 @@include('includes/scripts.html')
 
 <script>
-    $(function () {
+	$('#comboBoxWrapper').empty();
+	$('<input id="originalInput"/>').appendTo('#comboBoxWrapper');
 
-        $('#entries').val(JSON.stringify(createEntries(5), null, 2));
-        $('#spinnerTemplate').val(TrivialComponents.defaultSpinnerTemplate);
-        $('#noEntriesTemplate').val(TrivialComponents.defaultNoEntriesTemplate);
+	require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' }});
 
-        $('#template, #selectedEntryTemplate').each(function() {
-            $(this).TrivialComboBox({
-                template: TrivialComponents.icon2LinesTemplate,
-                entries: [{
-                    displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate,
-                    additionalInfo: 'TrivialComponents.image2LinesTemplate',
-                    imageUrl: 'img/icons/dev.png'
-                }, {
-                    displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate,
-                    additionalInfo: "TrivialComponents.roundImage2LinesColorBubbleTemplate"  ,
-                    imageUrl: 'img/icons/dev.png'
-                }, {
-                    displayValue: "Icon with two lines of text",
-                    value: TrivialComponents.icon2LinesTemplate,
-                    additionalInfo: "TrivialComponents.icon2LinesTemplate" ,
-                    imageUrl: 'img/icons/dev.png'
-                }, {
-                    displayValue: "Icon with single line of text",
-                    value: TrivialComponents.iconSingleLineTemplate,
-                    additionalInfo: "TrivialComponents.iconSingleLineTemplate"  ,
-                    imageUrl: 'img/icons/dev.png'
-                }, {
-                    displayValue: "Single line of text",
-                    value: TrivialComponents.singleLineTemplate,
-                    additionalInfo: "TrivialComponents.singleLineTemplate"  ,
-                    imageUrl: 'img/icons/dev.png'
-                }],
-                selectedEntry: {
-                    displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate,
-                    additionalInfo: "TrivialComponents.image2LinesTemplate",
-                    imageUrl: 'img/icons/dev.png'
-                },
-                allowFreeText: false
+	require(['vs/editor/editor.main'], function() {
+		jQuery.get('node_modules/@types/jquery/index.d.ts')
+            .then(function(data) {
+	            monaco.editor.createModel(data, "typescript");
+	            return jQuery.get('node_modules/trivial-components/dist/js/bundle/trivial-components.d.ts');
             })
-        });
-        $('#matchingMode').TrivialComboBox({
-                template: TrivialComponents.singleLineTemplate,
-                entries: [{
-                    displayValue: "contains"
-                },{
-                    displayValue: "prefix"
-                },{
-                    displayValue: "prefix-word"
-                }],
-                selectedEntry: {
-                    displayValue: "contains"
-                },
-                allowFreeText: false
-        });
-        $('#editingMode').TrivialComboBox({
-                template: TrivialComponents.singleLineTemplate,
-                entries: [{
-                    displayValue: "editable"
-                },{
-                    displayValue: "disabled"
-                },{
-                    displayValue: "readonly"
-                }],
-                selectedEntry: {
-                    displayValue: "editable"
-                },
-                allowFreeText: false
-        });
-
-        var customQueryFunction = function (queryString, resultCallback) {
-            setTimeout(function () {
-                resultCallback(createEntries(100).filter(function (entry) {
-                    return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
-                }));
-            }, 1000);
-        };
-
-        function reInitReadMore() {
-            $('.prettyprint').readmore({
-                collapsedHeight: 500,
-                moreLink: '<a href="#">Read more...</a>',
-                lessLink: '<a href="#">Read less...</a>'
+            .then(function(data) {
+	            monaco.editor.createModel(data, "typescript");
+	            return jQuery.get('ts/DemoUtils.ts');
+            })
+            .then(function(data) {
+	            monaco.editor.createModel(data, "typescript");
+	            return jQuery.get('ts/demo/combobox-all-settings.ts');
+            })
+            .then(function(data) {
+	            var model = monaco.editor.createModel(data, "typescript");
+	            var editor = monaco.editor.create(document.getElementById('code-editor'), {
+		            model: model,
+		            language: 'typescript',
+		            scrollbar: {
+			            useShadows: true,
+			            vertical: 'auto',
+			            horizontal: 'auto',
+			            verticalScrollbarSize: 7,
+			            horizontalScrollbarSize: 7
+		            }
+	            });
+	            editor.getModel().onDidChangeContent(DemoUtils.debounce(function() {
+		            try {
+			            window.eval(ts.transpile(editor.getModel().getLinesContent().join('\n')));
+		            } catch (e) {
+			            console.log('Could not update component due to eval error: ' + e);
+		            }
+	            }, 1000));
             });
-        }
-
-        function createComboBox() {
-            $('#comboBoxWrapper').empty();
-            var $comboBoxOriginalInput = $('<input id="combobox"/>').appendTo('#comboBoxWrapper');
-            $comboBoxOriginalInput.on('change', function() {
-                $('#originalInputValue').text($(this).val());
-            });
-            var config = {
-                showTrigger: $('#showTrigger').is(':checked'),
-                allowFreeText: $('#allowFreeText').is(':checked'),
-                freeTextEntryValues: JSON.parse($('#freeTextEntryValues').val()),
-                autoComplete: $('#autoComplete').is(':checked'),
-                queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
-                autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
-                valueProperty: $('#valueProperty').val(),
-                inputTextProperty: $('#inputTextProperty').val(),
-                matchingOptions: {
-                    matchingMode: $('#matchingMode').TrivialComboBox().getSelectedEntry().displayValue,
-                    ignoreCase: $('#ignoreCase').is(':checked')
-                },
-                template: $('#template').TrivialComboBox().getSelectedEntry().value,
-                selectedEntryTemplate: $('#selectedEntryTemplate').TrivialComboBox().getSelectedEntry().value,
-                spinnerTemplate: $('#spinnerTemplate').val(),
-                noEntriesTemplate: $('#noEntriesTemplate').val(),
-                selectedEntry: JSON.parse($('#selectedEntry').val()),
-                emptyEntry: JSON.parse($('#emptyEntry').val()),
-                entries: JSON.parse($('#entries').val()),
-                editingMode: $('#editingMode').TrivialComboBox().getSelectedEntry().displayValue
-            };
-            $('#configDisplay').removeClass("prettyprinted")
-                    .text("$('#combobox').TrivialComboBox(" + JSON.stringify(config, function(key, value) {
-                        if (key === 'queryFunction' && config.queryFunction) {
-                            return "%queryFunction%";
-                        } else {
-                            return value;
-                        }
-                    }, 2).replace("\"%queryFunction%\"", customQueryFunction.toString()) + ");");
-            var trivialComboBox = $comboBoxOriginalInput.TrivialComboBox(config);
-
-            function updateSelectedEntryDisplay() {
-                $('#selectedEntryDisplay')
-                        .text(JSON.stringify(trivialComboBox.getSelectedEntry(), null, 2))
-                        .removeClass("prettyprinted");
-                prettyPrint();
-            }
-
-            updateSelectedEntryDisplay();
-            trivialComboBox.$.change(function() {
-                updateSelectedEntryDisplay.call(this);
-                reInitReadMore();
-            });
-            prettyPrint();
-            reInitReadMore();
-        }
-        createComboBox();
-
-        $('#config input, #config textarea').change(function() {
-            createComboBox();
-        });
-
-    });
+		new TrivialComponents.TrivialComboBox();
+	});
 </script>
 
 @@include('includes/ga.html')

@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
@@ -36,11 +37,6 @@
             document.write('<link rel="stylesheet" href="css/all.css">');
         }
     </script>
-
-    <!--[if lt IE 9]>
-    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 </head>
 
 <body data-spy="scroll" data-target="#navbar">
@@ -90,11 +86,18 @@
         
 <br>
 
+
+
 <div class="alert alert-warning">
     <strong><span class="glyphicon glyphicon-warning-sign"></span> Attention:</strong>
     This component is <span class="badge alert-danger">alpha</span> and should be considered as work in progress. Any kind of API and usability changes may occur in future versions.
 </div>
-<div class="row">
+
+
+
+
+
+        <div class="row">
             <div class="col-sm-5">
                 <h3>Options</h3>
 
@@ -271,22 +274,28 @@
 </div>
 <script src="lib/js/jquery.min.js"></script>
 <script src="lib/js/bootstrap.min.js"></script>
-<script src="lib/js/position.min.js"></script>
 <script src="lib/js/mustache.min.js"></script>
-<script src="lib/js/trivial-core.js"></script>
-<script src="lib/js/trivial-highlight.js"></script>
-<script src="lib/js/trivial-minimallyScrollTo.js"></script>
-<script src="lib/js/trivial-listbox.js"></script>
-<script src="lib/js/trivial-combobox.js"></script>
-<script src="lib/js/trivial-list.js"></script>
-<script src="lib/js/trivial-unitbox.js"></script>
-<script src="lib/js/trivial-tagbox.js"></script>
-<script src="lib/js/trivial-treebox.js"></script>
-<script src="lib/js/trivial-tree.js"></script>
-<script src="lib/js/trivial-treecombobox.js"></script>
-<script src="js/demo.js"></script>
+<script src="lib/js/moment.js"></script>
+<script src="lib/js/levenshtein.js"></script>
+<script src="lib/js/version.js"></script>
+<script src="lib/js/position.js"></script>
 <script src="lib/js/prettify.min.js"></script>
-<script src="lib/js/readmore.min.js"></script>
+<script src="lib/js/trivial-highlight.js"></script>
+<script src="lib/js/TrivialCalendarBox.js"></script>
+<script src="lib/js/TrivialComboBox.js"></script>
+<script src="lib/js/TrivialCore.js"></script>
+<script src="lib/js/TrivialDateTimeField.js"></script>
+<script src="lib/js/TrivialEvent.js"></script>
+<script src="lib/js/TrivialListBox.js"></script>
+<script src="lib/js/TrivialTagComboBox.js"></script>
+<script src="lib/js/TrivialTree.js"></script>
+<script src="lib/js/TrivialTreeBox.js"></script>
+<script src="lib/js/TrivialTreeComboBox.js"></script>
+<script src="lib/js/TrivialUnitBox.js"></script>
+<script src="js/DemoUtils.js"></script>
+<script src="js/ExampleEditor.js"></script>
+<script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+
 
 <script>
     $(function () {

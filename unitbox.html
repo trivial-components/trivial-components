@@ -28,7 +28,7 @@
     <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
-    <title>TrivialList - Trivial Components</title>
+    <title>TrivialUnitBox - Trivial Components</title>
 
     <script>
         if (location.href.indexOf("localhost") != -1) {
@@ -78,7 +78,7 @@
 <div class="page-content">
 
     <section class="page-header-box">
-        <h1 class="project-name">TrivialList</h1>
+        <h1 class="project-name">TrivialUnitBox</h1>
     </section>
 
     <div class="container">
@@ -100,6 +100,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h3>Options</h3>
+
                 <form id="config">
                     <div class="checkbox">
                         <label>
@@ -120,24 +121,13 @@
                         <label for="autoCompleteDelay">autoCompleteDelay (ms)</label>
                         <input class="form-control" id="autoCompleteDelay" name="autoCompleteDelay" type="number" value="0"/>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="allowFreeText" name="allowFreeText"> allowFreeText
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="freeTextEntryValues">freeTextEntryValues</label>
-                        <textarea class="form-control code showcase-textarea" id="freeTextEntryValues" name="freeTextEntryValues">{
-    "_isFreeTextEntry": true
-}</textarea>
-                    </div>
                     <div class="form-group">
                         <label for="valueProperty">valueProperty</label>
                         <input class="form-control" id="valueProperty" name="valueProperty" value="id"/>
                     </div>
                     <div class="form-group">
                         <label for="inputTextProperty">inputTextProperty</label>
-                        <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="displayValue"/>
+                        <input class="form-control" id="inputTextProperty" name="inputTextProperty" value="code"/>
                     </div>
                     <div class="form-group">
                         <label for="matchingMode">matchingMode</label>
@@ -171,38 +161,32 @@
                     </div>
                     <div class="form-group">
                         <label for="selectedEntry">selectedEntry</label>
-                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">{
-    "displayValue": "Ami Nemitz",
-    "imageUrl": "https://avatars1.githubusercontent.com/u/271349?v=3&s=25",
-    "additionalInfo": "Magna gubergren sit",
-    "id": 2
-}</textarea>
+                <textarea class="form-control code showcase-textarea" id="selectedEntry" name="selectedEntry">null</textarea>
                     </div>
                     <div class="form-group">
                         <label for="emptyEntry">emptyEntry</label>
-                <textarea class="form-control code showcase-textarea" id="emptyEntry" name="emptyEntry">{
-    "displayValue": "Please select...",
-    "imageUrl": "-",
-    "additionalInfo": ""
-}</textarea>
+                        <textarea class="form-control code showcase-textarea" id="emptyEntry" name="emptyEntry"></textarea>
                     </div>
                 </form>
             </div>
             <div class="col-sm-7">
                 <h3>Result</h3>
-                <div id="listWrapper"></div>
+
+                <div id="unitBoxWrapper"></div>
                 <h4>Original input value</h4>
                 <code id="originalInputValue"></code>
-                <h4>Selected entry</h4>
-                <pre id="selectedEntryDisplay" class="prettyprint lang-js"></pre>
+                <h4>getSelectedUnit()</h4>
+                <pre id="selectedUnitDisplay" class="prettyprint lang-js"></pre>
+                <h4>getAmount</h4>
+                <pre id="amountDisplay" class="prettyprint lang-js"></pre>
                 <h3>Configuration</h3>
                 <pre id="configDisplay" class="prettyprint lang-js"></pre>
             </div>
         </div>
 
 
-
         <h3>Configuration Options<a class="anchor" id="configuration"></a></h3>
+
         <div class="table-responsive">
             <table class="table table-condensed table-hover">
                 <thead>
@@ -219,15 +203,6 @@
                         <code>null</code>, then the content of the text input will serve als value.
                     </td>
                     <td><code>null</code></td>
-                </tr>
-                <tr>
-                    <td>allowFreeText</td>
-                    <td>
-                        Allow free text input.<br/>
-                        If <code>true</code>, the user is not forced to select one of the suggested entries but can type whatever he wants into the field. If the user leaves the field without selecting any of the suggested values, then his input remains visible. In this case, <code>getSelectedEntry()</code> returns a fake entry with the <code>[inputTextProperty]</code> property set.<br/>
-                        If <code>false</code>, the user input will be deleted if he does not select a suggested entry.<br/>
-                    </td>
-                    <td><code>false</code></td>
                 </tr>
                 <tr>
                     <td>inputTextProperty</td>
@@ -294,7 +269,8 @@
                 </tr>
                 <tr>
                     <td>matchingOptions</td>
-                    <td>An object that defines how the entries in the dropdown should be matched and highlighted. Properties are <code>matchingMode</code>, <code>ignoreCase</code> and <code>maxLevenshteinDistance</code>, <br>
+                    <td>An object that defines how the entries in the dropdown should be matched and highlighted. Properties are
+                        <code>matchingMode</code>, <code>ignoreCase</code> and <code>maxLevenshteinDistance</code>, <br>
                         Possible values for <code>matchingMode</code>:
                         <ul>
                             <li><code>'contains'</code></li>
@@ -310,7 +286,8 @@
             </table>
         </div>
 
-    </div> <!-- container -->
+    </div>
+    <!-- container -->
 </div>
 
 <div class="container">
@@ -346,49 +323,70 @@
 <script>
     $(function () {
 
-        $('#entries').val(JSON.stringify(createEntries(5), null, 2));
+        $('#entries').val(JSON.stringify(createCurrencyEntries(5), null, 2));
         $('#spinnerTemplate').val(TrivialComponents.defaultSpinnerTemplate);
         $('#noEntriesTemplate').val(TrivialComponents.defaultNoEntriesTemplate);
+        $('#emptyEntry').val(JSON.stringify({"code": "..."}));
 
-        $('#template, #selectedEntryTemplate').each(function() {
+        $('#template').each(function () {
             $(this).TrivialComboBox({
                 template: TrivialComponents.singleLineTemplate,
                 entries: [{
-                    displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate
-                },{
-                    displayValue: "Round image with two lines of text and status buble",
-                    value: TrivialComponents.roundImage2LinesColorBubbleTemplate
-                },{
-                    displayValue: "Icon with two lines of text",
-                    value: TrivialComponents.icon2LinesTemplate
-                },{
-                    displayValue: "Icon with single line of text",
-                    value: TrivialComponents.iconSingleLineTemplate
-                },{
-                    displayValue: "Single line of text",
-                    value: TrivialComponents.singleLineTemplate
+                    displayValue: "Currency 2 lines template",
+                    value: TrivialComponents.currency2LineTemplate,
+                    additionalInfo: 'TrivialComponents.currency2LineTemplate',
+                    imageUrl: 'img/icons/dev.png'
+                }, {
+                    displayValue: "Currency single line short template",
+                    value: TrivialComponents.currencySingleLineShortTemplate,
+                    additionalInfo: "TrivialComponents.currencySingleLineShortTemplate",
+                    imageUrl: 'img/icons/dev.png'
                 }],
                 selectedEntry: {
-                    displayValue: "Image with two lines of text",
-                    value: TrivialComponents.image2LinesTemplate
+                    displayValue: "Currency 2 lines template",
+                    value: TrivialComponents.currency2LineTemplate,
+                    additionalInfo: 'TrivialComponents.currency2LineTemplate',
+                    imageUrl: 'img/icons/dev.png'
+                },
+                allowFreeText: false
+            })
+        });
+        $('#selectedEntryTemplate').each(function () {
+            $(this).TrivialComboBox({
+                template: TrivialComponents.singleLineTemplate,
+                entries: [{
+                    displayValue: "Currency 2 lines template",
+                    value: TrivialComponents.currency2LineTemplate,
+                    additionalInfo: 'TrivialComponents.currency2LineTemplate',
+                    imageUrl: 'img/icons/dev.png'
+                }, {
+                    displayValue: "Currency single line short template",
+                    value: TrivialComponents.currencySingleLineShortTemplate,
+                    additionalInfo: "TrivialComponents.currencySingleLineShortTemplate",
+                    imageUrl: 'img/icons/dev.png'
+                }],
+                selectedEntry: {
+                    displayValue: "Currency single line short template",
+                    value: TrivialComponents.currencySingleLineShortTemplate,
+                    additionalInfo: "TrivialComponents.currencySingleLineShortTemplate",
+                    imageUrl: 'img/icons/dev.png'
                 },
                 allowFreeText: false
             })
         });
         $('#matchingMode').TrivialComboBox({
-                template: TrivialComponents.singleLineTemplate,
-                entries: [{
-                    displayValue: "contains"
-                },{
-                    displayValue: "prefix"
-                },{
-                    displayValue: "prefix-word"
-                }],
-                selectedEntry: {
-                    displayValue: "contains"
-                },
-                allowFreeText: false
+            template: TrivialComponents.singleLineTemplate,
+            entries: [{
+                displayValue: "contains"
+            }, {
+                displayValue: "prefix"
+            }, {
+                displayValue: "prefix-word"
+            }],
+            selectedEntry: {
+                displayValue: "contains"
+            },
+            allowFreeText: false
         });
 
         var customQueryFunction = function (queryString, resultCallback) {
@@ -399,18 +397,22 @@
             }, 1000);
         };
 
-        var $listOriginalInput;
+        function reInitReadMore() {
+            $('.prettyprint').readmore({
+                collapsedHeight: 500,
+                moreLink: '<a href="#">Read more...</a>',
+                lessLink: '<a href="#">Read less...</a>'
+            });
+        }
 
-        function createList() {
-            $('#listWrapper').empty();
-            $listOriginalInput = $('<input id="list"/>').appendTo('#listWrapper');
-            $listOriginalInput.on('change', function() {
+        function createUnitBox() {
+            $('#unitBoxWrapper').empty();
+            var $unitBoxOriginalInput = $('<input id="unitbox"/>').appendTo('#unitBoxWrapper');
+            $unitBoxOriginalInput.on('change', function () {
                 $('#originalInputValue').text($(this).val());
             });
             var config = {
                 showTrigger: $('#showTrigger').is(':checked'),
-                allowFreeText: $('#allowFreeText').is(':checked'),
-                freeTextEntryValues: JSON.parse($('#freeTextEntryValues').val()),
                 autoComplete: $('#autoComplete').is(':checked'),
                 queryFunction: $('#customQueryFunction').is(':checked') ? customQueryFunction : undefined,
                 autoCompleteDelay: parseInt($('#autoCompleteDelay').val()),
@@ -429,32 +431,35 @@
                 entries: JSON.parse($('#entries').val())
             };
             $('#configDisplay').removeClass("prettyprinted")
-                    .text("$('#list').TrivialList(" + JSON.stringify(config, function(key, value) {
+                    .text("$('#unitbox').TrivialUnitBox(" + JSON.stringify(config, function (key, value) {
                         if (key === 'queryFunction' && config.queryFunction) {
                             return "%queryFunction%";
                         } else {
                             return value;
                         }
                     }, 2).replace("\"%queryFunction%\"", customQueryFunction.toString()) + ");");
-            var trivialList = $listOriginalInput.TrivialList(config);
+            var trivialUnitBox = $unitBoxOriginalInput.TrivialUnitBox(config);
 
             function updateSelectedEntryDisplay() {
-                $('#selectedEntryDisplay')
-                        .text(JSON.stringify(trivialList.getSelectedEntry(), null, 2))
+                $('#selectedUnitDisplay')
+                        .text(JSON.stringify(trivialUnitBox.getSelectedUnit(), null, 2))
                         .removeClass("prettyprinted");
                 prettyPrint();
             }
 
             updateSelectedEntryDisplay();
-            trivialList.$.change(function() {
+            trivialUnitBox.$.change(function () {
                 updateSelectedEntryDisplay.call(this);
+                reInitReadMore();
             });
             prettyPrint();
+            reInitReadMore();
         }
-        createList();
 
-        $('#config input, #config textarea').change(function() {
-            createList();
+        createUnitBox();
+
+        $('#config input, #config textarea').change(function () {
+            createUnitBox();
         });
 
     });

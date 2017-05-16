@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+@@include('includes/head.html', {"title": "TrivialComboBox - Trivial Components"})
+
+<body data-spy="scroll" data-target="#navbar">
+
+@@include('includes/nav.html', {"activeNavLink": "showcase"})
+
+<div class="page-content">
+
+    <section class="page-header-box">
+        <h1 class="project-name">TrivialComboBox</h1>
+    </section>
+
+    <div class="container-fluid">
+        <div id="exampleEditor"></div>
+    </div> <!-- container -->
+</div>
+
+@@include('includes/footer.html')
+@@include('includes/scripts.html')
+
+<script>
+	jQuery.get("ts/examples/combobox.json", function(data) {
+		var exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
+		exampleEditor.setEditorModel('ts/demo/combobox-all-settings.ts');
+    });
+</script>
+
+@@include('includes/ga.html')
+
+</body>
+</html>

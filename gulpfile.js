@@ -2,7 +2,6 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var bower = require('gulp-bower');
 var less = require('gulp-less');
-var minifyCSS = require('gulp-minify-css');
 var mirror = require('gulp-mirror');
 var rename = require('gulp-rename');
 var pipe = require('multipipe');
@@ -14,8 +13,6 @@ var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
 var postcss      = require('gulp-postcss');
-var autoprefixer = require('autoprefixer-core');
-var csswring = require('csswring');
 var fileinclude = require('gulp-file-include');
 
 gulp.task('clean', function () {
@@ -35,12 +32,15 @@ gulp.task('copyJsDependencies2lib', ['bower'], function () {
     return gulp.src([
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/jquery/dist/jquery.min.js',
-        'bower_components/jquery-ui/ui/minified/position.min.js',
+        'bower_components/jquery-ui/ui/version.js',
+        'bower_components/jquery-ui/ui/position.js',
         'bower_components/mustache/mustache.min.js',
         'bower_components/prettify/index.js',
-        'bower_components/trivial-components/js/*.js',
+        'node_modules/trivial-components/dist/js/single/*.js',
+        'node_modules/trivial-components/dist/js/bundle/trivial-components-global.d.ts',
         'bower_components/google-code-prettify/bin/prettify.min.js',
-        'bower_components/readmore/readmore.min.js'
+        'node_modules/moment/moment.js',
+        'node_modules/levenshtein/lib/levenshtein.js'
     ])
         .pipe(gulp.dest('lib/js'));
 });
@@ -55,8 +55,8 @@ gulp.task('less', function () {
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(postcss([
-            autoprefixer({ browsers: ['> 2%'] }),
-            csswring
+            require('autoprefixer')({ browsers: ['> 2%'] }),
+            require('cssnano')
         ]))
         .pipe(mirror(
             pipe(

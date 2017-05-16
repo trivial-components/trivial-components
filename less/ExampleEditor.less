@@ -1,0 +1,47 @@
+.example-editor {
+
+  border: 1px solid @input-border;
+  border-radius: @border-radius-base;
+
+  .main-area {
+    .code-heading {
+      padding-left: 10px;
+    }
+
+    .code-editor-section {
+      border-bottom: 1px solid @input-border;
+
+      .code-editor-wrapper {
+        height: 500px;
+      }
+    }
+
+    .result-section {
+      padding: 0 10px;
+
+      .selected-entry-display {
+        overflow: scroll;
+      }
+    }
+
+
+    @media (min-width: @screen-md-min) {
+      display: flex;
+      align-items: stretch;
+      flex-wrap: wrap;
+
+      .code-editor-section {
+        flex: 2 0 400px;
+        overflow: hidden;
+        border-bottom: none;
+        border-right: 1px solid @input-border;
+      }
+      .result-section {
+        flex: 1 0 200px;
+        overflow: hidden;
+      }
+    }
+  }
+
+}
+
