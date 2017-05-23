@@ -52,7 +52,7 @@ export class TrivialTree<E> implements TrivialComponent{
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTreeConfig<E> = {}) {
         this.config = $.extend(<TrivialTreeConfig<E>> {
-            valueFunction: (entry:E) => entry ? (entry as any).id : null,
+            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             childrenProperty: "children",
             lazyChildrenFlagProperty: "hasLazyChildren",
             searchBarMode: 'show-if-filled',

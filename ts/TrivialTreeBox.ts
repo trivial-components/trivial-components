@@ -56,7 +56,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 
     constructor($container: JQuery|Element|string, options: TrivialTreeBoxConfig<E> = {}) {
         this.config = $.extend(<TrivialTreeBoxConfig<E>> {
-            valueFunction: (entry:E) => entry ? (entry as any).id : null,
+            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             childrenProperty: "children",
             lazyChildrenFlagProperty: "hasLazyChildren",
             lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {

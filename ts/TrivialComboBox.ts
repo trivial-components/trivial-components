@@ -81,7 +81,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
 
     constructor(originalInput: JQuery|Element|string, options: TrivialComboBoxConfig<E> = {}) {
         this.config = $.extend(<TrivialComboBoxConfig<E>> {
-            valueFunction: (entry:E) => entry ? (entry as any).id : null,
+            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: (entry: E) => {
                 const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
                 return Mustache.render(template, entry);

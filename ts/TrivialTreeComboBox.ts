@@ -73,7 +73,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTreeComboBoxConfig<E> = {}) {
         this.config = $.extend(<TrivialTreeComboBoxConfig<E>> {
-            valueFunction: (entry: E) => entry ? (entry as any).id : null,
+            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: (entry: E, depth: number) => {
                 const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
                 const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
