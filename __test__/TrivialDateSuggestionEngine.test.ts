@@ -40,8 +40,18 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("2", moment("2015-01-01")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-01-02"), ymdOrder: "D"}
 		].map(readableSuggestion));
+	});
+	it('returns future day suggestions for a single digit input, jumping into the next month if necessary', function () {
 		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("2", moment("2015-01-05")).map(readableSuggestion)).toEqual([
 			{moment: moment("2015-02-02"), ymdOrder: "D"}
+		].map(readableSuggestion));
+	});
+	it('returns past day suggestions for a single digit input, if favorPastDates == true', function () {
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD", favorPastDates: true}).generateSuggestions("3", moment("2015-01-02")).map(readableSuggestion)).toEqual([
+			{moment: moment("2014-12-03"), ymdOrder: "D"}
+		].map(readableSuggestion));
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD", favorPastDates: true}).generateSuggestions("4", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+			{moment: moment("2015-01-04"), ymdOrder: "D"}
 		].map(readableSuggestion));
 	});
 	it('returns day (!) and day-month suggestions if the input has 2 digits and is interpretable as day', function () {
@@ -49,6 +59,16 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 			{moment: moment("2015-01-14"), ymdOrder: "D"},
 			{moment: moment("2016-01-04"), ymdOrder: "MD"},
 			{moment: moment("2015-04-01"), ymdOrder: "DM"}
+		].map(readableSuggestion));
+	});
+	it('skips months until it finds a valid date in the future for day-only input', function () {
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("30", moment("2015-01-31")).map(readableSuggestion)).toEqual([
+			{moment: moment("2015-03-30"), ymdOrder: "D"}
+		].map(readableSuggestion));
+	});
+	it('skips months until it finds a valid date in the past for day-only input, if favorPastDates == true', function () {
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD", favorPastDates: true}).generateSuggestions("30", moment("2015-03-29")).map(readableSuggestion)).toEqual([
+			{moment: moment("2015-01-30"), ymdOrder: "D"}
 		].map(readableSuggestion));
 	});
 	it('returns only day-month suggestions if the input has 2 digits and is NOT interpretable as day', function () {
@@ -59,6 +79,16 @@ describe('TeamApps.extractAllPossibleDateFragmentCombinations', function () {
 		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD"}).generateSuggestions("94", moment("2015-10-01")).map(readableSuggestion)).toEqual([
 			{moment: moment("2016-09-04"), ymdOrder: "MD"},
 			{moment: moment("2016-04-09"), ymdOrder: "DM"},
+		].map(readableSuggestion));
+	});
+	it('returns only day-month suggestions if the input has 2 digits and is NOT interpretable as day - in the past, if favorPastDates == true', function () {
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD", favorPastDates: true}).generateSuggestions("94", moment("2015-01-05")).map(readableSuggestion)).toEqual([
+			{moment: moment("2014-09-04"), ymdOrder: "MD"},
+			{moment: moment("2014-04-09"), ymdOrder: "DM"},
+		].map(readableSuggestion));
+		expect(new TrivialDateSuggestionEngine({preferredDateFormat: "YYYY-MM-DD", favorPastDates: true}).generateSuggestions("94", moment("2015-10-01")).map(readableSuggestion)).toEqual([
+			{moment: moment("2015-09-04"), ymdOrder: "MD"},
+			{moment: moment("2015-04-09"), ymdOrder: "DM"},
 		].map(readableSuggestion));
 	});
 	it('returns day-month and day-month-year suggestions for 3-digit inputs', function () {

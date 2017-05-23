@@ -28,9 +28,22 @@ export type YearMonthDayOrder = "YMD" | "YDM" | "MDY" | "MYD" | "DMY" | "DYM";
 
 export interface Options {
 	preferredDateFormat?: string,
+
+	/**
+	 * By default, the engine favors future dates. This flag makes it favor past dates.
+	 */
+	favorPastDates?: boolean
+}
+
+interface LocalDate {
+	year:number,
+	/** zero-indexed! */
+	month: number,
+	day: number
 }
 
 export class TrivialDateSuggestionEngine {
+	
 	private options: Options;
 
 	constructor(options: Options) {
@@ -45,9 +58,9 @@ export class TrivialDateSuggestionEngine {
 		let suggestions: DateSuggestion[];
 		if (searchString.match(/[^\d]/)) {
 			let fragments = searchString.split(/[^\d]/).filter(f => !!f);
-			suggestions = TrivialDateSuggestionEngine.createSuggestionsForFragments(fragments, now);
+			suggestions = this.createSuggestionsForFragments(fragments, now);
 		} else {
-			suggestions = TrivialDateSuggestionEngine.generateSuggestionsForDigitsOnlyInput(searchString, now);
+			suggestions = this.generateSuggestionsForDigitsOnlyInput(searchString, now);
 		}
 
 		// sort by relevance
@@ -91,17 +104,15 @@ export class TrivialDateSuggestionEngine {
 		return <YearMonthDayOrder> (["D", "M", "Y"].sort((a, b) => ymdIndexes[a] - ymdIndexes[b]).join(""));
 	}
 
-	private static createDateParts(moment: Moment, ymdOrder: string): DateSuggestion {
+	private static createSuggestion(moment: Moment, ymdOrder: string): DateSuggestion {
 		return {moment, ymdOrder};
 	}
 
-	public static generateSuggestionsForDigitsOnlyInput(input: string, today: Moment): DateSuggestion[] {
-		if (!input) {
-			let result = [];
-			for (let i = 0; i < 7; i++) {
-				result.push(TrivialDateSuggestionEngine.createDateParts(moment(today).add(i, "day"), ""));
-			}
-			return result;
+	public generateSuggestionsForDigitsOnlyInput(input: string, today: Moment): DateSuggestion[] {
+		input = input || "";
+
+		if (input.length === 0) {
+			return this.createSuggestionsForFragments([], today);
 		} else if (input.length > 8) {
 			return [];
 		}
@@ -109,15 +120,19 @@ export class TrivialDateSuggestionEngine {
 		let suggestions: DateSuggestion[] = [];
 		for (let i = 1; i <= input.length; i++) {
 			for (let j = Math.min(input.length, i + 1); j <= input.length && j - i <= 4; j - i === 2 ? j += 2 : j++) {
-				suggestions = suggestions.concat(TrivialDateSuggestionEngine.createSuggestionsForFragments([input.substring(0, i), input.substring(i, j), input.substring(j, input.length)], today));
+				suggestions = suggestions.concat(this.createSuggestionsForFragments([input.substring(0, i), input.substring(i, j), input.substring(j, input.length)], today));
 			}
 		}
 		return suggestions;
 	}
 
-	private static createSuggestionsForFragments(fragments: string[], today: Moment): DateSuggestion[] {
-		function todayOrFuture(m: Moment): boolean {
-			return today.isBefore(m, 'day') || today.isSame(m, 'day');
+	todayOrFavoriteDirection (m: Moment, today: Moment): boolean {
+		return this.options.favorPastDates ? today.isSameOrAfter(m, 'day') : today.isSameOrBefore(m, 'day');
+	}
+
+	private createSuggestionsForFragments(fragments: string[], today: Moment): DateSuggestion[] {
+		function mod(n:number, m:number) {
+			return ((n % m) + m) % m;
 		}
 
 		function numberToYear(n: number): number {
@@ -139,64 +154,90 @@ export class TrivialDateSuggestionEngine {
 		let [n1, n2, n3] = [parseInt(s1), parseInt(s2), parseInt(s3)];
 		let suggestions = [];
 
-		if (s1 && !s2 && !s3) {
-			let momentInCurrentMonth = moment([today.year(), today.month(), s1]);
-			if (momentInCurrentMonth.isValid() && todayOrFuture(momentInCurrentMonth)) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(momentInCurrentMonth, "D"));
-			} else {
-				let momentInNextMonth = moment([today.year() + (today.month() == 11 ? 1 : 0), (today.month() + 1) % 12, s1]);
-				if (momentInNextMonth.isValid()) {
-					suggestions.push(TrivialDateSuggestionEngine.createDateParts(momentInNextMonth, "D"));
+		if (!s1 && !s2 && !s3) {
+			let result = [];
+			for (let i = 0; i < 7; i++) {
+				result.push(TrivialDateSuggestionEngine.createSuggestion(moment(today).add((this.options.favorPastDates ? -1 : 1) * i, "day"), ""));
+			}
+			return result;
+		} else if (s1 && !s2 && !s3) {
+			if (n1 > 0 && n1 <= 31) {
+				let nextValidDate = this.findNextValidDate({year: today.year(), month: today.month(), day: n1}, (currentDate) => {
+					  return {
+						  year : currentDate.year + (this.options.favorPastDates ? (currentDate.month == 0 ? -1 : 0) : (currentDate.month == 11 ? 1 : 0)),
+						  month : mod(currentDate.month + (this.options.favorPastDates ? -1 : 1), 12),
+						  day: currentDate.day
+					  }
+				}, today);
+				if (nextValidDate) {
+					suggestions.push(TrivialDateSuggestionEngine.createSuggestion(nextValidDate, "D"));
 				}
 			}
 		} else if (s1 && s2 && !s3) {
-			let mom;
-			mom = moment([today.year(), n1 - 1, s2]);
-			if (mom.isValid() && todayOrFuture(mom)) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "MD"));
-			} else {
-				mom = moment([today.year() + 1, n1 - 1, s2]);
-				if (mom.isValid()) {
-					suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "MD"));
+			if (n1 <= 12 && n2 > 0 && n2 <= 31) {
+				let nextValidDate = this.findNextValidDate({year: today.year(), month: n1 - 1, day: n2}, (currentDate) => {
+					return {
+						year : currentDate.year + (this.options.favorPastDates ? -1 : 1),
+						month : currentDate.month,
+						day: currentDate.day
+					}
+				}, today);
+				if (nextValidDate) {
+					suggestions.push(TrivialDateSuggestionEngine.createSuggestion(nextValidDate, "MD"));
 				}
 			}
-			mom = moment([today.year(), n2 - 1, s1]);
-			if (mom.isValid() && todayOrFuture(mom)) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "DM"));
-			} else {
-				mom = moment([today.year() + 1, n2 - 1, s1]);
-				if (mom.isValid()) {
-					suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "DM"));
+			if (n2 <= 12 && n1 > 0 && n1 <= 31) {
+				let nextValidDate = this.findNextValidDate({year: today.year(), month: n2 - 1, day: n1}, (currentDate) => {
+					return {
+						year : currentDate.year + (this.options.favorPastDates ? -1 : 1),
+						month : currentDate.month,
+						day: currentDate.day
+					}
+				}, today);
+				if (nextValidDate) {
+					suggestions.push(TrivialDateSuggestionEngine.createSuggestion(nextValidDate, "DM"));
 				}
 			}
 		} else { // s1 && s2 && s3
 			let mom;
 			mom = moment([numberToYear(n1), n2 - 1, s3]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "YMD"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "YMD"));
 			}
 			mom = moment([numberToYear(n1), n3 - 1, s2]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "YDM"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "YDM"));
 			}
 			mom = moment([numberToYear(n2), n1 - 1, s3]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "MYD"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "MYD"));
 			}
 			mom = moment([numberToYear(n2), n3 - 1, s1]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "DYM"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "DYM"));
 			}
 			mom = moment([numberToYear(n3), n1 - 1, s2]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "MDY"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "MDY"));
 			}
 			mom = moment([numberToYear(n3), n2 - 1, s1]);
 			if (mom.isValid()) {
-				suggestions.push(TrivialDateSuggestionEngine.createDateParts(mom, "DMY"));
+				suggestions.push(TrivialDateSuggestionEngine.createSuggestion(mom, "DMY"));
 			}
 		}
 
 		return suggestions;
 	};
+
+	private findNextValidDate(startDate: LocalDate, incementor: (currentDate: LocalDate) => LocalDate, today: Moment): Moment {
+		let currentDate = startDate;
+		let momentInNextMonth: Moment = moment(startDate);
+		let numberOfIterations = 0;
+		while (!(momentInNextMonth.isValid() && this.todayOrFavoriteDirection(momentInNextMonth, today)) && numberOfIterations < 4) {
+			currentDate = incementor(currentDate);
+			momentInNextMonth = moment(currentDate);
+			numberOfIterations++;
+		}
+		return momentInNextMonth.isValid() ? momentInNextMonth : null;
+	}
 }
