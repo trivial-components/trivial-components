@@ -58,7 +58,6 @@ var zip = require('gulp-zip');
 var tar = require('gulp-tar');
 var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
-var karma = require('karma').server;
 var header = require('gulp-header');
 var strip = require('gulp-strip-comments');
 var stripCssComments = require('gulp-strip-css-comments');
@@ -272,13 +271,13 @@ gulp.task('typescript', ['install-typings'], function () {
 					'  window.TrivialComponents = window.TrivialComponents || {};' +
 					'  factory(function(name) {' +
 					'    if (name === "jquery") {' +
-					'      return jQuery;' +
+					'      return window.jQuery;' +
 					'    } else if (name === "levenshtein") {' +
-					'      return Levenshtein;' +
+					'      return window.Levenshtein;' +
 					'    } else if (name === "moment") {' +
-					'      return moment;' +
+					'      return window.moment;' +
 					'    } else if (name === "mustache") {' +
-					'      return Mustache;' +
+					'      return window.Mustache;' +
 					'    } else {' +
 					'      return window.TrivialComponents;' +
 					'    }' +
