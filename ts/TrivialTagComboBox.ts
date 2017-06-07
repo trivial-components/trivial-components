@@ -31,7 +31,6 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     noEntriesTemplate?: string,
     selectedEntries?: E[],
     textHighlightingEntryLimit?: number,
-    emptyEntry?: E | any,
     queryFunction?: QueryFunction<E>,
     autoComplete?: boolean,
     autoCompleteDelay?: number,
@@ -83,15 +82,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
             valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
             entryRenderingFunction: (entry: E) => {
-                const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
-                return Mustache.render(template, entry);
+                return Mustache.render(DEFAULT_TEMPLATES.image2LinesTemplate, entry);
             },
             selectedEntryRenderingFunction: (entry: E) => {
-                if ((entry as any).selectedEntryTemplate) {
-                    return Mustache.render((entry as any).selectedEntryTemplate, entry)
-                } else {
-                    return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
-                }
+                return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
             },
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
