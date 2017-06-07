@@ -28,7 +28,6 @@ import {TrivialEvent} from "./TrivialEvent";
 export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
     selectedEntryRenderingFunction?: (entry: E) => string,
     textHighlightingEntryLimit?: number,
-    emptyEntry?: E | any,
     queryFunction?: QueryFunction<E>,
     autoComplete?: boolean,
     autoCompleteDelay?: number,
@@ -76,24 +75,17 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
             valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: (entry: E, depth: number) => {
                 const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
+                const template = defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
                 return Mustache.render(template, entry);
             },
             selectedEntryRenderingFunction: (entry: E) => {
-                if ((entry as any).selectedEntryTemplate) {
-                    return Mustache.render((entry as any).selectedEntryTemplate, entry)
-                } else {
-                    return this.config.entryRenderingFunction(entry, 0);
-                }
+                return this.config.entryRenderingFunction(entry, 0);
             },
             selectedEntry: null,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
             textHighlightingEntryLimit: 100,
             entries: null,
-            emptyEntry: {
-                _isEmptyEntry: true
-            },
             queryFunction: null, // defined below...
             autoComplete: true,
             autoCompleteDelay: 0,
@@ -110,7 +102,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     }
                     return null;
                 } else {
-                    return this.config.entryToEditorTextFunction(entry);
+                    return entry ? this.config.entryToEditorTextFunction(entry) : null;
                 }
             },
             allowFreeText: false,
@@ -387,21 +379,15 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     }
 
     public setSelectedEntry(entry: E, commit: boolean, fireEvent?: boolean, originalEvent?: Event) {
-        if (entry == null) {
-            this.$originalInput.val(this.config.valueFunction(null));
-            this.selectedEntry = null;
-            let $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
-                .addClass("tr-combobox-entry")
-                .addClass("empty");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
-        } else {
-            this.$originalInput.val(this.config.valueFunction(entry));
-            this.selectedEntry = entry;
-            let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
-                .addClass("tr-combobox-entry");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
+        this.$originalInput.val(this.config.valueFunction(entry));
+        this.selectedEntry = entry;
+        let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+            .addClass("tr-combobox-entry");
+        this.$selectedEntryWrapper.empty().append($selectedEntry);
+        if (entry != null) {
             this.$editor.val(this.config.entryToEditorTextFunction(entry));
         }
+        
         if (commit) {
             this.lastCommittedValue = entry;
             if (fireEvent) {
@@ -420,7 +406,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     }
 
     private isEntrySelected() {
-        return this.selectedEntry != null && this.selectedEntry !== this.config.emptyEntry;
+        return this.selectedEntry != null;
     }
 
     private showEditor() {

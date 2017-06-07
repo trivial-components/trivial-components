@@ -33,7 +33,6 @@ export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
     selectedEntryRenderingFunction?: (entry: U) => string,
     amount?: number,
     noEntriesTemplate?: string,
-    emptyEntry?: U | any,
     queryFunction?: QueryFunction<U>,
     queryOnNonNumberCharacters?: boolean,
     openDropdownOnEditorClick?: boolean,
@@ -84,21 +83,16 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             unitDisplayPosition: 'right', // right or left
             allowNullAmount: true,
             entryRenderingFunction: (entry: U) => {
-                const template = (entry as any).template || DEFAULT_TEMPLATES.currency2LineTemplate;
-                return Mustache.render(template, entry);
+                return Mustache.render(DEFAULT_TEMPLATES.currency2LineTemplate, entry);
             },
             selectedEntryRenderingFunction: (entry: U) => {
-                const template = (entry as any).selectedEntryTemplate || DEFAULT_TEMPLATES.currencySingleLineShortTemplate;
-                return Mustache.render(template, entry);
+                return Mustache.render(DEFAULT_TEMPLATES.currencySingleLineShortTemplate, entry);
             },
             amount: null,
             selectedEntry: undefined,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
             entries: null,
-            emptyEntry: {
-                code: '...'
-            },
             queryFunction: null, // defined below...
             queryOnNonNumberCharacters: true,
             openDropdownOnEditorClick: false,
@@ -375,18 +369,11 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     }
 
     public setSelectedEntry(entry: U, fireEvent?: boolean, originalEvent?: Event) {
-        if (entry == null) {
-            this.selectedEntry = null;
-            const $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
-                .addClass("tr-combobox-entry")
-                .addClass("empty");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
-        } else {
-            this.selectedEntry = entry;
-            const $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
-                .addClass("tr-combobox-entry");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
-        }
+        this.selectedEntry = entry;
+        const $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+            .addClass("tr-combobox-entry");
+        this.$selectedEntryWrapper.empty().append($selectedEntry);
+
         this.cleanupEditorValue();
         this.updateOriginalInputValue();
         if (!this.$editor.is(":focus")) {
@@ -400,7 +387,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
     private formatEditorValue() {
         this.$editor.val(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, this.config.thousandsSeparator));
-    }
+    }                                                            
 
     private cleanupEditorValue() {
         if (this.$editor.val()) {

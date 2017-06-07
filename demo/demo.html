@@ -56,8 +56,6 @@
     <h5>Default query implementation:</h5>
     <small>Configured entries are filtered locally.</small>
     <input id="defaultFilteringComboBox">
-    <small>emptyEntryTemplate</small>
-    <input id="emptyEntryTemplateFilteringCombobox">
     <small>allowFreeText: true</small>
     <input id="freeTextComboBox">
     <small>autoComplete: false</small>
@@ -152,12 +150,9 @@
 <div style="width: 350px">
     <input id="readonlyTreeComboBox">
 </div>
-<small>emptyEntryTemplate</small>
+<small>lazy child loading</small>
 <div style="width: 350px">
-   <input id="emptyEntryTemplateTreeComboBox">
-</div>
-<div style="width: 350px">
-   <input id="emptyEntryTreeComboBox">
+   <input id="lazyChildLoadingTreeComboBox">
 </div>
 
 <h4>Trivial Tree</h4>
@@ -210,9 +205,6 @@ no search field:
 
         demo.defaultFilteringCombobox = new TrivialComponents.TrivialComboBox("#defaultFilteringComboBox", {
             entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select..."
-            },
             showClearButton: true
         });
         demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
@@ -225,22 +217,8 @@ no search field:
             console.log("defaultFilteringCombobox blur");
         });
 
-        demo.emptyEntryTemplateFilteringCombobox = new TrivialComponents.TrivialComboBox("#emptyEntryTemplateFilteringCombobox", {
-            entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select..."
-            },
-            emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>{{displayValue}}</i></div>',
-        });
-        demo.emptyEntryTemplateFilteringCombobox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("emptyEntryTemplateFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
-        });
-
         demo.freeTextComboBox = new TrivialComponents.TrivialComboBox('#freeTextComboBox', {
             entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select..."
-            },
             allowFreeText: true
         });
         demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry) {
@@ -249,26 +227,16 @@ no search field:
 
         demo.noAutoCompleteComboBox = new TrivialComponents.TrivialComboBox('#noAutoCompleteComboBox', {
             entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select..."
-            },
             autoComplete: false
         });
 
         demo.iconSingleLineComboBox = new TrivialComponents.TrivialComboBox('#iconSingleLineComboBox', {
             entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select..."
-            },
             template: TrivialComponents.iconSingleLineTemplate
         });
 
         demo.customFilteringComboBox = new TrivialComponents.TrivialComboBox('#customFilteringComboBox', {
             entries: createEntries(),
-            emptyEntry: {
-                imageUrl: "",
-                additionalInfo: ""
-            },
             queryFunction: function (queryString, resultCallback) {
                 setTimeout(function () {
                     resultCallback(createEntries().filter(function (entry) {
@@ -281,9 +249,6 @@ no search field:
 
         demo.valueFunctionComboBox = new TrivialComponents.TrivialComboBox('#valueFunctionComboBox', {
             entries: createEntries(),
-            emptyEntry: {
-                displayValue: "Please select and see value of originalInput..."
-            },
             valueFunction: function(entry) {
                 return entry ? entry.additionalInfo : null;
             }
@@ -480,10 +445,9 @@ no search field:
             editingMode: 'readonly'
         });
 
-        demo.emptyEntryTemplateTreeComboBox =  new TrivialComponents.TrivialTreeComboBox('#emptyEntryTemplateTreeComboBox', {
+        demo.lazyChildLoadingTreeComboBox =  new TrivialComponents.TrivialTreeComboBox('#lazyChildLoadingTreeComboBox', {
             templates: [TrivialComponents.icon2LinesTemplate],
             entries: createDemoTreeNodes(),
-            emptyEntryTemplate: '<div class="content-wrapper editor-area" style="padding: 3px;"><i>Please choose ...</i></div>',
             lazyChildrenQueryFunction: function (node, callback) {
                setTimeout(function () {
                   callback(createDemoTreeNodes())
@@ -491,29 +455,8 @@ no search field:
             },
             animationDuration: 200
         });
-        demo.emptyEntryTemplateTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("emptyEntryTemplateTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
-        });
-
-        demo.valueFunctionComboBox = new TrivialComponents.TrivialTreeComboBox('#emptyEntryTreeComboBox', {
-            templates: [TrivialComponents.icon2LinesTemplate],
-            entries: createDemoTreeNodes(),
-            emptyEntry: {
-                id: -1,
-                displayValue: "nothing selected",
-                additionalInfo: "-",
-                imageUrl: "img/icons/pin.png",
-                isLeaf: true
-            },
-            lazyChildrenQueryFunction: function (node, callback) {
-               setTimeout(function () {
-                  callback(createDemoTreeNodes())
-               }, 1000);
-            },
-            animationDuration: 200
-        });
-        demo.valueFunctionComboBox.onSelectedEntryChanged.addListener(function(entry) {
-            console.log("emptyEntryTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+        demo.lazyChildLoadingTreeComboBox.onSelectedEntryChanged.addListener(function(entry) {
+            console.log("lazyChildLoadingTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
         });
 
         demo.zeroConfigTree = new TrivialComponents.TrivialTree('#zeroConfigTree', {
@@ -562,9 +505,6 @@ no search field:
 
         demo.unitBox = new TrivialComponents.TrivialUnitBox('#unitBox', {
             entries: createCurrencyEntries(),
-            emptyEntry: {
-                code: '...'
-            },
             selectedEntry: {
                 code: 'EUR'
             }, decimalPrecision: 3,

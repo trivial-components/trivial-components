@@ -29,7 +29,6 @@ export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     selectedEntryRenderingFunction?: (entry: E) => string,
     noEntriesTemplate?: string,
     textHighlightingEntryLimit?: number,
-    emptyEntry?: E | any,
     queryFunction?: QueryFunction<E>,
     autoComplete?: boolean,
     autoCompleteDelay?: number,
@@ -83,24 +82,16 @@ export class TrivialComboBox<E> implements TrivialComponent{
         this.config = $.extend(<TrivialComboBoxConfig<E>> {
             valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: (entry: E) => {
-                const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
-                return Mustache.render(template, entry);
+                return Mustache.render(DEFAULT_TEMPLATES.image2LinesTemplate, entry);
             },
             selectedEntryRenderingFunction: (entry: E) => {
-                if ((entry as any).selectedEntryTemplate) {
-                    return Mustache.render((entry as any).selectedEntryTemplate, entry)
-                } else {
-                    return this.config.entryRenderingFunction(entry);
-                }
+                return this.config.entryRenderingFunction(entry); 
             },
             selectedEntry: undefined,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
             textHighlightingEntryLimit: 100,
             entries: null,
-            emptyEntry: {
-                _isEmptyEntry: true
-            },
             queryFunction: null, // defined below...
             autoComplete: true,
             autoCompleteDelay: 0,
@@ -119,7 +110,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
                     }
                     return null;
                 } else {
-                    return this.config.entryToEditorTextFunction(entry);
+                    return entry ? this.config.entryToEditorTextFunction(entry) : null;
                 }
             },
             allowFreeText: false,
@@ -385,21 +376,15 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     public setSelectedEntry(entry: E, commit = true, fireEvent = false, originalEvent?: Event) {
-        if (entry == null) {
-            this.$originalInput.val(this.config.valueFunction(null));
-            this.selectedEntry = null;
-            let $selectedEntry = $(this.config.selectedEntryRenderingFunction(this.config.emptyEntry))
-                .addClass("tr-combobox-entry")
-                .addClass("empty");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
-        } else {
-            this.$originalInput.val(this.config.valueFunction(entry));
-            this.selectedEntry = entry;
-            let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
-                .addClass("tr-combobox-entry");
-            this.$selectedEntryWrapper.empty().append($selectedEntry);
+        this.$originalInput.val(this.config.valueFunction(entry));
+        this.selectedEntry = entry;
+        let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
+            .addClass("tr-combobox-entry");
+        this.$selectedEntryWrapper.empty().append($selectedEntry);
+        if (entry != null) {
             this.$editor.val(this.config.entryToEditorTextFunction(entry));
         }
+
         if (commit) {
             this.lastCommittedValue = entry;
             if (fireEvent) {
@@ -418,7 +403,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     private isEntrySelected() {
-        return this.selectedEntry != null && this.selectedEntry !== this.config.emptyEntry;
+        return this.selectedEntry != null;
     }
 
     private showEditor() {
@@ -474,6 +459,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
     };
 
     public openDropDown() {
+        console.log("openDropDown")
         if (this.isDropDownNeeded()) {
             if (this.listBoxDirty) {
                 this.updateListBoxEntries();
