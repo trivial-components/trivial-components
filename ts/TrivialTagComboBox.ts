@@ -44,7 +44,9 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     distinct?: boolean,
     editingMode?: EditingMode,
     showDropDownOnResultsOnly?: boolean,
-    maxSelectedEntries?: number
+    maxSelectedEntries?: number,
+    tagCompleteDecider?: (entry: E) => boolean,
+    entryMerger?: (incompleteEntry: E, newEntryPart: E) => E
 }
 
 export class TrivialTagComboBox<E> implements TrivialComponent {
@@ -58,6 +60,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private $trigger: JQuery;
     private $editor: JQuery;
     private $dropDownTargetElement: JQuery;
+    private $tagArea: JQuery;
 
     public readonly onSelectedEntryChanged = new TrivialEvent<E[]>(this);
     public readonly onFocus = new TrivialEvent<void>(this);
@@ -75,7 +78,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private listBoxDirty = true;
     private repositionDropDownScheduler: number = null;
     private editingMode: EditingMode;
+
     private usingDefaultQueryFunction: boolean;
+    private currentPartialTag: E;
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E>) {
         options = options || {};
@@ -119,6 +124,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     _isFreeTextEntry: true
                 };
             },
+            tagCompleteDecider: (mergedEntry: E) => {
+                return true;
+            },
+            entryMerger: (partialEntry: E, newEntry: E) => {
+                return newEntry;
+            },
             showTrigger: true,
             distinct: true,
             matchingOptions: {
@@ -141,7 +152,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$tagComboBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
             .insertAfter(this.$originalInput);
         this.$originalInput.appendTo(this.$tagComboBox);
-        const $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
+        this.$tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
         if (this.config.showTrigger) {
             this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagComboBox);
             this.$trigger.mousedown(() => {
@@ -165,7 +176,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.setEditingMode(this.config.editingMode);
         this.$editor = $('<span contenteditable="true" class="tagbox-editor" autocomplete="off"></span>');
 
-        this.$editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
+        this.$editor.appendTo(this.$tagArea).addClass("tr-tagbox-editor tr-editor")
             .focus(() => {
                 if (this.blurCausedByClickInsideComponent) {
                     // do nothing!
@@ -175,10 +186,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.$tagComboBox.addClass('focus');
                 }
                 setTimeout(() => { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
-                    minimallyScrollTo($tagArea, this.$editor);
+                    minimallyScrollTo(this.$tagArea, this.$editor);
                 });
             })
             .blur((e) => {
+                console.error("blur");
                 if (this.blurCausedByClickInsideComponent) {
                     this.$editor.focus();
                 } else {
@@ -188,7 +200,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.entries = null;
                     this.closeDropDown();
                     if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);    
+                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
                     }
                     this.$editor.text("");
                 }
@@ -200,6 +212,16 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry) {
                         this.setSelectedEntry(highlightedEntry, true, e);
+                        return false;
+                    }
+                    if (this.currentPartialTag) {
+                        if (e.shiftKey) { // we do not want the editor to get the focus right back, so we need to position the $editor intelligently...
+                            this.$editor.insertAfter(this.currentPartialTag._trEntryElement);
+                        } else {
+                            this.$editor.insertBefore(this.currentPartialTag._trEntryElement);
+                        }
+                        this.currentPartialTag._trEntryElement.remove();
+                        this.currentPartialTag = null;
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -311,16 +333,19 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$tagComboBox.add(this.$dropDown).mousedown(() => {
             if (this.$editor.is(":focus")) {
                 this.blurCausedByClickInsideComponent = true;
+                console.log("-> true")
             }
         }).mouseup(() => {
             if (this.blurCausedByClickInsideComponent) {
                 this.$editor.focus();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
+                console.log("-> false mouseup")
             }
         }).mouseout(() => {
             if (this.blurCausedByClickInsideComponent) {
                 this.$editor.focus();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
+                console.log("-> false mouseout")
             }
         });
 
@@ -335,12 +360,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         });
 
-        $tagArea.click((e) => {
-            if (!this.config.showDropDownOnResultsOnly) {
-                this.openDropDown();
-            }
-            this.query();
-
+        this.$tagArea.mousedown((e) => {
             // find the tag in the same row as the click with the smallest distance to the click
             let $tagWithSmallestDistance: JQuery = null;
             let smallestDistanceX = 1000000;
@@ -369,6 +389,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 }
             }
             this.$editor.focus();
+        }).click((e) => {
+            if (!this.config.showDropDownOnResultsOnly) {
+                this.openDropDown();
+            }
+            this.query();
         });
 
         this.setSelectedEntries(this.config.selectedEntries);
@@ -459,27 +484,47 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             return; // entry already selected
         }
 
+        let wasPartial = !!this.currentPartialTag;
+        if (wasPartial) {
+            this.$editor.appendTo(this.$tagArea); // make sure the event handlers don't get detached when removing the partial tag
+            (this.currentPartialTag as any)._trEntryElement.remove();
+            entry = this.config.entryMerger(this.currentPartialTag, entry);
+        }
+
         const tag = $.extend({}, entry);
-        this.selectedEntries.splice(this.$editor.index(), 0, tag);
-        this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+
+        if (this.config.tagCompleteDecider(entry)) {
+            this.selectedEntries.splice(this.$editor.index(), 0, tag); // TODO #compositetag editor might be inside tag!!!!!!!!!!!!!!
+            this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+            this.currentPartialTag = null;
+        } else {
+            this.currentPartialTag = tag;
+        }
 
         const $entry = $(this.config.selectedEntryRenderingFunction(tag));
         const $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
-        $tagWrapper.append($entry).insertBefore(this.$editor);
+        $tagWrapper.append($entry).appendTo(this.$tagArea); // TODO #compositetag editor might be removed because inside tag!!!!!!!!!!!!!!!!!!!!!!!
         tag._trEntryElement = $tagWrapper;
 
-        if (this.config.editingMode == "editable") {
-            $entry.find('.tr-remove-button').click((e) => {
-                this.removeTag(tag);
-                return false;
-            });
+        $entry.find('.tr-remove-button').click((e) => {
+            this.removeTag(tag);
+            return false;
+        });
+
+        if (this.config.tagCompleteDecider(entry)) {
+            this.$editor.appendTo(this.$tagArea);
+        } else {
+            this.$editor.appendTo($entry.find('.tr-editor'));
         }
 
         this.$editor.text("");
+        this.$editor.focus();
 
-        if (fireEvent) {
+        if (this.config.tagCompleteDecider(entry) && fireEvent) {
             this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
         }
+
+        console.log("after Select: " + console.log(window.getSelection().anchorOffset));
     }
 
     private repositionDropDown() {
@@ -505,6 +550,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     public openDropDown() {
+        console.error("openDropDown");
         if (this.isDropDownNeeded()) {
             if (this.listBoxDirty) {
                 this.updateListBoxEntries();
@@ -520,6 +566,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     public closeDropDown() {
+        console.error("closeDropdown " + new Date().getMilliseconds());
         this.$tagComboBox.removeClass("open");
         this.$dropDown.hide();
         this.isDropDownOpen = false;

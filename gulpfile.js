@@ -240,7 +240,7 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-ts', function () {
-	gulp.watch(['ts/*.ts'], ['js-single']);
+	gulp.watch(['ts/*.ts', 'demo/ts/*.ts'], ['js-single', 'typescript-demo']);
 });
 
 var tsProject = ts.createProject('tsconfig.json');
@@ -287,6 +287,22 @@ gulp.task('typescript', ['install-typings'], function () {
 			}))
 			.pipe(gulp.dest("dist/js/single"))
 	]);
+});
+
+var tsDemoProject = ts.createProject('demo/tsconfig.json');
+gulp.task('typescript-demo', ['install-typings'], function () {
+	return tsDemoProject.src()
+		.pipe(sourcemaps.init())
+		.pipe(tsDemoProject())
+		.js
+		.pipe(sourcemaps.write('.', {
+			includeContent: false,
+			debug: true,
+			mapSources: function (filePath) {
+				return "ts/" + path.basename(filePath);
+			}
+		}))
+		.pipe(gulp.dest("demo"));
 });
 
 gulp.task("install-typings", function () {

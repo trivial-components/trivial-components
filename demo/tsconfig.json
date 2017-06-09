@@ -1,22 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "umd",
-    "noImplicitAny": true,
+    "module": "none",
+    "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outDir": "dist/js/single",
+    "sourceRoot": "..",
+    "outDir": ".",
     "sourceMap": true,
     "declaration": true
   },
   "include": [
     "ts/**/*",
-    "typings/index.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "demo"
+    "../typings/index.d.ts"
   ]
 }
 
