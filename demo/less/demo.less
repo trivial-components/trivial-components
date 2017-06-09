@@ -27,19 +27,14 @@ h5 {
   margin-bottom: 2px;
 }
 
-.search-tag {
+.entry {
   display: flex;
   margin: 1px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
 
   .attribute {
     padding: 3px 6px 3px 6px;
-    background-color: #ddd;
     color: black;
     font-weight: 500;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
     display: -webkit-box;
     display: flex;
     align-items: center;
@@ -47,23 +42,37 @@ h5 {
 
   .value {
     padding: 2px 6px 2px 4px;
-    background-color: #eee;
     color: black;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
     display: -webkit-box;
     display: flex;
     align-items: center;
 
     .profile-picture {
       flex: 0 0 auto;
-      width: 18px;
-      height: 18px;
-      border: 1px solid rgba(255, 255, 255, 0);
+      width: 20px;
+      height: 20px;
       background-position: center;
       background-size: cover;
       margin-right: 3px;
+      border: 1px solid #ddd;
       border-radius: 100%;
     }
+  }
+}
+
+.entry.tag {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+  .attribute {
+    background-color: #ddd;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  .value {
+    background-color: #eee;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
   }
 }

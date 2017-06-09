@@ -58,7 +58,6 @@ var zip = require('gulp-zip');
 var tar = require('gulp-tar');
 var gzip = require('gulp-gzip');
 var stripDebug = require('gulp-strip-debug');
-var karma = require('karma').server;
 var header = require('gulp-header');
 var strip = require('gulp-strip-comments');
 var stripCssComments = require('gulp-strip-css-comments');

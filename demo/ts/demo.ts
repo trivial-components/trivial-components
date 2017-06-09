@@ -60,7 +60,7 @@ $(function () {
 		showTrigger: false
 	});
 
-	var showDropDownOnResultsOnlyComboBoxEntries = createEntries();
+	const showDropDownOnResultsOnlyComboBoxEntries = createEntries();
 	demo.showDropDownOnResultsOnlyComboBox = new TrivialComponents.TrivialComboBox('#showDropDownOnResultsOnlyComboBox', {
 		entries: showDropDownOnResultsOnlyComboBoxEntries,
 		queryFunction: function (queryString, resultCallback) {
@@ -83,7 +83,7 @@ $(function () {
 		editingMode: 'readonly'
 	});
 
-	var listBoxEntries = createEntries(10);
+	const listBoxEntries = createEntries(10);
 	listBoxEntries[1].template = "<div>custom template for entry {{id}}</div>";
 	demo.listBox = new TrivialComponents.TrivialListBox('#listBox', {
 		entries: listBoxEntries
@@ -117,7 +117,7 @@ $(function () {
 		distinct: false
 	});
 
-	var partialEntries = [
+	const attributeEntries = [
 		{attribute: "From"},
 		{attribute: "To"},
 		{attribute: "CC"},
@@ -125,51 +125,53 @@ $(function () {
 		{attribute: "Attachments"}
 	];
 
-	var persons = [];
-	for (var i = 0; i < 50; i++) {
-		var firstName = randomOf(firstNames);
-		var lastName = randomOf(lastNames);
-		persons.push({
-			firstName: firstName,
-			lastName: lastName,
-			email: firstName + '.' + lastName + '@' + randomOf(words) + '.com',
-			imageUrl: randomImageUrl()
+	const personsEntries = [];
+	for (let i = 0; i < 50; i++) {
+		const firstName = randomOf(firstNames);
+		const lastName = randomOf(lastNames);
+		personsEntries.push({
+			person: {
+				firstName: firstName,
+				lastName: lastName,
+				email: firstName + '.' + lastName + '@' + randomOf(words) + '.com',
+				imageUrl: randomImageUrl()
+			}
 		});
 	}
 
-	let entryRenderingFunction = function (entry) {
+	let entryRenderingFunction = function (selectedDisplay, entry) {
 		if (entry == null) {
 			return '<div>';
-		} else if (entry.attribute != null && entry.lastName == null) {
-			return `<div class="search-tag"><div class="attribute">${entry.attribute}</div><div class="value free-text-value"><span class="tr-editor"></span></div></div>`;
-		} else if (entry.attribute != null && entry != null && entry.isFreeTextValue) {
-			return `<div class="search-tag"><div class="attribute">${entry.attribute || '*'}</div><div class="value free-text-value">${entry.value}</div></div>`;
-		} else if (entry.attribute != null && entry.lastName != null) {
-			return `<div class="search-tag"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.imageUrl})"></div> ${entry.firstName} ${entry.lastName}</div></div>`;
-		} else if (entry.lastName != null) {
-			return `<div class="search-tag"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.imageUrl})"></div> ${entry.firstName} ${entry.lastName}</div></div>`;
+		} else if (entry.attribute != null && entry.person == null) {
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value free-text-value"><span class="tr-editor"></span></div></div>`;
+		} else if (entry.attribute != null && entry.freeTextValue) {
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute || '*'}</div><div class="value free-text-value">${entry.freeTextValue}</div></div>`;
+		} else if (entry.attribute != null && entry.person != null) {
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.firstName} ${entry.person.lastName}</div></div>`;
+		} else if (entry.person != null) {
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.firstName} ${entry.person.lastName}</div></div>`;
 		}
 	};
 	demo.compositeTagBox = new TrivialComponents.TrivialTagComboBox<any>('#compositeTagBox', {
 		queryFunction: function (searchString, resultCallback) {
 			if (!searchString) {
-				resultCallback(partialEntries);
+				resultCallback(attributeEntries);
 			} else {
-				var matchingPartials = partialEntries.filter(function (e) {
+				const matchingPartials = attributeEntries.filter(function (e) {
 					return TrivialComponents.trivialMatch(e.attribute, searchString).length > 0;
 				});
-				var matchingPersons = persons.filter(function (e) {
-					return TrivialComponents.trivialMatch(e.firstName, searchString).length > 0
-						|| TrivialComponents.trivialMatch(e.lastName, searchString).length > 0
-						|| TrivialComponents.trivialMatch(e.email, searchString).length > 0;
+				const matchingPersons = personsEntries.filter(function (e) {
+					return TrivialComponents.trivialMatch(e.person.firstName, searchString).length > 0
+						|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0
+						|| TrivialComponents.trivialMatch(e.person.email, searchString).length > 0;
 				});
 				resultCallback([...matchingPartials, ...matchingPersons]);
 			}
 		},
-		entryRenderingFunction: entryRenderingFunction,
-		selectedEntryRenderingFunction: entryRenderingFunction,
+		entryRenderingFunction: (e) => entryRenderingFunction(false, e),
+		selectedEntryRenderingFunction: (e) => entryRenderingFunction(true, e),
 		tagCompleteDecider: (entry: any) => {
-			return entry.lastName != null;
+			return entry.person || entry.freeTextValue;
 		},
 		entryMerger: function (partialEntry, newEntry) {
 			return {
@@ -190,7 +192,7 @@ $(function () {
 		showTrigger: false
 	});
 
-	var showDropDownOnResultsOnlyTagBoxEntries =  createEntries();
+	const showDropDownOnResultsOnlyTagBoxEntries = createEntries();
 	demo.showDropDownOnResultsOnlyTagBox = new TrivialComponents.TrivialTagComboBox('#showDropDownOnResultsOnlyTagBox', {
 		entries: showDropDownOnResultsOnlyTagBoxEntries,
 		queryFunction: function (queryString, resultCallback) {
@@ -235,7 +237,7 @@ $(function () {
 		enforceSingleExpandedPath     : true
 	});
 
-	var $treeComboBox = $('#treeComboBox');
+	const $treeComboBox = $('#treeComboBox');
 	demo.treeComboBox = new TrivialComponents.TrivialTreeComboBox($treeComboBox, {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[0],
