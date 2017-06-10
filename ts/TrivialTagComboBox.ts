@@ -41,12 +41,11 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     freeTextEntryFactory?: (freeText: string) => E | any,
     showClearButton?: boolean,
     showTrigger?: boolean,
-    distinct?: boolean,
     editingMode?: EditingMode,
     showDropDownOnResultsOnly?: boolean,
-    maxSelectedEntries?: number,
     tagCompleteDecider?: (entry: E) => boolean,
-    entryMerger?: (incompleteEntry: E, newEntryPart: E) => E
+    entryMerger?: (incompleteEntry: E, newEntryPart: E) => E,
+    selectionVetoFunction?: (entry: E) => boolean
 }
 
 export class TrivialTagComboBox<E> implements TrivialComponent {
@@ -138,7 +137,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 maxLevenshteinDistance: 2
             },
             editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
-            showDropDownOnResultsOnly: false
+            showDropDownOnResultsOnly: false,
+            selectionVetoFunction: (e) => true
         }, options);
 
         if (!this.config.queryFunction) {
@@ -361,31 +361,16 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         });
 
         this.$tagArea.mousedown((e) => {
-            // find the tag in the same row as the click with the smallest distance to the click
-            let $tagWithSmallestDistance: JQuery = null;
-            let smallestDistanceX = 1000000;
-            for (let i = 0; i < this.selectedEntries.length; i++) {
-                const selectedEntry = this.selectedEntries[i];
-                const $tag = (selectedEntry as any)._trEntryElement;
-                const tagBoundingRect = $tag[0].getBoundingClientRect();
-                const sameRow = e.clientY >= tagBoundingRect.top && e.clientY < tagBoundingRect.bottom;
-                const sameCol = e.clientX >= tagBoundingRect.left && e.clientX < tagBoundingRect.right;
-                const distanceX = sameCol ? 0 : Math.min(Math.abs(e.clientX - tagBoundingRect.left), Math.abs(e.clientX - tagBoundingRect.right));
-                if (sameRow && distanceX < smallestDistanceX) {
-                    $tagWithSmallestDistance = $tag;
-                    smallestDistanceX = distanceX;
-                    if (distanceX === 0) {
-                        break;
+            if (this.currentPartialTag == null) {
+                let $nearestTag = this.findNearestTag(e);
+                if ($nearestTag) {
+                    const tagBoundingRect = $nearestTag[0].getBoundingClientRect();
+                    const isRightSide = e.clientX > (tagBoundingRect.left + tagBoundingRect.right) / 2;
+                    if (isRightSide) {
+                        this.$editor.insertAfter($nearestTag);
+                    } else {
+                        this.$editor.insertBefore($nearestTag);
                     }
-                }
-            }
-            if ($tagWithSmallestDistance) {
-                const tagBoundingRect = $tagWithSmallestDistance[0].getBoundingClientRect();
-                const isRightSide = e.clientX > (tagBoundingRect.left + tagBoundingRect.right) / 2;
-                if (isRightSide) {
-                    this.$editor.insertAfter($tagWithSmallestDistance);
-                } else {
-                    this.$editor.insertBefore($tagWithSmallestDistance);
                 }
             }
             this.$editor.focus();
@@ -400,6 +385,27 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         // ===
         this.$tagComboBox.data("trivialTagComboBox", this);
+    }
+
+    private findNearestTag(mouseEvent: JQueryMouseEventObject) {
+        let $nearestTag: JQuery = null;
+        let smallestDistanceX = 1000000;
+        for (let i = 0; i < this.selectedEntries.length; i++) {
+            const selectedEntry = this.selectedEntries[i];
+            const $tag = (selectedEntry as any)._trEntryElement;
+            const tagBoundingRect = $tag[0].getBoundingClientRect();
+            const sameRow = mouseEvent.clientY >= tagBoundingRect.top && mouseEvent.clientY < tagBoundingRect.bottom;
+            const sameCol = mouseEvent.clientX >= tagBoundingRect.left && mouseEvent.clientX < tagBoundingRect.right;
+            const distanceX = sameCol ? 0 : Math.min(Math.abs(mouseEvent.clientX - tagBoundingRect.left), Math.abs(mouseEvent.clientX - tagBoundingRect.right));
+            if (sameRow && distanceX < smallestDistanceX) {
+                $nearestTag = $tag;
+                smallestDistanceX = distanceX;
+                if (distanceX === 0) {
+                    break;
+                }
+            }
+        }
+        return $nearestTag;
     }
 
     private updateListBoxEntries() {
@@ -475,13 +481,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         if (entry == null) {
             return; // do nothing
         }
-        if (this.config.maxSelectedEntries && this.selectedEntries.length >= this.config.maxSelectedEntries) {
+        if (this.config.selectionVetoFunction(entry) === false) {
             return; // no more entries allowed
-        }
-        if (this.config.distinct && this.selectedEntries.map((entry: E) => {
-                return this.config.valueFunction([entry])
-            }).indexOf(this.config.valueFunction([entry])) != -1) {
-            return; // entry already selected
         }
 
         let wasPartial = !!this.currentPartialTag;
