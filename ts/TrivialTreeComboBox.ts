@@ -499,6 +499,8 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
 
 
     public updateEntries(newEntries: E[], highlightDirection?: HighlightDirection) {
+        this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
+
         this.$spinners.remove();
         this.$spinners = $();
         this.treeBox.updateEntries(newEntries);

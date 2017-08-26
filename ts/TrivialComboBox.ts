@@ -499,6 +499,8 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     private updateListBoxEntries() {
+        this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
+
         this.listBox.updateEntries(this.entries);
         this.listBoxDirty = false;
     }
