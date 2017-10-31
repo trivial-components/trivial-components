@@ -511,7 +511,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         });
 
         if (this.config.tagCompleteDecider(entry)) {
-            this.doIgnoringBlurEvents(() => this.$editor.appendTo(this.$tagArea));
+            this.doIgnoringBlurEvents(() => this.insertAtIndex(this.$editor, editorIndex + 1));
         } else {
             this.doIgnoringBlurEvents(() => this.$editor.appendTo($entry.find('.tr-editor')));
         }
@@ -606,6 +606,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private insertAtIndex($element: JQuery, index: number) {
+        console.log("inserting at: " + index);
         const lastIndex = this.$tagArea.children().length;
         if (index < lastIndex) {
             this.$tagArea.children().eq(index).before($element);
