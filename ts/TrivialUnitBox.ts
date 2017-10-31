@@ -499,7 +499,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             return null;
         } else {
             const selectedEntryToReturn = $.extend({}, this.selectedEntry);
-            selectedEntryToReturn._trEntryElement = undefined;
+            delete selectedEntryToReturn._trEntryElement;
             return selectedEntryToReturn;
         }
     }

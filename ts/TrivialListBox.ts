@@ -178,7 +178,7 @@ export class TrivialListBox<E> implements TrivialComponent {
     public getSelectedEntry() {
         if (this.selectedEntry) {
             const selectedEntryToReturn = $.extend({}, this.selectedEntry);
-            selectedEntryToReturn._trEntryElement = undefined;
+            delete selectedEntryToReturn._trEntryElement;
             return selectedEntryToReturn;
         } else {
             return null;

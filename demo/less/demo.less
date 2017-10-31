@@ -32,8 +32,9 @@ h5 {
   margin: 1px;
 
   .attribute {
-    padding: 3px 6px 3px 6px;
-    color: black;
+    padding: 3px 6px;
+    font-size: 85%;
+    color: #333;
     font-weight: 500;
     display: -webkit-box;
     display: flex;
@@ -60,18 +61,23 @@ h5 {
   }
 }
 
+.entry:not(.tag) .attribute {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
 .entry.tag {
   border: 1px solid #ddd;
   border-radius: 4px;
 
   .attribute {
     background-color: #ddd;
+    border-right: 1px solid #ddd;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
   }
 
   .value {
-    background-color: #eee;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
   }

@@ -45,6 +45,7 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     showDropDownOnResultsOnly?: boolean,
     tagCompleteDecider?: (entry: E) => boolean,
     entryMerger?: (partialEntry: E, newEntryPart: E) => E,
+    removePartialTagOnBlur: boolean,
     selectionAcceptor?: (entry: E) => boolean
 }
 
@@ -129,6 +130,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             entryMerger: (partialEntry: E, newEntry: E) => {
                 return newEntry;
             },
+            removePartialTagOnBlur: true,
             showTrigger: true,
             distinct: true,
             matchingOptions: {
@@ -200,6 +202,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.closeDropDown();
                     if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
                         this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
+                    } if (this.config.removePartialTagOnBlur && this.currentPartialTag != null) {
+                        this.cancelPartialTag();
                     }
                     this.$editor.text("");
                 }
@@ -233,23 +237,19 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.prev()) {
                             this.doIgnoringBlurEvents(() => this.$editor.insertBefore(this.$editor.prev()));
-                            selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
-                            this.$editor.focus();
+                            this.focusEditor();
                         }
                     } else if (e.which == keyCodes.right_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.next()) {
                             this.doIgnoringBlurEvents(() => this.$editor.insertAfter(this.$editor.next()));
-                            selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
-                            this.$editor.focus();
+                            this.focusEditor();
                         }
                     }
                 } else if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     if (this.$editor.text() == "") {
                         if (this.currentPartialTag != null) {
-                            this.doIgnoringBlurEvents(() => this.$editor.insertAfter((this.currentPartialTag as any)._trEntryElement));
-                            this.$editor.focus();
-                            (this.currentPartialTag as any)._trEntryElement.remove();
-                            this.currentPartialTag = null;
+                            this.cancelPartialTag();
+                            this.focusEditor();
                         } else {
                             const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
                             if (tagToBeRemoved) {
@@ -276,7 +276,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     return false; // some browsers move the caret to the beginning on up key
                 } else if (e.which == keyCodes.escape) {
                     this.closeDropDown();
-                    this.$editor.text("");
+                    if (this.$editor.text().length > 0) {
+                        this.$editor.text("");
+                    } else if (this.currentPartialTag != null) {
+                        this.cancelPartialTag();
+                        this.focusEditor();
+                    }
                 } else {
                     if (!this.config.showDropDownOnResultsOnly) {
                         this.openDropDown();
@@ -380,6 +385,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         // ===
         this.$tagComboBox.data("trivialTagComboBox", this);
+    }
+
+    private cancelPartialTag() {
+        this.doIgnoringBlurEvents(() => this.$editor.insertBefore((this.currentPartialTag as any)._trEntryElement));
+        (this.currentPartialTag as any)._trEntryElement.remove();
+        this.currentPartialTag = null;
     }
 
     private findNearestTag(mouseEvent: JQueryMouseEventObject) {
@@ -517,12 +528,16 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
 
         this.$editor.text("");
-        selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
-        this.$editor.focus();
+        this.focusEditor();
 
         if (this.config.tagCompleteDecider(entry) && fireEvent) {
             this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
         }
+    }
+
+    private focusEditor() {
+        selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
+        this.$editor.focus();
     }
 
     private repositionDropDown() {
@@ -648,7 +663,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         const selectedEntriesToReturn: E[] = [];
         for (let i = 0; i < this.selectedEntries.length; i++) {
             const selectedEntryToReturn = $.extend({}, this.selectedEntries[i]);
-            selectedEntryToReturn._trEntryElement = undefined;
+            delete selectedEntryToReturn._trEntryElement;
             selectedEntriesToReturn.push(selectedEntryToReturn);
         }
         return selectedEntriesToReturn;
