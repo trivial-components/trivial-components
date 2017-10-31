@@ -45,7 +45,7 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     showDropDownOnResultsOnly?: boolean,
     tagCompleteDecider?: (entry: E) => boolean,
     entryMerger?: (partialEntry: E, newEntryPart: E) => E,
-    removePartialTagOnBlur: boolean,
+    removePartialTagOnBlur?: boolean,
     selectionAcceptor?: (entry: E) => boolean
 }
 
@@ -82,8 +82,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private usingDefaultQueryFunction: boolean;
     private currentPartialTag: E;
 
-    constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E>) {
-        options = options || {};
+    constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E> = {} as any) {
         this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
             valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
             entryRenderingFunction: (entry: E) => {
@@ -162,11 +161,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 if (this.isDropDownOpen) {
                     this.closeDropDown();
                 } else {
-                    setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                        this.$editor.select();
-                        this.openDropDown();
-                        this.query();
-                    });
+                    this.$editor.select();
+                    this.openDropDown();
+                    this.query();
                 }
             });
         }
@@ -228,7 +225,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         (this.currentPartialTag as any)._trEntryElement.remove();
                         this.currentPartialTag = null;
                     }
-                    
+
                     this.closeDropDown(); console.log("closing dropdown!");
                     if (e.which == keyCodes.enter) {
                         e.preventDefault(); // under any circumstances, prevent the new line to be added to the editor!
@@ -259,13 +256,13 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         }
                     } else {
                         this.doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
-                        this.query(1);
+	                    setTimeout(() => this.query(1)); // asynchronously to make sure the editor has been updated
                     }
                 } else if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     this.openDropDown();
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (!this.isDropDownOpen) {
-                        this.query(direction);
+	                    setTimeout(() => this.query(direction)); // asynchronously to make sure the editor has been updated
                         if (!this.config.showDropDownOnResultsOnly) {
                             this.openDropDown();
                         }
@@ -286,7 +283,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     if (!this.config.showDropDownOnResultsOnly) {
                         this.openDropDown();
                     }
-                    this.query(1);
+	                setTimeout(() => this.query(1)); // asynchronously to make sure the editor has been updated
                 }
             })
             .keyup((e) => {
@@ -457,25 +454,22 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private query(highlightDirection?: HighlightDirection) {
-        // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-        setTimeout(() => {
-            const queryString = this.getNonSelectedEditorValue();
-            const completeInputString = this.$editor.text().replace(String.fromCharCode(160), " ");
-            if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-                if (this.$spinners.length === 0) {
-                    const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                    this.$spinners = this.$spinners.add($spinner);
-                }
-                this.config.queryFunction(queryString, (newEntries: E[]) => {
-                    this.updateEntries(newEntries, highlightDirection);
-                    if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                        this.openDropDown();
-                    }
-                });
-                this.lastQueryString = queryString;
-                this.lastCompleteInputQueryString = completeInputString;
+        const queryString = this.getNonSelectedEditorValue();
+        const completeInputString = this.$editor.text().replace(String.fromCharCode(160), " ");
+        if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
+            if (this.$spinners.length === 0) {
+                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                this.$spinners = this.$spinners.add($spinner);
             }
-        }, 0);
+            this.config.queryFunction(queryString, (newEntries: E[]) => {
+                this.updateEntries(newEntries, highlightDirection);
+                if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                    this.openDropDown();
+                }
+            });
+            this.lastQueryString = queryString;
+            this.lastCompleteInputQueryString = completeInputString;
+        }
     }
 
     private fireChangeEvents(entries: E[], originalEvent: Event) {
@@ -502,7 +496,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         const tag = $.extend({}, entry);
 
         if (this.config.tagCompleteDecider(entry)) {
-            this.selectedEntries.splice(editorIndex, 0, tag); 
+            this.selectedEntries.splice(editorIndex, 0, tag);
             this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
             this.currentPartialTag = null;
         } else {
@@ -514,7 +508,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             .append($entry);
 
         this.doIgnoringBlurEvents(() => this.insertAtIndex($tagWrapper, editorIndex));
-        tag._trEntryElement = $tagWrapper;       
+        tag._trEntryElement = $tagWrapper;
 
         $entry.find('.tr-remove-button').click((e) => {
             this.removeTag(tag);

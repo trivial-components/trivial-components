@@ -125,6 +125,7 @@ $(function () {
 		{attribute: "From"},
 		{attribute: "To"},
 		{attribute: "CC"},
+		{attribute: "BCC"},
 		{attribute: "Message Text"},
 		{attribute: "Attachments"}
 	];
@@ -149,9 +150,9 @@ $(function () {
 		} else if (entry.attribute != null && entry.person == null) {
 			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value free-text-value"><span class="tr-editor"></span></div></div>`;
 		} else if (entry.attribute != null && entry.person != null) {
-			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + '' + entry.person.lastName : entry.person.email}</div></div>`;
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + ' ' + entry.person.lastName : entry.person.email}</div></div>`;
 		} else if (entry.person != null) {
-			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + '' + entry.person.lastName : entry.person.email}</div></div>`;
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + ' ' + entry.person.lastName : entry.person.email}</div></div>`;
 		}
 	};
 	demo.compositeTagBox = new TrivialComponents.TrivialTagComboBox<any>('#compositeTagBox', {
@@ -161,10 +162,11 @@ $(function () {
 			matchingAttributeEntries = demo.compositeTagBox.getCurrentPartialTag() == null ? attributeEntries.filter(function (e) {
 					return TrivialComponents.trivialMatch(e.attribute, searchString).length > 0;
 			}) : [];
-				const matchingPersons = personsEntries.filter(function (e) {
-					return TrivialComponents.trivialMatch(e.person.firstName, searchString).length > 0
-						|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0;
-				});
+			const matchingPersons = personsEntries.filter(function (e) {
+				let textMatches = TrivialComponents.trivialMatch(e.person.firstName, searchString).length > 0
+					|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0;
+				return matchingAttributeEntries.length == 0 && textMatches;
+			});
 			resultCallback([...matchingAttributeEntries, ...matchingPersons]);
 		},
 		entryRenderingFunction: (e) => entryRenderingFunction(false, e),
