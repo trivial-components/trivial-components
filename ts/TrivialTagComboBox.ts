@@ -481,7 +481,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         if (entry == null) {
             return; // do nothing
         }
-        if (this.config.selectionAcceptor(entry) === false) {
+        if (!this.config.selectionAcceptor(entry)) {
             return; // no more entries allowed
         }
 
