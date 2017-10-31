@@ -298,15 +298,15 @@ gulp.task('typescript-demo', ['install-typings'], function () {
 			includeContent: false,
 			debug: true,
 			mapSources: function (filePath) {
-				return "ts/" + path.basename(filePath);
+				return path.basename(filePath);
 			}
 		}))
-		.pipe(gulp.dest("demo"));
+		.pipe(gulp.dest("demo/ts"));
 });
 
 gulp.task("install-typings", function () {
-    return gulp.src("./typings.json")
-        .pipe(gulpTypings());
+    return gulp.src("./typings.json");
+        // .pipe(gulpTypings());
 });
 
 gulp.task('github-release', ['default'], function () {

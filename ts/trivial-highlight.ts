@@ -58,7 +58,7 @@ export type HighlightOptions = MatchingOptions & {
             const $this = $(this);
 
             $this.find('.' + options.highlightClassName).contents().unwrap();
-            if (isIE11) { // this is ie11
+            if (isIE11) {
                 normalizeForIE11(this);
             } else {
                 this.normalize();

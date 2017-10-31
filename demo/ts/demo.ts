@@ -4,6 +4,10 @@
 
 $(function () {
 
+	// setInterval(() => console.log(document.activeElement), 1000);
+	// setInterval(() => console.log(window.getSelection().focusNode), 1000);
+
+
 	let demo: any = (window as any).demo = {};
 
 	demo.defaultFilteringCombobox = new TrivialComponents.TrivialComboBox("#defaultFilteringComboBox", {
@@ -144,41 +148,45 @@ $(function () {
 			return '<div>';
 		} else if (entry.attribute != null && entry.person == null) {
 			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value free-text-value"><span class="tr-editor"></span></div></div>`;
-		} else if (entry.attribute != null && entry.freeTextValue) {
-			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute || '*'}</div><div class="value free-text-value">${entry.freeTextValue}</div></div>`;
 		} else if (entry.attribute != null && entry.person != null) {
-			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.firstName} ${entry.person.lastName}</div></div>`;
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="attribute">${entry.attribute}</div><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + '' + entry.person.lastName : entry.person.email}</div></div>`;
 		} else if (entry.person != null) {
-			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.firstName} ${entry.person.lastName}</div></div>`;
+			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + '' + entry.person.lastName : entry.person.email}</div></div>`;
 		}
 	};
 	demo.compositeTagBox = new TrivialComponents.TrivialTagComboBox<any>('#compositeTagBox', {
 		queryFunction: function (searchString, resultCallback) {
-			if (!searchString) {
-				resultCallback(attributeEntries);
-			} else {
-				const matchingPartials = attributeEntries.filter(function (e) {
+			searchString = searchString || "";
+			let matchingAttributeEntries: { attribute: string }[];
+			matchingAttributeEntries = demo.compositeTagBox.getCurrentPartialTag() == null ? attributeEntries.filter(function (e) {
 					return TrivialComponents.trivialMatch(e.attribute, searchString).length > 0;
-				});
+			}) : [];
 				const matchingPersons = personsEntries.filter(function (e) {
 					return TrivialComponents.trivialMatch(e.person.firstName, searchString).length > 0
-						|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0
-						|| TrivialComponents.trivialMatch(e.person.email, searchString).length > 0;
+						|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0;
 				});
-				resultCallback([...matchingPartials, ...matchingPersons]);
-			}
+			resultCallback([...matchingAttributeEntries, ...matchingPersons]);
 		},
 		entryRenderingFunction: (e) => entryRenderingFunction(false, e),
 		selectedEntryRenderingFunction: (e) => entryRenderingFunction(true, e),
 		tagCompleteDecider: (entry: any) => {
-			return entry.person || entry.freeTextValue;
+			return entry.person;
 		},
 		entryMerger: function (partialEntry, newEntry) {
 			return {
 				... newEntry,
 				... partialEntry
 			};
-		}
+		},
+		allowFreeText: true,
+		freeTextEntryFactory: (s) => {
+			return {
+				person: {
+					email: s
+				}
+			}
+		},
+		selectionAcceptor: (e) => e.attribute != null || e.email && e.email.indexOf("@") !== -1    
 	});
 
 	demo.maxSelectedEntriesTagBox = new TrivialComponents.TrivialTagComboBox('#maxSelectedEntriesTagBox', {

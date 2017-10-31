@@ -6,7 +6,7 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceRoot": "..",
-    "outDir": ".",
+    "outDir": "ts",
     "sourceMap": true,
     "declaration": true
   },
