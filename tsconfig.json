@@ -10,7 +10,7 @@
     "watch": true
   },
   "include": [
-    "ts/**/*",
+    "ts/*.ts",
     "typings/index.d.ts"
   ],
   "exclude": [

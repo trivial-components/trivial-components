@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>TrivialComboBox - Demo</title>
+
+    <script>
+        if (location.href.indexOf("localhost") != -1) {
+            document.write('<link rel="stylesheet" href="css/all.with-source-maps.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="css/all.css">');
+        }
+    </script>
+</head>
+
+<body data-spy="scroll" data-target="#navbar">
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">
+                <img class="navbar-logo" src="img/logo.png"/>Trivial Components
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="index.html">Home</a></li>
+                <li class="active"><a href="demo.html">Demo</a></li>
+                <li><a href="typedoc/index.html">Docs</a></li>
+                <li><a href="https://github.com/trivial-components/trivial-components/releases">Download</a></li>
+                <li><a href="https://github.com/trivial-components/trivial-components">Github</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <section class="page-header-box">
+        <h1 class="project-name">Demo</h1>
+    </section>
+
+    <div class="container">
+        <div id="exampleEditor"></div>
+    </div> <!-- container -->
+</div>
+
+<div class="container">
+    <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/trivial-components/trivial-components">Trivial Components</a> is maintained by <a href="https://github.com/trivial-components">trivial-components</a>.</span>
+    </footer>
+</div>
+<script src="lib/js/jquery.min.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="lib/js/mustache.min.js"></script>
+<script src="lib/js/moment.js"></script>
+<script src="lib/js/levenshtein.js"></script>
+<script src="lib/js/version.js"></script>
+<script src="lib/js/position.js"></script>
+<script src="lib/js/prettify.min.js"></script>
+<script src="lib/js/trivial-highlight.js"></script>
+<script src="lib/js/TrivialCalendarBox.js"></script>
+<script src="lib/js/TrivialComboBox.js"></script>
+<script src="lib/js/TrivialCore.js"></script>
+<script src="lib/js/TrivialDateTimeField.js"></script>
+<script src="lib/js/TrivialEvent.js"></script>
+<script src="lib/js/TrivialListBox.js"></script>
+<script src="lib/js/TrivialTagComboBox.js"></script>
+<script src="lib/js/TrivialTree.js"></script>
+<script src="lib/js/TrivialTreeBox.js"></script>
+<script src="lib/js/TrivialTreeComboBox.js"></script>
+<script src="lib/js/TrivialUnitBox.js"></script>
+<script src="js/DemoUtils.js"></script>
+<script src="js/ExampleEditor.js"></script>
+<script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+
+
+<script>
+	jQuery.get("ts/examples/demo.json", function(data) {
+		var exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
+    });
+</script>
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-62201674-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+</body>
+</html>

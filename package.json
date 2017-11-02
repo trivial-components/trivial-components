@@ -52,6 +52,7 @@
     "gulp-sourcemaps": "^1.9.1",
     "gulp-strip-debug": "^1.1.0",
     "gulp-tar": "^1.9.0",
+    "gulp-typedoc": "^2.1.1",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.11",
@@ -60,7 +61,8 @@
     "moment": "^2.18.1",
     "monaco-editor": "^0.8.3",
     "multipipe": "^1.0.2",
-    "trivial-components": "^0.1.12",
+    "trivial-components": "0.x",
+    "typedoc": "^0.9.0",
     "typescript": "2.x"
   }
 }

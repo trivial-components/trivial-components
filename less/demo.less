@@ -1,0 +1,56 @@
+.composite-demo-entry {
+  display: flex;
+  margin: 1px;
+
+  .attribute {
+    padding: 3px 6px;
+    font-size: 85%;
+    color: #333;
+    font-weight: 500;
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+  }
+
+  .value {
+    padding: 2px 6px 2px 4px;
+    color: black;
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+
+    .profile-picture {
+      flex: 0 0 auto;
+      width: 20px;
+      height: 20px;
+      background-position: center;
+      background-size: cover;
+      margin-right: 3px;
+      border: 1px solid #ddd;
+      border-radius: 100%;
+    }
+  }
+
+  &:not(.tag) .attribute {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  &.tag {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+    .attribute {
+      background-color: #ddd;
+      border-right: 1px solid #ddd;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .value {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+  }
+}
+

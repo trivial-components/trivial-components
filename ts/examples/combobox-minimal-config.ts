@@ -3,7 +3,10 @@ let combobox = new TrivialComponents.TrivialComboBox("#originalInput", {
 	selectedEntry: DemoUtils.createEntries(1)[0]
 });
 
-combobox.onSelectedEntryChanged.addListener(function () {
+function updateValueDisplay() {
 	$('#originalInputValue').text($('#originalInput').val());
 	$('#selectedEntryDisplay').text(JSON.stringify(combobox.getSelectedEntry(), null, 2));
-});
+}
+
+combobox.onSelectedEntryChanged.addListener(updateValueDisplay);
+updateValueDisplay();

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+@@include('includes/head.html', {"title": "TrivialComboBox - Demo"})
+
+<body data-spy="scroll" data-target="#navbar">
+
+@@include('includes/nav.html', {"activeNavLink": "showcase"})
+
+<div class="page-content">
+
+    <section class="page-header-box">
+        <h1 class="project-name">Demo</h1>
+    </section>
+
+    <div class="container">
+        <div id="exampleEditor"></div>
+    </div> <!-- container -->
+</div>
+
+@@include('includes/footer.html')
+@@include('includes/scripts.html')
+
+<script>
+	jQuery.get("ts/examples/demo.json", function(data) {
+		var exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
+    });
+</script>
+
+@@include('includes/ga.html')
+
+</body>
+</html>

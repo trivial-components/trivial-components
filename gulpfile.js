@@ -16,7 +16,7 @@ var postcss      = require('gulp-postcss');
 var fileinclude = require('gulp-file-include');
 
 gulp.task('clean', function () {
-    del(['bower_components', 'css', 'lib']);
+    del(['bower_components', 'css', 'lib', 'typedoc']);
 });
 
 gulp.task('bower', function () {
@@ -50,7 +50,7 @@ gulp.task('copyFonts2lib', ['bower'], function() {
         .pipe(gulp.dest('lib/fonts'));
 });
 
-gulp.task('less', function () {
+gulp.task('less', ['bower'], function () {
     return gulp.src(['less/all.less'])
         .pipe(sourcemaps.init())
         .pipe(less())
@@ -79,11 +79,28 @@ gulp.task('generate-html', function() {
         .pipe(gulp.dest('./'));
 });
 
+var typedoc = require("gulp-typedoc");
+
+gulp.task("typedoc", function() {
+	return gulp
+		.src(["node_modules/trivial-components/ts/*.ts", "!node_modules/trivial-components/ts/*.d.ts"])
+		.pipe(typedoc({
+			module: "es2015",
+			out: "./typedoc",
+			json: "./typedoc/trivial-components.typedoc.json",
+
+			// TypeDoc options (see typedoc docs)
+			name: "trivial-components",
+			ignoreCompilerErrors: true,
+			version: true
+		}));
+});
+
 gulp.task('watch', function() {
     livereload.listen();
     gulp.watch(['less/*.less', 'page-templates/**/*.html'], ['less', 'generate-html']);
 });
 
-gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib', 'generate-html']);
+gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib', 'generate-html', 'typedoc']);
 
 

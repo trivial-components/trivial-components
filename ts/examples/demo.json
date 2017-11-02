@@ -1,0 +1,49 @@
+[
+  {
+    "displayValue": "TrivialComboBox",
+    "imageUrl": "/img/icons/folder.png",
+    "apiDocLink": "typedoc/modules/_trivialcombobox_.html",
+    "children": [
+      {
+        "fileName": "combobox-minimal-config.ts",
+        "imageUrl": "/img/icons/dev.png",
+        "displayValue": "Minimal configuration",
+        "additionalInfo": "Minimal configuration example",
+        "apiDocLink": "typedoc/modules/_trivialcombobox_.html"
+      }
+    ],
+    "expanded": true
+  },
+  {
+    "displayValue": "TrivialTagComboBox",
+    "imageUrl": "/img/icons/folder.png",
+    "apiDocLink": "typedoc/modules/_trivialtagcombobox_.html",
+    "children": [
+      {
+        "fileName": "tagcombobox-minimal-config.ts",
+        "imageUrl": "/img/icons/dev.png",
+        "displayValue": "Minimal configuration",
+        "additionalInfo": "Minimal configuration example",
+        "description": "This example shows the minimal necessary configuration (plus an event listener to make this demo work as expected).",
+        "apiDocLink": "typedoc/modules/_trivialtagcombobox_.html"
+      },
+      {
+        "fileName": "tagcombobox-simple-text-tags.ts",
+        "imageUrl": "/img/icons/dev.png",
+        "displayValue": "Simple text tags",
+        "additionalInfo": "No dropdown, just plain old free text tags...",
+        "description": "",
+        "apiDocLink": "typedoc/modules/_trivialtagcombobox_.html"
+      },
+      {
+        "fileName": "tagcombobox-composite-tags.ts",
+        "imageUrl": "/img/icons/dev.png",
+        "displayValue": "Composite tags",
+        "additionalInfo": "Example for more complex tag user interaction",
+        "description": "Handling complex tag input situations is supported with TrivialTagComboBox. In fact, the API allows for the weirdest kinds of tags composition, using its <code>entryMerger</code> configuration.",
+        "apiDocLink": "typedoc/modules/_trivialtagcombobox_.html"
+      }
+    ],
+    "expanded": true
+  }
+]
