@@ -41,10 +41,12 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     freeTextEntryFactory?: (freeText: string) => E | any,
     showClearButton?: boolean,
     showTrigger?: boolean,
-    distinct?: boolean,
     editingMode?: EditingMode,
     showDropDownOnResultsOnly?: boolean,
-    maxSelectedEntries?: number
+    tagCompleteDecider?: (entry: E) => boolean,
+    entryMerger?: (partialEntry: E, newEntryPart: E) => E,
+    removePartialTagOnBlur?: boolean,
+    selectionAcceptor?: (entry: E) => boolean
 }
 
 export class TrivialTagComboBox<E> implements TrivialComponent {
@@ -58,6 +60,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private $trigger: JQuery;
     private $editor: JQuery;
     private $dropDownTargetElement: JQuery;
+    private $tagArea: JQuery;
 
     public readonly onSelectedEntryChanged = new TrivialEvent<E[]>(this);
     public readonly onFocus = new TrivialEvent<void>(this);
@@ -75,10 +78,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private listBoxDirty = true;
     private repositionDropDownScheduler: number = null;
     private editingMode: EditingMode;
-    private usingDefaultQueryFunction: boolean;
 
-    constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E>) {
-        options = options || {};
+    private usingDefaultQueryFunction: boolean;
+    private currentPartialTag: E;
+
+    constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E> = {} as any) {
         this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
             valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
             entryRenderingFunction: (entry: E) => {
@@ -119,6 +123,13 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     _isFreeTextEntry: true
                 };
             },
+            tagCompleteDecider: (mergedEntry: E) => {
+                return true;
+            },
+            entryMerger: (partialEntry: E, newEntry: E) => {
+                return newEntry;
+            },
+            removePartialTagOnBlur: true,
             showTrigger: true,
             distinct: true,
             matchingOptions: {
@@ -127,7 +138,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 maxLevenshteinDistance: 2
             },
             editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
-            showDropDownOnResultsOnly: false
+            showDropDownOnResultsOnly: false,
+            selectionAcceptor: (e) => true
         }, options);
 
         if (!this.config.queryFunction) {
@@ -141,19 +153,17 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$tagComboBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
             .insertAfter(this.$originalInput);
         this.$originalInput.appendTo(this.$tagComboBox);
-        const $tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
+        this.$tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
         if (this.config.showTrigger) {
             this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagComboBox);
             this.$trigger.mousedown(() => {
-                this.$editor.focus();
+                this.focusEditor();
                 if (this.isDropDownOpen) {
                     this.closeDropDown();
                 } else {
-                    setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                        this.$editor.select();
-                        this.openDropDown();
-                        this.query();
-                    });
+                    this.$editor.select();
+                    this.openDropDown();
+                    this.query();
                 }
             });
         }
@@ -165,7 +175,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.setEditingMode(this.config.editingMode);
         this.$editor = $('<span contenteditable="true" class="tagbox-editor" autocomplete="off"></span>');
 
-        this.$editor.appendTo($tagArea).addClass("tr-tagbox-editor tr-editor")
+        this.$editor.appendTo(this.$tagArea).addClass("tr-tagbox-editor tr-editor")
             .focus(() => {
                 if (this.blurCausedByClickInsideComponent) {
                     // do nothing!
@@ -175,7 +185,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.$tagComboBox.addClass('focus');
                 }
                 setTimeout(() => { // the editor needs to apply its new css sheets (:focus) before we scroll to it...
-                    minimallyScrollTo($tagArea, this.$editor);
+                    minimallyScrollTo(this.$tagArea, this.$editor);
                 });
             })
             .blur((e) => {
@@ -188,7 +198,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.entries = null;
                     this.closeDropDown();
                     if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);    
+                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
+                    } if (this.config.removePartialTagOnBlur && this.currentPartialTag != null) {
+                        this.cancelPartialTag();
                     }
                     this.$editor.text("");
                 }
@@ -196,46 +208,61 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             .keydown((e: KeyboardEvent) => {
                 if (keyCodes.isModifierKey(e)) {
                     return;
-                } else if (e.which == keyCodes.tab) {
+                } else if (e.which == keyCodes.tab || e.which == keyCodes.enter) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
-                    if (this.isDropDownOpen && highlightedEntry) {
+                    if (this.isDropDownOpen && highlightedEntry != null) {
                         this.setSelectedEntry(highlightedEntry, true, e);
+                        e.preventDefault(); // do not tab away from the tag box nor insert a newline character
+                    } else if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
+                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
+                        e.preventDefault(); // do not tab away from the tag box nor insert a newline character
+                    } else if (this.currentPartialTag) {
+                        if (e.shiftKey) { // we do not want the editor to get the focus right back, so we need to position the $editor intelligently...
+                            this.doIgnoringBlurEvents(() => this.$editor.insertAfter((this.currentPartialTag as any)._trEntryElement));
+                        } else {
+                            this.doIgnoringBlurEvents(() => this.$editor.insertBefore((this.currentPartialTag as any)._trEntryElement));
+                        }
+                        (this.currentPartialTag as any)._trEntryElement.remove();
+                        this.currentPartialTag = null;
                     }
-                    return;
+
+                    this.closeDropDown(); console.log("closing dropdown!");
+                    if (e.which == keyCodes.enter) {
+                        e.preventDefault(); // under any circumstances, prevent the new line to be added to the editor!
+                    }
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                     if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.prev()) {
-                            this.$editor.insertBefore(this.$editor.prev());
-                            this.$editor.focus();
+                            this.doIgnoringBlurEvents(() => this.$editor.insertBefore(this.$editor.prev()));
+                            this.focusEditor();
                         }
                     } else if (e.which == keyCodes.right_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.next()) {
-                            this.$editor.insertAfter(this.$editor.next());
-                            this.$editor.focus();
+                            this.doIgnoringBlurEvents(() => this.$editor.insertAfter(this.$editor.next()));
+                            this.focusEditor();
                         }
                     }
-                    return;
-                }
-
-                if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
+                } else if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     if (this.$editor.text() == "") {
-                        const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
-                        if (tagToBeRemoved) {
-                            this.removeTag(tagToBeRemoved, e);
-                            this.closeDropDown();
+                        if (this.currentPartialTag != null) {
+                            this.cancelPartialTag();
+                            this.focusEditor();
+                        } else {
+                            const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
+                            if (tagToBeRemoved) {
+                                this.removeTag(tagToBeRemoved, e);
+                                this.closeDropDown();
+                            }
                         }
                     } else {
                         this.doNoAutoCompleteBecauseBackspaceWasPressed = true; // we want query results, but no autocomplete
-                        this.query(1);
+	                    setTimeout(() => this.query(1)); // asynchronously to make sure the editor has been updated
                     }
-                    return; // do not open the dropdown.
-                }
-
-                if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
+                } else if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     this.openDropDown();
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (!this.isDropDownOpen) {
-                        this.query(direction);
+	                    setTimeout(() => this.query(direction)); // asynchronously to make sure the editor has been updated
                         if (!this.config.showDropDownOnResultsOnly) {
                             this.openDropDown();
                         }
@@ -244,24 +271,19 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
                     }
                     return false; // some browsers move the caret to the beginning on up key
-                } else if (e.which == keyCodes.enter) {
-                    const highlightedEntry = this.listBox.getHighlightedEntry();
-                    if (this.isDropDownOpen && highlightedEntry != null) {
-                        this.setSelectedEntry(highlightedEntry, true, e);
-                        this.entries = null;
-                    } else if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), false, e);
-                    }
-                    this.closeDropDown();
-                    e.preventDefault(); // prevent the new line to be added to the editor!
                 } else if (e.which == keyCodes.escape) {
                     this.closeDropDown();
-                    this.$editor.text("");
+                    if (this.$editor.text().length > 0) {
+                        this.$editor.text("");
+                    } else if (this.currentPartialTag != null) {
+                        this.cancelPartialTag();
+                        this.focusEditor();
+                    }
                 } else {
                     if (!this.config.showDropDownOnResultsOnly) {
                         this.openDropDown();
                     }
-                    this.query(1);
+	                setTimeout(() => this.query(1)); // asynchronously to make sure the editor has been updated
                 }
             })
             .keyup((e) => {
@@ -314,12 +336,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         }).mouseup(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.$editor.focus();
+                this.focusEditor();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         }).mouseout(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.$editor.focus();
+                this.focusEditor();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         });
@@ -335,46 +357,58 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         });
 
-        $tagArea.click((e) => {
+        this.$tagArea.mousedown((e) => {
+            if (this.currentPartialTag == null) {
+                let $nearestTag = this.findNearestTag(e);
+                if ($nearestTag) {
+                    const tagBoundingRect = $nearestTag[0].getBoundingClientRect();
+                    const isRightSide = e.clientX > (tagBoundingRect.left + tagBoundingRect.right) / 2;
+                    if (isRightSide) {
+                        this.doIgnoringBlurEvents(() => this.$editor.insertAfter($nearestTag));
+                    } else {
+                        this.doIgnoringBlurEvents(() => this.$editor.insertBefore($nearestTag));
+                    }
+                }
+            }
+            this.$editor.focus();
+        }).click((e) => {
             if (!this.config.showDropDownOnResultsOnly) {
                 this.openDropDown();
             }
             this.query();
-
-            // find the tag in the same row as the click with the smallest distance to the click
-            let $tagWithSmallestDistance: JQuery = null;
-            let smallestDistanceX = 1000000;
-            for (let i = 0; i < this.selectedEntries.length; i++) {
-                const selectedEntry = this.selectedEntries[i];
-                const $tag = (selectedEntry as any)._trEntryElement;
-                const tagBoundingRect = $tag[0].getBoundingClientRect();
-                const sameRow = e.clientY >= tagBoundingRect.top && e.clientY < tagBoundingRect.bottom;
-                const sameCol = e.clientX >= tagBoundingRect.left && e.clientX < tagBoundingRect.right;
-                const distanceX = sameCol ? 0 : Math.min(Math.abs(e.clientX - tagBoundingRect.left), Math.abs(e.clientX - tagBoundingRect.right));
-                if (sameRow && distanceX < smallestDistanceX) {
-                    $tagWithSmallestDistance = $tag;
-                    smallestDistanceX = distanceX;
-                    if (distanceX === 0) {
-                        break;
-                    }
-                }
-            }
-            if ($tagWithSmallestDistance) {
-                const tagBoundingRect = $tagWithSmallestDistance[0].getBoundingClientRect();
-                const isRightSide = e.clientX > (tagBoundingRect.left + tagBoundingRect.right) / 2;
-                if (isRightSide) {
-                    this.$editor.insertAfter($tagWithSmallestDistance);
-                } else {
-                    this.$editor.insertBefore($tagWithSmallestDistance);
-                }
-            }
-            this.$editor.focus();
         });
 
         this.setSelectedEntries(this.config.selectedEntries);
 
         // ===
         this.$tagComboBox.data("trivialTagComboBox", this);
+    }
+
+    private cancelPartialTag() {
+        this.doIgnoringBlurEvents(() => this.$editor.insertBefore((this.currentPartialTag as any)._trEntryElement));
+        (this.currentPartialTag as any)._trEntryElement.remove();
+        this.currentPartialTag = null;
+    }
+
+    private findNearestTag(mouseEvent: JQueryMouseEventObject) {
+        let $nearestTag: JQuery = null;
+        let smallestDistanceX = 1000000;
+        for (let i = 0; i < this.selectedEntries.length; i++) {
+            const selectedEntry = this.selectedEntries[i];
+            const $tag = (selectedEntry as any)._trEntryElement;
+            const tagBoundingRect = $tag[0].getBoundingClientRect();
+            const sameRow = mouseEvent.clientY >= tagBoundingRect.top && mouseEvent.clientY < tagBoundingRect.bottom;
+            const sameCol = mouseEvent.clientX >= tagBoundingRect.left && mouseEvent.clientX < tagBoundingRect.right;
+            const distanceX = sameCol ? 0 : Math.min(Math.abs(mouseEvent.clientX - tagBoundingRect.left), Math.abs(mouseEvent.clientX - tagBoundingRect.right));
+            if (sameRow && distanceX < smallestDistanceX) {
+                $nearestTag = $tag;
+                smallestDistanceX = distanceX;
+                if (distanceX === 0) {
+                    break;
+                }
+            }
+        }
+        return $nearestTag;
     }
 
     private updateListBoxEntries() {
@@ -422,25 +456,22 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private query(highlightDirection?: HighlightDirection) {
-        // call queryFunction asynchronously to be sure the input field has been updated before the result callback is called. Note: the query() method is called on keydown...
-        setTimeout(() => {
-            const queryString = this.getNonSelectedEditorValue();
-            const completeInputString = this.$editor.text().replace(String.fromCharCode(160), " ");
-            if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-                if (this.$spinners.length === 0) {
-                    const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                    this.$spinners = this.$spinners.add($spinner);
-                }
-                this.config.queryFunction(queryString, (newEntries: E[]) => {
-                    this.updateEntries(newEntries, highlightDirection);
-                    if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                        this.openDropDown();
-                    }
-                });
-                this.lastQueryString = queryString;
-                this.lastCompleteInputQueryString = completeInputString;
+        const queryString = this.getNonSelectedEditorValue();
+        const completeInputString = this.$editor.text().replace(String.fromCharCode(160), " ");
+        if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
+            if (this.$spinners.length === 0) {
+                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+                this.$spinners = this.$spinners.add($spinner);
             }
-        }, 0);
+            this.config.queryFunction(queryString, (newEntries: E[]) => {
+                this.updateEntries(newEntries, highlightDirection);
+                if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                    this.openDropDown();
+                }
+            });
+            this.lastQueryString = queryString;
+            this.lastCompleteInputQueryString = completeInputString;
+        }
     }
 
     private fireChangeEvents(entries: E[], originalEvent: Event) {
@@ -452,36 +483,57 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         if (entry == null) {
             return; // do nothing
         }
-        if (this.config.maxSelectedEntries && this.selectedEntries.length >= this.config.maxSelectedEntries) {
+        if (!this.config.selectionAcceptor(entry)) {
             return; // no more entries allowed
         }
-        if (this.config.distinct && this.selectedEntries.map((entry: E) => {
-                return this.config.valueFunction([entry])
-            }).indexOf(this.config.valueFunction([entry])) != -1) {
-            return; // entry already selected
+
+        let wasPartial = !!this.currentPartialTag;
+        const editorIndex = wasPartial ? (this.currentPartialTag as any)._trEntryElement.index() : this.$editor.index();
+        if (wasPartial) {
+            this.doIgnoringBlurEvents(() => this.$editor.appendTo(this.$tagArea)); // make sure the event handlers don't get detached when removing the partial tag
+            (this.currentPartialTag as any)._trEntryElement.remove();
+            entry = this.config.entryMerger(this.currentPartialTag, entry);
         }
 
         const tag = $.extend({}, entry);
-        this.selectedEntries.splice(this.$editor.index(), 0, tag);
-        this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+
+        if (this.config.tagCompleteDecider(entry)) {
+            this.selectedEntries.splice(editorIndex, 0, tag);
+            this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+            this.currentPartialTag = null;
+        } else {
+            this.currentPartialTag = tag;
+        }
 
         const $entry = $(this.config.selectedEntryRenderingFunction(tag));
-        const $tagWrapper = $('<div class="tr-tagbox-tag"></div>');
-        $tagWrapper.append($entry).insertBefore(this.$editor);
+        const $tagWrapper = $('<div class="tr-tagbox-tag"></div>')
+            .append($entry);
+
+        this.doIgnoringBlurEvents(() => this.insertAtIndex($tagWrapper, editorIndex));
         tag._trEntryElement = $tagWrapper;
 
-        if (this.config.editingMode == "editable") {
-            $entry.find('.tr-remove-button').click((e) => {
-                this.removeTag(tag);
-                return false;
-            });
+        $entry.find('.tr-remove-button').click((e) => {
+            this.removeTag(tag);
+            return false;
+        });
+
+        if (this.config.tagCompleteDecider(entry)) {
+            this.doIgnoringBlurEvents(() => this.insertAtIndex(this.$editor, editorIndex + 1));
+        } else {
+            this.doIgnoringBlurEvents(() => this.$editor.appendTo($entry.find('.tr-editor')));
         }
 
         this.$editor.text("");
+        this.focusEditor();
 
-        if (fireEvent) {
+        if (this.config.tagCompleteDecider(entry) && fireEvent) {
             this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
         }
+    }
+
+    private focusEditor() {
+        selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
+        this.$editor.focus();
     }
 
     private repositionDropDown() {
@@ -517,7 +569,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.isDropDownOpen = true;
         }
         if (this.repositionDropDownScheduler == null) {
-            this.repositionDropDownScheduler = window.setInterval(() => this.repositionDropDown(), 1000); // make sure that under no circumstances the dropdown is mal-positioned
+            this.repositionDropDownScheduler = window.setInterval(() => this.repositionDropDown(), 300); // make sure that under no circumstances the dropdown is mal-positioned
         }
     }
 
@@ -527,6 +579,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.isDropDownOpen = false;
         if (this.repositionDropDownScheduler != null) {
             clearInterval(this.repositionDropDownScheduler);
+            this.repositionDropDownScheduler = null;
         }
     }
 
@@ -563,6 +616,25 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         return this.editingMode == 'editable' && (this.config.entries && this.config.entries.length > 0 || !this.usingDefaultQueryFunction || this.config.showTrigger);
     }
 
+    private insertAtIndex($element: JQuery, index: number) {
+        const lastIndex = this.$tagArea.children().length;
+        if (index < lastIndex) {
+            this.$tagArea.children().eq(index).before($element);
+        } else {
+            this.$tagArea.append($element);
+        }
+    }
+
+    private doIgnoringBlurEvents(f:Function) {
+        let oldValueOfBlurCausedByClickInsideComponent = this.blurCausedByClickInsideComponent;
+        this.blurCausedByClickInsideComponent = true;
+        try {
+            return f.call(this);
+        } finally {
+            this.blurCausedByClickInsideComponent = oldValueOfBlurCausedByClickInsideComponent;
+        }
+    }
+
     public setEditingMode(newEditingMode: EditingMode) {
         this.editingMode = newEditingMode;
         this.$tagComboBox.removeClass("editable readonly disabled").addClass(this.editingMode);
@@ -586,11 +658,15 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         const selectedEntriesToReturn: E[] = [];
         for (let i = 0; i < this.selectedEntries.length; i++) {
             const selectedEntryToReturn = $.extend({}, this.selectedEntries[i]);
-            selectedEntryToReturn._trEntryElement = undefined;
+            delete selectedEntryToReturn._trEntryElement;
             selectedEntriesToReturn.push(selectedEntryToReturn);
         }
         return selectedEntriesToReturn;
     };
+
+    public getCurrentPartialTag() {
+        return this.currentPartialTag;
+    }
 
     public focus() {
         this.$editor.focus();

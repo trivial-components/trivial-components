@@ -52,9 +52,7 @@ function randomEmail() {
     return randomOf(firstNames)
 }
 
-function createEntries(count) {
-    count = count || 100;
-
+function createEntries(count = 100) {
     var entries = [];
     for (var i = 0; i < count; i++) {
         var firstName = randomOf(firstNames);

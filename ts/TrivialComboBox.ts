@@ -557,7 +557,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
             return this.config.freeTextEntryFactory(this.$editor.val());
         } else {
             const selectedEntryToReturn = $.extend({}, this.selectedEntry);
-            selectedEntryToReturn._trEntryElement = undefined;
+            delete selectedEntryToReturn._trEntryElement;
             return selectedEntryToReturn;
         }
     };
