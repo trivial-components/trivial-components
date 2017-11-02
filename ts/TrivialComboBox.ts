@@ -459,7 +459,6 @@ export class TrivialComboBox<E> implements TrivialComponent{
     };
 
     public openDropDown() {
-        console.log("openDropDown")
         if (this.isDropDownNeeded()) {
             if (this.listBoxDirty) {
                 this.updateListBoxEntries();

@@ -157,7 +157,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         if (this.config.showTrigger) {
             this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagComboBox);
             this.$trigger.mousedown(() => {
-                this.$editor.focus();
+                this.focusEditor();
                 if (this.isDropDownOpen) {
                     this.closeDropDown();
                 } else {
@@ -336,12 +336,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         }).mouseup(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.$editor.focus();
+                this.focusEditor();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         }).mouseout(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.$editor.focus();
+                this.focusEditor();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         });
@@ -615,7 +615,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private insertAtIndex($element: JQuery, index: number) {
-        console.log("inserting at: " + index);
         const lastIndex = this.$tagArea.children().length;
         if (index < lastIndex) {
             this.$tagArea.children().eq(index).before($element);
