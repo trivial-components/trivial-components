@@ -51,22 +51,24 @@ module Demo {
 					<button class="run-button btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
 				</div>
 			</div>
-			<div class="main-area">
-			    <div class="code-editor-section">
-			        <h3 class="heading code-heading">Code</h3>
-					<div id="${this.codeEditorId}" class="code-editor-wrapper"></div>
+			<div class="content">
+			    <div class="main-area">
+				    <div class="code-editor-section">
+				        <h3 class="heading code-heading">Code</h3>
+						<div id="${this.codeEditorId}" class="code-editor-wrapper"></div>
+					</div>
+					<div class="result-section">
+						<h3 class="heading result-heading">Result</h3>
+						<div class="result-wrapper"></div>
+					</div>
 				</div>
-				<div class="result-section">
-					<h3 class="heading result-heading">Result</h3>
-					<div class="result-wrapper"></div>
+				<div class="description">
+					<h3>Description</h3>
+					<p class="description-text"></p>
+					<p class="apidoc-link-paragraph">
+						See <a class="apidoc-link" href="">API documentation</a>.
+					</p>
 				</div>
-			</div>
-			<div class="description">
-				<h3>Description</h3>
-				<p class="description-text"></p>
-				<p class="apidoc-link-paragraph">
-					See <a class="apidoc-link" href="">API documentation</a>.
-				</p>
 			</div>
 		</div>`;
 

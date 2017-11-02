@@ -11,11 +11,11 @@
     align-items: stretch;
     background-color: #f5f5f5;
 
-    >* {
+    > * {
       height: 100%;
     }
 
-    >*:not(:first-child) {
+    > *:not(:first-child) {
       margin-left: 20px;
     }
 
@@ -36,68 +36,66 @@
     }
   }
 
-  .description, .code-editor-section, .result-section {
-    background: white;
-    margin: 7px;
-    box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, .5);
-  }
+  .content {
+    box-shadow: inset 1px 1px 10px 0 rgba(0, 0, 0, .3);
+    overflow: hidden; // prevent margin collapsing
+    
+    .main-area {
 
-  .description {
-    padding: 0 10px;
+      .code-editor-section {
+        overflow: hidden;
 
-    &:before, &:after { // prevent margin collapsing
-      content: ' ';
-      display: table;
+        .code-heading {
+          padding-left: 10px;
+        }
+
+        .code-editor-wrapper {
+          height: 50vh;
+        }
+      }
+
+      .result-section {
+        overflow: hidden;
+        padding: 0 10px;
+
+        .original-input-value-wrapper {
+          overflow: auto;
+        }
+
+        .selected-entry-display {
+          overflow: auto;
+        }
+      }
+
+      @media (min-width: @screen-md-min) {
+        display: flex;
+        align-items: stretch;
+        flex-wrap: wrap;
+
+        .code-editor-section {
+          flex: 2 0 400px;
+        }
+
+        .result-section {
+          flex: 1 0 200px;
+        }
+      }
+    }
+
+    .code-editor-section, .result-section, .description {
+      background: white;
+      margin: 7px;
+      box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, .3);
+    }
+
+    .description {
+      overflow: hidden;
+      padding: 0 10px;
     }
   }
 
   h3 {
     margin-top: 10px;
-  }
-
-  .main-area {
-
-    .code-heading {
-      padding-left: 10px;
-    }
-
-    .code-editor-section {
-      border-bottom: 1px solid @input-border;
-
-      .code-editor-wrapper {
-        height: 50vh;
-      }
-    }
-
-    .result-section {
-      padding: 0 10px;
-
-      .original-input-value-wrapper {
-        overflow: auto;
-      }
-
-      .selected-entry-display {
-        overflow: auto;
-      }
-    }
-
-
-    @media (min-width: @screen-md-min) {
-      display: flex;
-      align-items: stretch;
-      flex-wrap: wrap;
-
-      .code-editor-section {
-        flex: 2 0 400px;
-        overflow: hidden;
-        border-bottom: none;
-        border-right: 1px solid @input-border;
-      }
-      .result-section {
-        flex: 1 0 200px;
-        overflow: hidden;
-      }
-    }
   }
 
 }
