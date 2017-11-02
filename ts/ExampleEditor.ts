@@ -30,6 +30,11 @@ module Demo {
 
 	export class ExampleEditor {
 		private $mainDomElement: JQuery;
+		private $descriptionText: JQuery;
+		private $apiDocLink: JQuery;
+		private $resultWrapper: JQuery;
+		private $runButton: JQuery;
+
 		private editor: IStandaloneCodeEditor;
 		private editorModel: monaco.editor.IModel;
 		private uuid = DemoUtils.generateUUID();
@@ -41,7 +46,10 @@ module Demo {
   				<label>Example</label>
 				<div class="selection-combobox-wrapper">
 					<input type="text" id="${this.exampleSelectionComboBoxId}">
-				</div>  			
+				</div>
+				<div class="toolbar-buttons-wrapper">
+					<button class="run-button btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+				</div>
 			</div>
 			<div class="main-area">
 			    <div class="code-editor-section">
@@ -64,6 +72,10 @@ module Demo {
 
 		constructor($targetElement: Element | JQuery | string, exampleData: DemoTreeEntry[]) {
 			this.$mainDomElement = $(this.template).appendTo($targetElement);
+			this.$descriptionText = this.$mainDomElement.find('.description-text');
+			this.$apiDocLink = this.$mainDomElement.find('.apidoc-link');
+			this.$resultWrapper = this.$mainDomElement.find('.result-wrapper');
+			this.$runButton = this.$mainDomElement.find('.run-button');
 
 			require.config({paths: {'vs': 'lib/js/vs'}});
 			require(['vs/editor/editor.main'], () => {
@@ -100,11 +112,21 @@ module Demo {
 						}
 					});
 					selectionComboBox.onSelectedEntryChanged.addListener(entry => {
-						this.$mainDomElement.find('.description-text').html(entry.description || "");
-						this.$mainDomElement.find('.apidoc-link').attr("href", entry.apiDocLink);
+						this.$descriptionText.html(entry.description || "");
+						this.$apiDocLink.attr("href", entry.apiDocLink);
 						this.setEditorModel(`ts/examples/${entry.fileName}`);
 					});
 					selectionComboBox.setSelectedEntry(exampleData[0].children[0], true, true);
+
+					this.$runButton.click(() => {
+						this.compileAndEvaluate();
+					});
+					this.editor.onKeyDown((e) => {
+						if ((e.metaKey || e.ctrlKey) && e.keyCode == 49) {
+							this.compileAndEvaluate();
+							e.preventDefault();
+						}
+					});
 				});
 			});
 		}
@@ -117,8 +139,7 @@ module Demo {
 						this.editorModel = monaco.editor.createModel(data, "typescript");
 						this.editor.setModel(this.editorModel);
 						this.editorModel.onDidChangeContent(DemoUtils.debounce(() => {
-							this.compileAndEvaluate();
-						}, 1000));
+						}, 200));
 						this.compileAndEvaluate();
 					});
 			});
@@ -127,7 +148,7 @@ module Demo {
 		private reEvaluateTimeout: number;
 		private compileAndEvaluate() {
 			try {
-				this.$mainDomElement.find('.result-wrapper')
+				this.$resultWrapper
 					.empty()
 					.append(DEFAULT_RESULT_AREA_HTML);
 				let tsCode = this.editor.getModel().getLinesContent().join('\n');
