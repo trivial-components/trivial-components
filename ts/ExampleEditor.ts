@@ -65,10 +65,10 @@ module Demo {
 		constructor($targetElement: Element | JQuery | string, exampleData: DemoTreeEntry[]) {
 			this.$mainDomElement = $(this.template).appendTo($targetElement);
 
-			require.config({paths: {'vs': 'node_modules/monaco-editor/min/vs'}});
+			require.config({paths: {'vs': 'lib/js/vs'}});
 			require(['vs/editor/editor.main'], () => {
 				loadTypescriptFilesAsMonacoModels([
-					'node_modules/@types/jquery/index.d.ts',
+					'lib/js/jquery/index.d.ts',
 					'lib/js/trivial-components-global.d.ts',
 					'ts/DemoUtils.ts'
 				], () => {

@@ -14,6 +14,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var del = require('del');
 var postcss      = require('gulp-postcss');
 var fileinclude = require('gulp-file-include');
+var merge = require('merge-stream');
 
 gulp.task('clean', function () {
     del(['bower_components', 'css', 'lib', 'typedoc']);
@@ -29,7 +30,7 @@ gulp.task('bower-update', function () {
 });
 
 gulp.task('copyJsDependencies2lib', ['bower'], function () {
-    return gulp.src([
+    var a = gulp.src([
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/jquery-ui/ui/version.js',
@@ -40,9 +41,13 @@ gulp.task('copyJsDependencies2lib', ['bower'], function () {
         'node_modules/trivial-components/dist/js/bundle/trivial-components-global.d.ts',
         'bower_components/google-code-prettify/bin/prettify.min.js',
         'node_modules/moment/moment.js',
-        'node_modules/levenshtein/lib/levenshtein.js'
-    ])
-        .pipe(gulp.dest('lib/js'));
+        'node_modules/levenshtein/lib/levenshtein.js',
+	    'node_modules/monaco-editor/min/**/*'
+    ]).pipe(gulp.dest('lib/js'));
+    var b = gulp.src([
+	    'node_modules/@types/jquery/index.d.ts'
+    ]).pipe(gulp.dest('lib/js/jquery'));
+	return merge(a, b);
 });
 
 gulp.task('copyFonts2lib', ['bower'], function() {
