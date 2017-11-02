@@ -102,7 +102,7 @@ module Demo {
 					selectionComboBox.onSelectedEntryChanged.addListener(entry => {
 						this.$mainDomElement.find('.description-text').html(entry.description || "");
 						this.$mainDomElement.find('.apidoc-link').attr("href", entry.apiDocLink);
-						this.setEditorModel(`/ts/examples/${entry.fileName}`);
+						this.setEditorModel(`ts/examples/${entry.fileName}`);
 					});
 					selectionComboBox.setSelectedEntry(exampleData[0].children[0], true, true);
 				});

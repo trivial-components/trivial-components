@@ -46,7 +46,7 @@ var Demo;
                     selectionComboBox.onSelectedEntryChanged.addListener(function (entry) {
                         _this.$mainDomElement.find('.description-text').html(entry.description || "");
                         _this.$mainDomElement.find('.apidoc-link').attr("href", entry.apiDocLink);
-                        _this.setEditorModel("/ts/examples/" + entry.fileName);
+                        _this.setEditorModel("ts/examples/" + entry.fileName);
                     });
                     selectionComboBox.setSelectedEntry(exampleData[0].children[0], true, true);
                 });
