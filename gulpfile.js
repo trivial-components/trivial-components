@@ -63,7 +63,6 @@ var strip = require('gulp-strip-comments');
 var stripCssComments = require('gulp-strip-css-comments');
 var sizereport = require('gulp-sizereport');
 var ts = require('gulp-typescript');
-var gulpTypings = require("gulp-typings");
 var release = require('gulp-github-release');
 var merge = require('merge-stream');
 var spawn = require('child_process').spawn;
