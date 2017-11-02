@@ -378,7 +378,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.query();
         });
 
-        this.setSelectedEntries(this.config.selectedEntries);
+        this.setSelectedEntries(this.config.selectedEntries, true);
 
         // ===
         this.$tagComboBox.data("trivialTagComboBox", this);
@@ -479,12 +479,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.onSelectedEntryChanged.fire(entries, originalEvent);
     }
 
-    private setSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event) {
+    private setSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event, forceAcceptance?: boolean) {
         if (entry == null) {
             return; // do nothing
         }
-        if (!this.config.selectionAcceptor(entry)) {
-            return; // no more entries allowed
+        if (!forceAcceptance && !this.config.selectionAcceptor(entry)) {
+            return;
         }
 
         let wasPartial = !!this.currentPartialTag;
@@ -643,13 +643,13 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
     }
 
-    public setSelectedEntries(entries: E[]) {
+    public setSelectedEntries(entries: E[], forceAcceptance?: boolean) {
         this.selectedEntries
             .slice() // copy the array as it gets changed during the forEach loop
             .forEach((e) => this.removeTag(e));
         if (entries) {
             for (let i = 0; i < entries.length; i++) {
-                this.setSelectedEntry(entries[i]);
+                this.setSelectedEntry(entries[i], false, null, forceAcceptance);
             }
         }
     }
