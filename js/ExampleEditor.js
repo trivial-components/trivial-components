@@ -40,13 +40,10 @@ var Demo;
                     var selectionComboBox = new TrivialComponents.TrivialTreeComboBox("#" + _this.exampleSelectionComboBoxId, {
                         entries: exampleData,
                         entryRenderingFunction: function (entry, depth) {
-                            if (entry != null) {
-                                var template = entry.template || TrivialComponents.DEFAULT_TEMPLATES.icon2LinesTemplate;
-                                return Mustache.render(template, entry);
-                            }
-                            else {
-                                return "<div>Please select...</div>";
-                            }
+                            return Mustache.render(TrivialComponents.DEFAULT_TEMPLATES.icon2LinesTemplate, entry || {
+                                displayValue: "Please select...",
+                                imageUrl: "data:image/gif;base64,R0lGODlhAQABAAAAACw="
+                            });
                         }
                     });
                     selectionComboBox.onSelectedEntryChanged.addListener(function (entry) {

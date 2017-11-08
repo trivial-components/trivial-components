@@ -112,12 +112,10 @@ module Demo {
 					let selectionComboBox = new TrivialComponents.TrivialTreeComboBox<DemoTreeEntry>("#" + this.exampleSelectionComboBoxId, {
 						entries: exampleData,
 						entryRenderingFunction: (entry, depth) => {
-							if (entry != null) {
-								const template = (entry as any).template || TrivialComponents.DEFAULT_TEMPLATES.icon2LinesTemplate;
-								return Mustache.render(template, entry);
-							} else {
-								return "<div>Please select...</div>";
-							}
+							return Mustache.render(TrivialComponents.DEFAULT_TEMPLATES.icon2LinesTemplate, entry || {
+									displayValue: "Please select...",
+									imageUrl: "data:image/gif;base64,R0lGODlhAQABAAAAACw="
+								});
 						}
 					});
 					selectionComboBox.onSelectedEntryChanged.addListener(entry => {
