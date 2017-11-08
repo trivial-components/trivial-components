@@ -64,6 +64,7 @@ module Demo {
 				</div>
 				<div class="result-section">
 					<h3 class="heading result-heading">Result</h3>
+					<div class="info-text alert alert-info"></div>
 					<div class="result-wrapper"></div>
 				</div>
 			</div>
@@ -78,6 +79,7 @@ module Demo {
 
 		constructor($targetElement: Element | JQuery | string, exampleData: DemoTreeEntry[]) {
 			this.$mainDomElement = $(this.template).appendTo($targetElement);
+			this.$infoText = this.$mainDomElement.find('.info-text');
 			this.$descriptionText = this.$mainDomElement.find('.description-text');
 			this.$apiDocLink = this.$mainDomElement.find('.apidoc-link');
 			this.$resultWrapper = this.$mainDomElement.find('.result-wrapper');
@@ -119,6 +121,7 @@ module Demo {
 						}
 					});
 					selectionComboBox.onSelectedEntryChanged.addListener(entry => {
+						this.$infoText.toggleClass("hidden", !entry.infoText).html(entry.infoText || "");
 						this.$descriptionText.html(entry.description || "");
 						this.$apiDocLink.attr("href", entry.apiDocLink);
 						this.setEditorModel(`ts/examples/${entry.fileName}`);

@@ -49,7 +49,7 @@ module DemoUtils {
         count = count || 100;
 
         const entries = [];
-        for (let i = 0; i < count; i++) {
+        for (let i = 1; i <= count; i++) {
             const firstName = randomOf(firstNames);
             const lastName = randomOf(lastNames);
             entries.push({

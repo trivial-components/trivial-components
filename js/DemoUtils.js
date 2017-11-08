@@ -46,7 +46,7 @@ var DemoUtils;
     function createEntries(count) {
         count = count || 100;
         var entries = [];
-        for (var i = 0; i < count; i++) {
+        for (var i = 1; i <= count; i++) {
             var firstName = randomOf(DemoUtils.firstNames);
             var lastName = randomOf(DemoUtils.lastNames);
             entries.push({

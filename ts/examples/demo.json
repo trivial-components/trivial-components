@@ -10,6 +10,14 @@
         "displayValue": "Minimal configuration",
         "additionalInfo": "Minimal configuration example",
         "apiDocLink": "typedoc/modules/_trivialcombobox_.html"
+      },
+      {
+        "fileName": "combobox-custom-queryFunction.ts",
+        "imageUrl": "img/icons/dev.png",
+        "displayValue": "Custom queryFunction",
+        "additionalInfo": "Custom retrieving and filtering of entries",
+        "apiDocLink": "typedoc/modules/_trivialcombobox_.html",
+        "infoText": "Note that the custom query function is case sensitive!"
       }
     ],
     "expanded": true
