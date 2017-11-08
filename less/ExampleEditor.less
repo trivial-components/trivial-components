@@ -3,6 +3,16 @@
   background: #ddd;
   border: 1px solid @input-border;
   border-radius: @border-radius-base;
+  display: flex;
+  flex-direction: column;
+
+  &.maximized {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
 
   .toolbar {
     padding: 5px 10px;
@@ -32,66 +42,66 @@
     }
 
     .toolbar-buttons-wrapper {
-
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
     }
   }
 
-  .content {
-    box-shadow: inset 1px 1px 10px 0 rgba(0, 0, 0, .3);
-    overflow: hidden; // prevent margin collapsing
-    
-    .main-area {
+  .main-area {
+    display: block;
+    flex: 1 1 60vh;
+
+    .code-editor-section {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      .code-heading {
+        padding-left: 10px;
+      }
+
+      .code-editor-wrapper {
+        flex: 1;
+        overflow: hidden;
+      }
+    }
+
+    .result-section {
+      overflow: hidden;
+      padding: 0 10px;
+
+      .original-input-value-wrapper {
+        overflow: auto;
+      }
+
+      .selected-entry-display {
+        overflow: auto;
+      }
+    }
+
+    @media (min-width: @screen-md-min) {
+      display: flex;
 
       .code-editor-section {
-        overflow: hidden;
-
-        .code-heading {
-          padding-left: 10px;
-        }
-
-        .code-editor-wrapper {
-          height: 50vh;
-        }
+        flex: 3 3 300px;
       }
 
       .result-section {
-        overflow: hidden;
-        padding: 0 10px;
-
-        .original-input-value-wrapper {
-          overflow: auto;
-        }
-
-        .selected-entry-display {
-          overflow: auto;
-        }
-      }
-
-      @media (min-width: @screen-md-min) {
-        display: flex;
-        align-items: stretch;
-        flex-wrap: wrap;
-
-        .code-editor-section {
-          flex: 2 0 400px;
-        }
-
-        .result-section {
-          flex: 1 0 200px;
-        }
+        flex: 1 1 100px;
       }
     }
+  }
 
-    .code-editor-section, .result-section, .description {
-      background: white;
-      margin: 7px;
-      box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, .3);
-    }
+  .description {
+    overflow: hidden;
+    padding: 0 10px;
+  }
 
-    .description {
-      overflow: hidden;
-      padding: 0 10px;
-    }
+  .code-editor-section, .result-section, .description {
+    background: white;
+    margin: 7px;
+    box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, .3);
   }
 
   h3 {

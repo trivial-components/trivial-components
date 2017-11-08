@@ -23,7 +23,7 @@
 
 <script>
 	jQuery.get("ts/examples/demo.json", function(data) {
-		var exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
+		window.exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
     });
 </script>
 

@@ -34,6 +34,7 @@ module Demo {
 		private $apiDocLink: JQuery;
 		private $resultWrapper: JQuery;
 		private $runButton: JQuery;
+		private $fullscreenButton: JQuery;
 
 		private editor: IStandaloneCodeEditor;
 		private editorModel: monaco.editor.IModel;
@@ -48,27 +49,30 @@ module Demo {
 					<input type="text" id="${this.exampleSelectionComboBoxId}">
 				</div>
 				<div class="toolbar-buttons-wrapper">
-					<button class="run-button btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+					<div class="btn-group" role="group" aria-label="...">
+					  <button class="run-button btn btn-success"><span class="glyphicon glyphicon-play"></span></button>
+					</div>
+					<div class="btn-group" role="group" aria-label="...">
+					  <button class="fullscreen-button btn btn-default"><span class="glyphicon glyphicon-fullscreen"></span></button>
+					</div>
 				</div>
 			</div>
-			<div class="content">
-			    <div class="main-area">
-				    <div class="code-editor-section">
-				        <h3 class="heading code-heading">Code</h3>
-						<div id="${this.codeEditorId}" class="code-editor-wrapper"></div>
-					</div>
-					<div class="result-section">
-						<h3 class="heading result-heading">Result</h3>
-						<div class="result-wrapper"></div>
-					</div>
+		    <div class="main-area">
+			    <div class="code-editor-section">
+			        <h3 class="heading code-heading">Code</h3>
+					<div id="${this.codeEditorId}" class="code-editor-wrapper"></div>
 				</div>
-				<div class="description">
-					<h3>Description</h3>
-					<p class="description-text"></p>
-					<p class="apidoc-link-paragraph">
-						See <a class="apidoc-link" href="">API documentation</a>.
-					</p>
+				<div class="result-section">
+					<h3 class="heading result-heading">Result</h3>
+					<div class="result-wrapper"></div>
 				</div>
+			</div>
+			<div class="description">
+				<h3>Description</h3>
+				<p class="description-text"></p>
+				<p class="apidoc-link-paragraph">
+					See <a class="apidoc-link" href="">API documentation</a>.
+				</p>
 			</div>
 		</div>`;
 
@@ -78,6 +82,7 @@ module Demo {
 			this.$apiDocLink = this.$mainDomElement.find('.apidoc-link');
 			this.$resultWrapper = this.$mainDomElement.find('.result-wrapper');
 			this.$runButton = this.$mainDomElement.find('.run-button');
+			this.$fullscreenButton = this.$mainDomElement.find('.fullscreen-button');
 
 			require.config({paths: {'vs': 'lib/js/vs'}});
 			require(['vs/editor/editor.main'], () => {
@@ -123,6 +128,10 @@ module Demo {
 					this.$runButton.click(() => {
 						this.compileAndEvaluate();
 					});
+					this.$fullscreenButton.click(() => {
+						this.$mainDomElement.toggleClass("maximized");
+						this.$fullscreenButton.find('span').toggleClass("glyphicon-remove glyphicon-fullscreen");
+					});
 					this.editor.onKeyDown((e) => {
 						if ((e.metaKey || e.ctrlKey) && e.keyCode == 49) {
 							this.compileAndEvaluate();
@@ -162,6 +171,8 @@ module Demo {
 				if (e.message === "ts is not defined") {
 					window.clearTimeout(this.reEvaluateTimeout);
 					this.reEvaluateTimeout = window.setTimeout(() => this.compileAndEvaluate(), 1000);
+				} else {
+					throw e;
 				}
 			}
 		}
