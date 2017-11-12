@@ -43,7 +43,22 @@ export type Match = {
 export type HighlightDirection = number|null|undefined;
 export type NavigationDirection = "up" | "left" | "down" | "right";
 export type ResultCallback<E> = (entries: E[]) => void;
+
+/**
+ * A function used to retrieve the entries ("suggestions") to be displayed in the dropdown box.
+ * Does _not_ return any result. The entries need to be provided via the `resultCallback` function.
+ *
+ * @param queryString the text currently entered by the user
+ * @param resultCallback the callback function to call with the entries to display in the dropdown
+ */
 export type QueryFunction<E> = (queryString: string, resultCallback: ResultCallback<E>) => void;
+
+/**
+ * Used to render an entry.
+ *
+ * @param entry the entry to render
+ * @return HTML string
+ */
 export type RenderingFunction<E> = (entry: E) => string;
 
 export const keyCodes = {

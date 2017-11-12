@@ -22,11 +22,36 @@ import {DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollT
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialListBoxConfig<E> {
+    /**
+     * Rendering function used to display a _suggested_ entry
+     * (i.e. an entry displayed in the dropdown).
+     *
+     * @param entry
+     * @return HTML string
+     * @default Using the `image2LinesTemplate` from `TrivialCore`.
+     */
     entryRenderingFunction?: RenderingFunction<E>,
+
+    /**
+     * The initially selected entry. (Caution: use `selectedEntries` for `TrivialTagBox`).
+     */
     selectedEntry?: E,
-    spinnerTemplate?: string,
+
+    /**
+     * The initial list of suggested entries.
+     */
     entries?: E[],
+
+    /**
+     * Used for highlighting suggested entries. Also used by the default filtering functions int `TrivialCore`.
+     *
+     * @default `{ matchingMode: 'contains', ignoreCase: true, maxLevenshteinDistance: 1 }`
+     */
     matchingOptions?: MatchingOptions,
+
+    /**
+     * Html string defining what to display when the list of results from the `queryFunction` is empty.
+     */
     noEntriesTemplate?: string
 }
 
@@ -49,12 +74,11 @@ export class TrivialListBox<E> implements TrivialComponent {
                 return Mustache.render(template, entry);
             },
             selectedEntry: null,
-            spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             entries: null,
             matchingOptions: {
                 matchingMode: 'contains',
                 ignoreCase: true,
-                maxLevenshteinDistance: 2
+                maxLevenshteinDistance: 1
             },
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate
         }, options);

@@ -18,28 +18,126 @@ limitations under the License.
 
 import * as $ from "jquery";
 import * as Mustache from "mustache";
-import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately, TrivialComponent, keyCodes} from "./TrivialCore";
+import {
+    DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately, TrivialComponent, keyCodes,
+    RenderingFunction
+} from "./TrivialCore";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {TrivialEvent} from "./TrivialEvent";   
 
 export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
-    /** The function used for calculating the value of the original input. */
+    /**
+     * Calculates the value to set on the original input.
+     *
+     * @param entry the selected entry
+     * @return the string to set as the value of the original input
+     */
     valueFunction?: (entry: E) => string,
-    /** The function used for rendering the selected entry. If not specified, this defaults to {@link entryRenderingFunction} */
-    selectedEntryRenderingFunction?: (entry: E) => string,
-    noEntriesTemplate?: string,
+
+    /**
+     * Rendering function used to display a _selected_ entry
+     * (i.e. an entry inside the editor area of the component, not the dropdown).
+     *
+     * @param entry
+     * @return HTML string
+     * @default `wrapWithDefaultTagWrapper(entryRenderingFunction(entry))`
+     */
+    selectedEntryRenderingFunction?: RenderingFunction<E>,
+
+    /**
+     * Initially selected entry.
+     *
+     * @default `null`
+     */
+    selectedEntry?: E,
+
+    /**
+     * Performance setting. Defines the maximum number of entries until which text highlighting is performed.
+     * Set to `0` to disable text highlighting.
+     *
+     * @default `100`
+     */
     textHighlightingEntryLimit?: number,
+
+    /**
+     * Used to retrieve the entries ("suggestions") to be displayed in the dropdown box.
+     *
+     * @see QueryFunction
+     * @default creates a client-side query function using the provided [[entries]]
+     */
     queryFunction?: QueryFunction<E>,
+
+    /**
+     * Whether or not to provide auto-completion.
+     *
+     * @default `true`
+     */
     autoComplete?: boolean,
+
+    /**
+     * The number of milliseconds to wait until auto-completion is performed.
+     *
+     * @default `0`
+     */
     autoCompleteDelay?: number,
-    entryToEditorTextFunction?: (entry: E) => string,
+
+    /**
+     * Generates an autocompletion string for the current input of the user and currently highlighted entry in the dropdown.
+     *
+     * @param editorText the current text input from the user
+     * @param entry the currently highlighted entry in the dropdown
+     * @return The _full_ string (not only the completion part) to apply for auto-completion.
+     * @default best effort implementation using entry properties
+     */
     autoCompleteFunction?: (editorText: string, entry: E) => string,
+
+    /**
+     * Similar to [[autoCompleteFunction]]. Used to set the editor's text when focusing the component.
+     *
+     * @default `entry["displayValue"]`
+     */
+    entryToEditorTextFunction?: (entry: E) => string,
+
+    /**
+     * Whether or not to allow free text to be entered by the user.
+     *
+     * @default `false`
+     */
     allowFreeText?: boolean,
+
+    /**
+     * Creates an entry (object) from a string entered by the user.
+     *
+     * @param freeText the text entered by the user
+     * @default `{ displayValue: freeText, _isFreeTextEntry: true }`
+     */
     freeTextEntryFactory?: (freeText: string) => E | any,
+
+    /**
+     * The clear button is a the small 'x' at the right of the entry display that can be clicked to clear the selection.
+     */
     showClearButton?: boolean,
+
+    /**
+     * The trigger is the button on the right side of the component that can be clicket to open the dropdown.
+     *
+     * @default `true`
+     */
     showTrigger?: boolean,
+
     editingMode?: EditingMode,
-    showDropDownOnResultsOnly?: boolean
+
+    /**
+     * It `true`, opening the dropdown will be delayed until the result callback of the [[queryFunction]] is called.
+     *
+     * @default `false`
+     */
+    showDropDownOnResultsOnly?: boolean,
+
+    /**
+     * HTML string defining the spinner to be displayed while entries are being retrieved.
+     */
+    spinnerTemplate?: string
 }
 
 /**

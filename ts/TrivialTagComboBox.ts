@@ -21,32 +21,155 @@ import * as Mustache from "mustache";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {
     DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
-    wrapWithDefaultTagWrapper, keyCodes
+    wrapWithDefaultTagWrapper, keyCodes, RenderingFunction
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
+    /**
+     * Calculates the value to set on the original input.
+     * 
+     * @param entries the list of selected entries
+     * @return the string to set as the value of the original input
+     */
     valueFunction?: (entries: E[]) => string,
-    selectedEntryRenderingFunction?: (entry: E) => string,
-    noEntriesTemplate?: string,
+
+    /**
+     * Rendering function used to display a _selected_ entry
+     * (i.e. an entry inside the editor area of the component, not the dropdown).
+     *
+     * @param entry
+     * @return HTML string
+     * @default `wrapWithDefaultTagWrapper(entryRenderingFunction(entry))`
+     */
+    selectedEntryRenderingFunction?: RenderingFunction<E>,
+
+    /**
+     * Initially selected entries.
+     *
+     * @default `[]`
+     */
     selectedEntries?: E[],
+
+    /**
+     * Performance setting. Defines the maximum number of entries until which text highlighting is performed.
+     * Set to `0` to disable text highlighting.
+     *
+     * @default `100`
+     */
     textHighlightingEntryLimit?: number,
+
+    /**
+     * Used to retrieve the entries ("suggestions") to be displayed in the dropdown box.
+     *
+     * @see QueryFunction
+     * @default creates a client-side query function using the provided [[entries]]
+     */
     queryFunction?: QueryFunction<E>,
+
+    /**
+     * Whether or not to provide auto-completion.
+     *
+     * @default `true`
+     */
     autoComplete?: boolean,
+
+    /**
+     * The number of milliseconds to wait until auto-completion is performed.
+     *
+     * @default `0`
+     */
     autoCompleteDelay?: number,
-    entryToEditorTextFunction?: (entry: E) => string,
+
+    /**
+     * Generates an autocompletion string for the current input of the user and currently highlighted entry in the dropdown.
+     *
+     * @param editorText the current text input from the user
+     * @param entry the currently highlighted entry in the dropdown
+     * @return The _full_ string (not only the completion part) to apply for auto-completion.
+     * @default best effort implementation using entry properties
+     */
     autoCompleteFunction?: (editorText: string, entry: E) => string,
-    allowFreeText?: boolean,
-    freeTextSeparators?: [',', ';'], // TODO function here?
+
+    /**
+     * List of characters that, when entered by the user, trigger the creation of a tag/entry.
+     *
+     * @default `[",", ";"]`
+     */
+    freeTextSeparators?: string[],
+
+    /**
+     * Creates an entry (object) from a string entered by the user.
+     *
+     * @param freeText the text entered by the user
+     * @default `{ displayValue: freeText, _isFreeTextEntry: true }`
+     */
     freeTextEntryFactory?: (freeText: string) => E | any,
-    showClearButton?: boolean,
+
+    /**
+     * The trigger is the button on the right side of the component that can be clicket to open the dropdown.
+     *
+     * @default `true`
+     */
     showTrigger?: boolean,
+
     editingMode?: EditingMode,
+
+    /**
+     * It `true`, opening the dropdown will be delayed until the result callback of the [[queryFunction]] is called.
+     *
+     * @default `false`
+     */
     showDropDownOnResultsOnly?: boolean,
+
+    /**
+     * Function deciding whether an entry entered by the user is complete or not (partial).
+     * A partial entry is an entry that needs more input from the user's side.
+     *
+     * @param entry
+     * @return `true` if the entry is considered complete, `false` if not
+     * @default always returns `true`
+     */
     tagCompleteDecider?: (entry: E) => boolean,
+
+    /**
+     * Used to merge the current partial tag with the newly selected by the user.
+     * (composite tags feature)
+     *
+     * @param partialEntry the current partial entry
+     * @param newEntryPart the entry selected/entered by the user
+     * @return a new entry that will replace the current partial entry. This may in turn be a partial or complete entry.
+     * @default always returns the `newEntryPart`
+     */
     entryMerger?: (partialEntry: E, newEntryPart: E) => E,
+
+    /**
+     * Whether or not a partial tag should be removed when the component
+     * looses the focus.
+     *
+     * @default `true`
+     */
     removePartialTagOnBlur?: boolean,
-    selectionAcceptor?: (entry: E) => boolean
+
+    /**
+     * Decides whether the user's input/selection is accepted or not.
+     * This can serve many purposes, including
+     *  * implementing duplicate prevention
+     *  * limiting the number of selectable tags
+     *  * allowing or disallowing free text entries (this was previously possible using the now removed `allowFreeText` option)
+     *  * allowing only free text entries of a certain form
+     *  * ...
+     *
+     * @param entry the entry to be accepted or not
+     * @return `true` if the entry is accepted, `false` if not
+     * @default accepting all non-free-text entries
+     */
+    selectionAcceptor?: (entry: E) => boolean,
+
+    /**
+     * HTML string defining the spinner to be displayed while entries are being retrieved.
+     */
+    spinnerTemplate?: string
 }
 
 export class TrivialTagComboBox<E> implements TrivialComponent {
@@ -90,7 +213,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
             },
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
-            noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
             textHighlightingEntryLimit: 100,
             entries: null,
             selectedEntries: [],
@@ -113,7 +235,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     return null;
                 }
             },
-            allowFreeText: false,
             freeTextSeparators: [',', ';'], // TODO function here
             freeTextEntryFactory: (freeText: string) => {
                 return {
@@ -129,7 +250,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             },
             removePartialTagOnBlur: true,
             showTrigger: true,
-            distinct: true,
             matchingOptions: {
                 matchingMode: 'contains',
                 ignoreCase: true,
@@ -137,7 +257,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             },
             editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
             showDropDownOnResultsOnly: false,
-            selectionAcceptor: (e) => true
+            selectionAcceptor: (e) => !(e as any)._isFreeTextEntry // do not allow free text entries by default
         }, options);
 
         if (!this.config.queryFunction) {
@@ -195,8 +315,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.$tagComboBox.removeClass('focus');
                     this.entries = null;
                     this.closeDropDown();
-                    if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
+                    if (this.$editor.text().trim().length > 0) {
+                        this.addSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
                     }
                     if (this.config.removePartialTagOnBlur && this.currentPartialTag != null) {
                         this.cancelPartialTag();
@@ -210,10 +330,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 } else if (e.which == keyCodes.tab || e.which == keyCodes.enter) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry != null) {
-                        this.setSelectedEntry(highlightedEntry, true, e);
+                        this.addSelectedEntry(highlightedEntry, true, e);
                         e.preventDefault(); // do not tab away from the tag box nor insert a newline character
-                    } else if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
-                        this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
+                    } else if (this.$editor.text().trim().length > 0) {
+                        this.addSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
                         e.preventDefault(); // do not tab away from the tag box nor insert a newline character
                     } else if (this.currentPartialTag) {
                         if (e.shiftKey) { // we do not want the editor to get the focus right back, so we need to position the $editor intelligently...
@@ -290,21 +410,19 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 if (this.$editor.find('*').length > 0) {
                     this.$editor.text(this.$editor.text()); // removes possible <div> or <br> or whatever the browser likes to put inside...
                 }
-                if (this.config.allowFreeText) {
-                    const editorValueBeforeCursor = this.getNonSelectedEditorValue();
-                    if (editorValueBeforeCursor.length > 0) {
-                        const tagValuesEnteredByUser = splitStringBySeparatorChars(editorValueBeforeCursor, this.config.freeTextSeparators);
+                const editorValueBeforeCursor = this.getNonSelectedEditorValue();
+                if (editorValueBeforeCursor.length > 0) {
+                    const tagValuesEnteredByUser = splitStringBySeparatorChars(editorValueBeforeCursor, this.config.freeTextSeparators);
 
-                        for (let i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
-                            const value = tagValuesEnteredByUser[i].trim();
-                            if (value.length > 0) {
-                                this.setSelectedEntry(this.config.freeTextEntryFactory(value), true, e);
-                            }
-                            this.$editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
-                            selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
-                            this.entries = null;
-                            this.closeDropDown();
+                    for (let i = 0; i < tagValuesEnteredByUser.length - 1; i++) {
+                        const value = tagValuesEnteredByUser[i].trim();
+                        if (value.length > 0) {
+                            this.addSelectedEntry(this.config.freeTextEntryFactory(value), true, e);
                         }
+                        this.$editor.text(tagValuesEnteredByUser[tagValuesEnteredByUser.length - 1]);
+                        selectElementContents(this.$editor[0], this.$editor.text().length, this.$editor.text().length);
+                        this.entries = null;
+                        this.closeDropDown();
                     }
                 }
             })
@@ -347,7 +465,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
         this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
             if (selectedEntry) {
-                this.setSelectedEntry(selectedEntry, true, originalEvent);
+                this.addSelectedEntry(selectedEntry, true, originalEvent);
                 this.listBox.setSelectedEntry(null);
                 this.closeDropDown();
             }
@@ -469,7 +587,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.onSelectedEntryChanged.fire(entries, originalEvent);
     }
 
-    private setSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event, forceAcceptance?: boolean) {
+    private addSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event, forceAcceptance?: boolean) {
         if (entry == null) {
             return; // do nothing
         }
@@ -639,7 +757,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             .forEach((e) => this.removeTag(e));
         if (entries) {
             for (let i = 0; i < entries.length; i++) {
-                this.setSelectedEntry(entries[i], false, null, forceAcceptance);
+                this.addSelectedEntry(entries[i], false, null, forceAcceptance);
             }
         }
     }

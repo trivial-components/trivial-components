@@ -22,22 +22,111 @@ import {DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollT
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialTreeBoxConfig<E> {
+    /**
+     * Calculates a unique value for an entry. Used to identify nodes in the tree.
+     */
     valueFunction?: (entry: E) => string,
+
+    /**
+     * Rendering function used to display a _suggested_ entry
+     * (i.e. an entry displayed in the dropdown).
+     *
+     * @param entry
+     * @param depth the depth of the entry in the tree
+     * @return HTML string
+     * @default Using the `image2LinesTemplate` from `TrivialCore`.
+     */
     entryRenderingFunction?: (entry: E, depth: number) => string,
+
+    /**
+     * The initially selected entry. (Caution: use `selectedEntries` for `TrivialTagBox`).
+     */
     selectedEntry?: E,
-    spinnerTemplate?: string,
-    noEntriesTemplate?: string,
+
+    /**
+     * The initial list of suggested entries.
+    */
     entries?: E[],
+
+    /**
+     * Used for highlighting suggested entries. Also used by the default filtering functions int `TrivialCore`.
+     *
+     * @default `{ matchingMode: 'contains', ignoreCase: true, maxLevenshteinDistance: 1 }`
+     */
     matchingOptions?: MatchingOptions,
+
+    /**
+     * Property used to retrieve the children of a node.
+     *
+     * Note: This is subject to being replaced by a function in future versions.
+     *
+     * @default `'children'`
+     */
     childrenProperty?: string, // TODO replace by getChildrenFunction: (entry: E) => E[]
+
+    /**
+     * Property used to determine whether a node has children that need to be lazy-loaded.
+     *
+     * Note: This is subject to being replaced by a function in future versions.
+     *
+     * @default `'hasLazyChildren'`
+     */
     lazyChildrenFlagProperty?: string,  // TODO replace by hasChildrenFunction: (entry: E) => boolean
+
+    /**
+     * Function for retrieving children of a node.
+     *
+     * @param node
+     * @param resultCallback
+     */
     lazyChildrenQueryFunction?: (node: E, resultCallback: ResultCallback<E>) => void, // TODO unify with getter/setter
+
+    /**
+     * Property used to determine whether a node is expanded or not.
+     *
+     * Note: This is subject to being replaced by a function in future versions.
+     * @default `'expanded'`
+     */
     expandedProperty?: string, // TODO replace by expandedPropertyGetter: (entry: E) => boolean, expandedPropertySetter: (entry: E, expanded: boolean) => void
+
+    /**
+     * The ID of the initially selected entry in the tree.
+     *
+     * Note: This option is subject to change!
+     */
     selectedEntryId?: any,
+
+    /**
+     * Animation duration in milliseconds for expand and collapse animations.
+     */
     animationDuration?: number,
+
+    /**
+     * Whether or not to show the expander controls for parent nodes.
+     */
     showExpanders?: boolean,
-    openOnSelection?: boolean, // open expandable nodes when they are selected
+
+    /**
+     * Whether or not to expand a node when it is selected.
+     */
+    expandOnSelection?: boolean,
+
+    /**
+     * Special mode that allows only one path to be expanded.
+     * Expands all ancestor nodes of the selected node, as well as the selected node itself.
+     * Collapses all others.
+     */
     enforceSingleExpandedPath?: boolean // only one path is expanded at any time
+
+    /**
+     * Html string defining what to display when the list of results from the `queryFunction` is empty.
+     */
+    noEntriesTemplate?: string,
+
+    /**
+     * HTML string defining the spinner to be displayed while lazy children are being retrieved.
+     */
+    spinnerTemplate?: string
 }
 
 export class TrivialTreeBox<E> implements TrivialComponent {
@@ -79,7 +168,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
             },
             animationDuration: 70,
             showExpanders: true,
-            openOnSelection: false, // open expandable nodes when they are selected
+            expandOnSelection: false, // open expandable nodes when they are selected
             enforceSingleExpandedPath: false // only one path is expanded at any time
         }, options);
 
@@ -332,7 +421,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         this.markSelectedEntry(entry);
         this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
         this.fireChangeEvents(entry, originalEvent);
-        if (entry && this.config.openOnSelection) {
+        if (entry && this.config.expandOnSelection) {
             this.setNodeExpanded(entry, true, true);
         }
     }

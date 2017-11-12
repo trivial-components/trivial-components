@@ -37,7 +37,12 @@ export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
     queryOnNonNumberCharacters?: boolean,
     openDropdownOnEditorClick?: boolean,
     showTrigger?: boolean,
-    editingMode?: EditingMode
+    editingMode?: EditingMode,
+    
+    /**
+     * HTML string defining the spinner to be displayed while entries are being retrieved.
+     */
+    spinnerTemplate?: string
 }
 
 export type TrivialUnitBoxChangeEvent<U> = {
