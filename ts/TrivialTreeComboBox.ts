@@ -51,8 +51,6 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     private treeBox: TrivialTreeBox<E>;
     private isDropDownOpen = false;
     private isEditorVisible = false;
-    private lastQueryString: string = null;
-    private lastCompleteInputQueryString: string = null;
     private selectedEntry: E = null;
     private lastCommittedValue: E = null;
     private blurCausedByClickInsideComponent = false;
@@ -248,12 +246,10 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (!this.isDropDownOpen) {
                         this.query(direction);
-                        if (!this.config.showDropDownOnResultsOnly) {
-                            this.openDropDown();
-                        }
+	                    this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
                         this.treeBox.highlightNextEntry(direction);
-                        this.autoCompleteIfPossible();
+                        this.autoCompleteIfPossible(this.config.autoCompleteDelay);
                     }
                     return false; // some browsers move the caret to the beginning on up key
                 } else if (e.which == keyCodes.enter) {
@@ -353,24 +349,16 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     }
 
     private query(highlightDirection?: HighlightDirection) {
-        const queryString = this.getNonSelectedEditorValue();
-        const completeInputString = this.$editor.val();
-        if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-            if (this.$spinners.length === 0) {
-                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                this.$spinners = this.$spinners.add($spinner);
-            }
-            this.config.queryFunction(queryString, (newEntries: E[]) => {
-                this.updateEntries(newEntries, highlightDirection);
-                if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                    this.openDropDown();
-                }
-            });
-            this.lastQueryString = queryString;
-            this.lastCompleteInputQueryString = completeInputString;
-        } else {
-            this.openDropDown();
+        if (this.$spinners.length === 0) {
+            const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+            this.$spinners = this.$spinners.add($spinner);
         }
+        this.config.queryFunction(this.getNonSelectedEditorValue(), (newEntries: E[]) => {
+            this.updateEntries(newEntries, highlightDirection);
+            if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                this.openDropDown();
+            }
+        });
     }
 
     private fireChangeEvents(entry: E, originalEvent?: Event) {
@@ -503,6 +491,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
 
         this.$spinners.remove();
         this.$spinners = $();
+        
         this.treeBox.updateEntries(newEntries);
 
         const nonSelectedEditorValue = this.getNonSelectedEditorValue();

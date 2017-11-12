@@ -68,8 +68,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
     private listBox: TrivialListBox<E>;
     private isDropDownOpen = false;
-    private lastQueryString: string = null;
-    private lastCompleteInputQueryString: string = null;
     private entries: E[];
     private selectedEntries: E[] = [];
     private blurCausedByClickInsideComponent = false;
@@ -199,7 +197,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     this.closeDropDown();
                     if (this.config.allowFreeText && this.$editor.text().trim().length > 0) {
                         this.setSelectedEntry(this.config.freeTextEntryFactory(this.$editor.text()), true, e);
-                    } if (this.config.removePartialTagOnBlur && this.currentPartialTag != null) {
+                    }
+                    if (this.config.removePartialTagOnBlur && this.currentPartialTag != null) {
                         this.cancelPartialTag();
                     }
                     this.$editor.text("");
@@ -259,13 +258,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 	                    setTimeout(() => this.query(1)); // asynchronously to make sure the editor has been updated
                     }
                 } else if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
-                    this.openDropDown();
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (!this.isDropDownOpen) {
-	                    setTimeout(() => this.query(direction)); // asynchronously to make sure the editor has been updated
-                        if (!this.config.showDropDownOnResultsOnly) {
-                            this.openDropDown();
-                        }
+	                    this.query(direction);
+                        this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
                         this.listBox.highlightNextEntry(direction);
                         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
@@ -415,10 +411,14 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
 
         this.listBox.updateEntries(this.entries);
+        this.listBox.highlightTextMatches(this.entries.length <= this.config.textHighlightingEntryLimit ? this.getNonSelectedEditorValue() : null);
+
         this.listBoxDirty = false;
     }
 
     public updateEntries(newEntries: E[], highlightDirection?: HighlightDirection) {
+        this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
+
         this.entries = newEntries;
         this.$spinners.remove();
         this.$spinners = $();
@@ -427,10 +427,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         } else {
             this.listBoxDirty = true;
         }
-
-        const nonSelectedEditorValue = this.getNonSelectedEditorValue();
-
-        this.listBox.highlightTextMatches(newEntries.length <= this.config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
         if (highlightDirection) {
             this.listBox.highlightNextEntry(highlightDirection);
@@ -456,22 +452,16 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private query(highlightDirection?: HighlightDirection) {
-        const queryString = this.getNonSelectedEditorValue();
-        const completeInputString = this.$editor.text().replace(String.fromCharCode(160), " ");
-        if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-            if (this.$spinners.length === 0) {
-                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                this.$spinners = this.$spinners.add($spinner);
-            }
-            this.config.queryFunction(queryString, (newEntries: E[]) => {
-                this.updateEntries(newEntries, highlightDirection);
-                if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                    this.openDropDown();
-                }
-            });
-            this.lastQueryString = queryString;
-            this.lastCompleteInputQueryString = completeInputString;
+	    if (this.$spinners.length === 0) {
+            const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+            this.$spinners = this.$spinners.add($spinner);
         }
+        this.config.queryFunction(this.getNonSelectedEditorValue(), (newEntries: E[]) => {
+            this.updateEntries(newEntries, highlightDirection);
+            if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                this.openDropDown();
+            }
+        });
     }
 
     private fireChangeEvents(entries: E[], originalEvent: Event) {

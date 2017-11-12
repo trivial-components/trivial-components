@@ -66,8 +66,6 @@ export class TrivialComboBox<E> implements TrivialComponent{
     private listBox: TrivialListBox<E>;
     private isDropDownOpen = false;
     private isEditorVisible = false;
-    private lastQueryString: string = null;
-    private lastCompleteInputQueryString: string = null;
     private entries: E[];
     private selectedEntry: E = null;
     private lastCommittedValue: E = null;
@@ -245,12 +243,10 @@ export class TrivialComboBox<E> implements TrivialComponent{
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                     if (!this.isDropDownOpen) {
                         this.query(direction);
-                        if (!this.config.showDropDownOnResultsOnly) {
-                            this.openDropDown();
-                        }
+                        this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
                         this.listBox.highlightNextEntry(direction);
-                        this.autoCompleteIfPossible();
+                        this.autoCompleteIfPossible(this.config.autoCompleteDelay);
                     }
                     return false; // some browsers move the caret to the beginning on up key
                 } else if (e.which == keyCodes.enter) {
@@ -350,24 +346,16 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     private query(highlightDirection?: HighlightDirection) {
-        const queryString = this.getNonSelectedEditorValue();
-        const completeInputString = this.$editor.val();
-        if (this.lastQueryString !== queryString || this.lastCompleteInputQueryString !== completeInputString) {
-            if (this.$spinners.length === 0) {
-                const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-                this.$spinners = this.$spinners.add($spinner);
-            }
-            this.config.queryFunction(queryString, (newEntries: E[]) => {
-                this.updateEntries(newEntries, highlightDirection);
-                if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
-                    this.openDropDown();
-                }
-            });
-            this.lastQueryString = queryString;
-            this.lastCompleteInputQueryString = completeInputString;
-        } else {
-            this.openDropDown();
+        if (this.$spinners.length === 0) {
+            const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+            this.$spinners = this.$spinners.add($spinner);
         }
+        this.config.queryFunction(this.getNonSelectedEditorValue(), (newEntries: E[]) => {
+            this.updateEntries(newEntries, highlightDirection);
+            if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
+                this.openDropDown();
+            }
+        });
     }
 
     private fireChangeEvents(entry: E, originalEvent: Event) {
@@ -459,7 +447,6 @@ export class TrivialComboBox<E> implements TrivialComponent{
     };
 
     public openDropDown() {
-        console.log("openDropDown")
         if (this.isDropDownNeeded()) {
             if (this.listBoxDirty) {
                 this.updateListBoxEntries();
@@ -502,10 +489,14 @@ export class TrivialComboBox<E> implements TrivialComponent{
         this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
 
         this.listBox.updateEntries(this.entries);
+        this.listBox.highlightTextMatches(this.entries.length <= this.config.textHighlightingEntryLimit ? this.getNonSelectedEditorValue() : null);
+
         this.listBoxDirty = false;
     }
 
     public updateEntries(newEntries:E[], highlightDirection?:number) {
+        this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
+
         this.entries = newEntries;
         this.$spinners.remove();
         this.$spinners = $();
@@ -514,10 +505,6 @@ export class TrivialComboBox<E> implements TrivialComponent{
         } else {
             this.listBoxDirty = true;
         }
-
-        const nonSelectedEditorValue = this.getNonSelectedEditorValue();
-
-        this.listBox.highlightTextMatches(newEntries.length <= this.config.textHighlightingEntryLimit ? nonSelectedEditorValue : null);
 
         if (highlightDirection == null) {
             if (this.selectedEntry) {
