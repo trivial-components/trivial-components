@@ -82,20 +82,21 @@ export class TrivialCalendarBox implements TrivialComponent {
 
 export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     valueFunction?: (entry: E) => string;
-    selectedEntryRenderingFunction?: (entry: E) => string;
-    noEntriesTemplate?: string;
+    selectedEntryRenderingFunction?: RenderingFunction<E>;
+    selectedEntry?: E;
     textHighlightingEntryLimit?: number;
     queryFunction?: QueryFunction<E>;
     autoComplete?: boolean;
     autoCompleteDelay?: number;
-    entryToEditorTextFunction?: (entry: E) => string;
     autoCompleteFunction?: (editorText: string, entry: E) => string;
+    entryToEditorTextFunction?: (entry: E) => string;
     allowFreeText?: boolean;
     freeTextEntryFactory?: (freeText: string) => E | any;
     showClearButton?: boolean;
     showTrigger?: boolean;
     editingMode?: EditingMode;
     showDropDownOnResultsOnly?: boolean;
+    spinnerTemplate?: string;
 }
 export class TrivialComboBox<E> implements TrivialComponent {
     private config;
@@ -114,8 +115,6 @@ export class TrivialComboBox<E> implements TrivialComponent {
     private listBox;
     private isDropDownOpen;
     private isEditorVisible;
-    private lastQueryString;
-    private lastCompleteInputQueryString;
     private entries;
     private selectedEntry;
     private lastCommittedValue;
@@ -332,7 +331,6 @@ export class TrivialEvent<EO> {
 export interface TrivialListBoxConfig<E> {
     entryRenderingFunction?: RenderingFunction<E>;
     selectedEntry?: E;
-    spinnerTemplate?: string;
     entries?: E[];
     matchingOptions?: MatchingOptions;
     noEntriesTemplate?: string;
@@ -365,19 +363,15 @@ export class TrivialListBox<E> implements TrivialComponent {
 
 export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     valueFunction?: (entries: E[]) => string;
-    selectedEntryRenderingFunction?: (entry: E) => string;
-    noEntriesTemplate?: string;
+    selectedEntryRenderingFunction?: RenderingFunction<E>;
     selectedEntries?: E[];
     textHighlightingEntryLimit?: number;
     queryFunction?: QueryFunction<E>;
     autoComplete?: boolean;
     autoCompleteDelay?: number;
-    entryToEditorTextFunction?: (entry: E) => string;
     autoCompleteFunction?: (editorText: string, entry: E) => string;
-    allowFreeText?: boolean;
-    freeTextSeparators?: [',', ';'];
+    freeTextSeparators?: string[];
     freeTextEntryFactory?: (freeText: string) => E | any;
-    showClearButton?: boolean;
     showTrigger?: boolean;
     editingMode?: EditingMode;
     showDropDownOnResultsOnly?: boolean;
@@ -385,6 +379,7 @@ export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     entryMerger?: (partialEntry: E, newEntryPart: E) => E;
     removePartialTagOnBlur?: boolean;
     selectionAcceptor?: (entry: E) => boolean;
+    spinnerTemplate?: string;
 }
 export class TrivialTagComboBox<E> implements TrivialComponent {
     private config;
@@ -401,8 +396,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     readonly onBlur: TrivialEvent<void>;
     private listBox;
     private isDropDownOpen;
-    private lastQueryString;
-    private lastCompleteInputQueryString;
     private entries;
     private selectedEntries;
     private blurCausedByClickInsideComponent;
@@ -421,7 +414,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private removeTag(tagToBeRemoved, originalEvent?);
     private query(highlightDirection?);
     private fireChangeEvents(entries, originalEvent);
-    private setSelectedEntry(entry, fireEvent?, originalEvent?);
+    private addSelectedEntry(entry, fireEvent?, originalEvent?, forceAcceptance?);
     private focusEditor();
     private repositionDropDown();
     openDropDown(): void;
@@ -432,7 +425,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private insertAtIndex($element, index);
     private doIgnoringBlurEvents(f);
     setEditingMode(newEditingMode: EditingMode): void;
-    setSelectedEntries(entries: E[]): void;
+    setSelectedEntries(entries: E[], forceAcceptance?: boolean): void;
     getSelectedEntries(): E[];
     getCurrentPartialTag(): E;
     focus(): void;
@@ -512,8 +505,6 @@ export interface TrivialTreeBoxConfig<E> {
     valueFunction?: (entry: E) => string;
     entryRenderingFunction?: (entry: E, depth: number) => string;
     selectedEntry?: E;
-    spinnerTemplate?: string;
-    noEntriesTemplate?: string;
     entries?: E[];
     matchingOptions?: MatchingOptions;
     childrenProperty?: string;
@@ -523,8 +514,10 @@ export interface TrivialTreeBoxConfig<E> {
     selectedEntryId?: any;
     animationDuration?: number;
     showExpanders?: boolean;
-    openOnSelection?: boolean;
+    expandOnSelection?: boolean;
     enforceSingleExpandedPath?: boolean;
+    noEntriesTemplate?: string;
+    spinnerTemplate?: string;
 }
 export class TrivialTreeBox<E> implements TrivialComponent {
     private config;
@@ -574,19 +567,22 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 
 
 export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
-    selectedEntryRenderingFunction?: (entry: E) => string;
+    valueFunction?: (entry: E) => string;
+    selectedEntryRenderingFunction?: RenderingFunction<E>;
+    selectedEntry?: E;
     textHighlightingEntryLimit?: number;
     queryFunction?: QueryFunction<E>;
     autoComplete?: boolean;
     autoCompleteDelay?: number;
-    entryToEditorTextFunction?: (entry: E) => string;
     autoCompleteFunction?: (editorText: string, entry: E) => string;
+    entryToEditorTextFunction?: (entry: E) => string;
     allowFreeText?: boolean;
     freeTextEntryFactory?: (freeText: string) => E | any;
     showClearButton?: boolean;
     showTrigger?: boolean;
     editingMode?: EditingMode;
     showDropDownOnResultsOnly?: boolean;
+    spinnerTemplate?: string;
 }
 export class TrivialTreeComboBox<E> implements TrivialComponent {
     private $treeComboBox;
@@ -597,8 +593,6 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     private treeBox;
     private isDropDownOpen;
     private isEditorVisible;
-    private lastQueryString;
-    private lastCompleteInputQueryString;
     private selectedEntry;
     private lastCommittedValue;
     private blurCausedByClickInsideComponent;
@@ -658,6 +652,7 @@ export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
     openDropdownOnEditorClick?: boolean;
     showTrigger?: boolean;
     editingMode?: EditingMode;
+    spinnerTemplate?: string;
 }
 export type TrivialUnitBoxChangeEvent<U> = {
     unit: string;

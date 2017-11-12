@@ -112,7 +112,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialunitbox_.trivialunitboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#selectedentryrenderingfunction" class="tsd-kind-icon">selected<wbr>Entry<wbr>Rendering<wbr>Function</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#showtrigger" class="tsd-kind-icon">show<wbr>Trigger</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialunitbox_.trivialunitboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#thousandsseparator" class="tsd-kind-icon">thousands<wbr>Separator</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#unitdisplayposition" class="tsd-kind-icon">unit<wbr>Display<wbr>Position</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialunitbox_.trivialunitboxconfig.html#unitidproperty" class="tsd-kind-icon">unit<wbr>IdProperty</a></li>
@@ -181,9 +181,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#entries">entries</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:28</li>
+							<li>Defined in TrivialListBox.ts:43</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The initial list of suggested entries.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="entryrenderingfunction" class="tsd-anchor"></a>
@@ -192,9 +197,25 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#entryrenderingfunction">entryRenderingFunction</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:25</li>
+							<li>Defined in TrivialListBox.ts:33</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Rendering function used to display a <em>suggested</em> entry
+							(i.e. an entry displayed in the dropdown).</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>returns</dt>
+							<dd><p>HTML string</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p>Using the <code>image2LinesTemplate</code> from <code>TrivialCore</code>.</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="matchingoptions" class="tsd-anchor"></a>
@@ -203,9 +224,19 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#matchingoptions">matchingOptions</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:29</li>
+							<li>Defined in TrivialListBox.ts:50</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Used for highlighting suggested entries. Also used by the default filtering functions int <code>TrivialCore</code>.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>{ matchingMode: &#39;contains&#39;, ignoreCase: true, maxLevenshteinDistance: 1 }</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="noentriestemplate" class="tsd-anchor"></a>
@@ -255,9 +286,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#selectedentry">selectedEntry</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:26</li>
+							<li>Defined in TrivialListBox.ts:38</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The initially selected entry. (Caution: use <code>selectedEntries</code> for <code>TrivialTagBox</code>).</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="selectedentryrenderingfunction" class="tsd-anchor"></a>
@@ -300,16 +336,20 @@
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="spinnertemplate" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> spinner<wbr>Template</h3>
 					<div class="tsd-signature tsd-kind-icon">spinner<wbr>Template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#spinnertemplate">spinnerTemplate</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:27</li>
+							<li>Defined in TrivialUnitBox.ts:45</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>HTML string defining the spinner to be displayed while entries are being retrieved.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="thousandsseparator" class="tsd-anchor"></a>
@@ -458,7 +498,7 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialunitbox_.trivialunitboxconfig.html#showtrigger" class="tsd-kind-icon">show<wbr>Trigger</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialunitbox_.trivialunitboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">

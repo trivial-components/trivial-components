@@ -11,6 +11,9 @@ let combobox = new TrivialComponents.TrivialComboBox("#originalInput", {
 	}
 });
 
+
+
+// ---------------------------- demo boilerplate ----------------------------
 function updateValueDisplay() {
 	$('#originalInputValue').text($('#originalInput').val());
 	$('#selectedEntryDisplay').text(JSON.stringify(combobox.getSelectedEntry(), null, 2));

@@ -4,6 +4,9 @@ let tagComboBox = new TrivialComponents.TrivialTagComboBox("#originalInput", {
 	selectedEntries: [entries[0], entries[5]]
 });
 
+
+
+// ---------------------------- demo boilerplate ----------------------------
 function updateValueDisplay() {
 	$('#originalInputValue').text($('#originalInput').val());
 	$('#selectedEntryDisplay').text(JSON.stringify(tagComboBox.getSelectedEntries(), null, 2));

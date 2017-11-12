@@ -74,7 +74,6 @@ let tagComboBox = new TrivialComponents.TrivialTagComboBox<any>('#originalInput'
 			... personsEntries[0]
 		}
 	],
-	allowFreeText: true,
 	freeTextEntryFactory: (s) => {
 		return {
 			person: {
@@ -86,6 +85,9 @@ let tagComboBox = new TrivialComponents.TrivialTagComboBox<any>('#originalInput'
 	valueFunction: (entries) => entries.map(entry => `${entry.attribute || "any"}:${entry.person && entry.person.email}`).join(',')
 });
 
+
+
+// ---------------------------- demo boilerplate ----------------------------
 function updateValueDisplay() {
 	$('#originalInputValue').text($('#originalInput').val());
 	$('#selectedEntryDisplay').text(JSON.stringify(tagComboBox.getSelectedEntries(), null, 2));

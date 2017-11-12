@@ -105,12 +105,12 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#enforcesingleexpandedpath" class="tsd-kind-icon">enforce<wbr>Single<wbr>Expanded<wbr>Path</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#entries" class="tsd-kind-icon">entries</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#entryrenderingfunction" class="tsd-kind-icon">entry<wbr>Rendering<wbr>Function</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#expandonselection" class="tsd-kind-icon">expand<wbr>OnSelection</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#expandedproperty" class="tsd-kind-icon">expanded<wbr>Property</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#lazychildrenflagproperty" class="tsd-kind-icon">lazy<wbr>Children<wbr>Flag<wbr>Property</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#lazychildrenqueryfunction" class="tsd-kind-icon">lazy<wbr>Children<wbr>Query<wbr>Function</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#matchingoptions" class="tsd-kind-icon">matching<wbr>Options</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#noentriestemplate" class="tsd-kind-icon">no<wbr>Entries<wbr>Template</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#openonselection" class="tsd-kind-icon">open<wbr>OnSelection</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#selectedentryid" class="tsd-kind-icon">selected<wbr>Entry<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialtreebox_.trivialtreeboxconfig.html#showexpanders" class="tsd-kind-icon">show<wbr>Expanders</a></li>
@@ -129,9 +129,14 @@
 					<div class="tsd-signature tsd-kind-icon">animation<wbr>Duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:37</li>
+							<li>Defined in TrivialTreeBox.ts:102</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Animation duration in milliseconds for expand and collapse animations.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="childrenproperty" class="tsd-anchor"></a>
@@ -139,9 +144,20 @@
 					<div class="tsd-signature tsd-kind-icon">children<wbr>Property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:32</li>
+							<li>Defined in TrivialTreeBox.ts:65</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Property used to retrieve the children of a node.</p>
+						</div>
+						<p>Note: This is subject to being replaced by a function in future versions.</p>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>&#39;children&#39;</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="enforcesingleexpandedpath" class="tsd-anchor"></a>
@@ -149,9 +165,16 @@
 					<div class="tsd-signature tsd-kind-icon">enforce<wbr>Single<wbr>Expanded<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:40</li>
+							<li>Defined in TrivialTreeBox.ts:119</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Special mode that allows only one path to be expanded.
+								Expands all ancestor nodes of the selected node, as well as the selected node itself.
+							Collapses all others.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="entries" class="tsd-anchor"></a>
@@ -159,9 +182,14 @@
 					<div class="tsd-signature tsd-kind-icon">entries<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:30</li>
+							<li>Defined in TrivialTreeBox.ts:49</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The initial list of suggested entries.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="entryrenderingfunction" class="tsd-anchor"></a>
@@ -169,9 +197,28 @@
 					<div class="tsd-signature tsd-kind-icon">entry<wbr>Rendering<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:26</li>
+							<li>Defined in TrivialTreeBox.ts:39</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Rendering function used to display a <em>suggested</em> entry
+							(i.e. an entry displayed in the dropdown).</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd><p>the depth of the entry in the tree</p>
+							</dd>
+							<dt>returns</dt>
+							<dd><p>HTML string</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p>Using the <code>image2LinesTemplate</code> from <code>TrivialCore</code>.</p>
+							</dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -198,14 +245,40 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="expandonselection" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> expand<wbr>OnSelection</h3>
+					<div class="tsd-signature tsd-kind-icon">expand<wbr>OnSelection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in TrivialTreeBox.ts:112</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Whether or not to expand a node when it is selected.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="expandedproperty" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> expanded<wbr>Property</h3>
 					<div class="tsd-signature tsd-kind-icon">expanded<wbr>Property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:35</li>
+							<li>Defined in TrivialTreeBox.ts:90</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Property used to determine whether a node is expanded or not.</p>
+						</div>
+						<p>Note: This is subject to being replaced by a function in future versions.</p>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>&#39;expanded&#39;</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="lazychildrenflagproperty" class="tsd-anchor"></a>
@@ -213,9 +286,20 @@
 					<div class="tsd-signature tsd-kind-icon">lazy<wbr>Children<wbr>Flag<wbr>Property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:33</li>
+							<li>Defined in TrivialTreeBox.ts:74</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Property used to determine whether a node has children that need to be lazy-loaded.</p>
+						</div>
+						<p>Note: This is subject to being replaced by a function in future versions.</p>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>&#39;hasLazyChildren&#39;</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="lazychildrenqueryfunction" class="tsd-anchor"></a>
@@ -223,9 +307,20 @@
 					<div class="tsd-signature tsd-kind-icon">lazy<wbr>Children<wbr>Query<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:34</li>
+							<li>Defined in TrivialTreeBox.ts:82</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Function for retrieving children of a node.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>param</dt>
+							<dd></dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -257,9 +352,19 @@
 					<div class="tsd-signature tsd-kind-icon">matching<wbr>Options<span class="tsd-signature-symbol">:</span> <a href="../modules/_trivialcore_.html#matchingoptions" class="tsd-signature-type">MatchingOptions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:31</li>
+							<li>Defined in TrivialTreeBox.ts:56</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Used for highlighting suggested entries. Also used by the default filtering functions int <code>TrivialCore</code>.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>{ matchingMode: &#39;contains&#39;, ignoreCase: true, maxLevenshteinDistance: 1 }</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="noentriestemplate" class="tsd-anchor"></a>
@@ -267,19 +372,14 @@
 					<div class="tsd-signature tsd-kind-icon">no<wbr>Entries<wbr>Template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:29</li>
+							<li>Defined in TrivialTreeBox.ts:124</li>
 						</ul>
 					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="openonselection" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> open<wbr>OnSelection</h3>
-					<div class="tsd-signature tsd-kind-icon">open<wbr>OnSelection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in TrivialTreeBox.ts:39</li>
-						</ul>
-					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Html string defining what to display when the list of results from the <code>queryFunction</code> is empty.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="selectedentry" class="tsd-anchor"></a>
@@ -287,9 +387,14 @@
 					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">E</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:27</li>
+							<li>Defined in TrivialTreeBox.ts:44</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The initially selected entry. (Caution: use <code>selectedEntries</code> for <code>TrivialTagBox</code>).</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="selectedentryid" class="tsd-anchor"></a>
@@ -297,9 +402,15 @@
 					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:36</li>
+							<li>Defined in TrivialTreeBox.ts:97</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ID of the initially selected entry in the tree.</p>
+						</div>
+						<p>Note: This option is subject to change!</p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="showexpanders" class="tsd-anchor"></a>
@@ -307,9 +418,14 @@
 					<div class="tsd-signature tsd-kind-icon">show<wbr>Expanders<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:38</li>
+							<li>Defined in TrivialTreeBox.ts:107</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Whether or not to show the expander controls for parent nodes.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="spinnertemplate" class="tsd-anchor"></a>
@@ -317,9 +433,14 @@
 					<div class="tsd-signature tsd-kind-icon">spinner<wbr>Template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:28</li>
+							<li>Defined in TrivialTreeBox.ts:129</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>HTML string defining the spinner to be displayed while lazy children are being retrieved.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="valuefunction" class="tsd-anchor"></a>
@@ -327,9 +448,14 @@
 					<div class="tsd-signature tsd-kind-icon">value<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialTreeBox.ts:25</li>
+							<li>Defined in TrivialTreeBox.ts:28</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Calculates a unique value for an entry. Used to identify nodes in the tree.</p>
+						</div>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -430,6 +556,9 @@
 								<a href="_trivialtreebox_.trivialtreeboxconfig.html#entryrenderingfunction" class="tsd-kind-icon">entry<wbr>Rendering<wbr>Function</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_trivialtreebox_.trivialtreeboxconfig.html#expandonselection" class="tsd-kind-icon">expand<wbr>OnSelection</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialtreebox_.trivialtreeboxconfig.html#expandedproperty" class="tsd-kind-icon">expanded<wbr>Property</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -443,9 +572,6 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialtreebox_.trivialtreeboxconfig.html#noentriestemplate" class="tsd-kind-icon">no<wbr>Entries<wbr>Template</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_trivialtreebox_.trivialtreeboxconfig.html#openonselection" class="tsd-kind-icon">open<wbr>OnSelection</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialtreebox_.trivialtreeboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a>

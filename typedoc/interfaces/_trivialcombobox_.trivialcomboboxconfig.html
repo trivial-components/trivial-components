@@ -107,14 +107,14 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#entrytoeditortextfunction" class="tsd-kind-icon">entry<wbr>ToEditor<wbr>Text<wbr>Function</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#freetextentryfactory" class="tsd-kind-icon">free<wbr>Text<wbr>Entry<wbr>Factory</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialcombobox_.trivialcomboboxconfig.html#matchingoptions" class="tsd-kind-icon">matching<wbr>Options</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="_trivialcombobox_.trivialcomboboxconfig.html#noentriestemplate" class="tsd-kind-icon">no<wbr>Entries<wbr>Template</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialcombobox_.trivialcomboboxconfig.html#noentriestemplate" class="tsd-kind-icon">no<wbr>Entries<wbr>Template</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#queryfunction" class="tsd-kind-icon">query<wbr>Function</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialcombobox_.trivialcomboboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="_trivialcombobox_.trivialcomboboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#selectedentryrenderingfunction" class="tsd-kind-icon">selected<wbr>Entry<wbr>Rendering<wbr>Function</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#showclearbutton" class="tsd-kind-icon">show<wbr>Clear<wbr>Button</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#showdropdownonresultsonly" class="tsd-kind-icon">show<wbr>Drop<wbr>Down<wbr>OnResults<wbr>Only</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#showtrigger" class="tsd-kind-icon">show<wbr>Trigger</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_trivialcombobox_.trivialcomboboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#texthighlightingentrylimit" class="tsd-kind-icon">text<wbr>Highlighting<wbr>Entry<wbr>Limit</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_trivialcombobox_.trivialcomboboxconfig.html#valuefunction" class="tsd-kind-icon">value<wbr>Function</a></li>
 							</ul>
@@ -130,9 +130,19 @@
 					<div class="tsd-signature tsd-kind-icon">allow<wbr>Free<wbr>Text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:37</li>
+							<li>Defined in TrivialComboBox.ts:106</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Whether or not to allow free text to be entered by the user.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>false</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="autocomplete" class="tsd-anchor"></a>
@@ -140,9 +150,19 @@
 					<div class="tsd-signature tsd-kind-icon">auto<wbr>Complete<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:33</li>
+							<li>Defined in TrivialComboBox.ts:75</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Whether or not to provide auto-completion.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>true</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="autocompletedelay" class="tsd-anchor"></a>
@@ -150,9 +170,19 @@
 					<div class="tsd-signature tsd-kind-icon">auto<wbr>Complete<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:34</li>
+							<li>Defined in TrivialComboBox.ts:82</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The number of milliseconds to wait until auto-completion is performed.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>0</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="autocompletefunction" class="tsd-anchor"></a>
@@ -160,9 +190,28 @@
 					<div class="tsd-signature tsd-kind-icon">auto<wbr>Complete<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:36</li>
+							<li>Defined in TrivialComboBox.ts:92</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Generates an autocompletion string for the current input of the user and currently highlighted entry in the dropdown.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd><p>the current text input from the user</p>
+							</dd>
+							<dt>param</dt>
+							<dd><p>the currently highlighted entry in the dropdown</p>
+							</dd>
+							<dt>returns</dt>
+							<dd><p>The <em>full</em> string (not only the completion part) to apply for auto-completion.</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p>best effort implementation using entry properties</p>
+							</dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -194,7 +243,7 @@
 					<div class="tsd-signature tsd-kind-icon">editing<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../modules/_trivialcore_.html#editingmode" class="tsd-signature-type">EditingMode</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:41</li>
+							<li>Defined in TrivialComboBox.ts:128</li>
 						</ul>
 					</aside>
 				</section>
@@ -205,9 +254,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#entries">entries</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:28</li>
+							<li>Defined in TrivialListBox.ts:43</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The initial list of suggested entries.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="entryrenderingfunction" class="tsd-anchor"></a>
@@ -216,9 +270,25 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#entryrenderingfunction">entryRenderingFunction</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:25</li>
+							<li>Defined in TrivialListBox.ts:33</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Rendering function used to display a <em>suggested</em> entry
+							(i.e. an entry displayed in the dropdown).</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>returns</dt>
+							<dd><p>HTML string</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p>Using the <code>image2LinesTemplate</code> from <code>TrivialCore</code>.</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="entrytoeditortextfunction" class="tsd-anchor"></a>
@@ -226,9 +296,19 @@
 					<div class="tsd-signature tsd-kind-icon">entry<wbr>ToEditor<wbr>Text<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:35</li>
+							<li>Defined in TrivialComboBox.ts:99</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Similar to <a href="_trivialcombobox_.trivialcomboboxconfig.html#autocompletefunction">autoCompleteFunction</a>. Used to set the editor&#39;s text when focusing the component.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>entry[&quot;displayValue&quot;]</code></p>
+							</dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -257,9 +337,22 @@
 					<div class="tsd-signature tsd-kind-icon">free<wbr>Text<wbr>Entry<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:38</li>
+							<li>Defined in TrivialComboBox.ts:114</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Creates an entry (object) from a string entered by the user.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd><p>the text entered by the user</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p><code>{ displayValue: freeText, _isFreeTextEntry: true }</code></p>
+							</dd>
+						</dl>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
@@ -292,20 +385,35 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#matchingoptions">matchingOptions</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:29</li>
+							<li>Defined in TrivialListBox.ts:50</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Used for highlighting suggested entries. Also used by the default filtering functions int <code>TrivialCore</code>.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>{ matchingMode: &#39;contains&#39;, ignoreCase: true, maxLevenshteinDistance: 1 }</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="noentriestemplate" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> no<wbr>Entries<wbr>Template</h3>
 					<div class="tsd-signature tsd-kind-icon">no<wbr>Entries<wbr>Template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
-						<p>Overrides <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#noentriestemplate">noEntriesTemplate</a></p>
+						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#noentriestemplate">noEntriesTemplate</a></p>
 						<ul>
-							<li>Defined in TrivialComboBox.ts:30</li>
+							<li>Defined in TrivialListBox.ts:55</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Html string defining what to display when the list of results from the <code>queryFunction</code> is empty.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="queryfunction" class="tsd-anchor"></a>
@@ -313,55 +421,68 @@
 					<div class="tsd-signature tsd-kind-icon">query<wbr>Function<span class="tsd-signature-symbol">:</span> <a href="../modules/_trivialcore_.html#queryfunction" class="tsd-signature-type">QueryFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:32</li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="selectedentry" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> selected<wbr>Entry</h3>
-					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">E</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#selectedentry">selectedEntry</a></p>
-						<ul>
-							<li>Defined in TrivialListBox.ts:26</li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="selectedentryrenderingfunction" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> selected<wbr>Entry<wbr>Rendering<wbr>Function</h3>
-					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<wbr>Rendering<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in TrivialComboBox.ts:29</li>
+							<li>Defined in TrivialComboBox.ts:68</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The function used for rendering the selected entry. If not specified, this defaults to <a href="_trivialcombobox_.trivialcomboboxconfig.html#entryrenderingfunction">entryRenderingFunction</a></p>
+							<p>Used to retrieve the entries (&quot;suggestions&quot;) to be displayed in the dropdown box.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>see</dt>
+							<dd><p>QueryFunction</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p>creates a client-side query function using the provided <a href="_trivialcombobox_.trivialcomboboxconfig.html#entries">entries</a></p>
+							</dd>
+						</dl>
 					</div>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-siganture">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>entry<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>entry: <span class="tsd-signature-type">E</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-									</li>
-								</ul>
-							</li>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
+					<a name="selectedentry" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> selected<wbr>Entry</h3>
+					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">E</span></div>
+					<aside class="tsd-sources">
+						<p>Overrides <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#selectedentry">selectedEntry</a></p>
+						<ul>
+							<li>Defined in TrivialComboBox.ts:52</li>
 						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Initially selected entry.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>null</code></p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="selectedentryrenderingfunction" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> selected<wbr>Entry<wbr>Rendering<wbr>Function</h3>
+					<div class="tsd-signature tsd-kind-icon">selected<wbr>Entry<wbr>Rendering<wbr>Function<span class="tsd-signature-symbol">:</span> <a href="../modules/_trivialcore_.html#renderingfunction" class="tsd-signature-type">RenderingFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in TrivialComboBox.ts:45</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Rendering function used to display a <em>selected</em> entry
+							(i.e. an entry inside the editor area of the component, not the dropdown).</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>returns</dt>
+							<dd><p>HTML string</p>
+							</dd>
+							<dt>default</dt>
+							<dd><p><code>wrapWithDefaultTagWrapper(entryRenderingFunction(entry))</code></p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
@@ -370,9 +491,14 @@
 					<div class="tsd-signature tsd-kind-icon">show<wbr>Clear<wbr>Button<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:39</li>
+							<li>Defined in TrivialComboBox.ts:119</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The clear button is a the small &#39;x&#39; at the right of the entry display that can be clicked to clear the selection.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="showdropdownonresultsonly" class="tsd-anchor"></a>
@@ -380,9 +506,19 @@
 					<div class="tsd-signature tsd-kind-icon">show<wbr>Drop<wbr>Down<wbr>OnResults<wbr>Only<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:42</li>
+							<li>Defined in TrivialComboBox.ts:135</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>It <code>true</code>, opening the dropdown will be delayed until the result callback of the <a href="_trivialcombobox_.trivialcomboboxconfig.html#queryfunction">queryFunction</a> is called.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>false</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="showtrigger" class="tsd-anchor"></a>
@@ -390,20 +526,34 @@
 					<div class="tsd-signature tsd-kind-icon">show<wbr>Trigger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:40</li>
+							<li>Defined in TrivialComboBox.ts:126</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The trigger is the button on the right side of the component that can be clicket to open the dropdown.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>true</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="spinnertemplate" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> spinner<wbr>Template</h3>
 					<div class="tsd-signature tsd-kind-icon">spinner<wbr>Template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="_triviallistbox_.triviallistboxconfig.html">TrivialListBoxConfig</a>.<a href="_triviallistbox_.triviallistboxconfig.html#spinnertemplate">spinnerTemplate</a></p>
 						<ul>
-							<li>Defined in TrivialListBox.ts:27</li>
+							<li>Defined in TrivialComboBox.ts:140</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>HTML string defining the spinner to be displayed while entries are being retrieved.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="texthighlightingentrylimit" class="tsd-anchor"></a>
@@ -411,9 +561,20 @@
 					<div class="tsd-signature tsd-kind-icon">text<wbr>Highlighting<wbr>Entry<wbr>Limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:31</li>
+							<li>Defined in TrivialComboBox.ts:60</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Performance setting. Defines the maximum number of entries until which text highlighting is performed.
+							Set to <code>0</code> to disable text highlighting.</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p><code>100</code></p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="valuefunction" class="tsd-anchor"></a>
@@ -421,13 +582,21 @@
 					<div class="tsd-signature tsd-kind-icon">value<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in TrivialComboBox.ts:27</li>
+							<li>Defined in TrivialComboBox.ts:35</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The function used for calculating the value of the original input.</p>
+							<p>Calculates the value to set on the original input.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd><p>the selected entry</p>
+							</dd>
+							<dt>returns</dt>
+							<dd><p>the string to set as the value of the original input</p>
+							</dd>
+						</dl>
 					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
@@ -543,13 +712,13 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#matchingoptions" class="tsd-kind-icon">matching<wbr>Options</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#noentriestemplate" class="tsd-kind-icon">no<wbr>Entries<wbr>Template</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#queryfunction" class="tsd-kind-icon">query<wbr>Function</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#selectedentry" class="tsd-kind-icon">selected<wbr>Entry</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -564,7 +733,7 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#showtrigger" class="tsd-kind-icon">show<wbr>Trigger</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_trivialcombobox_.trivialcomboboxconfig.html#spinnertemplate" class="tsd-kind-icon">spinner<wbr>Template</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
