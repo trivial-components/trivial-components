@@ -574,7 +574,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public setSelectedEntries(entries: E[]) {
         this.selectedEntries
             .slice() // copy the array as it gets changed during the forEach loop
-            .forEach((e) => this.removeTag(e));
+            .forEach((e) => this.removeTag(e)); // TODO events are thrown! change this!!!
         if (entries) {
             for (let i = 0; i < entries.length; i++) {
                 this.setSelectedEntry(entries[i]);

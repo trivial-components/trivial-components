@@ -179,7 +179,11 @@ gulp.task('ts-declarations-bundle', ['typescript'], function () {
 		    content = content.replace(/import .*\n?/g, '');
 		    content = content.replace(/export as namespace .*\n?/g, '');
 		    content = content.replace(/export declare /g, 'export ');
-		    content = 'declare namespace TrivialComponents {\n' + content + '\n}';
+		    content = 'declare module moment {interface Moment {}}\n\n'
+			    + 'declare namespace TrivialComponents {\n'
+			    + 'import Moment = moment.Moment;\n\n'
+			    + content
+			    + '\n}';
 		    return content;
 	    }))
         .pipe(header(copyrightHeader))
