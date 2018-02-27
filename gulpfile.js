@@ -140,7 +140,7 @@ gulp.task('js-bundle', ['js-single'], function () {
 });
 
 gulp.task('ts-declarations-bundle', ['typescript'], function () {
-    return gulp.src(['dist/js/single/*.d.ts'])
+    return gulp.src(['dist/js/single/*.d.ts', "!dist/js/single/index.d.ts"])
 	    .pipe(strip())
         .pipe(concat('trivial-components-global.d.ts'))
 	    .pipe(change(function (content) {
