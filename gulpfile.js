@@ -256,6 +256,8 @@ gulp.task('typescript', ['install-typings'], function () {
 					'      return window.Levenshtein;' +
 					'    } else if (name === "moment") {' +
 					'      return window.moment;' +
+					'    } else if (name === "place-to") {' +
+					'      return window["place-to"];' +
 					'    } else {' +
 					'      return window.TrivialComponents;' +
 					'    }' +

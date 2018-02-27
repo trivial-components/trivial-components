@@ -17,12 +17,13 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
+import {place} from 'place-to';
 import {
 	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately, TrivialComponent, keyCodes,
 	RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
 } from "./TrivialCore";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
-import {TrivialEvent} from "./TrivialEvent";   
+import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     /**
@@ -178,7 +179,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
             valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.image2Lines,
             selectedEntryRenderingFunction: (entry: E) => {
-                return this.config.entryRenderingFunction(entry); 
+                return this.config.entryRenderingFunction(entry);
             },
             selectedEntry: undefined,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
@@ -494,16 +495,12 @@ export class TrivialComboBox<E> implements TrivialComponent{
         if ($editorArea.length === 0) {
             $editorArea = this.$selectedEntryWrapper;
         }
-        this.$editor
-            .css({
-                "width": Math.min($editorArea[0].offsetWidth, this.$trigger ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
-                "height": ($editorArea[0].offsetHeight) + "px"
-            })
-            .position({
-                my: "left top",
-                at: "left top",
-                of: $editorArea
-            });
+	    this.$editor.css({
+		    "width": Math.min($editorArea[0].offsetWidth, this.$trigger ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
+		    "height": ($editorArea[0].offsetHeight) + "px"
+	    });
+        place(this.$editor[0], "top left")
+            .to($editorArea[0], "top left");
         this.isEditorVisible = true;
     }
 
@@ -517,27 +514,11 @@ export class TrivialComboBox<E> implements TrivialComponent{
     }
 
     private repositionDropDown() {
-        this.$dropDown
-            .show()
-            .position({
-                my: "left top",
-                at: "left bottom",
-                of: this.$comboBox,
-                collision: "flip",
-                using:  (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
-                    if (info.vertical === "top") {
-                        this.$comboBox.removeClass("dropdown-flipped");
-                        this.$dropDown.removeClass("flipped");
-                    } else {
-                        this.$comboBox.addClass("dropdown-flipped");
-                        this.$dropDown.addClass("flipped");
-                    }
-                    this.$dropDown.css({
-                        left: calculatedPosition.left + 'px',
-                        top: calculatedPosition.top + 'px'
-                    });
-                }
-            });
+        this.$dropDown.show();
+        place(this.$dropDown[0], "top left")
+            .to(this.$comboBox[0], "bottom left");
+	    this.$comboBox.removeClass("dropdown-flipped"); // TODO
+	    this.$dropDown.removeClass("flipped"); // TODO
         this.$dropDown.width(this.$comboBox.width());
     };
 

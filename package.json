@@ -76,13 +76,14 @@
     "ts-jest": "^20.0.0",
     "typedoc": "^0.6.0",
     "typescript": "^2.8.1",
-    "typings": "^2.0.0"
+    "typings": "^2.0.0",
   },
   "dependencies": {
     "jquery": "^3.2.1",
     "levenshtein": "^1.0.5",
     "moment": "^2.22.0",
-    "moment-timezone": "^0.5.14"
+    "moment-timezone": "^0.5.14",
+    "place-to": "^0.1.2"
   },
   "jest": {
     "transform": {

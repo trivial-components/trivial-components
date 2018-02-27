@@ -23,6 +23,7 @@ import {
 } from "./TrivialCore";
 import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 import {TrivialEvent} from "./TrivialEvent";
+import {place} from "place-to";
 
 export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
     /**
@@ -500,16 +501,12 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         if ($editorArea.length === 0) {
             $editorArea = this.$selectedEntryWrapper;
         }
-        this.$editor
-            .css({
-                "width": Math.min($editorArea[0].offsetWidth, this.$trigger ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
-                "height": ($editorArea[0].offsetHeight) + "px"
-            })
-            .position({
-                my: "left top",
-                at: "left top",
-                of: $editorArea
-            });
+	    this.$editor.css({
+		    "width": Math.min($editorArea[0].offsetWidth, this.$trigger ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
+		    "height": ($editorArea[0].offsetHeight) + "px"
+	    });
+	    place(this.$editor[0], "top left")
+		    .to($editorArea[0], "top left");
         this.isEditorVisible = true;
     }
 
@@ -523,27 +520,11 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     }
 
     private repositionDropDown() {
-        this.$dropDown
-            .show()
-            .position({
-                my: "left top",
-                at: "left bottom",
-                of: this.$treeComboBox,
-                collision: "flip",
-                using: (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
-                    if (info.vertical === "top") {
-                        this.$treeComboBox.removeClass("dropdown-flipped");
-                        this.$dropDown.removeClass("flipped");
-                    } else {
-                        this.$treeComboBox.addClass("dropdown-flipped");
-                        this.$dropDown.addClass("flipped");
-                    }
-                    this.$dropDown.css({
-                        left: calculatedPosition.left + 'px',
-                        top: calculatedPosition.top + 'px'
-                    });
-                }
-            });
+        this.$dropDown.show();
+	    place(this.$dropDown[0], "top left")
+		    .to(this.$treeComboBox[0], "bottom left");
+	    this.$treeComboBox.removeClass("dropdown-flipped"); // TODO
+	    this.$dropDown.removeClass("flipped"); // TODO
 	    this.$dropDown.width(this.$treeComboBox.width());
     };
 
