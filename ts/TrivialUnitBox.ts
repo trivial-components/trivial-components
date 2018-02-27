@@ -431,8 +431,8 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                         top: calculatedPosition.top + 'px'
                     });
                 }
-            })
-            .width(this.$unitBox.width());
+            });
+	    this.$dropDown.width(this.$unitBox.width());
     };
 
     public openDropDown() {

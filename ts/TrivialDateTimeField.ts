@@ -506,9 +506,8 @@ export class TrivialDateTimeField implements TrivialComponent {
                         top: calculatedPosition.top + 'px'
                     });
                 }
-            })
-			.width(this.$dateTimeField.width()
-            );
+            });
+	    this.$dropDown.width(this.$dateTimeField.width());
     }
 
     public openDropDown() {

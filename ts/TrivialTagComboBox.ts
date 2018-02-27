@@ -660,7 +660,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     top: calculatedPosition.top + 'px'
                 });
             }
-        }).width(this.$tagComboBox.width());
+        });
+	    this.$dropDown.width(this.$tagComboBox.width());
     }
 
     public openDropDown() {

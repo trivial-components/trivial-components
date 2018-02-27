@@ -543,8 +543,8 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                         top: calculatedPosition.top + 'px'
                     });
                 }
-            })
-            .width(this.$treeComboBox.width());
+            });
+	    this.$dropDown.width(this.$treeComboBox.width());
     };
 
     public openDropDown() {
