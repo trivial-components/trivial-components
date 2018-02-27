@@ -16,7 +16,6 @@
   ],
   "dependencies": {
     "jquery": "3.x",
-    "jquery-ui": "1.x",
     "levenshtein": "1.x",
     "moment": "2.x",
     "moment-timezone": "~0.4.0",

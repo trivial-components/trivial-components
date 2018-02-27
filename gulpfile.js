@@ -82,7 +82,6 @@ gulp.task('copyLibs2dist', ['bower'], function () {
     return gulp.src([
         'bower_components/jquery/dist/jquery.js',
         'bower_components/Caret.js/dist/jquery.caret.js',
-        'bower_components/jquery-ui/ui/position.js',
         'bower_components/mustache/mustache.js',
         'bower_components/levenshtein/lib/levenshtein.js'
     ])
@@ -294,6 +293,8 @@ gulp.task('typescript', ['install-typings'], function () {
 					'      return window.moment;' +
 					'    } else if (name === "mustache") {' +
 					'      return window.Mustache;' +
+					'    } else if (name === "place-to") {' +
+					'      return window["place-to"];' +
 					'    } else {' +
 					'      return window.TrivialComponents;' +
 					'    }' +

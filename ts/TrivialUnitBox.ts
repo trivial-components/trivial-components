@@ -21,6 +21,7 @@ import * as Mustache from "mustache";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
+import {place} from "place-to";
 
 export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
     unitValueProperty?: string,
@@ -411,27 +412,11 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     }
 
     private repositionDropDown() {
-        this.$dropDown
-            .show()
-            .position({
-                my: "left top",
-                at: "left bottom",
-                of: this.$unitBox,
-                collision: "flip",
-                using: (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
-                    if (info.vertical === "top") {
-                        this.$unitBox.removeClass("dropdown-flipped");
-                        this.$dropDown.removeClass("flipped");
-                    } else {
-                        this.$unitBox.addClass("dropdown-flipped");
-                        this.$dropDown.addClass("flipped");
-                    }
-                    this.$dropDown.css({
-                        left: calculatedPosition.left + 'px',
-                        top: calculatedPosition.top + 'px'
-                    });
-                }
-            });
+        this.$dropDown.show();
+	    place(this.$dropDown[0], "top left")
+		    .to(this.$unitBox[0], "bottom left");
+	    this.$unitBox.removeClass("dropdown-flipped"); // TODO
+	    this.$dropDown.removeClass("flipped"); // TODO
 	    this.$dropDown.width(this.$unitBox.width());
     };
 

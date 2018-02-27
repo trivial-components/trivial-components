@@ -27,6 +27,7 @@ import {TrivialListBox} from "./TrivialListBox";
 import {TrivialCalendarBox} from "./TrivialCalendarBox";
 import {TrivialDateSuggestionEngine} from "./TrivialDateSuggestionEngine";
 import {TrivialTimeSuggestionEngine} from "./TrivialTimeSuggestionEngine";
+import {place} from "place-to";
 
 enum Mode {
     MODE_CALENDAR,
@@ -487,27 +488,10 @@ export class TrivialDateTimeField implements TrivialComponent {
     }
 
     private repositionDropDown() {
-        this.$dropDown
-			.show()
-			.position({
-                my: "left top",
-                at: "left bottom",
-                of: this.$dateTimeField,
-                collision: "flip",
-                using: (calculatedPosition: { left: number, top: number }, info: { vertical: string }) => {
-                    if (info.vertical === "top") {
-                        this.$dateTimeField.removeClass("dropdown-flipped");
-                        this.$dropDown.removeClass("flipped");
-                    } else {
-                        this.$dateTimeField.addClass("dropdown-flipped");
-                        this.$dropDown.addClass("flipped");
-                    }
-                    this.$dropDown.css({
-                        left: calculatedPosition.left + 'px',
-                        top: calculatedPosition.top + 'px'
-                    });
-                }
-            });
+	    place(this.$dropDown[0], "top left")
+		    .to(this.$dateTimeField[0], "bottom left");
+	    this.$dateTimeField.removeClass("dropdown-flipped"); // TODO
+	    this.$dropDown.removeClass("flipped"); // TODO
 	    this.$dropDown.width(this.$dateTimeField.width());
     }
 

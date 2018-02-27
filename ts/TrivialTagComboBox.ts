@@ -24,6 +24,7 @@ import {
     wrapWithDefaultTagWrapper, keyCodes
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
+import {place} from "place-to";
 
 export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
     valueFunction?: (entries: E[]) => string,
@@ -485,25 +486,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private repositionDropDown() {
-        this.$dropDown.position({
-            my: "left top",
-            at: "left bottom",
-            of: this.$tagComboBox,
-            collision: "flip",
-            using: (calculatedPosition: {top: number, left: number}, info: {vertical: string}) => {
-                if (info.vertical === "top") {
-                    this.$tagComboBox.removeClass("dropdown-flipped");
-                    this.$dropDown.removeClass("flipped");
-                } else {
-                    this.$tagComboBox.addClass("dropdown-flipped");
-                    this.$dropDown.addClass("flipped");
-                }
-                this.$dropDown.css({
-                    left: calculatedPosition.left + 'px',
-                    top: calculatedPosition.top + 'px'
-                });
-            }
-        });
+	    place(this.$dropDown[0], "top left")
+		    .to(this.$tagComboBox[0], "bottom left");
+	    this.$tagComboBox.removeClass("dropdown-flipped"); // TODO
+	    this.$dropDown.removeClass("flipped"); // TODO
 	    this.$dropDown.width(this.$tagComboBox.width());
     }
 
