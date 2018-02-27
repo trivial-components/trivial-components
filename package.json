@@ -25,7 +25,7 @@
     "url": "https://github.com/trivial-components/trivial-components/issues"
   },
   "homepage": "http://trivial-components.github.io/trivial-components/",
-  "main": "./dist/js/single/index.hs",
+  "main": "./dist/js/single/index.js",
   "types": "./dist/js/single/index.d.ts",
   "scripts": {
     "test": "jest"
