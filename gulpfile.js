@@ -121,6 +121,18 @@ gulp.task('js-single', ['typescript'], function () {
         .pipe(gulp.dest('./dist/js/single'));
 });
 
+
+gulp.task('js-commonjs', ['typescript-commonjs'], function () {
+    return gulp.src(['dist/js/commonjs/TrivialCore.js', 'dist/js/commonjs/*.js', '!**/*.min.*'])
+        .pipe(stripDebug())
+        .pipe(rename(function (path) {
+            path.basename += ".min";
+        }))
+        .pipe(uglify())
+        .pipe(header(minCopyrightHeader))
+        .pipe(gulp.dest('./dist/js/commonjs'));
+});
+
 gulp.task('js-bundle', ['js-single'], function () {
     return gulp.src(['dist/js/single/TrivialCore.js', 'dist/js/single/*.js', '!**/*.min.js'])
         .pipe(stripDebug())
@@ -160,7 +172,7 @@ gulp.task('test', function (done) {
 	});
 });
 
-gulp.task('prepare-dist', ['less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'test']);
+gulp.task('prepare-dist', ['less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'js-commonjs', 'ts-declarations-bundle', 'test']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -251,6 +263,33 @@ gulp.task('typescript', ['install-typings'], function () {
 					'}')
 			}))
 			.pipe(gulp.dest("dist/js/single"))
+	]);
+});
+
+var tsProjectCommonJs = ts.createProject('tsconfig.json', {
+	module: "commonjs",
+	outDir: "dist/js/commonjs"
+});
+
+gulp.task('typescript-commonjs', ['install-typings'], function () {
+	var tsResult = tsProjectCommonJs.src()
+		.pipe(sourcemaps.init())
+		.pipe(tsProjectCommonJs());
+
+	return merge([ // Merge the two output streams, so this task is finished when the IO of both operations is done.
+		tsResult
+			.dts
+			.pipe(gulp.dest("dist/js/commonjs")),
+		tsResult
+			.js
+			.pipe(sourcemaps.write('.', {
+				includeContent: false,
+				debug: true,
+				mapSources: function (filePath) {
+					return "../../../ts/" + path.basename(filePath);
+				}
+			}))
+			.pipe(gulp.dest("dist/js/commonjs"))
 	]);
 });
 
