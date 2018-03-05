@@ -1,6 +1,6 @@
 {
   "name": "trivial-components",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "description": "UI components the way you always wanted them.",
   "repository": {
     "url": "https://github.com/trivial-components/trivial-components.git",
@@ -65,7 +65,6 @@
     "gulp-strip-debug": "^1.1.0",
     "gulp-tar": "^1.9.0",
     "gulp-typescript": "3.x",
-    "gulp-typings": "^2.0.4",
     "gulp-uglify": "^2.0.0",
     "gulp-watch": "^4.3.11",
     "gulp-zip": "^3.2.0",
