@@ -16,8 +16,6 @@
  limitations under the License.
  */
 
-import Moment = moment.Moment;
-
 import * as $ from "jquery";
 import * as moment from 'moment';
 import * as Mustache from "mustache";
@@ -35,10 +33,10 @@ enum Mode {
     MODE_TIME_LIST
 }
 
-type DatePart = { moment: Moment, ymdOrder: string };
+type DatePart = { moment: moment.Moment, ymdOrder: string };
 
 type DateComboBoxEntry = {
-    moment: Moment,
+    moment: moment.Moment,
     day: number,
     weekDay: string,
     month: number,
@@ -104,7 +102,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         '  <div class="content-wrapper tr-editor-area">{{displayString}}</div>' +
         '</div>';
 
-    public readonly onChange = new TrivialEvent<Moment>(this);
+    public readonly onChange = new TrivialEvent<moment.Moment>(this);
 
     private dateListBox: TrivialListBox<DateComboBoxEntry>;
     private timeListBox: TrivialListBox<TimeComboBoxEntry>;
@@ -482,7 +480,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         }
     }
 
-    public setValue(mom: Moment) {
+    public setValue(mom: moment.Moment) {
         this.setDate(mom && TrivialDateTimeField.createDateComboBoxEntry(mom, this.config.dateFormat));
         this.setTime(mom && TrivialDateTimeField.createTimeComboBoxEntry(mom.hour(), mom.minute(), this.config.timeFormat));
     }
@@ -584,7 +582,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         return s;
     }
 
-    private static createDateComboBoxEntry(m: Moment, dateFormat: string): DateComboBoxEntry {
+    private static createDateComboBoxEntry(m: moment.Moment, dateFormat: string): DateComboBoxEntry {
         return {
             moment: m,
             day: m.date(),

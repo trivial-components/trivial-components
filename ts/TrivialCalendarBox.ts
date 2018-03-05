@@ -16,8 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Moment = moment.Moment;
-
 import * as $ from "jquery";
 import * as moment from 'moment';
 import {NavigationDirection, TrivialComponent} from "./TrivialCore";
@@ -29,7 +27,7 @@ export enum WeekDay {
 export type TimeUnit = 'year'|'month'|'day'|'hour'|'minute';
 
 export interface TrivialCalendarBoxConfig {
-    selectedDate?: Moment,
+    selectedDate?: moment.Moment,
     firstDayOfWeek?: WeekDay,
     mode?: 'date' | 'time' | 'datetime',
     highlightKeyboardNavigationState?: boolean
@@ -41,7 +39,7 @@ export class TrivialCalendarBox implements TrivialComponent {
 
     private keyboardNavigationState: TimeUnit;
     private keyboardNavCssClass: string;
-    private selectedDate: Moment;
+    private selectedDate: moment.Moment;
     private $calendarBox: JQuery;
     private $calendarDisplay: JQuery;
     private $yearDisplay: JQuery;
@@ -58,7 +56,7 @@ export class TrivialCalendarBox implements TrivialComponent {
     private $digitalTimeMinuteDisplayWrapper: JQuery;
     private $digitalTimeMinuteDisplay: JQuery;
 
-    public readonly onChange = new TrivialEvent<{ value: Moment, timeUnitEdited: TimeUnit}>(this);
+    public readonly onChange = new TrivialEvent<{ value: moment.Moment, timeUnitEdited: TimeUnit}>(this);
     public readonly onOnEditingTimeUnitChange = new TrivialEvent<TimeUnit>(this);
 
     constructor(private $container: JQuery|Element|string, options: TrivialCalendarBoxConfig = {}) {
@@ -140,18 +138,18 @@ export class TrivialCalendarBox implements TrivialComponent {
         }
     }
 
-    private static getDaysForCalendarDisplay(dateInMonthDoBeDisplayed: Moment, firstDayOfWeek: WeekDay) {
+    private static getDaysForCalendarDisplay(dateInMonthDoBeDisplayed: moment.Moment, firstDayOfWeek: WeekDay) {
         const firstDayOfMonth = dateInMonthDoBeDisplayed.clone().utc().startOf('month').hour(12); // mid-day to prevent strange daylight-saving effects.
         const firstDayToBeDisplayed = firstDayOfMonth.clone().isoWeekday(firstDayOfWeek <= firstDayOfMonth.isoWeekday() ? firstDayOfWeek : firstDayOfWeek - 7);
 
-        const daysOfMonth: Moment[] = [];
+        const daysOfMonth: moment.Moment[] = [];
         for (const day = firstDayToBeDisplayed.clone(); daysOfMonth.length < 42; day.add(1, 'day')) {
             daysOfMonth.push(day.clone());
         }
         return daysOfMonth;
     }
 
-    private updateMonthDisplay(dateInMonthToBeDisplayed: Moment) {
+    private updateMonthDisplay(dateInMonthToBeDisplayed: moment.Moment) {
         this.$year.text(dateInMonthToBeDisplayed.year());
         this.$month.text(moment.months()[dateInMonthToBeDisplayed.month()]);
         this.$monthTable.remove();
@@ -182,7 +180,7 @@ export class TrivialCalendarBox implements TrivialComponent {
                         $td.addClass(this.keyboardNavCssClass);
                     }
                 }
-                $td.click(((day: Moment) => {
+                $td.click(((day: moment.Moment) => {
                     this.setKeyboardNavigationState("day");
                     this.setMonthAndDay(day.month() + 1, day.date(), true);
                 }).bind(this, day));
@@ -191,7 +189,7 @@ export class TrivialCalendarBox implements TrivialComponent {
         }
     }
 
-    private updateClockDisplay(date: Moment) {
+    private updateClockDisplay(date: moment.Moment) {
         this.$amPmText.text(date.hour() >= 12 ? 'pm' : 'am');
         const minutesAngle = date.minute() * 6;
         const hours = (date.hour() % 12) + date.minute() / 60;
@@ -208,7 +206,7 @@ export class TrivialCalendarBox implements TrivialComponent {
         this.updateClockDisplay(this.selectedDate);
     };
 
-    public setSelectedDate(moment: Moment) {
+    public setSelectedDate(moment: moment.Moment) {
         this.selectedDate = moment;
         this.updateDisplay();
     }

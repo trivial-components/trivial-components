@@ -16,10 +16,6 @@
 *
 */
 
-import Moment = moment.Moment;
-
-import * as moment from 'moment';
-
 export interface TimeSuggestion {
 	hour: number;
 	minute: number;

@@ -16,12 +16,10 @@
  *
  */
 
-import Moment = moment.Moment;
-
 import * as moment from 'moment';
 
 export interface DateSuggestion {
-	moment: Moment;
+	moment: moment.Moment;
 	ymdOrder: string;
 }
 export type YearMonthDayOrder = "YMD" | "YDM" | "MDY" | "MYD" | "DMY" | "DYM";
@@ -53,7 +51,7 @@ export class TrivialDateSuggestionEngine {
 		}
 	}
 
-	public generateSuggestions(searchString: string, now: Moment | Date): DateSuggestion[] {
+	public generateSuggestions(searchString: string, now: moment.Moment | Date): DateSuggestion[] {
 		now = moment(now);
 		let suggestions: DateSuggestion[];
 		if (searchString.match(/[^\d]/)) {
@@ -83,7 +81,7 @@ export class TrivialDateSuggestionEngine {
 	}
 
 	private removeDuplicates(suggestions: DateSuggestion[]) {
-		let seenDates: Moment[] = [];
+		let seenDates: moment.Moment[] = [];
 		return suggestions.filter(s => {
 			let dateAlreadyContained = seenDates.filter(seenDate => s.moment.isSame(seenDate, 'day')).length > 0;
 			if (dateAlreadyContained) {
@@ -104,11 +102,11 @@ export class TrivialDateSuggestionEngine {
 		return <YearMonthDayOrder> (["D", "M", "Y"].sort((a, b) => ymdIndexes[a] - ymdIndexes[b]).join(""));
 	}
 
-	private static createSuggestion(moment: Moment, ymdOrder: string): DateSuggestion {
+	private static createSuggestion(moment: moment.Moment, ymdOrder: string): DateSuggestion {
 		return {moment, ymdOrder};
 	}
 
-	public generateSuggestionsForDigitsOnlyInput(input: string, today: Moment): DateSuggestion[] {
+	public generateSuggestionsForDigitsOnlyInput(input: string, today: moment.Moment): DateSuggestion[] {
 		input = input || "";
 
 		if (input.length === 0) {
@@ -126,11 +124,11 @@ export class TrivialDateSuggestionEngine {
 		return suggestions;
 	}
 
-	todayOrFavoriteDirection (m: Moment, today: Moment): boolean {
+	todayOrFavoriteDirection (m: moment.Moment, today: moment.Moment): boolean {
 		return this.options.favorPastDates ? today.isSameOrAfter(m, 'day') : today.isSameOrBefore(m, 'day');
 	}
 
-	private createSuggestionsForFragments(fragments: string[], today: Moment): DateSuggestion[] {
+	private createSuggestionsForFragments(fragments: string[], today: moment.Moment): DateSuggestion[] {
 		function mod(n:number, m:number) {
 			return ((n % m) + m) % m;
 		}
@@ -229,9 +227,9 @@ export class TrivialDateSuggestionEngine {
 		return suggestions;
 	};
 
-	private findNextValidDate(startDate: LocalDate, incementor: (currentDate: LocalDate) => LocalDate, today: Moment): Moment {
+	private findNextValidDate(startDate: LocalDate, incementor: (currentDate: LocalDate) => LocalDate, today: moment.Moment): moment.Moment {
 		let currentDate = startDate;
-		let momentInNextMonth: Moment = moment(startDate);
+		let momentInNextMonth: moment.Moment = moment(startDate);
 		let numberOfIterations = 0;
 		while (!(momentInNextMonth.isValid() && this.todayOrFavoriteDirection(momentInNextMonth, today)) && numberOfIterations < 4) {
 			currentDate = incementor(currentDate);
