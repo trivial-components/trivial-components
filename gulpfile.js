@@ -38,7 +38,6 @@ var minCopyrightHeader = "/*! Trivial Components | (c) 2015 Yann Massard and oth
 var VERSION = require('./package.json').version;
 
 var gulp = require('gulp');
-var bower = require('gulp-bower');
 var jest = require('jest-cli');
 var less = require('gulp-less');
 var mirror = require('gulp-mirror');
@@ -72,36 +71,6 @@ gulp.task('clean', function () {
     return del(['dist']);
 });
 
-gulp.task('bower', function () {
-    return bower()
-        .pipe(gulp.dest('bower_components/'))
-});
-
-gulp.task('copyLibs2dist', ['bower'], function () {
-    return gulp.src([
-        'bower_components/jquery/dist/jquery.js',
-        'bower_components/Caret.js/dist/jquery.caret.js',
-        'bower_components/jquery-ui/ui/position.js',
-        'bower_components/mustache/mustache.js',
-        'bower_components/levenshtein/lib/levenshtein.js'
-    ])
-        .pipe(rename(function (path) {
-            // rename position to jquery.position...
-            if (path.basename.indexOf('position') === 0) {
-                path.basename = "jquery." + path.basename;
-            }
-        }))
-        .pipe(mirror(
-            pipe(
-                rename(function (path) {
-                    path.basename += ".min";
-                }),
-                uglify()
-            )
-        ))
-        .pipe(gulp.dest('./dist/lib'));
-});
-
 function compileLess(src, dest) {
     return gulp.src(src)
         .pipe(sourcemaps.init())
@@ -116,15 +85,15 @@ function compileLess(src, dest) {
         .pipe(livereload());
 }
 
-gulp.task('less', ['bower'], function () {
+gulp.task('less', function () {
     return compileLess(['less/trivial-components.less'], 'dist/css');
 });
 
-gulp.task('less-bootstrap', ['bower'], function () {
+gulp.task('less-bootstrap', function () {
     return compileLess(['less/trivial-components-bootstrap.less'], 'dist/css');
 });
 
-gulp.task('less-demo', ['bower'], function () {
+gulp.task('less-demo', function () {
     return compileLess(['demo/less/demo.less'], 'demo/css');
 });
 
@@ -191,7 +160,7 @@ gulp.task('test', function (done) {
 	});
 });
 
-gulp.task('prepare-dist', ['bower', 'less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'copyLibs2dist', 'test']);
+gulp.task('prepare-dist', ['less', 'less-bootstrap', 'minify-css', 'js-single', 'js-bundle', 'ts-declarations-bundle', 'test']);
 
 gulp.task('zip', ["prepare-dist"], function () {
     return gulp.src(['README.md', 'LICENSE', 'less*/*', 'ts*/*', 'dist/**/*', "!dist/*.gz", "!dist/*.zip"])
@@ -275,8 +244,6 @@ gulp.task('typescript', ['install-typings'], function () {
 					'      return window.Levenshtein;' +
 					'    } else if (name === "moment") {' +
 					'      return window.moment;' +
-					'    } else if (name === "mustache") {' +
-					'      return window.Mustache;' +
 					'    } else {' +
 					'      return window.TrivialComponents;' +
 					'    }' +

@@ -7,16 +7,14 @@
     "preserveConstEnums": true,
     "outDir": "dist/js/single",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "moduleResolution": "node"
   },
   "include": [
-    "ts/**/*",
-    "typings/index.d.ts"
+    "ts/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "demo"
+    "../../node_modules"
   ]
 }
 
