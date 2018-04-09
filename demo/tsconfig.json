@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "none",
+    "module": "umd",
     "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceRoot": "..",
     "outDir": "ts",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "moduleResolution": "node"
   },
   "include": [
     "ts/**/*",

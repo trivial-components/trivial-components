@@ -33,8 +33,6 @@ enum Mode {
     MODE_TIME_LIST
 }
 
-type DatePart = { moment: Moment, ymdOrder: string };
-
 type DateComboBoxEntry = {
     moment: Moment,
     day: number,
