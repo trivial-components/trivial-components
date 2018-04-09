@@ -224,7 +224,7 @@ gulp.task('watch-ts', function () {
 
 var tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('typescript', ['install-typings'], function () {
+gulp.task('typescript', [], function () {
 	var tsResult = tsProject.src()
 		.pipe(sourcemaps.init())
 		.pipe(tsProject());
@@ -273,7 +273,7 @@ var tsProjectCommonJs = ts.createProject('tsconfig.json', {
 	outDir: "dist/js/commonjs"
 });
 
-gulp.task('typescript-commonjs', ['install-typings'], function () {
+gulp.task('typescript-commonjs', [], function () {
 	var tsResult = tsProjectCommonJs.src()
 		.pipe(sourcemaps.init())
 		.pipe(tsProjectCommonJs());
@@ -296,7 +296,7 @@ gulp.task('typescript-commonjs', ['install-typings'], function () {
 });
 
 var tsDemoProject = ts.createProject('demo/tsconfig.json');
-gulp.task('typescript-demo', ['install-typings'], function () {
+gulp.task('typescript-demo', [], function () {
 	return tsDemoProject.src()
 		.pipe(sourcemaps.init())
 		.pipe(tsDemoProject())
@@ -309,11 +309,6 @@ gulp.task('typescript-demo', ['install-typings'], function () {
 			}
 		}))
 		.pipe(gulp.dest("demo/ts"));
-});
-
-gulp.task("install-typings", function () {
-    return gulp.src("./typings.json");
-        // .pipe(gulpTypings());
 });
 
 gulp.task('github-release', ['default'], function () {

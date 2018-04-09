@@ -75,8 +75,7 @@
     "multipipe": "^1.0.2",
     "ts-jest": "^20.0.0",
     "typedoc": "^0.6.0",
-    "typescript": "^2.8.1",
-    "typings": "^2.0.0",
+    "typescript": "^2.8.1"
   },
   "dependencies": {
     "jquery": "^3.2.1",
