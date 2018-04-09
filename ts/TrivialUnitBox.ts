@@ -17,9 +17,8 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
-import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes} from "./TrivialCore";
+import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes, DEFAULT_RENDERING_FUNCTIONS} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
@@ -87,12 +86,8 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             thousandsSeparator: ',',
             unitDisplayPosition: 'right', // right or left
             allowNullAmount: true,
-            entryRenderingFunction: (entry: U) => {
-                return Mustache.render(DEFAULT_TEMPLATES.currency2LineTemplate, entry);
-            },
-            selectedEntryRenderingFunction: (entry: U) => {
-                return Mustache.render(DEFAULT_TEMPLATES.currencySingleLineShortTemplate, entry);
-            },
+            entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.currency2Line,
+            selectedEntryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.currencySingleLineShort,
             amount: null,
             selectedEntry: undefined,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,

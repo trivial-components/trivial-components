@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
-import {DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollTo, ResultCallback, TrivialComponent} from "./TrivialCore";
+import {DEFAULT_RENDERING_FUNCTIONS, DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollTo, ResultCallback, TrivialComponent} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialTreeBoxConfig<E> {
@@ -153,9 +152,9 @@ export class TrivialTreeBox<E> implements TrivialComponent {
             },
             expandedProperty: 'expanded',
             entryRenderingFunction: function (entry: E, depth: number) {
-                const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                const template = (entry as any).template || defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
-                return Mustache.render(template, entry);
+	            const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
+	            const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
+	            return renderer(entry);
             },
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,

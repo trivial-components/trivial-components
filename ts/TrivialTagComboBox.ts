@@ -17,11 +17,10 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {
-    DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
-    wrapWithDefaultTagWrapper, keyCodes, RenderingFunction
+	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
+	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 
@@ -206,9 +205,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E> = {} as any) {
         this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
             valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
-            entryRenderingFunction: (entry: E) => {
-                return Mustache.render(DEFAULT_TEMPLATES.image2LinesTemplate, entry);
-            },
+            entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.image2Lines,
             selectedEntryRenderingFunction: (entry: E) => {
                 return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
             },

@@ -17,10 +17,9 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
 import {
-    DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately, TrivialComponent, keyCodes,
-    RenderingFunction
+	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately, TrivialComponent, keyCodes,
+	RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
 } from "./TrivialCore";
 import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {TrivialEvent} from "./TrivialEvent";   
@@ -177,9 +176,7 @@ export class TrivialComboBox<E> implements TrivialComponent{
     constructor(originalInput: JQuery|Element|string, options: TrivialComboBoxConfig<E> = {}) {
         this.config = $.extend(<TrivialComboBoxConfig<E>> {
             valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
-            entryRenderingFunction: (entry: E) => {
-                return Mustache.render(DEFAULT_TEMPLATES.image2LinesTemplate, entry);
-            },
+            entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.image2Lines,
             selectedEntryRenderingFunction: (entry: E) => {
                 return this.config.entryRenderingFunction(entry); 
             },

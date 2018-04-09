@@ -17,10 +17,9 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
 import {
-    DEFAULT_TEMPLATES, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately,
-    TrivialComponent, keyCodes, RenderingFunction
+	DEFAULT_TEMPLATES, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately,
+	TrivialComponent, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
 } from "./TrivialCore";
 import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 import {TrivialEvent} from "./TrivialEvent";
@@ -171,9 +170,9 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
         this.config = $.extend(<TrivialTreeComboBoxConfig<E>> {
             valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             entryRenderingFunction: (entry: E, depth: number) => {
-                const defaultTemplates = [DEFAULT_TEMPLATES.icon2LinesTemplate, DEFAULT_TEMPLATES.iconSingleLineTemplate];
-                const template = defaultTemplates[Math.min(depth, defaultTemplates.length - 1)];
-                return Mustache.render(template, entry);
+	            const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
+	            const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
+	            return renderer(entry);
             },
             selectedEntryRenderingFunction: (entry: E) => {
                 return this.config.entryRenderingFunction(entry, 0);

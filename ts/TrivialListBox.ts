@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import * as Mustache from "mustache";
-import {DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollTo, NavigationDirection, RenderingFunction, TrivialComponent} from "./TrivialCore";
+import {DEFAULT_RENDERING_FUNCTIONS, DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollTo, NavigationDirection, RenderingFunction, TrivialComponent} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 
 export interface TrivialListBoxConfig<E> {
@@ -69,10 +68,7 @@ export class TrivialListBox<E> implements TrivialComponent {
 
     constructor($container: JQuery|Element|string, options: TrivialListBoxConfig<E> = {} ) {
         this.config = $.extend(<TrivialListBoxConfig<E>> {
-            entryRenderingFunction: function (entry: E) {
-                const template = (entry as any).template || DEFAULT_TEMPLATES.image2LinesTemplate;
-                return Mustache.render(template, entry);
-            },
+            entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.image2Lines,
             selectedEntry: null,
             entries: null,
             matchingOptions: {

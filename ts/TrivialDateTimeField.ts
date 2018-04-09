@@ -20,7 +20,6 @@ import Moment = moment.Moment;
 
 import * as $ from "jquery";
 import * as moment from 'moment';
-import * as Mustache from "mustache";
 import {EditingMode, HighlightDirection, selectElementContents, TrivialComponent, keyCodes} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {TrivialListBox} from "./TrivialListBox";
@@ -69,39 +68,45 @@ export class TrivialDateTimeField implements TrivialComponent {
 
     private config: TrivialDateTimeFieldConfig;
 
-    private dateIconTemplate = `<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">
-    <defs>
-        <linearGradient id="Gradient1" x1="0" x2="0" y1="0" y2="1">
-            <stop class="calendar-symbol-ring-gradient-stop1" offset="0%"/>
-            <stop class="calendar-symbol-ring-gradient-stop2" offset="50%"/>
-            <stop class="calendar-symbol-ring-gradient-stop3" offset="100%"/>
-        </linearGradient>
-    </defs>        
-    <g id="layer1">
-        <rect class="calendar-symbol-page-background" x="90" y="90" width="360" height="400" ry="3.8"></rect>
-        <rect class="calendar-symbol-color" x="90" y="90" width="360" height="100" ry="3.5"></rect>
-        <rect class="calendar-symbol-page" x="90" y="90" width="360" height="395" ry="3.8"></rect>
-        <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="140" y="30" width="40" height="120" ry="30.8"></rect>
-        <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="250" y="30" width="40" height="120" ry="30.8"></rect>
-        <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="360" y="30" width="40" height="120" ry="30.8"></rect>
-        <text class="calendar-symbol-date" x="270" y="415" text-anchor="middle">{{weekDay}}</text>
-    </g>
-</svg>`;
-    private dateTemplate = '<div class="tr-template-icon-single-line">'
-        + this.dateIconTemplate
-        + '<div class="content-wrapper tr-editor-area">{{displayString}}</div>'
-        + '</div>';
-    private timeIconTemplate = '<svg class="clock-icon night-{{isNight}}" viewBox="0 0 110 110" width="22" height="22"> ' +
-        '<circle class="clockcircle" cx="55" cy="55" r="45"/>' +
-        '<g class="hands">' +
-        ' <line class="hourhand" x1="55" y1="55" x2="55" y2="35" {{#hourAngle}}transform="rotate({{hourAngle}},55,55)"{{/hourAngle}}/> ' +
-        ' <line class="minutehand" x1="55" y1="55" x2="55" y2="22" {{#minuteAngle}}transform="rotate({{minuteAngle}},55,55)"{{/minuteAngle}}/>' +
-        '</g> ' +
-        '</svg>';
-    private timeTemplate = '<div class="tr-template-icon-single-line">' +
-        this.timeIconTemplate +
-        '  <div class="content-wrapper tr-editor-area">{{displayString}}</div>' +
-        '</div>';
+    private dateIconRenderer = (entry: DateComboBoxEntry) => {
+	    return `<svg viewBox="0 0 540 540" width="22" height="22" class="calendar-icon">
+        <defs>
+            <linearGradient id="Gradient1" x1="0" x2="0" y1="0" y2="1">
+                <stop class="calendar-symbol-ring-gradient-stop1" offset="0%"/>
+                <stop class="calendar-symbol-ring-gradient-stop2" offset="50%"/>
+                <stop class="calendar-symbol-ring-gradient-stop3" offset="100%"/>
+            </linearGradient>
+        </defs>        
+        <g id="layer1">
+            <rect class="calendar-symbol-page-background" x="90" y="90" width="360" height="400" ry="3.8"></rect>
+            <rect class="calendar-symbol-color" x="90" y="90" width="360" height="100" ry="3.5"></rect>
+            <rect class="calendar-symbol-page" x="90" y="90" width="360" height="395" ry="3.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="140" y="30" width="40" height="120" ry="30.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="250" y="30" width="40" height="120" ry="30.8"></rect>
+            <rect class="calendar-symbol-ring" fill="url(#Gradient2)" x="360" y="30" width="40" height="120" ry="30.8"></rect>
+            <text class="calendar-symbol-date" x="270" y="415" text-anchor="middle">${entry && entry.weekDay || ''}</text>
+        </g>
+    </svg>`;
+    };
+    private dateRenderer = (entry: DateComboBoxEntry) => {
+	    return `<div class="tr-template-icon-single-line">
+            ${this.dateIconRenderer(entry)}
+            <div class="content-wrapper tr-editor-area">${entry && entry.displayString || ''}</div>
+        </div>`;
+    };
+    private timeIconRenderer = (entry: TimeComboBoxEntry) => {
+	    return `<svg class="clock-icon night-${entry && entry.isNight}" viewBox="0 0 110 110" width="22" height="22">
+            <circle class="clockcircle" cx="55" cy="55" r="45"/>
+            <g class="hands">
+                <line class="hourhand" x1="55" y1="55" x2="55" y2="35" ${(entry && entry.hourAngle) ? `transform="rotate(${entry.hourAngle},55,55)"` : ''}/>
+                <line class="minutehand" x1="55" y1="55" x2="55" y2="22" ${(entry && entry.minuteAngle) ? `transform="rotate(${entry.minuteAngle},55,55)"` : ''}/>
+            </g>
+        </svg>`;
+    };
+    private timeRenderer = (entry: TimeComboBoxEntry) => `<div class="tr-template-icon-single-line">
+        ${this.timeIconRenderer(entry)}
+        <div class="content-wrapper tr-editor-area">${entry && entry.displayString || ''}</div>
+    </div>`;
 
     public readonly onChange = new TrivialEvent<Moment>(this);
 
@@ -212,9 +217,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 
         let $dateListBox = $('<div class="date-listbox">').appendTo(this.$dropDown);
         this.dateListBox = new TrivialListBox<DateComboBoxEntry>($dateListBox, {
-            entryRenderingFunction: (entry: any) => {
-                return Mustache.render(this.dateTemplate, entry);
-            }
+            entryRenderingFunction: this.dateRenderer
         });
         this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry: DateComboBoxEntry) => {
             if (selectedEntry) {
@@ -225,9 +228,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         });
         let $timeListBox = $('<div class="time-listbox">').appendTo(this.$dropDown);
         this.timeListBox = new TrivialListBox<TimeComboBoxEntry>($timeListBox, {
-            entryRenderingFunction: (entry: any) => {
-                return Mustache.render(this.timeTemplate, entry);
-            }
+            entryRenderingFunction: this.timeRenderer
         });
         this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry: TimeComboBoxEntry) => {
             if (selectedEntry) {
@@ -467,17 +468,17 @@ export class TrivialDateTimeField implements TrivialComponent {
     private updateDisplay() {
         if (this.dateValue) {
             this.$dateEditor.text(moment([this.dateValue.year, this.dateValue.month - 1, this.dateValue.day]).format(this.config.dateFormat));
-            this.$dateIconWrapper.empty().append(Mustache.render(this.dateIconTemplate, this.dateValue));
+            this.$dateIconWrapper.empty().append(this.dateIconRenderer(this.dateValue));
         } else {
             this.$dateEditor.text("");
-            this.$dateIconWrapper.empty().append(Mustache.render(this.dateIconTemplate, {}));
+            this.$dateIconWrapper.empty().append(this.dateIconRenderer(null));
         }
         if (this.timeValue) {
             this.$timeEditor.text(moment([1970, 0, 1, this.timeValue.hour, this.timeValue.minute]).format(this.config.timeFormat));
-            this.$timeIconWrapper.empty().append(Mustache.render(this.timeIconTemplate, this.timeValue));
+            this.$timeIconWrapper.empty().append(this.timeIconRenderer(this.timeValue));
         } else {
             this.$timeEditor.text("");
-            this.$timeIconWrapper.empty().append(Mustache.render(this.timeIconTemplate, {}));
+            this.$timeIconWrapper.empty().append(this.timeIconRenderer(null));
         }
     }
 
