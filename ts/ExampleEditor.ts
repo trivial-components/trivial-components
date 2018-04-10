@@ -11,18 +11,18 @@ import {DEFAULT_RENDERING_FUNCTIONS, TrivialTreeComboBox} from "trivial-componen
 (window as any).MonacoEnvironment = {
 	getWorkerUrl: function (moduleId: string, label: string) {
 		if (label === 'json') {
-			return '../dist/json.worker.bundle.js';
+			return 'dist/json.worker.bundle.js';
 		}
 		if (label === 'css') {
-			return '../dist/css.worker.bundle.js';
+			return 'dist/css.worker.bundle.js';
 		}
 		if (label === 'html') {
-			return '../dist/html.worker.bundle.js';
+			return 'dist/html.worker.bundle.js';
 		}
 		if (label === 'typescript' || label === 'javascript') {
-			return '../dist/ts.worker.bundle.js';
+			return 'dist/ts.worker.bundle.js';
 		}
-		return '../dist/editor.worker.bundle.js';
+		return 'dist/editor.worker.bundle.js';
 	}
 };
 

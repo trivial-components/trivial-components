@@ -24,10 +24,16 @@ let plugins = [
 module.exports = [
 	merge(common.app, {
 		// devtool: 'source-map',
-		plugins: plugins
+		plugins: plugins,
+		output: {
+			publicPath: '/trivial-components/dist/'
+		},
 	}),
 	merge(common.workers, {
 		// devtool: 'source-map',
-		plugins: plugins
+		plugins: plugins,
+		output: {
+			publicPath: '/trivial-components/dist/'
+		}
 	})
 ];
