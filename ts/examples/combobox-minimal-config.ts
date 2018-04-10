@@ -1,6 +1,9 @@
-let combobox = new TrivialComponents.TrivialComboBox("#originalInput", {
-	entries: DemoUtils.createEntries(10),
-	selectedEntry: DemoUtils.createEntries(1)[0]
+import {TrivialComboBox} from "trivial-components";
+import {createEntries} from "../DemoUtils";
+
+let combobox = new TrivialComboBox("#originalInput", {
+	entries: createEntries(10),
+	selectedEntry: createEntries(1)[0]
 });
 
 

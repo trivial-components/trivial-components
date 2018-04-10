@@ -1,7 +1,5 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var bower = require('gulp-bower');
-var less = require('gulp-less');
 var mirror = require('gulp-mirror');
 var rename = require('gulp-rename');
 var pipe = require('multipipe');
@@ -15,64 +13,28 @@ var del = require('del');
 var postcss      = require('gulp-postcss');
 var fileinclude = require('gulp-file-include');
 var merge = require('merge-stream');
+var concat = require('gulp-concat');
+var replace = require('gulp-regex-replace');
 
 gulp.task('clean', function () {
-    del(['bower_components', 'css', 'lib', 'typedoc']);
+    del(['typedoc']);
 });
 
-gulp.task('bower', function () {
-    return bower()
-        .pipe(gulp.dest('bower_components/'))
-});
-gulp.task('bower-update', function () {
-    return bower({cmd: 'update'})
-        .pipe(gulp.dest('bower_components/'))
-});
-
-gulp.task('copyJsDependencies2lib', ['bower'], function () {
-    var a = gulp.src([
-        'bower_components/bootstrap/dist/js/bootstrap.min.js',
-        'bower_components/jquery/dist/jquery.min.js',
-        'bower_components/jquery-ui/ui/version.js',
-        'bower_components/jquery-ui/ui/position.js',
-        'bower_components/mustache/mustache.min.js',
-        'bower_components/prettify/index.js',
-        'node_modules/trivial-components/dist/js/single/*.js',
-        'node_modules/trivial-components/dist/js/bundle/trivial-components-global.d.ts',
-        'bower_components/google-code-prettify/bin/prettify.min.js',
-        'node_modules/moment/moment.js',
-        'node_modules/levenshtein/lib/levenshtein.js',
-	    'node_modules/monaco-editor/min/**/*'
-    ]).pipe(gulp.dest('lib/js'));
-    var b = gulp.src([
-	    'node_modules/@types/jquery/index.d.ts'
-    ]).pipe(gulp.dest('lib/js/jquery'));
-	return merge(a, b);
-});
-
-gulp.task('copyFonts2lib', ['bower'], function() {
-    return gulp.src("bower_components/bootstrap/fonts/*")
-        .pipe(gulp.dest('lib/fonts'));
-});
-
-gulp.task('less', ['bower'], function () {
-    return gulp.src(['less/all.less'])
-        .pipe(sourcemaps.init())
-        .pipe(less())
-        .pipe(postcss([
-            require('autoprefixer')({ browsers: ['> 2%'] }),
-            require('cssnano')
-        ]))
-        .pipe(mirror(
-            pipe(
-                rename(function (path) {
-                    path.basename += ".with-source-maps";
-                }),
-                sourcemaps.write()
-            )
-        ))
-        .pipe(gulp.dest('css'))
-        .pipe(livereload());
+gulp.task('copyJsDependencies2lib', function () {
+	var a = gulp.src([
+		'node_modules/@types/jquery/index.d.ts'
+	]).pipe(gulp.dest('lib/tsd/jquery'));
+	var b = gulp.src([
+		'node_modules/trivial-components/dist/js/bundle/trivial-components-global.d.ts',
+	]).pipe(gulp.dest('lib/tsd/trivial-components'));
+	var c = gulp.src([
+		'node_modules/trivial-components/dist/js/commonjs/*.d.ts',
+		'!node_modules/trivial-components/dist/js/commonjs/index.d.ts'
+	])
+		.pipe(concat('trivial-components-externals-concatenated.d.ts'))
+		.pipe(replace({regex:'import .*', replace:''}))
+		.pipe(gulp.dest('lib/tsd/trivial-components'));
+	return merge(a, b, c);
 });
 
 gulp.task('generate-html', function() {
@@ -103,9 +65,9 @@ gulp.task("typedoc", function() {
 
 gulp.task('watch', function() {
     livereload.listen();
-    gulp.watch(['less/*.less', 'page-templates/**/*.html'], ['less', 'generate-html']);
+    gulp.watch(['page-templates/**/*.html'], ['generate-html']);
 });
 
-gulp.task('default', ['bower', 'less', 'copyJsDependencies2lib', 'copyFonts2lib', 'generate-html', 'typedoc']);
+gulp.task('default', ['copyJsDependencies2lib', 'copyFonts2lib', 'generate-html', 'typedoc']);
 
 

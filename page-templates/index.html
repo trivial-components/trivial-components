@@ -104,48 +104,6 @@
         setTimeout(function () {
             $('.download-btn.initial').removeClass('initial');
         }, 100);
-
-
-        // combobox showcase
-        $('#zeroConfigComboBox').TrivialComboBox({entries: createEntries()});
-
-        $('#customFilteringComboBox').TrivialComboBox({
-            entries: createEntries(),
-            queryFunction: function (queryString, resultCallback) {
-                setTimeout(function () {
-                    resultCallback(createEntries().filter(function (entry) {
-                        return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
-                    }));
-                }, 500);
-            }
-        });
-
-        $('#icon2LinesTemplateComboBox').TrivialComboBox({
-            template: $.fn.TrivialComboBox.icon2LinesTemplate,
-            entries: createEntries()
-        });
-
-        $('#iconSingleLineTemplateComboBox').TrivialComboBox({
-            template: $.fn.TrivialComboBox.iconSingleLineTemplate,
-            entries: createEntries()
-        });
-
-        $('#singleLineTemplateComboBox').TrivialComboBox({
-            template: $.fn.TrivialComboBox.singleLineTemplate,
-            entries: createEntries()
-        });
-
-        $('#noAutoCompleteComboBox').TrivialComboBox({
-            autoComplete: false,
-            entries: createEntries()
-        });
-
-        $('#noTriggerComboBox').TrivialComboBox({
-            showTrigger: false,
-            entries: createEntries()
-        });
-
-        prettyPrint();
     });
 </script>
 

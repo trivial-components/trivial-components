@@ -30,13 +30,7 @@
 
     <title>TrivialComboBox - Demo</title>
 
-    <script>
-        if (location.href.indexOf("localhost") != -1) {
-            document.write('<link rel="stylesheet" href="css/all.with-source-maps.css">');
-        } else {
-            document.write('<link rel="stylesheet" href="css/all.css">');
-        }
-    </script>
+    <link rel="stylesheet" href="dist/main.css">       
 </head>
 
 <body data-spy="scroll" data-target="#navbar">
@@ -83,35 +77,10 @@
         <span class="site-footer-owner"><a href="https://github.com/trivial-components/trivial-components">Trivial Components</a> is maintained by <a href="https://github.com/trivial-components">trivial-components</a>.</span>
     </footer>
 </div>
-<script src="lib/js/jquery.min.js"></script>
-<script src="lib/js/bootstrap.min.js"></script>
-<script src="lib/js/mustache.min.js"></script>
-<script src="lib/js/moment.js"></script>
-<script src="lib/js/levenshtein.js"></script>
-<script src="lib/js/version.js"></script>
-<script src="lib/js/position.js"></script>
-<script src="lib/js/prettify.min.js"></script>
-<script src="lib/js/trivial-highlight.js"></script>
-<script src="lib/js/TrivialCalendarBox.js"></script>
-<script src="lib/js/TrivialComboBox.js"></script>
-<script src="lib/js/TrivialCore.js"></script>
-<script src="lib/js/TrivialDateTimeField.js"></script>
-<script src="lib/js/TrivialEvent.js"></script>
-<script src="lib/js/TrivialListBox.js"></script>
-<script src="lib/js/TrivialTagComboBox.js"></script>
-<script src="lib/js/TrivialTree.js"></script>
-<script src="lib/js/TrivialTreeBox.js"></script>
-<script src="lib/js/TrivialTreeComboBox.js"></script>
-<script src="lib/js/TrivialUnitBox.js"></script>
-<script src="js/DemoUtils.js"></script>
-<script src="js/ExampleEditor.js"></script>
-<script src="lib/js/vs/loader.js"></script>
-
+<script src="dist/main.bundle.js"></script>
+<script src="node_modules/systemjs/dist/system-production.js"></script>
 
 <script>
-	jQuery.get("ts/examples/demo.json", function(data) {
-		window.exampleEditor = new Demo.ExampleEditor('#exampleEditor', data);
-    });
 </script>
 
 <script>
