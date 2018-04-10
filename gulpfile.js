@@ -68,6 +68,6 @@ gulp.task('watch', function() {
     gulp.watch(['page-templates/**/*.html'], ['generate-html']);
 });
 
-gulp.task('default', ['copyJsDependencies2lib', 'copyFonts2lib', 'generate-html', 'typedoc']);
+gulp.task('default', ['copyJsDependencies2lib', 'generate-html', 'typedoc']);
 
 
