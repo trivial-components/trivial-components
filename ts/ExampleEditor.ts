@@ -209,17 +209,16 @@ export class ExampleEditor {
 			let jsCode = ts.transpile(tsCode);
 			jsCode = jsCode + "\n//# sourceURL=transpiled-demo-editor-code.js";
 
-			var require = (name: string) => {
+			var /* yes, var!! else, webpack will mess arround with the name! */ require /* local var used in evaluated code! */ = (name: string) => {
 				let modules: { [name: string]: any } = {
 					"trivial-components": TrivialComponents,
 					"../DemoUtils": DemoUtils
 				};
 				return modules[name];
 			};
-			console.log(jsCode);
 			eval(jsCode);
 		} catch (e) {
-			console.log('Could not update component due to eval error: ' + e);
+			console.warn('Could not update component due to eval error: ' + e);
 			if (e.message === "ts is not defined") {
 				window.clearTimeout(this.reEvaluateTimeout);
 				this.reEvaluateTimeout = window.setTimeout(() => this.compileAndEvaluate(), 1000);

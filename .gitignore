@@ -2,16 +2,13 @@
 bower_components/
 node/
 node_modules/
-dist/
 tmp/
 *.with-source-maps.*
 js/examples/
 
 ### NetBeans template
 nbproject/private/
-build/
 nbbuild/
-dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
@@ -22,7 +19,6 @@ nb-configuration.xml
 .metadata
 .gradle
 bin/
-tmp/
 *.tmp
 *.bak
 *.swp
