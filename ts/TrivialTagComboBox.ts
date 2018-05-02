@@ -17,22 +17,22 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {
 	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
 	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
+import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 
-export interface TrivialTagComboBoxConfig<E> extends TrivialListBoxConfig<E> {
+export interface TrivialTagComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
     /**
      * Calculates the value to set on the original input.
      * 
      * @param entries the list of selected entries
      * @return the string to set as the value of the original input
      */
-    valueFunction?: (entries: E[]) => string,
+    inputValueFunction?: (entries: E[]) => string,
 
     /**
      * Rendering function used to display a _selected_ entry
@@ -189,7 +189,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public readonly onFocus = new TrivialEvent<void>(this);
     public readonly onBlur = new TrivialEvent<void>(this);
 
-    private listBox: TrivialListBox<E>;
+    private listBox: TrivialTreeBox<E>;
     private isDropDownOpen = false;
     private entries: E[];
     private selectedEntries: E[] = [];
@@ -204,11 +204,21 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private currentPartialTag: E;
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTagComboBoxConfig<E> = {} as any) {
+	    let defaultIdFunction = (e:E) => {
+		    if (e == null) {
+			    return null;
+		    } else if ((e as any)._isFreeTextEntry) {
+			    return (e as any).displayValue;
+		    } else {
+			    return (e as any).id;
+		    }
+	    };
         this.config = $.extend(<TrivialTagComboBoxConfig<E>>{
-            valueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : (e as any).id).join(','),
+            idFunction: defaultIdFunction,
+            inputValueFunction: (entries:E[]) => entries.map(e => (e as any)._isFreeTextEntry ? (e as any).displayValue : defaultIdFunction(e)).join(','),
             entryRenderingFunction: DEFAULT_RENDERING_FUNCTIONS.image2Lines,
             selectedEntryRenderingFunction: (entry: E) => {
-                return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry));
+                return wrapWithDefaultTagWrapper(this.config.entryRenderingFunction(entry, 0));
             },
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
             textHighlightingEntryLimit: 100,
@@ -460,7 +470,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         const configWithoutEntries = $.extend({}, this.config);
         configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
-        this.listBox = new TrivialListBox<E>(this.$dropDown, configWithoutEntries);
+        this.listBox = new TrivialTreeBox<E>(this.$dropDown, configWithoutEntries);
         this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
             if (selectedEntry) {
                 this.addSelectedEntry(selectedEntry, true, originalEvent);
@@ -563,7 +573,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.selectedEntries.splice(index, 1);
         }
         (tagToBeRemoved as any)._trEntryElement.remove();
-        this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+        this.$originalInput.val(this.config.inputValueFunction(this.getSelectedEntries()));
         this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
     }
 
@@ -605,7 +615,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         if (this.config.tagCompleteDecider(entry)) {
             this.selectedEntries.splice(editorIndex, 0, tag);
-            this.$originalInput.val(this.config.valueFunction(this.getSelectedEntries()));
+            this.$originalInput.val(this.config.inputValueFunction(this.getSelectedEntries()));
             this.currentPartialTag = null;
         } else {
             this.currentPartialTag = tag;

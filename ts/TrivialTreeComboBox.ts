@@ -32,7 +32,7 @@ export interface TrivialTreeComboBoxConfig<E> extends TrivialTreeBoxConfig<E> {
      * @param entry the selected entry
      * @return the string to set as the value of the original input
      */
-    valueFunction?: (entry: E) => string,
+    inputValueFunction?: (entry: E) => string,
 
     /**
      * Rendering function used to display a _selected_ entry
@@ -168,15 +168,25 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     public readonly onBlur = new TrivialEvent<void>(this);
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTreeComboBoxConfig<E> = {}) {
+	    let defaultIdFunction = (e:E) => {
+		    if (e == null) {
+			    return null;
+		    } else if ((e as any)._isFreeTextEntry) {
+			    return (e as any).displayValue;
+		    } else {
+			    return (e as any).id;
+		    }
+	    };
         this.config = $.extend(<TrivialTreeComboBoxConfig<E>> {
-            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
+            idFunction: defaultIdFunction,
+            inputValueFunction: defaultIdFunction,
             entryRenderingFunction: (entry: E, depth: number) => {
 	            const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
 	            const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
 	            return renderer(entry);
             },
             selectedEntryRenderingFunction: (entry: E) => {
-                return this.config.entryRenderingFunction(entry, 0);
+                return this.config.entryRenderingFunction(entry, null);
             },
             selectedEntry: null,
             spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
@@ -328,7 +338,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
                     // After the keystroke has taken effect to the editor, check if the editor content has changed and if yes, deselect the currently selected entry!
                     let isNonIgnoredKey = !keyCodes.isModifierKey(e) && [keyCodes.enter, keyCodes.escape, keyCodes.tab].indexOf(e.which) === -1;
                     let editorValueDoesNotCorrespondToSelectedValue = this.isEntrySelected() && this.$editor.val() !== this.config.entryToEditorTextFunction(this.selectedEntry);
-                    if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.valueFunction(this.treeBox.getHighlightedEntry())) !== this.config.valueFunction(this.getSelectedEntry())) {
+                    if (isNonIgnoredKey && (editorValueDoesNotCorrespondToSelectedValue || this.config.idFunction(this.treeBox.getHighlightedEntry())) !== this.config.idFunction(this.getSelectedEntry())) {
                         this.setSelectedEntry(null, false, false, e);
                     }
                 });
@@ -466,7 +476,7 @@ export class TrivialTreeComboBox<E> implements TrivialComponent {
     }
 
     public setSelectedEntry(entry: E, commit: boolean, fireEvent?: boolean, originalEvent?: Event) {
-        this.$originalInput.val(this.config.valueFunction(entry));
+        this.$originalInput.val(this.config.inputValueFunction(entry));
         this.selectedEntry = entry;
         let $selectedEntry = $(this.config.selectedEntryRenderingFunction(entry))
             .addClass("tr-combobox-entry");

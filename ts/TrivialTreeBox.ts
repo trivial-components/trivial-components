@@ -24,7 +24,7 @@ export interface TrivialTreeBoxConfig<E> {
     /**
      * Calculates a unique value for an entry. Used to identify nodes in the tree.
      */
-    valueFunction?: (entry: E) => string,
+    idFunction?: (entry: E) => number | string,
 
     /**
      * Rendering function used to display a _suggested_ entry
@@ -139,12 +139,12 @@ export class TrivialTreeBox<E> implements TrivialComponent {
     private $tree: JQuery;
 
     private entries: E[];
-    private selectedEntryId: string;
+    private selectedEntryId: string | number;
     private highlightedEntry: E;
 
     constructor($container: JQuery|Element|string, options: TrivialTreeBoxConfig<E> = {}) {
         this.config = $.extend(<TrivialTreeBoxConfig<E>> {
-            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
+            idFunction: (entry:E) => entry ? "" + (entry as any).id : null,
             childrenProperty: "children",
             lazyChildrenFlagProperty: "hasLazyChildren",
             lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
@@ -181,7 +181,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
             this.updateEntries(this.entries);
         }
 
-        this.setSelectedEntry((this.config.selectedEntryId !== undefined && this.config.selectedEntryId !== null) ? this.findEntryById(this.config.selectedEntryId) : null);
+        this.setSelectedEntry((this.config.selectedEntryId != null) ? this.findEntryById(this.config.selectedEntryId) : null);
     }
 
 
@@ -203,7 +203,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         const $entry = $(this.config.entryRenderingFunction(entry, depth));
         $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
-        if (this.config.valueFunction(entry) === this.selectedEntryId) {
+        if (this.config.idFunction(entry) === this.selectedEntryId) {
             $entryAndExpanderWrapper.addClass("tr-selected-entry");
         }
 
@@ -403,9 +403,9 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         }
     }
 
-    private findEntryById(id: string) {
+    private findEntryById(id: string | number) {
         return this.findEntries((entry) =>  {
-            return this.config.valueFunction(entry) === id
+            return this.config.idFunction(entry) === id
         })[0];
     }
 
@@ -416,7 +416,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
     }
 
     public setSelectedEntry(entry: E, originalEvent?: Event) {
-        this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
+        this.selectedEntryId = entry ? this.config.idFunction(entry) : null;
         this.markSelectedEntry(entry);
         this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
         this.fireChangeEvents(entry, originalEvent);
@@ -568,7 +568,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
     };
 
     public updateNode(node: E) {
-        const oldNode = this.findEntryById(this.config.valueFunction(node));
+        const oldNode = this.findEntryById(this.config.idFunction(node));
         const parent = this.findParentNode(oldNode);
         if (parent) {
             (parent as any)[this.config.childrenProperty][(parent as any)[this.config.childrenProperty].indexOf(oldNode)] = node;
@@ -592,10 +592,13 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         }
     };
 
+	// TODO "refreshNode(nodeId, updateExpandedState: boolean, updateChildren: boolean)" which will update the node (and optionally the children) cache and display
+	// TODO "refreshChildren(nodeId, updateExpandedState: boolean)" which will call the children method again to update its cache and display!
+
     public addNode(parentNodeId: any, node: E) {
-        const parentNode = this.findEntryById(parentNodeId);
+	    const parentNode = this.findEntryById(parentNodeId);
         if (this.isLeaf(parentNode)) {
-            console.error('The parent node is a leaf node, so you cannot add children to it!');
+            console.error('The parent node is a leaf node, so you cannot add children to it!'); // TODO change this! (see above)
         }
         if (!(parentNode as any)[this.config.childrenProperty]) {
             (parentNode as any)[this.config.childrenProperty] = [];

@@ -32,8 +32,25 @@ import {TrivialEvent} from "./TrivialEvent";
 export type SearchBarMode = 'none' | 'show-if-filled' | 'always-visible';
 
 export interface TrivialTreeConfig<E> extends TrivialTreeBoxConfig<E> {
-    queryFunction?: QueryFunction<E>,
-    searchBarMode?: SearchBarMode,
+	/**
+     * Calculates the value to be set on the original input.
+	 */
+	inputValueFunction?: (entry: E) => number | string,
+
+    /**
+	 * Used to retrieve the filtered entries when the user types something into the search input.
+	 *
+	 * @see QueryFunction
+	 * @default creates a client-side query function using the provided [[entries]]
+	 */
+	queryFunction?: QueryFunction<E>,
+
+	/**
+     * Whether and when the search input is shown.
+	 */
+	searchBarMode?: SearchBarMode,
+
+
     directSelectionViaArrowKeys?: boolean,
     performanceOptimizationSettings?: {
         toManyVisibleItemsRenderDelay: number,
@@ -59,8 +76,10 @@ export class TrivialTree<E> implements TrivialComponent{
     private processUpdateTimer: number;
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTreeConfig<E> = {}) {
-        this.config = $.extend(<TrivialTreeConfig<E>> {
-            valueFunction: (entry:E) => entry ? "" + (entry as any).id : null,
+	    let defaultIdFunction = (entry:E) => entry ? "" + (entry as any).id : null;
+	    this.config = $.extend(<TrivialTreeConfig<E>> {
+            idFunction: defaultIdFunction,
+            inputValueFunction: defaultIdFunction,
             childrenProperty: "children",
             lazyChildrenFlagProperty: "hasLazyChildren",
             searchBarMode: 'show-if-filled',
@@ -273,13 +292,13 @@ export class TrivialTree<E> implements TrivialComponent{
 
     private findEntryById(id:number) {
         return this.findEntries((entry: E) => {
-            return this.config.valueFunction(entry) === id.toString()
+            return this.config.idFunction(entry) === id.toString()
         })[0];
     }
 
     private setSelectedEntry(entry: E) {
-        this.selectedEntryId = entry ? this.config.valueFunction(entry) : null;
-        this.$originalInput.val(entry ? this.config.valueFunction(entry) : null);
+        this.selectedEntryId = entry ? this.config.idFunction(entry) : null;
+        this.$originalInput.val(entry ? this.config.inputValueFunction(entry) : null);
         this.fireChangeEvents(entry);
     }
 

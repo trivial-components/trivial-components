@@ -22,11 +22,11 @@ import * as $ from "jquery";
 import * as moment from 'moment';
 import {EditingMode, HighlightDirection, selectElementContents, TrivialComponent, keyCodes} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
-import {TrivialListBox} from "./TrivialListBox";
 import {TrivialCalendarBox} from "./TrivialCalendarBox";
 import {TrivialDateSuggestionEngine} from "./TrivialDateSuggestionEngine";
 import {TrivialTimeSuggestionEngine} from "./TrivialTimeSuggestionEngine";
 import {place} from "place-to";
+import {TrivialTreeBox} from "./TrivialTreeBox";
 
 enum Mode {
     MODE_CALENDAR,
@@ -109,8 +109,8 @@ export class TrivialDateTimeField implements TrivialComponent {
 
     public readonly onChange = new TrivialEvent<Moment>(this);
 
-    private dateListBox: TrivialListBox<DateComboBoxEntry>;
-    private timeListBox: TrivialListBox<TimeComboBoxEntry>;
+    private dateListBox: TrivialTreeBox<DateComboBoxEntry>;
+    private timeListBox: TrivialTreeBox<TimeComboBoxEntry>;
     private calendarBox: TrivialCalendarBox;
     private isDropDownOpen = false;
 
@@ -215,7 +215,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         }
 
         let $dateListBox = $('<div class="date-listbox">').appendTo(this.$dropDown);
-        this.dateListBox = new TrivialListBox<DateComboBoxEntry>($dateListBox, {
+        this.dateListBox = new TrivialTreeBox<DateComboBoxEntry>($dateListBox, {
             entryRenderingFunction: this.dateRenderer
         });
         this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry: DateComboBoxEntry) => {
@@ -226,7 +226,7 @@ export class TrivialDateTimeField implements TrivialComponent {
             }
         });
         let $timeListBox = $('<div class="time-listbox">').appendTo(this.$dropDown);
-        this.timeListBox = new TrivialListBox<TimeComboBoxEntry>($timeListBox, {
+        this.timeListBox = new TrivialTreeBox<TimeComboBoxEntry>($timeListBox, {
             entryRenderingFunction: this.timeRenderer
         });
         this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry: TimeComboBoxEntry) => {

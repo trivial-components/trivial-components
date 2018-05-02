@@ -17,12 +17,12 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import {TrivialListBox, TrivialListBoxConfig} from "./TrivialListBox";
 import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes, DEFAULT_RENDERING_FUNCTIONS} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
+import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 
-export interface TrivialUnitBoxConfig<U> extends TrivialListBoxConfig<U> {
+export interface TrivialUnitBoxConfig<U> extends TrivialTreeBoxConfig<U> {
     unitValueProperty?: string,
     unitIdProperty?: string,
     decimalPrecision?: number,
@@ -61,7 +61,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     public readonly onFocus = new TrivialEvent<void>(this);
     public readonly onBlur = new TrivialEvent<void>(this);
 
-    private listBox: TrivialListBox<U>;
+    private listBox: TrivialTreeBox<U>;
     private isDropDownOpen = false;
     private entries: U[];
     private selectedEntry: U;
@@ -267,7 +267,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             }
         });
 
-        this.listBox = new TrivialListBox(this.$dropDown, this.config);
+        this.listBox = new TrivialTreeBox(this.$dropDown, this.config);
         this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U, eventSource, originalEvent: Event) => {
             if (selectedEntry) {
                 this.setSelectedEntry(selectedEntry, true, originalEvent);
