@@ -61,7 +61,7 @@ export interface TrivialTreeBoxConfig<E> {
      *
      * @default `'children'`
      */
-    childrenProperty?: string, // TODO replace by getChildrenFunction: (entry: E) => E[]
+    childrenProperty?: string, // TODO replace by childrenFunction: (entry: E) => E[]
 
     /**
      * Property used to determine whether a node has children that need to be lazy-loaded.
@@ -78,7 +78,7 @@ export interface TrivialTreeBoxConfig<E> {
      * @param node
      * @param resultCallback
      */
-    lazyChildrenQueryFunction?: (node: E, resultCallback: ResultCallback<E>) => void, // TODO unify with getter/setter
+    lazyChildrenQueryFunction?: (node: E, resultCallback: ResultCallback<E>) => void, // TODO unify with childrenFunction
 
     /**
      * Property used to determine whether a node is expanded or not.
@@ -86,7 +86,7 @@ export interface TrivialTreeBoxConfig<E> {
      * Note: This is subject to being replaced by a function in future versions.
      * @default `'expanded'`
      */
-    expandedProperty?: string, // TODO replace by expandedPropertyGetter: (entry: E) => boolean, expandedPropertySetter: (entry: E, expanded: boolean) => void
+    expandedProperty?: string, // TODO replace by expandedGetterFunction: (entry: E) => boolean, expandedSetterFunction: (entry: E, expanded: boolean) => void
 
     /**
      * The ID of the initially selected entry in the tree.
