@@ -25,10 +25,12 @@
     "url": "https://github.com/trivial-components/trivial-components/issues"
   },
   "homepage": "http://trivial-components.github.io/trivial-components/",
-  "main": "./dist/js/commonjs/index.js",
-  "types": "./dist/js/commonjs/index.d.ts",
+  "main": "./dist/js/index.js",
+  "types": "./dist/tsd/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "webpack",
+    "postbuild": "echo \"\\nexport as namespace TrivialComponents;\" >> dist/tsd/index.d.ts"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.47",
@@ -37,6 +39,7 @@
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.5.4",
     "autoprefixer-core": "^6.0.1",
+    "awesome-typescript-loader": "^5.0.0",
     "bower": "^1.8.0",
     "child_process": "^1.0.2",
     "cssnano": "^3.9.1",
@@ -75,7 +78,11 @@
     "multipipe": "^1.0.2",
     "ts-jest": "^20.0.0",
     "typedoc": "^0.6.0",
-    "typescript": "^2.8.1"
+    "typescript": "^2.8.1",
+    "uglifyjs-webpack-plugin": "^1.2.5",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2",
+    "webpack-merge": "^4.1.2"
   },
   "dependencies": {
     "jquery": "^3.2.1",

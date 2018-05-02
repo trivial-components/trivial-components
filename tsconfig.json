@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "umd",
+    "module": "commonjs",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outDir": "dist/js/single",
     "sourceMap": true,
     "declaration": true,
+    "declarationDir": "dist/tsd",
+    "outDir": "dist/js",
     "moduleResolution": "node"
   },
   "include": [
-    "ts/**/*"
+    "src/index.ts"
   ],
   "exclude": [
     "../../node_modules"

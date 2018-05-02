@@ -16,7 +16,6 @@
  *
  */
 
-export * from "./trivial-highlight";
 export * from "./TrivialCalendarBox";
 export * from "./TrivialCore";
 export * from "./TrivialDateSuggestionEngine";

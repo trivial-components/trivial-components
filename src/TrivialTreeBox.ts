@@ -19,6 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {DEFAULT_RENDERING_FUNCTIONS, DEFAULT_TEMPLATES, HighlightDirection, MatchingOptions, minimallyScrollTo, ResultCallback, TrivialComponent} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
+import {highlightMatches} from "./util/highlight";
 
 export interface TrivialTreeBoxConfig<E> {
     /**
@@ -501,7 +502,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
         for (let i = 0; i < this.entries.length; i++) {
             const entry = this.entries[i];
             const $entryElement = (entry as any)._trEntryElement.find('.tr-tree-entry');
-            $entryElement.trivialHighlight(searchString, this.config.matchingOptions);
+	        highlightMatches($entryElement, searchString, this.config.matchingOptions)
         }
         this.$tree.appendTo(this.$componentWrapper);
     }
