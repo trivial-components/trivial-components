@@ -308,7 +308,7 @@ gulp.task('typescript-demo', [], function () {
 				return path.basename(filePath);
 			}
 		}))
-		.pipe(gulp.dest("demo/ts"));
+		.pipe(gulp.dest("."));
 });
 
 gulp.task('github-release', ['default'], function () {

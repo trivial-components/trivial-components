@@ -16,6 +16,8 @@
  *
  */
 
+import "../less/trivial-components.less";
+
 export * from "./TrivialCalendarBox";
 export * from "./TrivialCore";
 export * from "./TrivialDateSuggestionEngine";

@@ -19,19 +19,20 @@
 var path = require('path');
 var webpack = require('webpack');
 var merge = require('webpack-merge');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var MiniCssExtractPlugin = require("mini-css-extract-plugin");
+var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 var baseConfig = {
 	entry: './src/index.ts',
 	output: {
-		path: path.resolve(__dirname, 'dist/js'),
+		path: path.resolve(__dirname, 'dist'),
 		filename: 'trivial-components.js',
 		libraryTarget: 'umd',
 		library: 'TrivialComponents'
 	},
 	resolve: {
-		extensions: ['.ts', '.tsx', '.js']
+		extensions: ['.ts', '.tsx', '.less', '.css', '.js']
 	},
 	optimization: {
 		minimize: false
@@ -42,6 +43,21 @@ var baseConfig = {
 			test: /\.tsx?$/,
 			loader: 'awesome-typescript-loader',
 			exclude: /node_modules/
+		}, {
+			test: /\.less$/,
+			use: [
+				MiniCssExtractPlugin.loader,
+				{
+					loader: "css-loader",
+					options: {
+						sourceMap: true
+					}
+				}, {
+					loader: "less-loader",
+					options: {
+						sourceMap: true
+					}
+				}]
 		}]
 	},
 	externals: {
@@ -53,7 +69,14 @@ var baseConfig = {
 };
 
 module.exports = [
-	baseConfig,
+	merge(baseConfig, {
+		plugins: [
+			new MiniCssExtractPlugin({
+				
+				filename: "trivial-components.css"
+			})
+		]
+	}),
 	merge(baseConfig, {
 		output: {
 			filename: 'trivial-components.min.js'
@@ -69,6 +92,23 @@ module.exports = [
 					}
 				}
 			})]
-		}
+		},
+		plugins: [
+			new MiniCssExtractPlugin({
+				filename: "trivial-components.min.css"
+			}),
+			new OptimizeCssAssetsPlugin({
+				assetNameRegExp: /\.css$/,
+				cssProcessor: require('cssnano'),
+				cssProcessorOptions: {
+					discardComments: {removeAll: true},
+					sourcemap: true,
+					map: {
+						inline: false
+					}
+				},
+				canPrint: true
+			})
+		]
 	})
 ];

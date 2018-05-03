@@ -8,7 +8,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationDir": "dist/tsd",
-    "outDir": "dist/js",
+    "outDir": "dist",
     "moduleResolution": "node"
   },
   "include": [
