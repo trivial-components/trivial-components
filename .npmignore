@@ -14,7 +14,7 @@ dist/trivial-components-*.tar.gz
 dist/trivial-components-*.zip
 dist/lib/
 yarn.lock
-__test__/*.js
+__test__/
 
 ### NetBeans template
 nbproject/private/
