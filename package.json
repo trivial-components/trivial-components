@@ -29,7 +29,8 @@
   "types": "./dist/tsd/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "webpack",
+    "prebuild": "rm -rf dist",
+    "build": "webpack --mode production",
     "postbuild": "echo \"\\nexport as namespace TrivialComponents;\" >> dist/tsd/index.d.ts"
   },
   "devDependencies": {

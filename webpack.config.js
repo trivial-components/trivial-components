@@ -35,7 +35,7 @@ var baseConfig = {
 		extensions: ['.ts', '.tsx', '.less', '.css', '.js']
 	},
 	optimization: {
-		minimize: false
+		minimize: true
 	},
 	devtool: 'source-map',
 	module: {

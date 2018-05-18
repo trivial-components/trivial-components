@@ -27,5 +27,5 @@ export * from "./TrivialTagComboBox";
 export * from "./TrivialTimeSuggestionEngine";
 export * from "./TrivialTree";
 export * from "./TrivialTreeBox";
-export * from "./TrivialTreeComboBox";
+export * from "./TrivialComboBox";
 export * from "./TrivialUnitBox";

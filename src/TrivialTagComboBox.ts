@@ -474,7 +474,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
             if (selectedEntry) {
                 this.addSelectedEntry(selectedEntry, true, originalEvent);
-                this.listBox.setSelectedEntry(null);
+                this.listBox.setSelectedEntryById(null);
                 this.closeDropDown();
             }
         });
@@ -557,7 +557,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         if (highlightDirection) {
             this.listBox.highlightNextEntry(highlightDirection);
         } else {
-            this.listBox.setHighlightedEntry(null);
+            this.listBox.setHighlightedEntryById(null);
         }
 
         this.autoCompleteIfPossible(this.config.autoCompleteDelay);

@@ -158,8 +158,8 @@ window.onload = (function () {
 		enforceSingleExpandedPath     : true
 	});
 
-	const $treeComboBox = $('#treeComboBox');
-	demo.treeComboBox = new TrivialComponents.TrivialTreeComboBox($treeComboBox, {
+	const $comboBox = $('#comboBox');
+	demo.comboBox = new TrivialComponents.TrivialComboBox($comboBox, {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[0],
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -170,17 +170,17 @@ window.onload = (function () {
 		animationDuration: 200,
 		showClearButton: true
 	});
-	demo.treeComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
-		console.log("treeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+	demo.comboBox.onSelectedEntryChanged.addListener(function(entry: any) {
+		console.log("comboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
 	});
-	demo.treeComboBox.onFocus.addListener(function() {
-		console.log("treeComboBox focus");
+	demo.comboBox.onFocus.addListener(function() {
+		console.log("comboBox focus");
 	});
-	demo.treeComboBox.onBlur.addListener(function() {
-		console.log("treeComboBox blur");
+	demo.comboBox.onBlur.addListener(function() {
+		console.log("comboBox blur");
 	});
 
-	demo.freeTextTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#freeTextTreeComboBox', {
+	demo.freeTextComboBox = new TrivialComponents.TrivialComboBox('#freeTextComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[0],
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -191,23 +191,23 @@ window.onload = (function () {
 		allowFreeText: true,
 		animationDuration: 0
 	});
-	demo.freeTextTreeComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
-		console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+	demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
+		console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
 	});
 
-	demo.disabledTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#disabledTreeComboBox', {
+	demo.disabledComboBox = new TrivialComponents.TrivialComboBox('#disabledComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[1],
 		editingMode: 'disabled'
 	});
 
-	demo.readonlyTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#readonlyTreeComboBox', {
+	demo.readonlyComboBox = new TrivialComponents.TrivialComboBox('#readonlyComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[2],
 		editingMode: 'readonly'
 	});
 
-	demo.lazyChildLoadingTreeComboBox =  new TrivialComponents.TrivialTreeComboBox('#lazyChildLoadingTreeComboBox', {
+	demo.lazyChildLoadingComboBox =  new TrivialComponents.TrivialComboBox('#lazyChildLoadingComboBox', {
 		entries: createDemoTreeNodes(),
 		lazyChildrenQueryFunction: function (node, callback) {
 			setTimeout(function () {
@@ -216,8 +216,8 @@ window.onload = (function () {
 		},
 		animationDuration: 200
 	});
-	demo.lazyChildLoadingTreeComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
-		console.log("lazyChildLoadingTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
+	demo.lazyChildLoadingComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
+		console.log("lazyChildLoadingComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
 	});
 
 	demo.zeroConfigTree = new TrivialComponents.TrivialTree('#zeroConfigTree', {

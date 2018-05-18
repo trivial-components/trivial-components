@@ -271,7 +271,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         this.listBox.onSelectedEntryChanged.addListener((selectedEntry: U, eventSource, originalEvent: Event) => {
             if (selectedEntry) {
                 this.setSelectedEntry(selectedEntry, true, originalEvent);
-                this.listBox.setSelectedEntry(null);
+                this.listBox.setSelectedEntryById(null);
                 this.closeDropDown();
             }
         });

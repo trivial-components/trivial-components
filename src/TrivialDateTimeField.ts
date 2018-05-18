@@ -221,7 +221,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         this.dateListBox.onSelectedEntryChanged.addListener((selectedEntry: DateComboBoxEntry) => {
             if (selectedEntry) {
                 this.setDate(selectedEntry, selectedEntry.displayString != (this.dateValue && this.dateValue.displayString));
-                this.dateListBox.setSelectedEntry(null);
+                this.dateListBox.setSelectedEntryById(null);
                 this.closeDropDown();
             }
         });
@@ -232,7 +232,7 @@ export class TrivialDateTimeField implements TrivialComponent {
         this.timeListBox.onSelectedEntryChanged.addListener((selectedEntry: TimeComboBoxEntry) => {
             if (selectedEntry) {
                 this.setTime(selectedEntry, selectedEntry.displayString != (this.timeValue && this.timeValue.displayString));
-                this.dateListBox.setSelectedEntry(null);
+                this.dateListBox.setSelectedEntryById(null);
                 this.closeDropDown();
             }
         });
