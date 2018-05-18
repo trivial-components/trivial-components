@@ -25,7 +25,7 @@
     "url": "https://github.com/trivial-components/trivial-components/issues"
   },
   "homepage": "http://trivial-components.github.io/trivial-components/",
-  "main": "./dist/index.js",
+  "main": "./dist/trivial-components.js",
   "types": "./dist/tsd/index.d.ts",
   "scripts": {
     "test": "jest",
@@ -35,7 +35,6 @@
   "devDependencies": {
     "@types/jasmine": "^2.5.47",
     "@types/jquery": "^2.0.34",
-    "@types/jqueryui": "^1.11.31",
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.5.4",
     "autoprefixer-core": "^6.0.1",
