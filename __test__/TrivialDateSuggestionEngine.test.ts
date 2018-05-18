@@ -16,11 +16,11 @@
  *  
  */
 
-import {TrivialDateSuggestionEngine} from "../src";
+import {TrivialDateSuggestionEngine} from "../src/TrivialDateSuggestionEngine";
 import * as moment from "../node_modules/moment/moment.js";
 
 
-function readableSuggestion(s) {
+function readableSuggestion(s: any) {
 	return s.moment.format('YYYY-MM-DD') + ":" + s.ymdOrder;
 }
 
