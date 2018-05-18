@@ -76,7 +76,7 @@ export class TrivialTree<E> implements TrivialComponent{
     private processUpdateTimer: number;
 
     constructor(originalInput: JQuery|Element|string, options: TrivialTreeConfig<E> = {}) {
-	    let defaultIdFunction = (entry:E) => entry ? "" + (entry as any).id : null;
+	    let defaultIdFunction = (entry:E) => entry ? (entry as any).id : null;
 	    this.config = $.extend(<TrivialTreeConfig<E>> {
             idFunction: defaultIdFunction,
             inputValueFunction: defaultIdFunction,
@@ -136,7 +136,7 @@ export class TrivialTree<E> implements TrivialComponent{
                 const direction = e.which == keyCodes.up_arrow ? -1 : 1;
                 if (this.entries != null) {
                     if (this.config.directSelectionViaArrowKeys) {
-                        this.treeBox.selectNextEntry(direction, e);
+                        this.treeBox.selectNextEntry(direction, e, true);
                     } else {
                         this.treeBox.highlightNextEntry(direction);
                     }
@@ -290,7 +290,7 @@ export class TrivialTree<E> implements TrivialComponent{
         return matchingEntries;
     }
 
-    private findEntryById(id:number) {
+    private findEntryById(id: string | number) {
         return this.findEntries((entry: E) => {
             return this.config.idFunction(entry) === id.toString()
         })[0];

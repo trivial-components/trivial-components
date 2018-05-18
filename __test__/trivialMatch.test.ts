@@ -17,7 +17,7 @@
  */
 
 'use strict';
-import {trivialMatch} from "../ts/TrivialCore";
+import {trivialMatch} from "../src";
 describe('trivialMatch', function() {
 
     it('must escape all regex special chars', function() {

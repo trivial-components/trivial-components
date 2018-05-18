@@ -22,64 +22,60 @@ import {TrivialEvent} from "./TrivialEvent";
 import {highlightMatches} from "./util/highlight";
 
 export interface TrivialTreeBoxConfig<E> {
-    /**
-     * Calculates a unique value for an entry. Used to identify nodes in the tree.
-     */
-    idFunction?: (entry: E) => number | string,
+	/**
+	 * Calculates a unique value for an entry. Used to identify nodes in the tree.
+	 */
+	idFunction?: (entry: E) => number | string,
 
-    /**
-     * Rendering function used to display a _suggested_ entry
-     * (i.e. an entry displayed in the dropdown).
-     *
-     * @param entry
-     * @param depth the depth of the entry in the tree
-     * @return HTML string
-     * @default Using the `image2LinesTemplate` from `TrivialCore`.
-     */
-    entryRenderingFunction?: (entry: E, depth: number) => string,
+	/**
+	 * Rendering function used to display a _suggested_ entry
+	 * (i.e. an entry displayed in the dropdown).
+	 *
+	 * @param entry
+	 * @param depth the depth of the entry in the tree
+	 * @return HTML string
+	 * @default Using the `image2LinesTemplate` from `TrivialCore`.
+	 */
+	entryRenderingFunction?: (entry: E, depth: number) => string,
 
-    /**
-     * The initially selected entry. (Caution: use `selectedEntries` for `TrivialTagBox`).
-     */
-    selectedEntry?: E,
+	/**
+	 * The initially selected entry. (Caution: use `selectedEntries` for `TrivialTagBox`).
+	 */
+	selectedEntry?: E,
 
-    /**
-     * The initial list of suggested entries.
-    */
-    entries?: E[],
+	/**
+	 * The initial list of suggested entries.
+	 */
+	entries?: E[],
 
-    /**
-     * Used for highlighting suggested entries. Also used by the default filtering functions int `TrivialCore`.
-     *
-     * @default `{ matchingMode: 'contains', ignoreCase: true, maxLevenshteinDistance: 1 }`
-     */
-    matchingOptions?: MatchingOptions,
+	/**
+	 * Used for highlighting suggested entries. Also used by the default filtering functions int `TrivialCore`.
+	 *
+	 * @default `{ matchingMode: 'contains', ignoreCase: true, maxLevenshteinDistance: 1 }`
+	 */
+	matchingOptions?: MatchingOptions,
 
     /**
      * Property used to retrieve the children of a node.
      *
-     * Note: This is subject to being replaced by a function in future versions.
-     *
      * @default `'children'`
      */
-    childrenProperty?: string, // TODO replace by childrenFunction: (entry: E) => E[]
+    childrenProperty?: string,
 
     /**
      * Property used to determine whether a node has children that need to be lazy-loaded.
      *
-     * Note: This is subject to being replaced by a function in future versions.
-     *
      * @default `'hasLazyChildren'`
      */
-    lazyChildrenFlagProperty?: string,  // TODO replace by hasChildrenFunction: (entry: E) => boolean
+    lazyChildrenFlagProperty?: string,
 
-    /**
-     * Function for retrieving children of a node.
+	/**
+	 * Function for retrieving children of a node.
      *
      * @param node
      * @param resultCallback
-     */
-    lazyChildrenQueryFunction?: (node: E, resultCallback: ResultCallback<E>) => void, // TODO unify with childrenFunction
+	 */
+	lazyChildrenQueryFunction?: (entry: E, resultCallback: ResultCallback<E>) => void,
 
     /**
      * Property used to determine whether a node is expanded or not.
@@ -87,535 +83,569 @@ export interface TrivialTreeBoxConfig<E> {
      * Note: This is subject to being replaced by a function in future versions.
      * @default `'expanded'`
      */
-    expandedProperty?: string, // TODO replace by expandedGetterFunction: (entry: E) => boolean, expandedSetterFunction: (entry: E, expanded: boolean) => void
+    expandedProperty?: string,
 
-    /**
-     * The ID of the initially selected entry in the tree.
-     *
-     * Note: This option is subject to change!
-     */
-    selectedEntryId?: any,
+	/**
+	 * The ID of the initially selected entry in the tree.
+	 */
+	selectedEntryId?: number | string,
 
-    /**
-     * Animation duration in milliseconds for expand and collapse animations.
-     */
-    animationDuration?: number,
+	/**
+	 * Animation duration in milliseconds for expand and collapse animations.
+	 */
+	animationDuration?: number,
 
-    /**
-     * Whether or not to show the expander controls for parent nodes.
-     */
-    showExpanders?: boolean,
+	/**
+	 * Whether or not to show the expander controls for parent nodes.
+	 */
+	showExpanders?: boolean,
 
-    /**
-     * Whether or not to expand a node when it is selected.
-     */
-    expandOnSelection?: boolean,
+	/**
+	 * Whether or not to expand a node when it is selected.
+	 */
+	expandOnSelection?: boolean,
 
-    /**
-     * Special mode that allows only one path to be expanded.
-     * Expands all ancestor nodes of the selected node, as well as the selected node itself.
-     * Collapses all others.
-     */
-    enforceSingleExpandedPath?: boolean // only one path is expanded at any time
+	/**
+	 * Special mode that allows only one path to be expanded.
+	 * Expands all ancestor nodes of the selected node, as well as the selected node itself.
+	 * Collapses all others.
+	 */
+	enforceSingleExpandedPath?: boolean // only one path is expanded at any time
 
-    /**
-     * Html string defining what to display when the list of results from the `queryFunction` is empty.
-     */
-    noEntriesTemplate?: string,
+	/**
+	 * Html string defining what to display when the list of results from the `queryFunction` is empty.
+	 */
+	noEntriesTemplate?: string,
 
-    /**
-     * HTML string defining the spinner to be displayed while lazy children are being retrieved.
-     */
-    spinnerTemplate?: string
+	/**
+	 * HTML string defining the spinner to be displayed while lazy children are being retrieved.
+	 */
+	spinnerTemplate?: string
+}
+
+class EntryWrapper<E> {
+	public readonly entry: E;
+	public $element: JQuery;
+	public children: EntryWrapper<E>[];
+	public readonly depth: number;
+
+	constructor(entry: E, public readonly parent: EntryWrapper<E>, private config: TrivialTreeBoxConfig<E> & {
+		elementFactory?: (entry: EntryWrapper<E>) => JQuery
+	}) {
+		this.entry = entry;
+		this.depth = parent != null ? parent.depth + 1 : 0;
+		let children: E[] = (this.entry as any)[config.childrenProperty];
+		let hasLazyChildren = !!(this.entry as any)[config.lazyChildrenFlagProperty];
+		if (children == null && hasLazyChildren) {
+			this.children = null;
+		} else if (children == null) {
+			this.children = [];
+		} else {
+			this.children = children.map(child => new EntryWrapper(child, this, config));
+		}
+	}
+
+	public get id() {
+		return this.config.idFunction(this.entry);
+	}
+
+	public lazyLoadChildren(resultCallback: ResultCallback<E>) {
+		return this.config.lazyChildrenQueryFunction(this.entry, (entries: E[]) => {
+			this.children = entries.map(child => new EntryWrapper(child, this, this.config));
+			resultCallback(entries);
+		});
+	}
+
+	public render() {
+		if (!this.$element) {
+			$(this.config.elementFactory(this));
+		}
+		return this.$element;
+	}
+
+	public isLeaf(): boolean {
+		return this.children != null && this.children.length === 0;
+	}
+
+	public get expanded() {
+		return (this.entry as any)[this.config.expandedProperty] || false;
+	}
+
+	public set expanded(expanded: boolean) {
+		(this.entry as any)[this.config.expandedProperty] = expanded;
+	}
 }
 
 export class TrivialTreeBox<E> implements TrivialComponent {
 
-    private config: TrivialTreeBoxConfig<E>;
+	private config: TrivialTreeBoxConfig<E>;
 
-    public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
-    public readonly onNodeExpansionStateChanged = new TrivialEvent<E>(this);
+	public readonly onSelectedEntryChanged = new TrivialEvent<E>(this);
+	public readonly onNodeExpansionStateChanged = new TrivialEvent<E>(this);
 
-    private $componentWrapper: JQuery;
-    private $tree: JQuery;
+	private $componentWrapper: JQuery;
+	private $tree: JQuery;
 
-    private entries: E[];
-    private selectedEntryId: string | number;
-    private highlightedEntry: E;
+	private entries: EntryWrapper<E>[];
+	private selectedEntryId: string | number;
+	private highlightedEntry: EntryWrapper<E>;
 
-    constructor($container: JQuery|Element|string, options: TrivialTreeBoxConfig<E> = {}) {
-        this.config = $.extend(<TrivialTreeBoxConfig<E>> {
-            idFunction: (entry:E) => entry ? "" + (entry as any).id : null,
-            childrenProperty: "children",
-            lazyChildrenFlagProperty: "hasLazyChildren",
-            lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
-                resultCallback((node as any).children || []);
-            },
+	constructor($container: JQuery | Element | string, options: TrivialTreeBoxConfig<E> = {}) {
+		let defaultConfig: TrivialTreeBoxConfig<E> = {
+			idFunction: (entry: E) => entry ? (entry as any).id : null,
+			childrenProperty: "children",
+			lazyChildrenFlagProperty: "hasLazyChildren",
+			lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
+				resultCallback((node as any).children || []);
+			},
             expandedProperty: 'expanded',
-            entryRenderingFunction: function (entry: E, depth: number) {
-	            const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
-	            const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
-	            return renderer(entry);
-            },
-            spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
-            noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
-            entries: null,
-            selectedEntryId: null,
-            matchingOptions: {
-                matchingMode: 'contains',
-                ignoreCase: true,
-                maxLevenshteinDistance: 2
-            },
-            animationDuration: 70,
-            showExpanders: true,
-            expandOnSelection: false, // open expandable nodes when they are selected
-            enforceSingleExpandedPath: false // only one path is expanded at any time
-        }, options);
+			entryRenderingFunction: function (entry: E, depth: number) {
+				const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
+				const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
+				return renderer(entry);
+			},
+			spinnerTemplate: DEFAULT_TEMPLATES.defaultSpinnerTemplate,
+			noEntriesTemplate: DEFAULT_TEMPLATES.defaultNoEntriesTemplate,
+			entries: null,
+			selectedEntryId: null,
+			matchingOptions: {
+				matchingMode: 'contains',
+				ignoreCase: true,
+				maxLevenshteinDistance: 2
+			},
+			animationDuration: 70,
+			showExpanders: true,
+			expandOnSelection: false, // open expandable nodes when they are selected
+			enforceSingleExpandedPath: false // only one path is expanded at any time
+		};
+		this.config = $.extend(defaultConfig, options);
 
-        this.entries = this.config.entries;
+		this.$componentWrapper = $('<div class="tr-treebox"/>').appendTo($container);
+		this.$componentWrapper.toggleClass("hide-expanders", !this.config.showExpanders);
 
-        this.$componentWrapper = $('<div class="tr-treebox"/>').appendTo($container);
-        this.$componentWrapper.toggleClass("hide-expanders", !this.config.showExpanders);
-        this.$tree = $('<div class="tr-tree-entryTree"></div>').appendTo(this.$componentWrapper);
+		this.updateEntries(this.config.entries || []);
 
-        if (this.entries) { // if this.config.entries was set...
-            this.updateEntries(this.entries);
-        }
+		this.setSelectedEntry((this.config.selectedEntryId != null) ? this.findEntryById(this.config.selectedEntryId).entry : null);
+	}
 
-        this.setSelectedEntry((this.config.selectedEntryId != null) ? this.findEntryById(this.config.selectedEntryId) : null);
-    }
+	private createEntryElement(entry: EntryWrapper<E>) {
+		const $outerEntryWrapper = $(`<div class="tr-tree-entry-outer-wrapper ${(entry.isLeaf() ? '' : 'has-children')}"></div>`);
+		entry.$element = $outerEntryWrapper;
+		const $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
+			.appendTo($outerEntryWrapper);
+		($entryAndExpanderWrapper[0] as any).trivialEntryWrapper = entry;
+		for (let k = 0; k < entry.depth; k++) {
+			$entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
+		}
+		$('<div class="tr-tree-expander"></div>')
+			.appendTo($entryAndExpanderWrapper);
+		let $entry = $(this.config.entryRenderingFunction(entry.entry, entry.depth));
+		$entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
 
+		if (entry.id === this.selectedEntryId) {
+			$entryAndExpanderWrapper.addClass("tr-selected-entry");
+		}
 
-    private isLeaf(entry: E) {
-        return ((entry as any)[this.config.childrenProperty] == null || (entry as any)[this.config.childrenProperty].length == 0) && !(entry as any)[this.config.lazyChildrenFlagProperty];
-    }
+		if (!entry.isLeaf()) {
+			const $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
+				.appendTo($outerEntryWrapper);
+			if (entry.children != null) {
+				if (entry.expanded) {
+					for (let i = 0; i < entry.children.length; i++) {
+						this.createEntryElement(entry.children[i]).appendTo($childrenWrapper);
+					}
+				}
+			} else {
+				$childrenWrapper.hide().append(this.config.spinnerTemplate).fadeIn();
+			}
+		}
+		this.setNodeExpanded(entry, entry.expanded, false);
+		return $outerEntryWrapper;
+	}
 
-    private createEntryElement(entry: E, depth: number) {
-        let leaf = this.isLeaf(entry);
-        const $outerEntryWrapper = $('<div class="tr-tree-entry-outer-wrapper ' + (leaf ? '' : 'has-children') + '" data-depth="' + depth + '"></div>');
-        (entry as any)._trEntryElement = $outerEntryWrapper;
-        const $entryAndExpanderWrapper = $('<div class="tr-tree-entry-and-expander-wrapper"></div>')
-            .appendTo($outerEntryWrapper);
-        for (let k = 0; k < depth; k++) {
-            $entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
-        }
-        const $expander = $('<div class="tr-tree-expander"></div>')
-            .appendTo($entryAndExpanderWrapper);
-        const $entry = $(this.config.entryRenderingFunction(entry, depth));
-        $entry.addClass("tr-tree-entry filterable-item").appendTo($entryAndExpanderWrapper);
+	private setNodeExpanded(node: EntryWrapper<E>, expanded: boolean, animate: boolean) {
+		let wasExpanded = node.expanded;
 
-        if (this.config.idFunction(entry) === this.selectedEntryId) {
-            $entryAndExpanderWrapper.addClass("tr-selected-entry");
-        }
+		if (expanded && this.config.enforceSingleExpandedPath) {
+			const currentlyExpandedNodes = this.findEntries((n) => {
+				return n.expanded;
+			});
+			const newExpandedPath = this.findPathToFirstMatchingNode((n) => {
+				return n === node;
+			});
+			for (let i = 0; i < currentlyExpandedNodes.length; i++) {
+				const currentlyExpandedNode = currentlyExpandedNodes[i];
+				if (newExpandedPath.indexOf(currentlyExpandedNode) === -1) {
+					this.setNodeExpanded(currentlyExpandedNode, false, true);
+				}
+			}
+		}
 
-        $entryAndExpanderWrapper
-            .mousedown((e) =>  {
-                this.$componentWrapper.trigger("mousedown", e);
-                this.setSelectedEntry(entry);
-            }).mouseup((e) =>  {
-            this.$componentWrapper.trigger("mouseup", e);
-        }).mouseenter(() =>  {
-            this.setHighlightedEntry(entry);
-        }).mouseleave((e) =>  {
-            if (!$((e as any).toElement).is('.tr-tree-entry-outer-wrapper')) {
-                this.setHighlightedEntry(null);
-            }
-        });
+		node.expanded = expanded;
+		node.$element.toggleClass("expanded", expanded);
 
-        if (!leaf) {
-            const $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
-                .appendTo($outerEntryWrapper);
-            $expander.mousedown(() =>  {
-                return false;
-            }).click((e) =>  {
-                this.setNodeExpanded(entry, !(entry as any)[this.config.expandedProperty], true);
-            });
-            if ((entry as any)[this.config.childrenProperty]) {
-                if ((entry as any)[this.config.expandedProperty]) {
-                    for (let i = 0; i < (entry as any)[this.config.childrenProperty].length; i++) {
-                        this.createEntryElement((entry as any)[this.config.childrenProperty][i], depth + 1).appendTo($childrenWrapper);
-                    }
-                }
-            } else if ((entry as any)[this.config.lazyChildrenFlagProperty]) {
-                $childrenWrapper.hide().append(this.config.spinnerTemplate).fadeIn();
-            }
-            this.setNodeExpanded(entry, (entry as any)[this.config.expandedProperty], false);
-        }
-        return $outerEntryWrapper;
-    }
+		let nodeHasUnrenderedChildren = (node: EntryWrapper<E>) => {
+			return node.children && node.children.some((child: EntryWrapper<E>) => {
+				return !child.$element || !$.contains(document.documentElement, child.$element[0]);
+			});
+		};
 
-    private updateTreeEntryElements() {
-        this.$tree.detach();
-        this.$tree = $('<div class="tr-tree-entryTree"></div>');
+		if (expanded && node.children == null) {
+			node.lazyLoadChildren((children: E[]) => this.setChildren(node, children));
+		} else if (expanded && nodeHasUnrenderedChildren(node)) {
+			this.renderChildren(node);
+		}
+		if (expanded) {
+			this.minimallyScrollTo(node.$element);
+		}
 
-        if (this.entries.length > 0) {
-            for (let i = 0; i < this.entries.length; i++) {
-                this.createEntryElement(this.entries[i], 0).appendTo(this.$tree);
-            }
-        } else {
-            this.$tree.append(this.config.noEntriesTemplate);
-        }
-        this.$tree.appendTo(this.$componentWrapper);
-    }
+		const childrenWrapper = node.$element.find("> .tr-tree-entry-children-wrapper");
+		if (expanded) {
+			if (animate) {
+				childrenWrapper.slideDown(this.config.animationDuration);
+			} else {
+				childrenWrapper.css("display", "block"); // show() does not do this if the node is not attached
+			}
+		} else {
+			if (animate) {
+				childrenWrapper.slideUp(this.config.animationDuration);
+			} else {
+				childrenWrapper.hide();
+			}
+		}
 
+		if (!!wasExpanded != !!expanded) {
+			this.onNodeExpansionStateChanged.fire(node.entry);
+		}
+	}
 
-    private setNodeExpanded(node: E, expanded: boolean, animate: boolean) {
-        let wasExpanded = (node as any)[this.config.expandedProperty];
+	private setChildren(parentEntryWrapper: EntryWrapper<E>, children: E[]) {
+		parentEntryWrapper.children = children.map(child => this.createEntryWrapper(child, parentEntryWrapper));
+		this.renderChildren(parentEntryWrapper);
+	}
 
-        if (expanded && this.config.enforceSingleExpandedPath) {
-            const currentlyExpandedNodes = this.findEntries((n) => {
-                return !!((n as any)[this.config.expandedProperty]);
-            });
-            const newExpandedPath = this.findPathToFirstMatchingNode((n) => {
-                return n === node;
-            });
-            for (let i = 0; i < currentlyExpandedNodes.length; i++) {
-                const currentlyExpandedNode = currentlyExpandedNodes[i];
-                if (newExpandedPath.indexOf(currentlyExpandedNode) === -1) {
-                    this.setNodeExpanded(currentlyExpandedNode, false, true);
-                }
-            }
-        }
+	private renderChildren(node: EntryWrapper<E>) {
+		const $childrenWrapper = node.$element.find('> .tr-tree-entry-children-wrapper');
+		$childrenWrapper.empty();
+		if (node.children && node.children.length > 0) {
+			node.children.forEach(child => {
+				child.render().appendTo($childrenWrapper);
+			});
+		} else {
+			node.$element.removeClass('has-children expanded');
+		}
+	}
 
-        (node as any)[this.config.expandedProperty] = !!expanded;
-        (node as any)._trEntryElement.toggleClass("expanded", !!expanded);
+	public updateEntries(newEntries: E[]) {
+		this.highlightedEntry = null;
+		this.entries = newEntries.map(e => this.createEntryWrapper(e, null));
 
-        let nodeHasUnrenderedChildren = (node: E) => {
-            return (node as any)[this.config.childrenProperty] && (node as any)[this.config.childrenProperty].some((child: E) =>  {
-                    return !(child as any)._trEntryElement || !$.contains(document.documentElement, (child as any)._trEntryElement[0]);
-                });
-        };
+		this.$tree && this.$tree.remove();
+		this.$tree = $('<div class="tr-tree-entryTree"></div>');
+		this.$tree.on("mousedown", ".tr-tree-entry-and-expander-wrapper", (e) => {
+			let entryWrapper = ($(e.target).closest(".tr-tree-entry-and-expander-wrapper")[0] as any).trivialEntryWrapper as EntryWrapper<E>;
+			this.setSelectedEntry(entryWrapper.entry, null, true);
+		}).on("mouseenter", ".tr-tree-entry-and-expander-wrapper", (e) => {
+			let entryWrapper = ($(e.target).closest(".tr-tree-entry-and-expander-wrapper")[0] as any).trivialEntryWrapper as EntryWrapper<E>;
+			this.setHighlightedEntry(entryWrapper.entry);
+		}).on("mouseleave", ".tr-tree-entry-and-expander-wrapper", (e) => {
+			if (!$((e as any).toElement).is('.tr-tree-entry-outer-wrapper')) {
+				this.setHighlightedEntry(null);
+			}
+		}).on("mousedown", ".tr-tree-expander", () => {
+			return false; // prevent selection!
+		}).on("click", ".tr-tree-expander", (e) => {
+			let entryWrapper = ($(e.target).closest(".tr-tree-entry-and-expander-wrapper")[0] as any).trivialEntryWrapper  as EntryWrapper<E>;
+			this.setNodeExpanded(entryWrapper, !entryWrapper.expanded, true);
+		});
 
-        if (expanded && (node as any)[this.config.lazyChildrenFlagProperty] && !(node as any)[this.config.childrenProperty]) {
-            this.config.lazyChildrenQueryFunction(node, (children: E[]) =>  {
-                this.setChildren(node, children);
-            });
-        } else if (expanded && nodeHasUnrenderedChildren(node)) {
-            this.renderChildren(node);
-        }
-        if (expanded) {
-            this.minimallyScrollTo((node as any)._trEntryElement);
-        }
+		if (this.entries.length > 0) {
+			this.entries.forEach(entry => entry.render().appendTo(this.$tree))
+		} else {
+			this.$tree.append(this.config.noEntriesTemplate);
+		}
+		this.$tree.appendTo(this.$componentWrapper);
 
-        const childrenWrapper = (node as any)._trEntryElement.find("> .tr-tree-entry-children-wrapper");
-        if (expanded) {
-            if (animate) {
-                childrenWrapper.slideDown(this.config.animationDuration);
-            } else {
-                childrenWrapper.css("display", "block"); // show() does not do this if the node is not attached
-            }
-        } else {
-            if (animate) {
-                childrenWrapper.slideUp(this.config.animationDuration);
-            } else {
-                childrenWrapper.hide();
-            }
-        }
+		const selectedEntry = this.findEntryById(this.selectedEntryId);
+		if (selectedEntry) {
+			// selected entry in filtered tree? then mark it as selected!
+			this.markSelectedEntry(selectedEntry);
+		}
+	}
 
-        if (!!wasExpanded != !!expanded) {
-            this.onNodeExpansionStateChanged.fire(node);
-        }
-    }
+	private createEntryWrapper(e: E, parent: EntryWrapper<E>) {
+		return new EntryWrapper(e, parent, {
+			...this.config,
+			elementFactory: (entry: EntryWrapper<E>) => this.createEntryElement(entry)
+		});
+	}
 
-    private nodeDepth(node: E) {
-        return node ? parseInt((node as any)._trEntryElement.attr('data-depth')) : 0;
-    }
+	private findEntries(filterFunction: ((node: EntryWrapper<E>) => boolean)) {
+		let findEntriesInSubTree = (node: EntryWrapper<E>, listOfFoundEntries: EntryWrapper<E>[]) => {
+			if (filterFunction.call(this, node)) {
+				listOfFoundEntries.push(node);
+			}
+			if (node.children) {
+				for (let i = 0; i < node.children.length; i++) {
+					const child = node.children[i];
+					findEntriesInSubTree(child, listOfFoundEntries);
+				}
+			}
+		};
 
-    private setChildren(node: E, children: E[]) {
-        (node as any)[this.config.childrenProperty] = children;
-        (node as any)[this.config.lazyChildrenFlagProperty] = false;
-        this.renderChildren(node);
-    }
+		const matchingEntries: EntryWrapper<E>[] = [];
+		for (let i = 0; i < this.entries.length; i++) {
+			const rootEntry = this.entries[i];
+			findEntriesInSubTree(rootEntry, matchingEntries);
+		}
+		return matchingEntries;
+	}
 
-    private renderChildren(node: E) {
-        const $childrenWrapper = (node as any)._trEntryElement.find('> .tr-tree-entry-children-wrapper');
-        $childrenWrapper.empty();
-        const children = (node as any)[this.config.childrenProperty];
-        if (children && children.length > 0) {
-            const depth = this.nodeDepth(node);
-            for (let i = 0; i < children.length; i++) {
-                const child = children[i];
-                this.createEntryElement(child, depth + 1).appendTo($childrenWrapper);
-            }
-        } else {
-            (node as any)._trEntryElement.removeClass('has-children expanded');
-        }
-    }
+	private findPathToFirstMatchingNode(predicateFunction: ((node: EntryWrapper<E>, path: EntryWrapper<E>[]) => boolean)): EntryWrapper<E>[] {
+		let searchInSubTree = (node: EntryWrapper<E>, path: EntryWrapper<E>[]): EntryWrapper<E>[] => {
+			if (predicateFunction.call(this, node, path)) {
+				path.push(node);
+				return path;
+			}
+			if (node.children) {
+				const newPath = path.slice();
+				newPath.push(node);
+				for (let i = 0; i < node.children.length; i++) {
+					const child = node.children[i];
+					const result = searchInSubTree(child, newPath);
+					if (result) {
+						return result;
+					}
+				}
+			}
+		};
 
-    public updateEntries(newEntries: E[]) {
-        this.highlightedEntry = null;
-        this.entries = newEntries;
+		for (let i = 0; i < this.entries.length; i++) {
+			const rootEntry = this.entries[i];
+			let path = searchInSubTree(rootEntry, []);
+			if (path) {
+				return path;
+			}
+		}
+	}
 
-        this.updateTreeEntryElements();
+	private findEntryById(id: string | number): EntryWrapper<E> {
+		return this.findEntries((entry) => {
+			return entry.id === id
+		})[0];
+	}
 
-        const selectedEntry = this.findEntryById(this.selectedEntryId);
-        if (selectedEntry) {
-            // selected entry in filtered tree? then mark it as selected!
-            this.markSelectedEntry(selectedEntry);
-        }
-    }
+	/**
+	 * @deprecated do it by id!
+	 */
+	public setSelectedEntry(entry: E, originalEvent?: Event, fireEvents = false) {
+		let entryWrapper = this.findEntryById(this.config.idFunction(entry));
+		this.selectedEntryId = entryWrapper && entryWrapper.id;
+		this.markSelectedEntry(entryWrapper);
+		this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
+		if (fireEvents) {
+			this.fireChangeEvents(entry, originalEvent);
+		}
+		if (entry && this.config.expandOnSelection) {
+			this.setNodeExpanded(entryWrapper, true, true);
+		}
+	}
 
-    private findEntries(filterFunction: ((node: E)=>boolean)) {
-        let findEntriesInSubTree = (node: E, listOfFoundEntries: E[]) => {
-            if (filterFunction.call(this, node)) {
-                listOfFoundEntries.push(node);
-            }
-            if ((node as any)[this.config.childrenProperty]) {
-                for (let i = 0; i < (node as any)[this.config.childrenProperty].length; i++) {
-                    const child = (node as any)[this.config.childrenProperty][i];
-                    findEntriesInSubTree(child, listOfFoundEntries);
-                }
-            }
-        };
+	public setSelectedEntryById(nodeId: number | string) {
+		this.setSelectedEntry(this.findEntryById(nodeId).entry, null);
+	}
 
-        const matchingEntries: E[] = [];
-        for (let i = 0; i < this.entries.length; i++) {
-            const rootEntry = this.entries[i];
-            findEntriesInSubTree(rootEntry, matchingEntries);
-        }
-        return matchingEntries;
-    }
+	private minimallyScrollTo($entryWrapper: JQuery) {
+		minimallyScrollTo(this.$componentWrapper.parent(), $entryWrapper);
+	}
 
-    private findPathToFirstMatchingNode(predicateFunction: ((node: E, path: any[]) => boolean)): E[] {
-        let searchInSubTree = (node: E, path: any[]): E[] => {
-            if (predicateFunction.call(this, node, path)) {
-                path.push(node);
-                return path;
-            }
-            if ((node as any)[this.config.childrenProperty]) {
-                const newPath = path.slice();
-                newPath.push(node);
-                for (let i = 0; i < (node as any)[this.config.childrenProperty].length; i++) {
-                    const child = (node as any)[this.config.childrenProperty][i];
-                    const result = searchInSubTree(child, newPath);
-                    if (result) {
-                        return result;
-                    }
-                }
-            }
-        };
+	private markSelectedEntry(entry: EntryWrapper<E>) {
+		this.$tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
+		if (entry && entry.$element) {
+			const $entryWrapper = entry.$element.find('>.tr-tree-entry-and-expander-wrapper');
+			$entryWrapper.addClass("tr-selected-entry");
+		}
+	}
 
-        for (let i = 0; i < this.entries.length; i++) {
-            const rootEntry = this.entries[i];
-            let path = searchInSubTree(rootEntry, []);
-            if (path) {
-                return path;
-            }
-        }
-    }
+	private fireChangeEvents(entry: E, originalEvent: Event) {
+		this.$componentWrapper.trigger("change");
+		this.onSelectedEntryChanged.fire(entry, originalEvent);
+	}
 
-    private findEntryById(id: string | number) {
-        return this.findEntries((entry) =>  {
-            return this.config.idFunction(entry) === id
-        })[0];
-    }
+	public selectNextEntry(direction: HighlightDirection, originalEvent?: Event, fireEvents = false) {
+		const nextVisibleEntry = this.getNextVisibleEntry(this.getSelectedEntryWrapper(), direction);
+		if (nextVisibleEntry != null) {
+			this.setSelectedEntry(nextVisibleEntry.entry, originalEvent, fireEvents);
+		}
+	}
 
-    private findParentNode(childNode: E) {
-        return this.findEntries((entry) =>  {
-            return (entry as any)[this.config.childrenProperty] && (entry as any)[this.config.childrenProperty].indexOf(childNode) != -1;
-        })[0];
-    }
+	public setHighlightedEntry(entry: E) {
+		if ((entry == null) !== (this.highlightedEntry == null) || this.config.idFunction(entry) !== (this.highlightedEntry && this.highlightedEntry.id)) {
+			this.highlightedEntry = entry != null ? this.findEntryById(this.config.idFunction(entry)) : null;
+			this.$tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
+			if (this.highlightedEntry != null && this.highlightedEntry.$element) {
+				const $entry = this.highlightedEntry.$element.find('>.tr-tree-entry-and-expander-wrapper');
+				$entry.addClass('tr-highlighted-entry');
+				this.minimallyScrollTo($entry);
+			} else {
+				const selectedEntry = this.getSelectedEntryWrapper();
+				if (selectedEntry) {
+					this.highlightedEntry = selectedEntry;
+				}
+			}
+		}
+	}
 
-    public setSelectedEntry(entry: E, originalEvent?: Event) {
-        this.selectedEntryId = entry ? this.config.idFunction(entry) : null;
-        this.markSelectedEntry(entry);
-        this.setHighlightedEntry(entry); // it makes no sense to select an entry and have another one still highlighted.
-        this.fireChangeEvents(entry, originalEvent);
-        if (entry && this.config.expandOnSelection) {
-            this.setNodeExpanded(entry, true, true);
-        }
-    }
+	private getNextVisibleEntry(currentEntry: EntryWrapper<E>, direction: HighlightDirection, onlyEntriesWithTextMatches: boolean = false) {
+		let newSelectedElementIndex: number;
+		const visibleEntriesAsList = this.findEntries((entry) => {
+			if (!entry.$element) {
+				return false;
+			} else {
+				if (onlyEntriesWithTextMatches) {
+					return entry.$element.is(':visible') && entry.$element.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
+				} else {
+					return entry.$element.is(':visible') || entry === currentEntry;
+				}
+			}
+		});
+		if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
+			return null;
+		} else if (currentEntry == null && direction > 0) {
+			newSelectedElementIndex = -1 + direction;
+		} else if (currentEntry == null && direction < 0) {
+			newSelectedElementIndex = visibleEntriesAsList.length + direction;
+		} else {
+			const currentSelectedElementIndex = visibleEntriesAsList.indexOf(currentEntry);
+			newSelectedElementIndex = (currentSelectedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
+		}
+		return visibleEntriesAsList[newSelectedElementIndex];
+	}
 
-    public setSelectedEntryById(nodeId: any) {
-        this.setSelectedEntry(this.findEntryById(nodeId), null);
-    }
+	public highlightTextMatches(searchString: string) {
+		this.$tree.detach();
+		for (let i = 0; i < this.entries.length; i++) {
+			const entry = this.entries[i];
+			const $entryElement = entry.$element.find('.tr-tree-entry');
+			highlightMatches($entryElement, searchString, this.config.matchingOptions)
+		}
+		this.$tree.appendTo(this.$componentWrapper);
+	}
 
-    private minimallyScrollTo($entryWrapper: JQuery) {
-        minimallyScrollTo(this.$componentWrapper.parent(), $entryWrapper);
-    }
+	public getSelectedEntry(): E | null {
+		let selectedEntryWrapper = this.getSelectedEntryWrapper();
+		return selectedEntryWrapper != null ? selectedEntryWrapper.entry : null;
+	}
 
-    private markSelectedEntry(entry: E) {
-        this.$tree.find(".tr-selected-entry").removeClass("tr-selected-entry");
-        if (entry && (entry as any)._trEntryElement) {
-            const $entryWrapper = (entry as any)._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
-            $entryWrapper.addClass("tr-selected-entry");
-        }
-    }
-
-    private fireChangeEvents(entry: E, originalEvent: Event) {
-        this.$componentWrapper.trigger("change");
-        this.onSelectedEntryChanged.fire(entry);
-    }
-
-    public selectNextEntry(direction: HighlightDirection, originalEvent?: Event) {
-        const nextVisibleEntry = this.getNextVisibleEntry(this.getSelectedEntry(), direction);
-        if (nextVisibleEntry != null) {
-            this.setSelectedEntry(nextVisibleEntry, originalEvent);
-        }
-    }
-
-    public setHighlightedEntry(entry: E) {
-        if (entry !== this.highlightedEntry) {
-            this.highlightedEntry = entry;
-            this.$tree.find('.tr-highlighted-entry').removeClass('tr-highlighted-entry');
-            if (entry != null && (entry as any)._trEntryElement) {
-                const $entry = (entry as any)._trEntryElement.find('>.tr-tree-entry-and-expander-wrapper');
-                $entry.addClass('tr-highlighted-entry');
-                this.minimallyScrollTo($entry);
-            } else {
-                const selectedEntry = this.getSelectedEntry();
-                if (selectedEntry) {
-                    this.highlightedEntry = selectedEntry;
-                }
-            }
-        }
-    }
-
-    private getNextVisibleEntry(currentEntry: E, direction: HighlightDirection, onlyEntriesWithTextMatches: boolean = false) {
-        let newSelectedElementIndex: number;
-        const visibleEntriesAsList = this.findEntries((entry) => {
-            if (!(entry as any)._trEntryElement) {
-                return false;
-            } else {
-                if (onlyEntriesWithTextMatches) {
-                    return (entry as any)._trEntryElement.is(':visible') && (entry as any)._trEntryElement.has('>.tr-tree-entry-and-expander-wrapper .tr-highlighted-text').length > 0;
-                } else {
-                    return (entry as any)._trEntryElement.is(':visible') || entry === currentEntry;
-                }
-            }
-        });
-        if (visibleEntriesAsList == null || visibleEntriesAsList.length == 0) {
-            return null;
-        } else if (currentEntry == null && direction > 0) {
-            newSelectedElementIndex = -1 + direction;
-        } else if (currentEntry == null && direction < 0) {
-            newSelectedElementIndex = visibleEntriesAsList.length + direction;
-        } else {
-            const currentSelectedElementIndex = visibleEntriesAsList.indexOf(currentEntry);
-            newSelectedElementIndex = (currentSelectedElementIndex + visibleEntriesAsList.length + direction) % visibleEntriesAsList.length;
-        }
-        return visibleEntriesAsList[newSelectedElementIndex];
-    }
-
-    public highlightTextMatches(searchString: string) {
-        this.$tree.detach();
-        for (let i = 0; i < this.entries.length; i++) {
-            const entry = this.entries[i];
-            const $entryElement = (entry as any)._trEntryElement.find('.tr-tree-entry');
-	        highlightMatches($entryElement, searchString, this.config.matchingOptions)
-        }
-        this.$tree.appendTo(this.$componentWrapper);
-    }
-
-    public getSelectedEntry() {
-        return (this.selectedEntryId !== undefined && this.selectedEntryId !== null) ? this.findEntryById(this.selectedEntryId) : null;
-    }
+	private getSelectedEntryWrapper() {
+		return (this.selectedEntryId !== undefined && this.selectedEntryId !== null) ? this.findEntryById(this.selectedEntryId) : null;
+	}
 
 
-    public revealSelectedEntry(animate: boolean = false) {
-        let selectedEntry = this.getSelectedEntry();
-        if (!selectedEntry) {
-            return;
-        }
-        let currentEntry = selectedEntry;
-        while (currentEntry = this.findParentNode(currentEntry)) {
-            this.setNodeExpanded(currentEntry, true, animate);
-        }
-        this.minimallyScrollTo((selectedEntry as any)._trEntryElement);
-    }
+	public revealSelectedEntry(animate: boolean = false) {
+		let selectedEntry = this.getSelectedEntryWrapper();
+		if (!selectedEntry) {
+			return;
+		}
+		let currentEntry = selectedEntry;
+		while (currentEntry = currentEntry.parent) {
+			this.setNodeExpanded(currentEntry, true, animate);
+		}
+		this.minimallyScrollTo(selectedEntry.$element);
+	}
 
-    public highlightNextEntry(direction: HighlightDirection) {
-        const nextVisibleEntry = this.getNextVisibleEntry(this.highlightedEntry || this.getSelectedEntry(), direction);
-        if (nextVisibleEntry != null) {
-            this.setHighlightedEntry(nextVisibleEntry);
-        }
-    }
+	public highlightNextEntry(direction: HighlightDirection) {
+		const nextVisibleEntry = this.getNextVisibleEntry(this.highlightedEntry || this.getSelectedEntryWrapper(), direction);
+		if (nextVisibleEntry != null) {
+			this.setHighlightedEntry(nextVisibleEntry.entry);
+		}
+	}
 
-    public highlightNextMatchingEntry(direction: HighlightDirection) {
-        const nextMatchingEntry = this.getNextVisibleEntry(this.highlightedEntry || this.getSelectedEntry(), direction, true);
-        if (nextMatchingEntry != null) {
-            this.setHighlightedEntry(nextMatchingEntry);
-        }
-    }
+	public highlightNextMatchingEntry(direction: HighlightDirection) {
+		const nextMatchingEntry = this.getNextVisibleEntry(this.highlightedEntry || this.getSelectedEntryWrapper(), direction, true);
+		if (nextMatchingEntry != null) {
+			this.setHighlightedEntry(nextMatchingEntry.entry);
+		}
+	}
 
-    public selectNextMatchingEntry(direction: HighlightDirection) {
-        const nextMatchingEntry = this.getNextVisibleEntry(this.highlightedEntry, direction, true);
-        if (nextMatchingEntry != null) {
-            this.setSelectedEntry(nextMatchingEntry);
-        }
-    }
+	public selectNextMatchingEntry(direction: HighlightDirection, fireEvents = false) {
+		const nextMatchingEntry = this.getNextVisibleEntry(this.highlightedEntry, direction, true);
+		if (nextMatchingEntry != null) {
+			this.setSelectedEntry(nextMatchingEntry.entry, null, fireEvents);
+		}
+	}
 
-    public getHighlightedEntry() {
-        return this.highlightedEntry
-    }
+	public getHighlightedEntry() {
+		return this.highlightedEntry && this.highlightedEntry.entry;
+	}
 
-    public setHighlightedNodeExpanded(expanded: boolean) {
-        if (!this.highlightedEntry || this.isLeaf(this.highlightedEntry)) {
-            return false;
-        } else {
-            let wasExpanded = (this.highlightedEntry as any)[this.config.expandedProperty];
-            this.setNodeExpanded(this.highlightedEntry, expanded, true);
-            return !wasExpanded != !expanded;
-        }
-    }
+	public setHighlightedNodeExpanded(expanded: boolean) {
+		if (!this.highlightedEntry || this.highlightedEntry.isLeaf()) {
+			return false;
+		} else {
+			let wasExpanded = this.highlightedEntry.expanded;
+			this.setNodeExpanded(this.highlightedEntry, expanded, true);
+			return !wasExpanded != !expanded;
+		}
+	}
 
-    public updateChildren(parentNodeId: string, children: E[]) {
-        const node = this.findEntryById(parentNodeId);
-        if (node) {
-            this.setChildren(node, children);
-        } else {
-            console.error("Could not set the children of unknown node with id " + parentNodeId);
-        }
-    };
+	public updateChildren(parentNodeId: string, children: E[]) {
+		const node = this.findEntryById(parentNodeId);
+		if (node) {
+			this.setChildren(node, children);
+		} else {
+			console.error("Could not set the children of unknown node with id " + parentNodeId);
+		}
+	};
 
-    public updateNode(node: E) {
-        const oldNode = this.findEntryById(this.config.idFunction(node));
-        const parent = this.findParentNode(oldNode);
-        if (parent) {
-            (parent as any)[this.config.childrenProperty][(parent as any)[this.config.childrenProperty].indexOf(oldNode)] = node;
-        } else {
-            this.entries[this.entries.indexOf(oldNode)] = node;
-        }
-        this.createEntryElement(node, this.nodeDepth(oldNode)).insertAfter((oldNode as any)._trEntryElement);
-        (oldNode as any)._trEntryElement.remove();
-    };
+	public updateNode(node: E) {
+		const oldNode = this.findEntryById(this.config.idFunction(node));
+		let parentNode = oldNode.parent;
+		let newEntryWrapper = this.createEntryWrapper(node, parentNode);
+		if (parentNode) {
+			parentNode.children[parentNode.children.indexOf(oldNode)] = newEntryWrapper;
+		} else {
+			this.entries[this.entries.indexOf(oldNode)] = newEntryWrapper;
+		}
+		newEntryWrapper.render().insertAfter(oldNode.$element);
+		oldNode.$element.remove();
+	};
 
-    public removeNode(nodeId: string) {
-        const childNode = this.findEntryById(nodeId);
-        if (childNode) {
-            const parentNode = this.findParentNode(childNode);
-            if (parentNode) {
-                (parentNode as any)[this.config.childrenProperty].splice((parentNode as any)[this.config.childrenProperty].indexOf(childNode), 1);
-            } else {
-                this.entries.splice(this.entries.indexOf(childNode), 1);
-            }
-            (childNode as any)._trEntryElement.remove();
-        }
-    };
+	public removeNode(nodeId: string) {
+		const childNode = this.findEntryById(nodeId);
+		if (childNode) {
+			const parentNode = childNode.parent;
+			if (parentNode) {
+				parentNode.children.splice(parentNode.children.indexOf(childNode), 1);
+			} else {
+				this.entries.splice(this.entries.indexOf(childNode), 1);
+			}
+			childNode.$element.remove();
+		}
+	};
 
 	// TODO "refreshNode(nodeId, updateExpandedState: boolean, updateChildren: boolean)" which will update the node (and optionally the children) cache and display
 	// TODO "refreshChildren(nodeId, updateExpandedState: boolean)" which will call the children method again to update its cache and display!
 
-    public addNode(parentNodeId: any, node: E) {
-	    const parentNode = this.findEntryById(parentNodeId);
-        if (this.isLeaf(parentNode)) {
-            console.error('The parent node is a leaf node, so you cannot add children to it!'); // TODO change this! (see above)
-        }
-        if (!(parentNode as any)[this.config.childrenProperty]) {
-            (parentNode as any)[this.config.childrenProperty] = [];
-        }
-        (parentNode as any)[this.config.childrenProperty].push(node);
-        const entryElement = this.createEntryElement(node, this.nodeDepth(parentNode) + 1);
-        entryElement
-            .appendTo((parentNode as any)._trEntryElement.find('>.tr-tree-entry-children-wrapper'));
-        (parentNode as any)._trEntryElement.addClass('has-children');
-    };
+	public addNode(parentNodeId: number | string, node: E) {
+		const parentNode = this.findEntryById(parentNodeId);
+		if (parentNode.isLeaf()) {
+			console.error('The parent node is a leaf node, so you cannot add children to it!'); // TODO change this! (see above)
+		}
+		if (parentNode.children == null) {
+			parentNode.children = [];
+		}
+		let newEntryWrapper = this.createEntryWrapper(node, parentNode);
+		parentNode.children.push(newEntryWrapper);
+		newEntryWrapper.render().appendTo(parentNode.$element.find('>.tr-tree-entry-children-wrapper'));
+		parentNode.$element.addClass('has-children');
+	};
 
-    public destroy() {
-        this.$componentWrapper.remove();
-    };
+	public destroy() {
+		this.$componentWrapper.remove();
+	};
 
-    getMainDomElement(): Element {
-        return this.$componentWrapper[0];
-    }
+	getMainDomElement(): Element {
+		return this.$componentWrapper[0];
+	}
 }

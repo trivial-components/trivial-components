@@ -1,19 +1,8 @@
-import {TrivialComboBox} from "../../ts/TrivialComboBox";
-import {createCurrencyEntries, createDemoTreeNodes, createEntries, DemoEntry, firstNames, lastNames, randomImageUrl, randomOf, words} from "./demo-util";
-import {TrivialListBox} from "../../ts/TrivialListBox";
-import {TrivialTagComboBox} from "../../ts/TrivialTagComboBox";
-import {TrivialTreeBox} from "../../ts/TrivialTreeBox";
-import {TrivialTreeComboBox} from "../../ts/TrivialTreeComboBox";
-import {TrivialTree} from "../../ts/TrivialTree";
-import {TrivialUnitBox} from "../../ts/TrivialUnitBox";
-import {TimeUnit, TrivialCalendarBox} from "../../ts/TrivialCalendarBox";
-import moment = require("moment");
-import {TrivialDateTimeField} from "../../ts/TrivialDateTimeField";
+///<reference path="../../dist/tsd/index.d.ts"/>
+///<reference types="moment"/>
+///<reference path="demo-util.ts"/>
 
-import Moment = moment.Moment;
-import {trivialMatch} from "../../ts/TrivialCore";
-
-$(function () {
+window.onload = (function () {
 
 	// setInterval(() => console.log(document.activeElement), 1000);
 	// setInterval(() => console.log(window.getSelection().focusNode), 1000);
@@ -21,90 +10,7 @@ $(function () {
 
 	let demo: any = (window as any).demo = {};
 
-	demo.defaultFilteringCombobox = new TrivialComboBox("#defaultFilteringComboBox", {
-		entries: createEntries(),
-		showClearButton: true
-	});
-	demo.defaultFilteringCombobox.onSelectedEntryChanged.addListener(function(entry: any) {   
-		console.log("defaultFilteringCombobox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
-	});
-	demo.defaultFilteringCombobox.onFocus.addListener(function() {
-		console.log("defaultFilteringCombobox focus");
-	});
-	demo.defaultFilteringCombobox.onBlur.addListener(function() {
-		console.log("defaultFilteringCombobox blur");
-	});
-
-	demo.freeTextComboBox = new TrivialComboBox('#freeTextComboBox', {
-		entries: createEntries(),
-		allowFreeText: true
-	});
-	demo.freeTextComboBox.onSelectedEntryChanged.addListener(function(entry: any) {
-		console.log("freeTextComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
-	});
-
-	demo.noAutoCompleteComboBox = new TrivialComboBox('#noAutoCompleteComboBox', {
-		entries: createEntries(),
-		autoComplete: false
-	});
-
-	demo.iconSingleLineComboBox = new TrivialComboBox('#iconSingleLineComboBox', {
-		entries: createEntries(),
-	});
-
-	demo.customFilteringComboBox = new TrivialComboBox('#customFilteringComboBox', {
-		entries: createEntries(),
-		queryFunction: function (queryString, resultCallback) {
-			setTimeout(function () {
-				resultCallback(createEntries().filter(function (entry: any) {
-					return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
-				}));
-			}, 500);
-		}
-	});
-
-	demo.valueFunctionComboBox = new TrivialComboBox('#valueFunctionComboBox', {
-		entries: createEntries(),
-		valueFunction: function(entry: any) {
-			return entry ? entry.additionalInfo : null;
-		}
-	});
-
-	demo.noTriggerComboBox = new TrivialComboBox('#noTriggerComboBox', {
-		entries: createEntries(),
-		showTrigger: false
-	});
-
-	const showDropDownOnResultsOnlyComboBoxEntries = createEntries();
-	demo.showDropDownOnResultsOnlyComboBox = new TrivialComboBox('#showDropDownOnResultsOnlyComboBox', {
-		entries: showDropDownOnResultsOnlyComboBoxEntries,
-		queryFunction: function (queryString, resultCallback) {
-			setTimeout(function () {
-				resultCallback(showDropDownOnResultsOnlyComboBoxEntries.filter(function (entry: any) {
-					return entry.displayValue.toLowerCase().indexOf(queryString.toLowerCase()) != -1 || entry.additionalInfo.toLowerCase().indexOf(queryString.toLowerCase()) != -1;
-				}));
-			}, 500);
-		},
-		showDropDownOnResultsOnly: true
-	});
-
-	demo.disabledComboBox = new TrivialComboBox('#disabledComboBox', {
-		selectedEntry: createEntries(1)[0],
-		editingMode: 'disabled'
-	});
-
-	demo.readonlyComboBox = new TrivialComboBox('#readonlyComboBox', {
-		selectedEntry: createEntries(1)[0],
-		editingMode: 'readonly'
-	});
-
-	const listBoxEntries = createEntries(10);
-	(listBoxEntries[1] as any).template = "<div>custom template for entry {{id}}</div>";
-	demo.listBox = new TrivialListBox('#listBox', {
-		entries: listBoxEntries
-	});
-
-	demo.zeroConfigTagBox = new TrivialTagComboBox('#zeroConfigTagBox', {
+	demo.zeroConfigTagBox = new TrivialComponents.TrivialTagComboBox('#zeroConfigTagBox', {
 		entries: createEntries()
 	});
 	demo.zeroConfigTagBox.onSelectedEntryChanged.addListener(function(entries: any[]) {
@@ -120,13 +26,13 @@ $(function () {
 		console.log("#zeroConfigTagBox change")
 	});
 
-	demo.customTemplateTagBox = new TrivialTagComboBox('#customTemplateTagBox1', {
+	demo.customTemplateTagBox = new TrivialComponents.TrivialTagComboBox('#customTemplateTagBox1', {
 		entries: createEntries(),
 		selectedEntries: createEntries(2),
 		showTrigger: false
 	});
 
-	demo.customTemplateTagBox2 = new TrivialTagComboBox('#customTemplateTagBox2', {
+	demo.customTemplateTagBox2 = new TrivialComponents.TrivialTagComboBox('#customTemplateTagBox2', {
 		entries: createEntries(),
 		showTrigger: false
 	});
@@ -165,16 +71,16 @@ $(function () {
 			return `<div class="entry ${selectedDisplay ? 'tag' : ''}"><div class="value person"><div class="profile-picture" style="background-image: url(${entry.person.imageUrl})"></div> ${entry.person.lastName ? entry.person.firstName + ' ' + entry.person.lastName : entry.person.email}</div></div>`;
 		}
 	};
-	demo.compositeTagBox = new TrivialTagComboBox<any>('#compositeTagBox', {
+	demo.compositeTagBox = new TrivialComponents.TrivialTagComboBox<any>('#compositeTagBox', {
 		queryFunction: function (searchString, resultCallback) {
 			searchString = searchString || "";
 			let matchingAttributeEntries: { attribute: string }[];
 			matchingAttributeEntries = demo.compositeTagBox.getCurrentPartialTag() == null ? attributeEntries.filter(function (e) {
-					return trivialMatch(e.attribute, searchString).length > 0;
+					return TrivialComponents.trivialMatch(e.attribute, searchString).length > 0;
 			}) : [];
 			const matchingPersons = personsEntries.filter(function (e) {
-				let textMatches = trivialMatch(e.person.firstName, searchString).length > 0
-					|| trivialMatch(e.person.lastName, searchString).length > 0;
+				let textMatches = TrivialComponents.trivialMatch(e.person.firstName, searchString).length > 0
+					|| TrivialComponents.trivialMatch(e.person.lastName, searchString).length > 0;
 				return matchingAttributeEntries.length == 0 && textMatches;
 			});
 			resultCallback([...matchingAttributeEntries, ...matchingPersons]);
@@ -197,19 +103,19 @@ $(function () {
 				}
 			}
 		},
-		selectionAcceptor: (e) => e.attribute != null || e.email && e.email.indexOf("@") !== -1    
+		selectionAcceptor: (e) => e.attribute != null || e.email && e.email.indexOf("@") !== -1
 	});
 
-	demo.maxSelectedEntriesTagBox = new TrivialTagComboBox('#maxSelectedEntriesTagBox', {
+	demo.maxSelectedEntriesTagBox = new TrivialComponents.TrivialTagComboBox('#maxSelectedEntriesTagBox', {
 		entries: createEntries(),
 	});
 
-	demo.noDropdownTagBox = new TrivialTagComboBox('#noDropdownTagBox', {
+	demo.noDropdownTagBox = new TrivialComponents.TrivialTagComboBox('#noDropdownTagBox', {
 		showTrigger: false
 	});
 
 	const showDropDownOnResultsOnlyTagBoxEntries = createEntries();
-	demo.showDropDownOnResultsOnlyTagBox = new TrivialTagComboBox('#showDropDownOnResultsOnlyTagBox', {
+	demo.showDropDownOnResultsOnlyTagBox = new TrivialComponents.TrivialTagComboBox('#showDropDownOnResultsOnlyTagBox', {
 		entries: showDropDownOnResultsOnlyTagBoxEntries,
 		queryFunction: function (queryString, resultCallback) {
 			setTimeout(function () {
@@ -221,17 +127,17 @@ $(function () {
 		showDropDownOnResultsOnly: true
 	});
 
-	demo.disabledTagBox = new TrivialTagComboBox('#disabledTagBox', {
+	demo.disabledTagBox = new TrivialComponents.TrivialTagComboBox('#disabledTagBox', {
 		selectedEntries: createEntries(2),
 		editingMode: 'disabled'
 	});
 
-	demo.readonlyTagBox = new TrivialTagComboBox('#readonlyTagBox', {
+	demo.readonlyTagBox = new TrivialComponents.TrivialTagComboBox('#readonlyTagBox', {
 		selectedEntries: createEntries(2),
 		editingMode: 'readonly'
 	});
 
-	demo.treeBoxContaine = new TrivialTreeBox('#treeBoxContainer', {
+	demo.treeBoxContaine = new TrivialComponents.TrivialTreeBox('#treeBoxContainer', {
 		entries: createDemoTreeNodes(),
 		selectedEntryId: 2,
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -240,7 +146,7 @@ $(function () {
 			}, 1000);
 		}
 	});
-	demo.singleSelectionTreeBoxContainer = new TrivialTreeBox('#singleSelectionTreeBoxContainer', {
+	demo.singleSelectionTreeBoxContainer = new TrivialComponents.TrivialTreeBox('#singleSelectionTreeBoxContainer', {
 		entries: createDemoTreeNodes(),
 		selectedEntryId: 2,
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -253,7 +159,7 @@ $(function () {
 	});
 
 	const $treeComboBox = $('#treeComboBox');
-	demo.treeComboBox = new TrivialTreeComboBox($treeComboBox, {
+	demo.treeComboBox = new TrivialComponents.TrivialTreeComboBox($treeComboBox, {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[0],
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -274,7 +180,7 @@ $(function () {
 		console.log("treeComboBox blur");
 	});
 
-	demo.freeTextTreeComboBox = new TrivialTreeComboBox('#freeTextTreeComboBox', {
+	demo.freeTextTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#freeTextTreeComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[0],
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -289,19 +195,19 @@ $(function () {
 		console.log("freeTextTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
 	});
 
-	demo.disabledTreeComboBox = new TrivialTreeComboBox('#disabledTreeComboBox', {
+	demo.disabledTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#disabledTreeComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[1],
 		editingMode: 'disabled'
 	});
 
-	demo.readonlyTreeComboBox = new TrivialTreeComboBox('#readonlyTreeComboBox', {
+	demo.readonlyTreeComboBox = new TrivialComponents.TrivialTreeComboBox('#readonlyTreeComboBox', {
 		entries: createDemoTreeNodes(),
 		selectedEntry: createDemoTreeNodes()[2],
 		editingMode: 'readonly'
 	});
 
-	demo.lazyChildLoadingTreeComboBox =  new TrivialTreeComboBox('#lazyChildLoadingTreeComboBox', {
+	demo.lazyChildLoadingTreeComboBox =  new TrivialComponents.TrivialTreeComboBox('#lazyChildLoadingTreeComboBox', {
 		entries: createDemoTreeNodes(),
 		lazyChildrenQueryFunction: function (node, callback) {
 			setTimeout(function () {
@@ -314,7 +220,7 @@ $(function () {
 		console.log("lazyChildLoadingTreeComboBox onSelectedEntryChanged " + (entry ? entry.displayValue : "null"))
 	});
 
-	demo.zeroConfigTree = new TrivialTree('#zeroConfigTree', {
+	demo.zeroConfigTree = new TrivialComponents.TrivialTree('#zeroConfigTree', {
 		entries: createDemoTreeNodes(),
 //            selectedEntryId: 2,
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -331,7 +237,7 @@ $(function () {
 		console.log("onNodeExpansionStateChanged " + node.id)
 	});
 
-	demo.onDemandSearchFieldTree = new TrivialTree('#onDemandSearchFieldTree', {
+	demo.onDemandSearchFieldTree = new TrivialComponents.TrivialTree('#onDemandSearchFieldTree', {
 		entries: createDemoTreeNodes(),
 		directSelectionViaArrowKeys: true,
 		selectedEntryId: 2,
@@ -343,7 +249,7 @@ $(function () {
 		searchBarMode: "show-if-filled"
 	});
 
-	demo.noSearchFieldTree = new TrivialTree('#noSearchFieldTree', {
+	demo.noSearchFieldTree = new TrivialComponents.TrivialTree('#noSearchFieldTree', {
 		entries: createDemoTreeNodes(),
 		selectedEntryId: 2,
 		lazyChildrenQueryFunction: function (node, callback) {
@@ -354,7 +260,7 @@ $(function () {
 		searchBarMode: 'none'
 	});
 
-	demo.unitBox = new TrivialUnitBox('#unitBox', {
+	demo.unitBox = new TrivialComponents.TrivialUnitBox('#unitBox', {
 		entries: createCurrencyEntries(),
 		selectedEntry: {
 			code: 'EUR'
@@ -363,7 +269,7 @@ $(function () {
 		thousandsSeparator: '.',
 		allowNullAmount: true
 	});
-	demo.unitBox.onChange.addListener(function (data: { value: Moment, timeUnitEdited: TimeUnit}) {
+	demo.unitBox.onChange.addListener(function (data: { value: any, timeUnitEdited: TrivialComponents.TimeUnit}) {
 		console.log("trivialUnitBox.amount: " + data.value);
 		console.log("trivialUnitBox.unit: " + data.timeUnitEdited);
 	});
@@ -376,32 +282,31 @@ $(function () {
 	demo.unitBox.getEditor().addEventListener("unit box editor keyup", function() {console.log("keyup: " + demo.unitBox.getAmount() + " " + demo.unitBox.getSelectedEntry().code)});
 
 
-	demo.unitBoxLeft = new TrivialUnitBox('#unitBoxLeft', {
+	demo.unitBoxLeft = new TrivialComponents.TrivialUnitBox('#unitBoxLeft', {
 		entries: createCurrencyEntries(),
 		unitDisplayPosition: 'left'
 	});
-	demo.unitBoxSingleLineTemplate = new TrivialUnitBox('#unitBoxSingleLineTemplate', {
+	demo.unitBoxSingleLineTemplate = new TrivialComponents.TrivialUnitBox('#unitBoxSingleLineTemplate', {
 		entries: createCurrencyEntries()
 	});
-	demo.readonlyUnitBox = new TrivialUnitBox('#readonlyUnitBox', {
+	demo.readonlyUnitBox = new TrivialComponents.TrivialUnitBox('#readonlyUnitBox', {
 		entries: createCurrencyEntries(),
 		editingMode: 'readonly',
 		amount: 123456789,
 		selectedEntry: createCurrencyEntries()[0]
 	});
-	demo.disabledUnitBox = new TrivialUnitBox('#disabledUnitBox', {
+	demo.disabledUnitBox = new TrivialComponents.TrivialUnitBox('#disabledUnitBox', {
 		entries: createCurrencyEntries(),
 		editingMode: 'disabled',
 		amount: 123456789,
 		selectedEntry: createCurrencyEntries()[0]
 	});
 
-	demo.calendarBox = new TrivialCalendarBox('#calendarBox', {
-		selectedDate: moment(),
+	demo.calendarBox = new TrivialComponents.TrivialCalendarBox('#calendarBox', {
 		firstDayOfWeek: 1
 	});
 
-	demo.dateTimeField = new TrivialDateTimeField('#dateTimeField', {});
+	demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
 
 	let $destroyAllButton = $('#destroyAllButton').click(function() {
 		Object.keys(demo).forEach(function(key) {

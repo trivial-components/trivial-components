@@ -6,7 +6,6 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceRoot": "..",
-    "outDir": "ts",
     "sourceMap": true,
     "declaration": true,
     "moduleResolution": "node"

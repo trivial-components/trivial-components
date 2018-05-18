@@ -16,7 +16,7 @@
  *  
  */
 
-import {TrivialDateSuggestionEngine} from "../ts/TrivialDateSuggestionEngine";
+import {TrivialDateSuggestionEngine} from "../src";
 import * as moment from "../node_modules/moment/moment.js";
 
 
