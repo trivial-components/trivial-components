@@ -324,12 +324,8 @@ export class TrivialComboBox<E> implements TrivialComponent {
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
-                    if (this.isDropDownOpen) {
-                        // expand the currently highlighted node.
-                        const changedExpandedState = this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
-                        if (changedExpandedState) {
-                            return false;
-                        }
+                    if (this.isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
+	                    return false; // the currently highlighted node got effectively expanded/collapsed, so cancel any other effect of the key stroke!
                     }
                     this.showEditor();
                     return; // let the user navigate freely left and right...

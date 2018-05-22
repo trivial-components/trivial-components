@@ -359,7 +359,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         e.preventDefault(); // under any circumstances, prevent the new line to be added to the editor!
                     }
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
-                    if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
+                    if (this.isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
+                        return false; // the currently highlighted node got effectively expanded/collapsed, so cancel any other effect of the key stroke!
+                    } else if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.prev()) {
                             this.doIgnoringBlurEvents(() => this.$editor.insertBefore(this.$editor.prev()));
                             this.focusEditor();
