@@ -31,6 +31,7 @@
     "test": "jest",
     "prebuild": "rm -rf dist",
     "build": "webpack --mode production",
+    "dev-build-watch": "webpack --mode development --watch",
     "postbuild": "echo \"\\nexport as namespace TrivialComponents;\" >> dist/tsd/index.d.ts"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "awesome-typescript-loader": "^5.0.0",
     "bower": "^1.8.0",
     "child_process": "^1.0.2",
+    "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^0.28.11",
     "cssnano": "^3.9.1",
     "del": "^2.2.2",

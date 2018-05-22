@@ -22,6 +22,7 @@ var merge = require('webpack-merge');
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
 
 var baseConfig = {
 	entry: './src/index.ts',
@@ -65,14 +66,16 @@ var baseConfig = {
 		"levenshtein": "Levenshtein",
 		"moment": "moment",
 		"moment-timezone": "moment"
-	}
+	},
+	plugins: [
+		new CleanWebpackPlugin(['dist'])
+	]
 };
 
 module.exports = [
 	merge(baseConfig, {
 		plugins: [
 			new MiniCssExtractPlugin({
-				
 				filename: "trivial-components.css"
 			})
 		]
