@@ -62,8 +62,18 @@ var baseConfig = {
 		}]
 	},
 	externals: {
-		"jquery": "jQuery",
-		"levenshtein": "Levenshtein",
+		"jquery": {
+			commonjs: "jquery",
+			commonjs2: "jquery",
+			amd: "jquery",
+			root: "jQuery"
+		},
+		"levenshtein": {
+			commonjs: "fast-levenshtein",
+			commonjs2: "fast-levenshtein",
+			amd: "fast-levenshtein",
+			root: "Levenshtein"
+		},
 		"moment": "moment",
 		"moment-timezone": "moment"
 	},
