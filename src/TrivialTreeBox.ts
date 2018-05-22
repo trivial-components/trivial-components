@@ -120,7 +120,12 @@ export interface TrivialTreeBoxConfig<E> {
 	/**
 	 * HTML string defining the spinner to be displayed while lazy children are being retrieved.
 	 */
-	spinnerTemplate?: string
+	spinnerTemplate?: string,
+
+	/**
+	 * When highlighting/selecting nodes, they sometimes need to get revealed to the user by scrolling. This option specifies the corresponding scroll container.
+	 */
+	scrollContainer?: Element | JQuery
 }
 
 class EntryWrapper<E> {
@@ -218,7 +223,8 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 			animationDuration: 70,
 			showExpanders: false,
 			expandOnSelection: false, // open expandable nodes when they are selected
-			enforceSingleExpandedPath: false // only one path is expanded at any time
+			enforceSingleExpandedPath: false, // only one path is expanded at any time
+			scrollContainer: $($container)
 		};
 		this.config = $.extend(defaultConfig, options);
 
@@ -458,7 +464,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 	}
 
 	private minimallyScrollTo($entryWrapper: JQuery) {
-		minimallyScrollTo(this.$componentWrapper.parent(), $entryWrapper);
+		minimallyScrollTo(this.config.scrollContainer, $entryWrapper);
 	}
 
 	private markSelectedEntry(entry: EntryWrapper<E>) {

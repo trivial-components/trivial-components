@@ -313,7 +313,6 @@ export class TrivialCalendarBox implements TrivialComponent {
             } else if (direction == 'up' || direction == 'right') {
                 this.setYear(this.selectedDate.year() + 1, fireEvent);
             }
-            fireEvent && this.fireChangeEvents('year');
             return true;
         } else if (unit == 'month') {
             if (direction == 'down' || direction == 'left') {
@@ -321,7 +320,6 @@ export class TrivialCalendarBox implements TrivialComponent {
             } else if (direction == 'up' || direction == 'right') {
                 this.setMonth(this.selectedDate.month() + 2, fireEvent);
             }
-            fireEvent && this.fireChangeEvents('month');
             return true;
         } else if (unit == 'day') {
             if (direction == 'down') {

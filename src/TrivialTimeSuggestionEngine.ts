@@ -88,14 +88,20 @@ export class TrivialTimeSuggestionEngine {
 
 	private static createMinuteSuggestions(minuteString: string): number[] {
 		const m = parseInt(minuteString);
-		if (isNaN(m)) {
-			return [0];
-		} else if (minuteString.length > 1) {
-			return [m % 60]; // the user entered an exact minute string!
-		} else if (m < 6) {
-			return [m * 10];
-		} else {
-			return [m % 60];
+		if (m < 0) {
+			return [];
+		} else if (isNaN(m)) {
+			return [0, 30];
+		} else if (minuteString.length === 1) {
+			return []; // do not suggest something like "20" for input "2" - we simply cannot suggest anything satisfying at this point.
+		} else if (minuteString.length === 2) {
+			if (m > 59) {
+				return [];
+			} else {
+				return [m];
+			}
+		} else { // minuteString.length > 2...
+			return [];
 		}
 	}
 
