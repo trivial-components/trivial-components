@@ -107,7 +107,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         }, options);
 
         if (!this.config.queryFunction) {
-            this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+            this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], ["code", "name", "symbol"], this.config.matchingOptions);
             this.usingDefaultQueryFunction = true;
         }
 
@@ -483,9 +483,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         if (this.selectedEntry == null) {
             return null;
         } else {
-            const selectedEntryToReturn = $.extend({}, this.selectedEntry);
-            delete selectedEntryToReturn._trEntryElement;
-            return selectedEntryToReturn;
+            return this.selectedEntry;
         }
     }
 

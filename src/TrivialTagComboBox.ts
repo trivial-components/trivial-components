@@ -19,7 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {
 	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
-	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
+	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
@@ -189,7 +189,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public readonly onFocus = new TrivialEvent<void>(this);
     public readonly onBlur = new TrivialEvent<void>(this);
 
-    private listBox: TrivialTreeBox<E>;
+    private treeBox: TrivialTreeBox<E>;
     private isDropDownOpen = false;
     private entries: E[];
     private selectedEntries: E[] = [];
@@ -247,6 +247,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             freeTextEntryFactory: (freeText: string) => {
                 return {
                     displayValue: freeText,
+	                id: generateUUID(),
                     _isFreeTextEntry: true
                 };
             },
@@ -269,7 +270,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }, options);
 
         if (!this.config.queryFunction) {
-            this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], this.config.matchingOptions);
+            this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], ["displayValue", "additionalInfo"], this.config.matchingOptions);
             this.usingDefaultQueryFunction = true;
         }
 
@@ -336,7 +337,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 if (keyCodes.isModifierKey(e)) {
                     return;
                 } else if (e.which == keyCodes.tab || e.which == keyCodes.enter) {
-                    const highlightedEntry = this.listBox.getHighlightedEntry();
+                    const highlightedEntry = this.treeBox.getHighlightedEntry();
                     if (this.isDropDownOpen && highlightedEntry != null) {
                         this.addSelectedEntry(highlightedEntry, true, e);
                         e.preventDefault(); // do not tab away from the tag box nor insert a newline character
@@ -391,7 +392,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 	                    this.query(direction);
                         this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
-                        this.listBox.highlightNextEntry(direction);
+                        this.treeBox.highlightNextEntry(direction);
                         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
                     }
                     return false; // some browsers move the caret to the beginning on up key
@@ -470,11 +471,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         const configWithoutEntries = $.extend({}, this.config);
         configWithoutEntries.entries = []; // for init performance reasons, initialize the dropdown content lazily
-        this.listBox = new TrivialTreeBox<E>(this.$dropDown, configWithoutEntries);
-        this.listBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
+        this.treeBox = new TrivialTreeBox<E>(this.$dropDown, configWithoutEntries);
+        this.treeBox.onSelectedEntryChanged.addListener((selectedEntry: E, eventSource?: any, originalEvent?: Event) => {
             if (selectedEntry) {
                 this.addSelectedEntry(selectedEntry, true, originalEvent);
-                this.listBox.setSelectedEntryById(null);
+                this.treeBox.setSelectedEntryById(null);
                 this.closeDropDown();
             }
         });
@@ -536,8 +537,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private updateListBoxEntries() {
         this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
 
-        this.listBox.updateEntries(this.entries);
-        this.listBox.highlightTextMatches(this.entries && this.entries.length <= this.config.textHighlightingEntryLimit ? this.getNonSelectedEditorValue() : null);
+        this.treeBox.updateEntries(this.entries);
+        this.treeBox.highlightTextMatches(this.entries && this.entries.length <= this.config.textHighlightingEntryLimit ? this.getNonSelectedEditorValue() : null);
 
         this.listBoxDirty = false;
     }
@@ -555,9 +556,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
 
         if (highlightDirection) {
-            this.listBox.highlightNextEntry(highlightDirection);
+            this.treeBox.highlightNextEntry(highlightDirection);
         } else {
-            this.listBox.setHighlightedEntryById(null);
+            this.treeBox.setHighlightedEntryById(null);
         }
 
         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
@@ -698,7 +699,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     private autoCompleteIfPossible(delay: number) {
         if (this.config.autoComplete) {
             clearTimeout(this.autoCompleteTimeoutId);
-            const highlightedEntry = this.listBox.getHighlightedEntry();
+            const highlightedEntry = this.treeBox.getHighlightedEntry();
             if (highlightedEntry && !this.doNoAutoCompleteBecauseBackspaceWasPressed) {
                 this.autoCompleteTimeoutId = window.setTimeout(() => {
                     const currentEditorValue = this.getNonSelectedEditorValue();
@@ -765,6 +766,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
         return selectedEntriesToReturn;
     };
+
+	public getDropDownComponent(): TrivialComponent {
+	    return this.treeBox;
+    }
 
     public getCurrentPartialTag() {
         return this.currentPartialTag;

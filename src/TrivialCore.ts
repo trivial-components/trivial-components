@@ -116,7 +116,7 @@ export interface DefaultCurrencyEntryStructure {
 	exchangeRateBase? : string
 }
 
-export const DEFAULT_RENDERING_FUNCTIONS: { [key: string]: RenderingFunction<DefaultEntryStructure | DefaultCurrencyEntryStructure> } = {
+export const DEFAULT_RENDERING_FUNCTIONS = {
 	image2Lines: (entry: DefaultEntryStructure) => {
 		entry = entry || {};
 		return `<div class="tr-template-image-2-lines">  
@@ -213,14 +213,16 @@ export function wrapWithDefaultTagWrapper(entryHtml: string) {
     </div>`);
 }
 
-export function defaultListQueryFunctionFactory<E>(entries: E[], matchingOptions: MatchingOptions): QueryFunction<E> {
+export function defaultListQueryFunctionFactory<E>(entries: E[], properties: (string | ((entry: E) => any))[], matchingOptions: MatchingOptions): QueryFunction<E> {
 	function filterElements(queryString: string): E[] {
 		const visibleEntries: any[] = [];
 		for (let i = 0; i < entries.length; i++) {
 			const entry = entries[i];
-			const $entryElement = (entry as any)._trEntryElement;
-			if (!queryString || trivialMatch($entryElement.text().trim().replace(/\s{2,}/g, ' '), queryString, matchingOptions).length > 0) {
-				visibleEntries.push(entry);
+			for (let j = 0; j < properties.length; j++) {
+				let propertyValue = extractValue(entry, properties[j]);
+				if (!queryString || trivialMatch(propertyValue, queryString, matchingOptions).length > 0) {
+					visibleEntries.push(entry);
+				}
 			}
 		}
 		return visibleEntries;
@@ -228,6 +230,18 @@ export function defaultListQueryFunctionFactory<E>(entries: E[], matchingOptions
 
 	return function (queryString: string, resultCallback: ResultCallback<E>) {
 		resultCallback(filterElements(queryString));
+	}
+}
+
+export type PropertyReadAccess<E> = (string | ((entry: E) => any));
+
+export function extractValue<E>(entry: E, property: PropertyReadAccess<E>): any {
+	if (entry == null) {
+		return null;
+	} else if (typeof property === 'string') {
+		return (entry as any)[property];
+	} else if (typeof property === 'function') {
+		return property(entry);
 	}
 }
 
@@ -401,7 +415,9 @@ export function objectEquals(x: any, y: any): boolean {
  * @returns array of matchers {start, length, distance}
  */
 export function trivialMatch(text: string, searchString: string, options?: MatchingOptions): Match[] {
-
+	if (!text) {
+		return [];
+	}
 	if (!searchString) {
 		return [{
 			start: 0,
