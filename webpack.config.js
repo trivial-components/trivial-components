@@ -69,9 +69,9 @@ var baseConfig = {
 			root: "jQuery"
 		},
 		"levenshtein": {
-			commonjs: "fast-levenshtein",
-			commonjs2: "fast-levenshtein",
-			amd: "fast-levenshtein",
+			commonjs: "levenshtein",
+			commonjs2: "levenshtein",
+			amd: "levenshtein",
 			root: "Levenshtein"
 		},
 		"moment": "moment",
