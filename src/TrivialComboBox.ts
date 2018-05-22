@@ -19,7 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {
 	DEFAULT_TEMPLATES, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately,
-	TrivialComponent, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS
+	TrivialComponent, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID
 } from "./TrivialCore";
 import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 import {TrivialEvent} from "./TrivialEvent";
@@ -216,6 +216,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
             freeTextEntryFactory: (freeText: string) => {
                 return {
                     displayValue: freeText,
+                    id: generateUUID(),
                     _isFreeTextEntry: true
                 };
             },
@@ -632,23 +633,13 @@ export class TrivialComboBox<E> implements TrivialComponent {
         } else if (this.selectedEntry == null && this.config.allowFreeText) {
             return this.config.freeTextEntryFactory(this.$editor.val());
         } else {
-            const selectedEntryToReturn = $.extend({}, this.selectedEntry);
-            delete selectedEntryToReturn._trEntryElement;
-            return selectedEntryToReturn;
+            return this.selectedEntry;
         }
     }
 
-    public updateChildren(parentNodeId: any, children: E[]) {
-        this.treeBox.updateChildren(parentNodeId, children);
-    }
-
-    public updateNode(node: E) {
-        this.treeBox.updateNode(node);
-    }
-
-    public removeNode(nodeId: string) {
-        this.treeBox.removeNode(nodeId);
-    }
+	public getDropDownComponent(): TrivialComponent {
+		return this.treeBox;
+	}
 
     public focus() {
         this.showEditor();
