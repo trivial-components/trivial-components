@@ -3,18 +3,21 @@ github-token.json
 
 ### JavaScript stuff
 bower_components/
-node/
 node_modules/
-typings/
-tmp/
-yarn-error.log
-test/
 demo/
 dist/trivial-components-*.tar.gz
 dist/trivial-components-*.zip
 dist/lib/
 yarn.lock
 __test__/
+.gitignore
+.npmignore
+.travis.yml
+gulpfile.js
+tsconfig.json
+webpack.config.js
+
+#### ===== IDEs =====
 
 ### NetBeans template
 nbproject/private/
