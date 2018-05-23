@@ -277,23 +277,24 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.entries = this.config.entries;
 
         this.$originalInput = $(originalInput).addClass("tr-original-input");
-        this.$tagComboBox = $('<div class="tr-tagbox tr-input-wrapper"/>')
+        this.$tagComboBox = $(`<div class="tr-tagbox tr-input-wrapper">
+            <div class="tr-tagbox-tagarea"></div>
+            <div class="tr-trigger ${this.config.showTrigger ? '' : 'hidden'}"><span class="tr-trigger-icon"/></div>
+        </div>`)
             .insertAfter(this.$originalInput);
-        this.$originalInput.appendTo(this.$tagComboBox);
-        this.$tagArea = $('<div class="tr-tagbox-tagarea"/>').appendTo(this.$tagComboBox);
-        if (this.config.showTrigger) {
-            this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$tagComboBox);
-            this.$trigger.mousedown(() => {
-                this.focusEditor();
-                if (this.isDropDownOpen) {
-                    this.closeDropDown();
-                } else {
-                    this.$editor.select();
-                    this.openDropDown();
-                    this.query();
-                }
-            });
-        }
+        this.$originalInput.prependTo(this.$tagComboBox);
+        this.$tagArea = this.$tagComboBox.find('.tr-tagbox-tagarea');
+        this.$trigger = this.$tagComboBox.find('.tr-trigger');
+        this.$trigger.mousedown(() => {
+            this.focusEditor();
+            if (this.isDropDownOpen) {
+                this.closeDropDown();
+            } else {
+                this.$editor.select();
+                this.openDropDown();
+                this.query();
+            }
+        });
         this.$dropDown = $('<div class="tr-dropdown"></div>')
             .scroll(() => {
                 return false;
@@ -786,7 +787,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         return this.$editor[0];
     }
 
-    public destroy() {
+	public setShowTrigger(showTrigger: boolean) {
+		this.$trigger.toggleClass('hidden', !showTrigger);
+	}
+
+	public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$tagComboBox);
         this.$tagComboBox.remove();
         this.$dropDown.remove();

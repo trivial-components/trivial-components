@@ -245,32 +245,32 @@ export class TrivialComboBox<E> implements TrivialComponent {
         }
 
         this.$originalInput = $(originalInput);
-        this.$comboBox = $('<div class="tr-comboBox tr-combobox tr-input-wrapper"/>')
+        this.$comboBox = $(`<div class="tr-comboBox tr-combobox tr-input-wrapper">
+            <div class="tr-combobox-selected-entry-wrapper"></div>
+            <div class="tr-remove-button ${this.config.showClearButton ? '' : 'hidden'}"></div>
+            <div class="tr-trigger ${this.config.showTrigger ? '' : 'hidden'}"><span class="tr-trigger-icon"/></div>
+        </div>`)
             .insertAfter(this.$originalInput);
-        this.$selectedEntryWrapper = $('<div class="tr-combobox-selected-entry-wrapper"/>').appendTo(this.$comboBox);
-        if (this.config.showClearButton) {
-            this.$clearButton = $('<div class="tr-remove-button">').appendTo(this.$comboBox);
-            this.$clearButton.mousedown((e) => {
-                this.$editor.val("");
-                this.setSelectedEntry(null, true, true, e);
-            });
-        }
-        if (this.config.showTrigger) {
-            this.$trigger = $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$comboBox);
-            this.$trigger.mousedown(() => {
-                if (this.isDropDownOpen) {
+        this.$selectedEntryWrapper = this.$comboBox.find('.tr-combobox-selected-entry-wrapper');
+        this.$clearButton = this.$comboBox.find('.tr-remove-button');
+        this.$clearButton.mousedown((e) => {
+            this.$editor.val("");
+            this.setSelectedEntry(null, true, true, e);
+        });
+        this.$trigger = this.$comboBox.find('.tr-trigger');
+        this.$trigger.mousedown(() => {
+            if (this.isDropDownOpen) {
+                this.showEditor();
+                this.closeDropDown();
+            } else {
+                setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
                     this.showEditor();
-                    this.closeDropDown();
-                } else {
-                    setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
-                        this.showEditor();
-                        this.$editor.select();
-                        this.openDropDown();
-                        this.query();
-                    });
-                }
-            });
-        }
+                    this.$editor.select();
+                    this.openDropDown();
+                    this.query();
+                });
+            }
+        });
         this.$dropDown = $('<div class="tr-dropdown"></div>')
             .scroll(() => {
                 return false;
@@ -509,7 +509,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
             $editorArea = this.$selectedEntryWrapper;
         }
 	    this.$editor.css({
-		    "width": Math.min($editorArea[0].offsetWidth, this.$trigger ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
+		    "width": Math.min($editorArea[0].offsetWidth, this.$trigger.is(':visible') ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
 		    "height": ($editorArea[0].offsetHeight) + "px"
 	    });
 	    place(this.$editor[0], "top left")
@@ -649,6 +649,14 @@ export class TrivialComboBox<E> implements TrivialComponent {
     public getDropDown() {
         return this.$dropDown;
     };
+
+    public setShowClearButton(showClearButton: boolean) {
+        this.$clearButton.toggleClass('hidden', !showClearButton);
+    }
+
+    public setShowTrigger(showTrigger: boolean) {
+	    this.$trigger.toggleClass('hidden', !showTrigger);
+    }
 
     public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$comboBox);
