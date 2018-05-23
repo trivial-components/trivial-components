@@ -623,7 +623,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
         }
     }
 
-    public getSelectedEntry() {
+    public getSelectedEntry(): E {
         if (this.selectedEntry == null && (!this.config.allowFreeText || !this.$editor.val())) {
             return null;
         } else if (this.selectedEntry == null && this.config.allowFreeText) {

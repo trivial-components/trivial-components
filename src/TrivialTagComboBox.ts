@@ -759,7 +759,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
     }
 
-    public getSelectedEntries() {
+    public getSelectedEntries(): E[] {
         const selectedEntriesToReturn: E[] = [];
         for (let i = 0; i < this.selectedEntries.length; i++) {
             const selectedEntryToReturn = $.extend({}, this.selectedEntries[i]);
