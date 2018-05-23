@@ -117,8 +117,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
         this.$originalInput = $(originalInput).addClass("tr-original-input");
         this.$editor = $('<input type="text"/>');
-        this.$unitBox = $('<div class="tr-unitbox tr-input-wrapper"/>').insertAfter(this.$originalInput)
-            .addClass(this.config.unitDisplayPosition === 'left' ? 'unit-display-left' : 'unit-display-right');
+        this.$unitBox = $('<div class="tr-unitbox tr-input-wrapper"/>').insertAfter(this.$originalInput);
         this.$originalInput.appendTo(this.$unitBox);
         this.$selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo(this.$unitBox);
         this.$selectedEntryWrapper = $('<div class="tr-unitbox-selected-entry-wrapper"/>').appendTo(this.$selectedEntryAndTriggerWrapper);
@@ -276,6 +275,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             }
         });
 
+	    this.setUnitDisplayPosition(this.config.unitDisplayPosition);
         this.$editor.val(this.config.amount || this.$originalInput.val());
         this.formatEditorValue();
         this.setSelectedEntry(this.config.selectedEntry || null, false, null);
@@ -511,6 +511,12 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     public getEditor(): Element {
         return this.$editor[0];
     }
+
+	public setUnitDisplayPosition(unitDisplayPosition: "left" | "right") {
+		this.$unitBox.toggleClass('unit-display-left', unitDisplayPosition === 'left');
+		this.$unitBox.toggleClass('unit-display-right', unitDisplayPosition === 'right');
+		this.updateOriginalInputValue();
+	}
 
     public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$unitBox);

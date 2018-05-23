@@ -552,6 +552,8 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     public updateEntries(newEntries: E[], highlightDirection?: HighlightDirection) {
+	    newEntries = newEntries || [];
+	    
         this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
 
         this.entries = newEntries;
