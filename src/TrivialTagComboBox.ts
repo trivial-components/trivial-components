@@ -19,7 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {
 	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
-	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID
+	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
@@ -269,10 +269,15 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             selectionAcceptor: (e) => !(e as any)._isFreeTextEntry // do not allow free text entries by default
         }, options);
 
-        if (!this.config.queryFunction) {
-            this.config.queryFunction = defaultListQueryFunctionFactory(this.config.entries || [], ["displayValue", "additionalInfo"], this.config.matchingOptions);
-            this.usingDefaultQueryFunction = true;
-        }
+	    if (!this.config.queryFunction) {
+		    this.config.queryFunction = defaultTreeQueryFunctionFactory(
+			    this.config.entries || [],
+			    defaultEntryMatchingFunctionFactory(["displayValue", "additionalInfo"], this.config.matchingOptions),
+			    this.config.childrenProperty,
+			    this.config.expandedProperty
+		    );
+		    this.usingDefaultQueryFunction = true;
+	    }
 
         this.entries = this.config.entries;
 

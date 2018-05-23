@@ -222,6 +222,7 @@ export function defaultListQueryFunctionFactory<E>(entries: E[], properties: (st
 				let propertyValue = extractValue(entry, properties[j]);
 				if (!queryString || trivialMatch(propertyValue, queryString, matchingOptions).length > 0) {
 					visibleEntries.push(entry);
+					break;
 				}
 			}
 		}
