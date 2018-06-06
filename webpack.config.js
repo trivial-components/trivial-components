@@ -36,7 +36,7 @@ var baseConfig = {
 		extensions: ['.ts', '.tsx', '.less', '.css', '.js']
 	},
 	optimization: {
-		minimize: true
+		minimize: false // overwritten below
 	},
 	devtool: 'source-map',
 	module: {
@@ -52,6 +52,12 @@ var baseConfig = {
 					loader: "css-loader",
 					options: {
 						sourceMap: true
+					}
+				}, {
+					loader: 'postcss-loader',
+					options: {
+						sourceMap: true,
+						plugins: (loader) => [require('autoprefixer')({browsers: ['> 1%', 'IE 11']})],
 					}
 				}, {
 					loader: "less-loader",
