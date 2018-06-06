@@ -81,7 +81,7 @@ export class TrivialTree<E> implements TrivialComponent{
             idFunction: defaultIdFunction,
             inputValueFunction: defaultIdFunction,
             childrenProperty: "children",
-            lazyChildrenFlagProperty: "hasLazyChildren",
+		    lazyChildrenFlag: "hasLazyChildren",
             searchBarMode: 'show-if-filled',
             lazyChildrenQueryFunction: (node: E, resultCallback: Function) => {
                 resultCallback([])

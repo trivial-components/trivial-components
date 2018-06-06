@@ -228,7 +228,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                 maxLevenshteinDistance: 2
             },
             childrenProperty: "children",
-            lazyChildrenFlagProperty: "hasLazyChildren",
+	        lazyChildrenFlag: "hasLazyChildren",
             expandedProperty: 'expanded',
             editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
             showDropDownOnResultsOnly: false

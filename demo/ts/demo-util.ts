@@ -61,13 +61,13 @@
 	statusColor: string
 }
 
- function createEntries(count = 100): DemoEntry[] {
+ function createEntries(count = 100, idBias = 0): DemoEntry[] {
     var entries: DemoEntry[] = [];
     for (var i = 0; i < count; i++) {
         var firstName = randomOf(firstNames);
         var lastName = randomOf(lastNames);
         entries.push({
-            id: i,
+            id: i + idBias,
             displayValue: firstName + ' ' + lastName,
             additionalInfo: randomWords(3),
             additionalInfo2: firstName.toLowerCase() + '.' + lastName.toLowerCase() + '@' + randomOf(words) + '.' + randomOf(countryExtensions),
@@ -1249,7 +1249,12 @@
         imageUrl: "img/icons/contacts.png",
         isLeaf: true
     }, {
-        id: 5, displayValue: "Custom Template Node",
+        id: 5, displayValue: "Lazy Children Here!",
+        imageUrl: "img/icons/folder.png",
+        isLeaf: true,
+        hasLazyChildren: true
+    }, {
+        id: 6, displayValue: "Custom Template Node",
         imageUrl: "img/icons/contacts.png",
         isLeaf: true,
         template: "<div>Custom template</div>"

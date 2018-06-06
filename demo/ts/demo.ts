@@ -209,9 +209,10 @@ window.onload = (function () {
 
 	demo.lazyChildLoadingComboBox =  new TrivialComponents.TrivialComboBox('#lazyChildLoadingComboBox', {
 		entries: createDemoTreeNodes(),
+		showExpanders: true,
 		lazyChildrenQueryFunction: function (node, callback) {
 			setTimeout(function () {
-				callback(createDemoTreeNodes())
+				callback(createEntries(3, 1000 * node.id) as any)
 			}, 1000);
 		},
 		animationDuration: 200

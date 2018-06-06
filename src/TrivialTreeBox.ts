@@ -63,11 +63,11 @@ export interface TrivialTreeBoxConfig<E> {
     childrenProperty?: string,
 
     /**
-     * Property used to determine whether a node has children that need to be lazy-loaded.
+     * Property name or function used to determine whether a node has children that need to be lazy-loaded.
      *
      * @default `'hasLazyChildren'`
      */
-    lazyChildrenFlagProperty?: string,
+    lazyChildrenFlag?: string | ((entry: E) => boolean),
 
 	/**
 	 * Function for retrieving children of a node.
@@ -141,7 +141,7 @@ class EntryWrapper<E> {
 		this.entry = entry;
 		this.depth = parent != null ? parent.depth + 1 : 0;
 		let children: E[] = (this.entry as any)[config.childrenProperty];
-		let hasLazyChildren = !!(this.entry as any)[config.lazyChildrenFlagProperty];
+		let hasLazyChildren: boolean = (typeof config.lazyChildrenFlag === 'string') ? !!(this.entry as any)[config.lazyChildrenFlag] : config.lazyChildrenFlag(entry);
 		if (children == null && hasLazyChildren) {
 			this.children = null;
 		} else if (children == null) {
@@ -201,7 +201,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		let defaultConfig: TrivialTreeBoxConfig<E> = {
 			idFunction: (entry: E) => entry ? (entry as any).id : null,
 			childrenProperty: "children",
-			lazyChildrenFlagProperty: "hasLazyChildren",
+			lazyChildrenFlag: "hasLazyChildren",
 			lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
 				resultCallback((node as any).children || []);
 			},
