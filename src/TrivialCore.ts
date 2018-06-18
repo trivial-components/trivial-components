@@ -264,7 +264,7 @@ export function defaultEntryMatchingFunctionFactory(searchedPropertyNames: strin
 	};
 }
 
-export function defaultTreeQueryFunctionFactory(topLevelEntries: any[], entryMatchingFunction: Function, childrenPropertyName: string, expandedPropertyName: string) {
+export function defaultTreeQueryFunctionFactory(topLevelEntries: any[] | (() => any[]), entryMatchingFunction: (entry: any, queryString: string, nodeDepth: number) => boolean, childrenPropertyName: string, expandedPropertyName: string) {
 
 	function findMatchingEntriesAndTheirAncestors(entry: any, queryString: string, nodeDepth: number) {
 		const entryProxy = createProxy(entry);
@@ -289,55 +289,14 @@ export function defaultTreeQueryFunctionFactory(topLevelEntries: any[], entryMat
 		return matchesItself || hasMatchingChildren ? entryProxy : null;
 	}
 
-	return function (queryString: string, resultCallback: Function) {
-		if (!queryString) {
-			resultCallback(topLevelEntries);
-		} else {
-			const matchingEntries: any[] = [];
-			for (let i = 0; i < topLevelEntries.length; i++) {
-				const topLevelEntry = topLevelEntries[i];
-				const entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
-				if (entryProxy) {
-					matchingEntries.push(entryProxy);
-				}
-			}
-			resultCallback(matchingEntries);
-		}
-	}
-}
-
-export function customTreeQueryFunctionFactory(topLevelEntries: any[], childrenPropertyName: string, expandedPropertyName: string, customNodeMatchingFunction: (entry: any, queryString: string, nodeDepth: number) => boolean) {
-
-	function findMatchingEntriesAndTheirAncestors(entry: any, queryString: string, nodeDepth: number) {
-		const entryProxy = createProxy(entry);
-		entryProxy[childrenPropertyName] = [];
-		entryProxy[expandedPropertyName] = false;
-		if (entry[childrenPropertyName]) {
-			for (let i = 0; i < entry[childrenPropertyName].length; i++) {
-				const child = entry[childrenPropertyName][i];
-				const childProxy = findMatchingEntriesAndTheirAncestors(child, queryString, nodeDepth + 1);
-				if (childProxy) {
-					entryProxy[childrenPropertyName].push(childProxy);
-					entryProxy[expandedPropertyName] = true;
-				}
-			}
-		}
-		let hasMatchingChildren = entryProxy[childrenPropertyName].length > 0;
-		const matchesItself = customNodeMatchingFunction(entry, queryString, nodeDepth);
-		if (matchesItself && !hasMatchingChildren) {
-			// still make it expandable!
-			entryProxy[childrenPropertyName] = entry[childrenPropertyName];
-		}
-		return matchesItself || hasMatchingChildren ? entryProxy : null;
-	}
-
 	return function (queryString: string, resultCallback: (entries: any[]) => void) {
+		let theTopLevelEntries = typeof topLevelEntries === 'function' ? topLevelEntries() : topLevelEntries;
 		if (!queryString) {
-			resultCallback(topLevelEntries);
+			resultCallback(theTopLevelEntries);
 		} else {
 			const matchingEntries: any[] = [];
-			for (let i = 0; i < topLevelEntries.length; i++) {
-				const topLevelEntry = topLevelEntries[i];
+			for (let i = 0; i < theTopLevelEntries.length; i++) {
+				const topLevelEntry = theTopLevelEntries[i];
 				const entryProxy = findMatchingEntriesAndTheirAncestors(topLevelEntry, queryString, 0);
 				if (entryProxy) {
 					matchingEntries.push(entryProxy);
