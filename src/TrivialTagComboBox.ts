@@ -291,7 +291,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$tagArea = this.$tagComboBox.find('.tr-tagbox-tagarea');
         this.$trigger = this.$tagComboBox.find('.tr-trigger');
         this.$trigger.mousedown(() => {
-            this.focusEditor();
+            this.focus();
             if (this.isDropDownOpen) {
                 this.closeDropDown();
             } else {
@@ -370,19 +370,19 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     } else if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.prev()) {
                             this.doIgnoringBlurEvents(() => this.$editor.insertBefore(this.$editor.prev()));
-                            this.focusEditor();
+                            this.focus();
                         }
                     } else if (e.which == keyCodes.right_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.next()) {
                             this.doIgnoringBlurEvents(() => this.$editor.insertAfter(this.$editor.next()));
-                            this.focusEditor();
+                            this.focus();
                         }
                     }
                 } else if (e.which == keyCodes.backspace || e.which == keyCodes.delete) {
                     if (this.$editor.text() == "") {
                         if (this.currentPartialTag != null) {
                             this.cancelPartialTag();
-                            this.focusEditor();
+                            this.focus();
                         } else {
                             const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
                             if (tagToBeRemoved) {
@@ -410,7 +410,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         this.$editor.text("");
                     } else if (this.currentPartialTag != null) {
                         this.cancelPartialTag();
-                        this.focusEditor();
+                        this.focus();
                     }
                 } else {
                     if (!this.config.showDropDownOnResultsOnly) {
@@ -467,12 +467,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         }).mouseup(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.focusEditor();
+                this.focus();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         }).mouseout(() => {
             if (this.blurCausedByClickInsideComponent) {
-                this.focusEditor();
+                this.focus();
                 setTimeout(() => this.blurCausedByClickInsideComponent = false); // let the other handlers do their job before removing event blocker
             }
         });
@@ -651,16 +651,11 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
 
         this.$editor.text("");
-        this.focusEditor();
+        this.focus();
 
         if (this.config.tagCompleteDecider(entry) && fireEvent) {
             this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
         }
-    }
-
-    private focusEditor() {
-        selectElementContents(this.$editor[0], 0, 0); // we need to do this, else the cursor does not appear in Chrome...
-        this.$editor.focus();
     }
 
     private repositionDropDown() {
@@ -787,7 +782,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
     public focus() {
         this.$editor.focus();
-        selectElementContents(this.$editor[0], 0, this.$editor.text().length);
     };
 
     public getEditor(): Element {
