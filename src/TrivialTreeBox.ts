@@ -55,35 +55,35 @@ export interface TrivialTreeBoxConfig<E> {
 	 */
 	matchingOptions?: MatchingOptions,
 
-    /**
-     * Property used to retrieve the children of a node.
-     *
-     * @default `'children'`
-     */
-    childrenProperty?: string,
+	/**
+	 * Property used to retrieve the children of a node.
+	 *
+	 * @default `'children'`
+	 */
+	childrenProperty?: string,
 
-    /**
-     * Property name or function used to determine whether a node has children that need to be lazy-loaded.
-     *
-     * @default `'hasLazyChildren'`
-     */
-    lazyChildrenFlag?: string | ((entry: E) => boolean),
+	/**
+	 * Property name or function used to determine whether a node has children that need to be lazy-loaded.
+	 *
+	 * @default `'hasLazyChildren'`
+	 */
+	lazyChildrenFlag?: string | ((entry: E) => boolean),
 
 	/**
 	 * Function for retrieving children of a node.
-     *
-     * @param node
-     * @param resultCallback
+	 *
+	 * @param node
+	 * @param resultCallback
 	 */
 	lazyChildrenQueryFunction?: (entry: E, resultCallback: ResultCallback<E>) => void,
 
-    /**
-     * Property used to determine whether a node is expanded or not.
-     *
-     * Note: This is subject to being replaced by a function in future versions.
-     * @default `'expanded'`
-     */
-    expandedProperty?: string,
+	/**
+	 * Property used to determine whether a node is expanded or not.
+	 *
+	 * Note: This is subject to being replaced by a function in future versions.
+	 * @default `'expanded'`
+	 */
+	expandedProperty?: string,
 
 	/**
 	 * The ID of the initially selected entry in the tree.
@@ -125,7 +125,17 @@ export interface TrivialTreeBoxConfig<E> {
 	/**
 	 * When highlighting/selecting nodes, they sometimes need to get revealed to the user by scrolling. This option specifies the corresponding scroll container.
 	 */
-	scrollContainer?: Element | JQuery
+	scrollContainer?: Element | JQuery,
+
+	/**
+	 * The indentation in pixels used.
+	 *
+	 * If null, use the default value given by the CSS rules.
+	 * If number, indent each depth/level by the given number of pixels.
+	 * If array, indent each depth by the corresponding value in the array.
+	 * If function, indent each depth by the result of the given function (with depth starting at 0).
+	 */
+	indentation?: null | number | number[] | ((depth: number) => number)
 }
 
 class EntryWrapper<E> {
@@ -149,7 +159,7 @@ class EntryWrapper<E> {
 		} else {
 			this.children = children.map(child => new EntryWrapper(child, this, config));
 		}
-		this._id = config.idFunction(entry) || generateUUID();
+		this._id = config.idFunction(entry) || generateUUID();
 	}
 
 	public get id() {
@@ -205,7 +215,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 			lazyChildrenQueryFunction: function (node: E, resultCallback: Function) {
 				resultCallback((node as any).children || []);
 			},
-            expandedProperty: 'expanded',
+			expandedProperty: 'expanded',
 			entryRenderingFunction: function (entry: E, depth: number) {
 				const defaultRenderers = [DEFAULT_RENDERING_FUNCTIONS.icon2Lines, DEFAULT_RENDERING_FUNCTIONS.iconSingleLine];
 				const renderer = defaultRenderers[Math.min(depth, defaultRenderers.length - 1)];
@@ -224,7 +234,8 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 			showExpanders: false,
 			expandOnSelection: false, // open expandable nodes when they are selected
 			enforceSingleExpandedPath: false, // only one path is expanded at any time
-			scrollContainer: $($container)
+			scrollContainer: $($container),
+			indentation: null
 		};
 		this.config = $.extend(defaultConfig, options);
 
@@ -243,7 +254,15 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 			.appendTo($outerEntryWrapper);
 		($entryAndExpanderWrapper[0] as any).trivialEntryWrapper = entry;
 		for (let k = 0; k < entry.depth; k++) {
-			$entryAndExpanderWrapper.append('<div class="tr-indent-spacer"/>');
+			let indentationWidth: number;
+			if (typeof this.config.indentation === 'number') {
+				indentationWidth = this.config.indentation;
+			} else if (Array.isArray(this.config.indentation)) {
+				indentationWidth = this.config.indentation[Math.min(k, this.config.indentation.length - 1)];
+			} else if (typeof this.config.indentation === 'function') {
+				indentationWidth = this.config.indentation(k);
+			}
+			$entryAndExpanderWrapper.append(`<div class="tr-indent-spacer" ${indentationWidth != null ? `style="width:${indentationWidth}px"` : ''}/>`);
 		}
 		$('<div class="tr-tree-expander"></div>')
 			.appendTo($entryAndExpanderWrapper);
