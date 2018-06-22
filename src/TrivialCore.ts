@@ -308,6 +308,9 @@ export function defaultTreeQueryFunctionFactory(topLevelEntries: any[] | (() => 
 }
 
 export function selectElementContents(domElement: Node, start: number, end: number) {
+	if (domElement == null || !document.body.contains(domElement)) {
+		return;
+	}
 	domElement = domElement.firstChild || domElement;
 	end = end || start;
 	const range = document.createRange();

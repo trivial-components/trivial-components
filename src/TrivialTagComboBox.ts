@@ -360,7 +360,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         this.currentPartialTag = null;
                     }
 
-                    this.closeDropDown(); console.log("closing dropdown!");
+                    this.closeDropDown();
                     if (e.which == keyCodes.enter) {
                         e.preventDefault(); // under any circumstances, prevent the new line to be added to the editor!
                     }
@@ -782,6 +782,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
     public focus() {
         this.$editor.focus();
+	    selectElementContents(this.$editor[0], 0, this.$editor.text().length); // we need to do this, else the cursor does not appear in Chrome when navigating using left and right keys...
     };
 
     public getEditor(): Element {
