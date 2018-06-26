@@ -306,7 +306,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     }
 
     private getQueryString() {
-        return this.$editor.val().replace(this.numberRegex, '');
+        return (this.$editor.val() || "").toString().replace(this.numberRegex, '').trim();
     }
 
     private getEditorValueNumberPart(fillupDecimals?: boolean): string {
@@ -401,7 +401,9 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             return "";
         }
         const amountAsString = "" + integerNumber;
-        if (amountAsString.length <= precision) {
+        if (precision === 0) {
+            return amountAsString;
+        } else if (amountAsString.length <= precision) {
             return 0 + decimalSeparator + new Array(precision - amountAsString.length + 1).join("0") + amountAsString;
         } else {
             const integerPart = amountAsString.substring(0, amountAsString.length - precision);
