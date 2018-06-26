@@ -190,6 +190,9 @@ class EntryWrapper<E> {
 
 	public set expanded(expanded: boolean) {
 		(this.entry as any)[this.config.expandedProperty] = expanded;
+		if (this.$element) {
+			this.$element.toggleClass("expanded", expanded);
+		}
 	}
 }
 
@@ -309,35 +312,36 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		}
 
 		node.expanded = expanded;
-		node.$element.toggleClass("expanded", expanded);
 
-		let nodeHasUnrenderedChildren = (node: EntryWrapper<E>) => {
-			return node.children && node.children.some((child: EntryWrapper<E>) => {
-				return !child.$element || !$.contains(document.documentElement, child.$element[0]);
-			});
-		};
+		if (node.$element) {
+			let nodeHasUnrenderedChildren = (node: EntryWrapper<E>) => {
+				return node.children && node.children.some((child: EntryWrapper<E>) => {
+					return !child.$element || !$.contains(document.documentElement, child.$element[0]);
+				});
+			};
 
-		if (expanded && node.children == null) {
-			node.lazyLoadChildren((children: E[]) => this.setChildren(node, children));
-		} else if (expanded && nodeHasUnrenderedChildren(node)) {
-			this.renderChildren(node);
-		}
-		if (expanded) {
-			this.minimallyScrollTo(node.$element);
-		}
-
-		const childrenWrapper = node.$element.find("> .tr-tree-entry-children-wrapper");
-		if (expanded) {
-			if (animate) {
-				childrenWrapper.slideDown(this.config.animationDuration);
-			} else {
-				childrenWrapper.css("display", "block"); // show() does not do this if the node is not attached
+			if (expanded && node.children == null) {
+				node.lazyLoadChildren((children: E[]) => this.setChildren(node, children));
+			} else if (expanded && nodeHasUnrenderedChildren(node)) {
+				this.renderChildren(node);
 			}
-		} else {
-			if (animate) {
-				childrenWrapper.slideUp(this.config.animationDuration);
+			if (expanded) {
+				this.minimallyScrollTo(node.$element);
+			}
+
+			const childrenWrapper = node.$element.find("> .tr-tree-entry-children-wrapper");
+			if (expanded) {
+				if (animate && this.config.animationDuration > 0) {
+					childrenWrapper.slideDown(this.config.animationDuration);
+				} else {
+					childrenWrapper.css("display", "block"); // show() does not do this if the node is not attached
+				}
 			} else {
-				childrenWrapper.hide();
+				if (animate && this.config.animationDuration > 0) {
+					childrenWrapper.slideUp(this.config.animationDuration);
+				} else {
+					childrenWrapper.hide();
+				}
 			}
 		}
 
