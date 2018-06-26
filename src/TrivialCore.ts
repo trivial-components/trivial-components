@@ -383,8 +383,11 @@ export function objectEquals(x: any, y: any): boolean {
  * @returns array of matchers {start, length, distance}
  */
 export function trivialMatch(text: string, searchString: string, options?: MatchingOptions): Match[] {
-	if (!text) {
+	if (text == null) {
 		return [];
+	}
+	if (typeof text !== "string" /* non-typescript or "any" usage */) {
+		text = "" + text;
 	}
 	if (!searchString) {
 		return [{
