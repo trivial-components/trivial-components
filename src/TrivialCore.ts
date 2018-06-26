@@ -248,10 +248,15 @@ export function extractValue<E>(entry: E, property: PropertyReadAccess<E>): any 
 
 export function createProxy(delegate: any): any {
 	const proxyConstructor = function () {
+		this._trProxyDelegate = delegate;
 	};
 	proxyConstructor.prototype = delegate;
 	let proxyConstructorTypescriptHack = proxyConstructor as any;
 	return new proxyConstructorTypescriptHack();
+}
+
+export function unProxyEntry(entry: any): any {
+	return entry != null ? (entry._trProxyDelegate || entry) : null;
 }
 
 export function defaultEntryMatchingFunctionFactory(searchedPropertyNames: string[], matchingOptions: MatchingOptions) {

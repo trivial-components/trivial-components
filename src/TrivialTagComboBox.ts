@@ -19,7 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {
 	DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, escapeSpecialRegexCharacter, HighlightDirection, minimallyScrollTo, QueryFunction, selectElementContents, TrivialComponent,
-	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory
+	wrapWithDefaultTagWrapper, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory, unProxyEntry
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
@@ -603,7 +603,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
     private fireChangeEvents(entries: E[], originalEvent: Event) {
         this.$originalInput.trigger("change");
-        this.onSelectedEntryChanged.fire(entries, originalEvent);
+        this.onSelectedEntryChanged.fire(unProxyEntry(entries), originalEvent);
     }
 
     private addSelectedEntry(entry: E, fireEvent = false, originalEvent?: Event, forceAcceptance?: boolean) {

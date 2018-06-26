@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as $ from "jquery";
-import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes, DEFAULT_RENDERING_FUNCTIONS} from "./TrivialCore";
+import {DEFAULT_TEMPLATES, defaultListQueryFunctionFactory, EditingMode, HighlightDirection, QueryFunction, TrivialComponent, keyCodes, DEFAULT_RENDERING_FUNCTIONS, unProxyEntry} from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 import {place} from "place-to";
 import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
@@ -364,7 +364,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         this.$originalInput.trigger("change");
         this.onChange.fire({
             unit: this.selectedEntry != null ? (this.selectedEntry as any)[this.config.unitValueProperty] : null,
-            unitEntry: this.selectedEntry,
+            unitEntry: unProxyEntry(this.selectedEntry),
             amount: this.getAmount(),
             amountAsFloatingPointNumber: parseFloat(this.formatAmount(this.getAmount(), this.config.decimalPrecision, this.config.decimalSeparator, this.config.thousandsSeparator))
         }, originalEvent);
@@ -486,7 +486,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         if (this.selectedEntry == null) {
             return null;
         } else {
-            return this.selectedEntry;
+            return unProxyEntry(this.selectedEntry);
         }
     }
 

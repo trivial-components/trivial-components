@@ -19,7 +19,7 @@ limitations under the License.
 import * as $ from "jquery";
 import {
 	DEFAULT_TEMPLATES, defaultEntryMatchingFunctionFactory, defaultTreeQueryFunctionFactory, EditingMode, HighlightDirection, objectEquals, QueryFunction, setTimeoutOrDoImmediately,
-	TrivialComponent, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID
+	TrivialComponent, keyCodes, RenderingFunction, DEFAULT_RENDERING_FUNCTIONS, generateUUID, unProxyEntry
 } from "./TrivialCore";
 import {TrivialTreeBox, TrivialTreeBoxConfig} from "./TrivialTreeBox";
 import {TrivialEvent} from "./TrivialEvent";
@@ -469,7 +469,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
 
     private fireChangeEvents(entry: E, originalEvent?: Event) {
         this.$originalInput.trigger("change");
-        this.onSelectedEntryChanged.fire(entry, originalEvent);
+        this.onSelectedEntryChanged.fire(unProxyEntry(entry), originalEvent);
     }
 
     public setSelectedEntry(entry: E, commit: boolean, fireEvent?: boolean, originalEvent?: Event) {
@@ -631,7 +631,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
         } else if (this.selectedEntry == null && this.config.allowFreeText) {
             return this.config.freeTextEntryFactory(this.$editor.val());
         } else {
-            return this.selectedEntry;
+            return unProxyEntry(this.selectedEntry);
         }
     }
 

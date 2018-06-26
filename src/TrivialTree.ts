@@ -26,7 +26,7 @@ import {
 	QueryFunction,
 	TrivialComponent,
 	keyCodes,
-	DEFAULT_RENDERING_FUNCTIONS
+	DEFAULT_RENDERING_FUNCTIONS, unProxyEntry
 } from "./TrivialCore";
 import {TrivialEvent} from "./TrivialEvent";
 export type SearchBarMode = 'none' | 'show-if-filled' | 'always-visible';
@@ -305,11 +305,11 @@ export class TrivialTree<E> implements TrivialComponent{
     private fireChangeEvents(entry: E) {
         this.$originalInput.trigger("change");
         this.$componentWrapper.trigger("change");
-        this.onSelectedEntryChanged.fire(entry);
+        this.onSelectedEntryChanged.fire(unProxyEntry(entry));
     }
 
     public getSelectedEntry() {
-        this.treeBox.getSelectedEntry()
+    	unProxyEntry(this.treeBox.getSelectedEntry());
     };
 
     public updateChildren(parentNodeId: any, children: E[]) {
