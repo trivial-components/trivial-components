@@ -130,6 +130,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             } else if (this.editingMode === "editable") {
                 setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
                     this.openDropDown();
+                    this.$editor.focus();
                     this.query();
                 });
             }
