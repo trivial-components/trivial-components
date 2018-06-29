@@ -557,8 +557,9 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.blurCausedByClickInsideComponent = false; // we won't get any mouseout or mouseup events for entries if they get removed. so do this here proactively
 
         this.entries = newEntries;
-        this.$spinners.remove();
-        this.$spinners = $();
+
+        this.hideSpinner();
+
         if (this.isDropDownOpen) {
             this.updateListBoxEntries();
         } else {
@@ -589,10 +590,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     }
 
     private query(highlightDirection?: HighlightDirection) {
-	    if (this.$spinners.length === 0) {
-            const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
-            this.$spinners = this.$spinners.add($spinner);
-        }
+	    this.showSpinner();
         this.config.queryFunction(this.getNonSelectedEditorValue(), (newEntries: E[]) => {
             this.updateEntries(newEntries, highlightDirection);
             if (this.config.showDropDownOnResultsOnly && newEntries && newEntries.length > 0 && this.$editor.is(":focus")) {
@@ -600,6 +598,20 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
         });
     }
+
+	private showSpinner() {
+		if (this.$spinners.length === 0) {
+			const $spinner = $(this.config.spinnerTemplate).appendTo(this.$dropDown);
+			this.$spinners = this.$spinners.add($spinner);
+		}
+		$(this.getDropDownComponent().getMainDomElement()).addClass('hidden');
+	}
+
+	private hideSpinner() {
+		this.$spinners.remove();
+		this.$spinners = $();
+		$(this.getDropDownComponent().getMainDomElement()).removeClass('hidden');
+	}
 
     private fireChangeEvents(entries: E[], originalEvent: Event) {
         this.$originalInput.trigger("change");
