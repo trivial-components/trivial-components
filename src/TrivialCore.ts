@@ -204,12 +204,12 @@ export const DEFAULT_TEMPLATES = {
 	defaultNoEntriesTemplate: `<div class="tr-default-no-data-display"><div>No matching entries...</div></div>`
 };
 
-export function wrapWithDefaultTagWrapper(entryHtml: string) {
+export function wrapWithDefaultTagWrapper(entryHtml: string, deleteButton = true) {
 	return (`<div class="tr-tagbox-default-wrapper-template">
         <div class="tr-tagbox-tag-content">
             ${entryHtml}
         </div>
-        <div class="tr-remove-button"></div>
+        ${deleteButton ? '<div class="tr-remove-button"></div>' : ''}
     </div>`);
 }
 
