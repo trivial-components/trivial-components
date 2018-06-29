@@ -159,7 +159,8 @@ class EntryWrapper<E> {
 		} else {
 			this.children = children.map(child => new EntryWrapper(child, this, config));
 		}
-		this._id = config.idFunction(entry) || generateUUID();
+		let id = config.idFunction(entry);
+		this._id = id != null ? id : generateUUID();
 	}
 
 	public get id() {
