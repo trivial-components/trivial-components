@@ -239,12 +239,14 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                 }
             })
             .mousedown(() => {
-                if (this.config.openDropdownOnEditorClick) {
-                    this.openDropDown();
-                    if (this.entries == null) {
-                        this.query();
-                    }
-                }
+	            if (this.editingMode === "editable") {
+		            if (this.config.openDropdownOnEditorClick) {
+			            this.openDropDown();
+			            if (this.entries == null) {
+				            this.query();
+			            }
+		            }
+	            }
             }).change((e) => {
                 this.updateOriginalInputValue();
                 this.fireChangeEvents(e);

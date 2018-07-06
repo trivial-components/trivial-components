@@ -262,7 +262,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
             if (this.isDropDownOpen) {
                 this.showEditor();
                 this.closeDropDown();
-            } else {
+            } else if (this.editingMode === "editable") {
                 setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
                     this.showEditor();
                     this.$editor.select();
@@ -400,10 +400,12 @@ export class TrivialComboBox<E> implements TrivialComponent {
                 }
             })
             .mousedown(() => {
-                if (!this.config.showDropDownOnResultsOnly) {
-                    this.openDropDown();
-                }
-                this.query();
+	            if (this.editingMode === "editable") {
+		            if (!this.config.showDropDownOnResultsOnly) {
+			            this.openDropDown();
+		            }
+		            this.query();
+	            }
             });
 
         if (this.$originalInput.attr("tabindex")) {
@@ -445,12 +447,14 @@ export class TrivialComboBox<E> implements TrivialComponent {
         this.setSelectedEntry(this.config.selectedEntry, true, false, null);
 
         this.$selectedEntryWrapper.click(() => {
-            this.showEditor();
-            this.$editor.select();
-            if (!this.config.showDropDownOnResultsOnly) {
-                this.openDropDown();
-            }
-            this.query();
+	        if (this.editingMode === "editable") {
+		        this.showEditor();
+		        this.$editor.select();
+		        if (!this.config.showDropDownOnResultsOnly) {
+			        this.openDropDown();
+		        }
+		        this.query();
+	        }
         });
     }
 

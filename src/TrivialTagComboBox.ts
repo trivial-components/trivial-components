@@ -294,7 +294,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.focus();
             if (this.isDropDownOpen) {
                 this.closeDropDown();
-            } else {
+            } else if (this.editingMode === "editable") {
                 this.$editor.select();
                 this.openDropDown();
                 this.query();
@@ -444,10 +444,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                 }
             })
             .mousedown(() => {
-                if (!this.config.showDropDownOnResultsOnly) {
-                    this.openDropDown();
-                }
-                this.query();
+	            if (this.editingMode === "editable") {
+		            if (!this.config.showDropDownOnResultsOnly) {
+			            this.openDropDown();
+		            }
+		            this.query();
+	            }
             });
 
 
@@ -503,10 +505,12 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             }
             this.$editor.focus();
         }).click((e) => {
-            if (!this.config.showDropDownOnResultsOnly) {
-                this.openDropDown();
-            }
-            this.query();
+	        if (this.editingMode === "editable") {
+		        if (!this.config.showDropDownOnResultsOnly) {
+			        this.openDropDown();
+		        }
+		        this.query();
+	        }
         });
 
         this.setSelectedEntries(this.config.selectedEntries, true);
