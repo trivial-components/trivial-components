@@ -84,7 +84,8 @@ var baseConfig = {
 		"moment-timezone": "moment"
 	},
 	plugins: [
-		new CleanWebpackPlugin(['dist'])
+		new CleanWebpackPlugin(['dist']),
+		new webpack.BannerPlugin("Trivial Components | (c) 2018 Yann Massard and others | Apache License, Version 2.0")
 	]
 };
 
