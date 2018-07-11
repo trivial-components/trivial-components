@@ -59,7 +59,8 @@ export interface TrivialDateTimeFieldConfig {
 	autoComplete?: boolean,
 	autoCompleteDelay?: number,
 	showTrigger?: boolean,
-	editingMode?: EditingMode
+	editingMode?: EditingMode,
+	favorPastDates?: boolean
 }
 
 export interface LocalDate {
@@ -166,7 +167,8 @@ export class TrivialDateTimeField implements TrivialComponent {
 			autoComplete: true,
 			autoCompleteDelay: 0,
 			showTrigger: true,
-			editingMode: "editable" // one of 'editable', 'disabled' and 'readonly'
+			editingMode: "editable", // one of 'editable', 'disabled' and 'readonly'
+			favorPastDates: false
 		}, options);
 
 		this.$originalInput = $(originalInput).addClass("tr-original-input");
@@ -389,7 +391,8 @@ export class TrivialDateTimeField implements TrivialComponent {
 		this.$activeEditor = this.$dateEditor;
 
 		this.dateSuggestionEngine = new TrivialDateSuggestionEngine({
-			preferredDateFormat: this.config.dateFormat
+			preferredDateFormat: this.config.dateFormat,
+			favorPastDates: this.config.favorPastDates
 		});
 		this.timeSuggestionEngine = new TrivialTimeSuggestionEngine();
 	}

@@ -307,7 +307,7 @@ window.onload = (function () {
 		firstDayOfWeek: 1
 	});
 
-	demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {});
+	demo.dateTimeField = new TrivialComponents.TrivialDateTimeField('#dateTimeField', {favorPastDates: false});
 
 	let $destroyAllButton = $('#destroyAllButton').click(function() {
 		Object.keys(demo).forEach(function(key) {

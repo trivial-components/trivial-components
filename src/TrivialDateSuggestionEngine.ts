@@ -49,6 +49,7 @@ export class TrivialDateSuggestionEngine {
 	constructor(options: Options) {
 		this.options = {
 			preferredDateFormat: "YYYY-MM-DD",
+			favorPastDates: false,
 			...options
 		}
 	}
