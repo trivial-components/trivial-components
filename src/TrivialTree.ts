@@ -292,7 +292,7 @@ export class TrivialTree<E> implements TrivialComponent{
 
     private findEntryById(id: string | number) {
         return this.findEntries((entry: E) => {
-            return this.config.idFunction(entry) === id.toString()
+            return this.config.idFunction(entry) === id
         })[0];
     }
 
