@@ -116,7 +116,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
         this.numberRegex = new RegExp('\\d*\\' + this.config.decimalSeparator + '?\\d*', 'g');
 
         this.$originalInput = $(originalInput).addClass("tr-original-input");
-        this.$editor = $('<input type="text"/>');
+        this.$editor = $('<input type="text" autocomplete="false"/>');
         this.$unitBox = $('<div class="tr-unitbox tr-input-wrapper"/>').insertAfter(this.$originalInput);
         this.$originalInput.appendTo(this.$unitBox);
         this.$selectedEntryAndTriggerWrapper = $('<div class="tr-unitbox-selected-entry-and-trigger-wrapper"/>').appendTo(this.$unitBox);

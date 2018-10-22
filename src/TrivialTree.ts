@@ -154,7 +154,7 @@ export class TrivialTree<E> implements TrivialComponent{
                 this.query(1);
             }
         });
-        this.$editor = $('<input type="text" class="tr-tree-editor tr-editor"/>')
+        this.$editor = $('<input type="text" autocomplete="false" class="tr-tree-editor tr-editor"/>')
             .prependTo(this.$componentWrapper)
             .attr("tabindex", this.$originalInput.attr("-1"))
             .focus(() => {
