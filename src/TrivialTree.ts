@@ -332,6 +332,10 @@ export class TrivialTree<E> implements TrivialComponent{
         this.treeBox.setSelectedEntryById(nodeId);
     };
 
+    public getTreeBox() {
+        return this.treeBox;
+    }
+
     public getEditor(): Element {
         return this.$editor[0];
     }
