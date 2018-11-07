@@ -145,7 +145,7 @@ export class TrivialTree<E> implements TrivialComponent{
             } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
                 this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow);
             } else if (e.which == keyCodes.enter) {
-                this.treeBox.setSelectedEntryById(this.config.idFunction(this.treeBox.getHighlightedEntry()));
+                this.treeBox.setSelectedEntryById(this.config.idFunction(this.treeBox.getHighlightedEntry()), true);
             } else if (e.which == keyCodes.escape) {
                 this.$editor.val("");
                 this.query();

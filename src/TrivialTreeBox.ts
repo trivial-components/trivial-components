@@ -483,8 +483,8 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		}
 	}
 
-	public setSelectedEntryById(nodeId: number | string) {
-		this.setSelectedEntry(this.findEntryById(nodeId), null);
+	public setSelectedEntryById(nodeId: number | string, fireEvents = false) {
+		this.setSelectedEntry(this.findEntryById(nodeId), null, fireEvents);
 	}
 
 	private minimallyScrollTo($entryWrapper: JQuery) {
