@@ -190,7 +190,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public readonly onBlur = new TrivialEvent<void>(this);
 
     private treeBox: TrivialTreeBox<E>;
-    private isDropDownOpen = false;
+    private _isDropDownOpen = false;
     private entries: E[];
     private selectedEntries: E[] = [];
     private blurCausedByClickInsideComponent = false;
@@ -292,7 +292,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         this.$trigger = this.$tagComboBox.find('.tr-trigger');
         this.$trigger.mousedown(() => {
             this.focus();
-            if (this.isDropDownOpen) {
+            if (this._isDropDownOpen) {
                 this.closeDropDown();
             } else if (this.editingMode === "editable") {
                 this.$editor.select();
@@ -344,7 +344,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     return;
                 } else if (e.which == keyCodes.tab || e.which == keyCodes.enter) {
                     const highlightedEntry = this.treeBox.getHighlightedEntry();
-                    if (this.isDropDownOpen && highlightedEntry != null) {
+                    if (this._isDropDownOpen && highlightedEntry != null) {
                         this.addSelectedEntry(highlightedEntry, true, e);
                         e.preventDefault(); // do not tab away from the tag box nor insert a newline character
                     } else if (this.$editor.text().trim().length > 0) {
@@ -365,7 +365,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         e.preventDefault(); // under any circumstances, prevent the new line to be added to the editor!
                     }
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
-                    if (this.isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
+                    if (this._isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
                         return false; // the currently highlighted node got effectively expanded/collapsed, so cancel any other effect of the key stroke!
                     } else if (e.which == keyCodes.left_arrow && this.$editor.text().length === 0 && window.getSelection().anchorOffset === 0) {
                         if (this.$editor.prev()) {
@@ -396,7 +396,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                     }
                 } else if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                    if (!this.isDropDownOpen) {
+                    if (!this._isDropDownOpen) {
 	                    this.query(direction);
                         this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
@@ -564,7 +564,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         this.hideSpinner();
 
-        if (this.isDropDownOpen) {
+        if (this._isDropDownOpen) {
             this.updateListBoxEntries();
         } else {
             this.listBoxDirty = true;
@@ -578,7 +578,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-        if (this.isDropDownOpen) {
+        if (this._isDropDownOpen) {
             this.openDropDown(); // only for repositioning!
         }
     }
@@ -690,7 +690,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
             this.$tagComboBox.addClass("open");
             this.$dropDown.show();
             this.repositionDropDown();
-            this.isDropDownOpen = true;
+            this._isDropDownOpen = true;
         }
         if (this.repositionDropDownScheduler == null) {
             this.repositionDropDownScheduler = window.setInterval(() => this.repositionDropDown(), 300); // make sure that under no circumstances the dropdown is mal-positioned
@@ -700,7 +700,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public closeDropDown() {
         this.$tagComboBox.removeClass("open");
         this.$dropDown.hide();
-        this.isDropDownOpen = false;
+        this._isDropDownOpen = false;
         if (this.repositionDropDownScheduler != null) {
             clearInterval(this.repositionDropDownScheduler);
             this.repositionDropDownScheduler = null;
@@ -807,6 +807,10 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
 
 	public setShowTrigger(showTrigger: boolean) {
 		this.$trigger.toggleClass('hidden', !showTrigger);
+	}
+
+	public isDropDownOpen(): boolean {
+		return this._isDropDownOpen;
 	}
 
 	public destroy() {

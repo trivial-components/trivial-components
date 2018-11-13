@@ -127,7 +127,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	private dateListBox: TrivialTreeBox<DateComboBoxEntry>;
 	private timeListBox: TrivialTreeBox<TimeComboBoxEntry>;
 	private calendarBox: TrivialCalendarBox;
-	private isDropDownOpen = false;
+	private _isDropDownOpen = false;
 
 	private dateValue: DateComboBoxEntry = null; // moment object representing the current value
 	private timeValue: TimeComboBoxEntry = null; // moment object representing the current value
@@ -221,7 +221,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 		const $trigger = this.$dateTimeField.find('.tr-trigger');
 		$trigger.toggle(this.config.showTrigger);
 		$trigger.mousedown(() => {
-			if (this.isDropDownOpen) {
+			if (this._isDropDownOpen) {
 				this.closeDropDown();
 			} else {
 				setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
@@ -314,7 +314,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 					if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
 						this.getActiveEditor().select();
 						const direction = e.which == keyCodes.up_arrow ? -1 : 1;
-						if (this.isDropDownOpen) {
+						if (this._isDropDownOpen) {
 							if (this.dropDownMode !== Mode.MODE_CALENDAR) {
 								this.getActiveBox().highlightNextEntry(direction);
 								this.autoCompleteIfPossible(this.config.autoCompleteDelay);
@@ -329,7 +329,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 						}
 						return false; // some browsers move the caret to the beginning on up key
 					} else if (e.which == keyCodes.enter) {
-						if (this.isDropDownOpen) {
+						if (this._isDropDownOpen) {
 							e.preventDefault(); // do not submit form
 							this.selectHighlightedListBoxEntry();
 							selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
@@ -337,7 +337,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 						}
 					} else if (e.which == keyCodes.escape) {
 						e.preventDefault(); // prevent ie from doing its text field magic...
-						if (this.isDropDownOpen) {
+						if (this._isDropDownOpen) {
 							this.updateDisplay();
 							selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
 						}
@@ -439,7 +439,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	private selectHighlightedListBoxEntry() {
 		if (this.dropDownMode === Mode.MODE_DATE_LIST || this.dropDownMode === Mode.MODE_TIME_LIST) {
 			const highlightedEntry = this.getActiveBox().getHighlightedEntry();
-			if (this.isDropDownOpen && highlightedEntry) {
+			if (this._isDropDownOpen && highlightedEntry) {
 				if (this.getActiveEditor() === this.$dateEditor) {
 					this.setDate(highlightedEntry, true);
 				} else {
@@ -557,14 +557,14 @@ export class TrivialDateTimeField implements TrivialComponent {
 			this.$dateTimeField.addClass("open");
 			this.$dropDown.show();
 			this.repositionDropDown();
-			this.isDropDownOpen = true;
+			this._isDropDownOpen = true;
 		}
 	}
 
 	public closeDropDown() {
 		this.$dateTimeField.removeClass("open");
 		this.$dropDown.hide();
-		this.isDropDownOpen = false;
+		this._isDropDownOpen = false;
 	}
 
 	private getNonSelectedEditorValue() {
@@ -618,7 +618,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 
 		this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-		if (this.isDropDownOpen) {
+		if (this._isDropDownOpen) {
 			this.openDropDown(); // only for repositioning!
 		}
 	}
@@ -655,6 +655,10 @@ export class TrivialDateTimeField implements TrivialComponent {
 
 	public focus() {
 		selectElementContents(this.getActiveEditor()[0], 0, this.getActiveEditor().text().length);
+	}
+
+	public isDropDownOpen(): boolean {
+		return this._isDropDownOpen;
 	}
 
 	public destroy() {

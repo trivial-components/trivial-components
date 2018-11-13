@@ -148,7 +148,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
     private config: TrivialComboBoxConfig<E>;
     private $editor: JQuery;
     private treeBox: TrivialTreeBox<E>;
-    private isDropDownOpen = false;
+    private _isDropDownOpen = false;
     private isEditorVisible = false;
     private selectedEntry: E = null;
     private lastCommittedValue: E = null;
@@ -259,7 +259,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
         });
         this.$trigger = this.$comboBox.find('.tr-trigger');
         this.$trigger.mousedown(() => {
-            if (this.isDropDownOpen) {
+            if (this._isDropDownOpen) {
                 this.showEditor();
                 this.closeDropDown();
             } else if (this.editingMode === "editable") {
@@ -315,7 +315,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                     return;
                 } else if (e.which == keyCodes.tab) {
                     let highlightedEntry = this.treeBox.getHighlightedEntry();
-                    if (this.isDropDownOpen && highlightedEntry) {
+                    if (this._isDropDownOpen && highlightedEntry) {
                         this.setSelectedEntry(highlightedEntry, true, true, e);
                     } else if (!this.$editor.val()) {
                         this.setSelectedEntry(null, true, true, e);
@@ -324,7 +324,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                     }
                     return;
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
-                    if (this.isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
+                    if (this._isDropDownOpen && this.treeBox.setHighlightedNodeExpanded(e.which == keyCodes.right_arrow)) {
 	                    return false; // the currently highlighted node got effectively expanded/collapsed, so cancel any other effect of the key stroke!
                     }
                     this.showEditor();
@@ -350,7 +350,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                         this.showEditor();
                     }
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                    if (!this.isDropDownOpen) {
+                    if (!this._isDropDownOpen) {
                         this.query(direction);
 	                    this.openDropDown(); // directly open the dropdown (the user definitely wants to see it)
                     } else {
@@ -362,7 +362,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                     if (this.isEditorVisible || this.editorContainsFreeText()) {
                         e.preventDefault(); // do not submit form
                         let highlightedEntry = this.treeBox.getHighlightedEntry();
-                        if (this.isDropDownOpen && highlightedEntry) {
+                        if (this._isDropDownOpen && highlightedEntry) {
                             this.setSelectedEntry(highlightedEntry, true, true, e);
                         } else if (!this.$editor.val()) {
                             this.setSelectedEntry(null, true, true, e);
@@ -374,7 +374,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
                     }
                 } else if (e.which == keyCodes.escape) {
                     e.preventDefault(); // prevent ie from doing its text field magic...
-                    if (!(this.editorContainsFreeText() && this.isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
+                    if (!(this.editorContainsFreeText() && this._isDropDownOpen)) { // TODO if list is empty, still reset, even if there is freetext.
                         this.hideEditor();
                         this.$editor.val("");
                         this.setSelectedEntry(this.lastCommittedValue, false, false, e);
@@ -509,7 +509,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
         if (this.isEditorVisible) {
             this.showEditor(); // reposition editor
         }
-        if (this.isDropDownOpen) {
+        if (this._isDropDownOpen) {
             this.repositionDropDown();
         }
     }
@@ -554,14 +554,14 @@ export class TrivialComboBox<E> implements TrivialComponent {
         if (this.isDropDownNeeded()) {
             this.$comboBox.addClass("open");
             this.repositionDropDown();
-            this.isDropDownOpen = true;
+            this._isDropDownOpen = true;
         }
     }
 
     public closeDropDown() {
         this.$comboBox.removeClass("open");
         this.$dropDown.hide();
-        this.isDropDownOpen = false;
+        this._isDropDownOpen = false;
     }
 
     private getNonSelectedEditorValue() {
@@ -622,7 +622,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
 
         this.autoCompleteIfPossible(this.config.autoCompleteDelay);
 
-        if (this.isDropDownOpen) {
+        if (this._isDropDownOpen) {
             this.openDropDown(); // only for repositioning!
         }
     }
@@ -674,7 +674,12 @@ export class TrivialComboBox<E> implements TrivialComponent {
 	    this.$trigger.toggleClass('hidden', !showTrigger);
     }
 
-    public destroy() {
+
+	public isDropDownOpen(): boolean {
+		return this._isDropDownOpen;
+	}
+
+	public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$comboBox);
         this.$comboBox.remove();
         this.$dropDown.remove();

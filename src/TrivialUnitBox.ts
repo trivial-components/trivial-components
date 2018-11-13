@@ -62,7 +62,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     public readonly onBlur = new TrivialEvent<void>(this);
 
     private listBox: TrivialTreeBox<U>;
-    private isDropDownOpen = false;
+    private _isDropDownOpen = false;
     private entries: U[];
     private selectedEntry: U;
     private blurCausedByClickInsideComponent = false;
@@ -125,7 +125,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
             $('<div class="tr-trigger"><span class="tr-trigger-icon"/></div>').appendTo(this.$selectedEntryAndTriggerWrapper);
         }
         this.$selectedEntryAndTriggerWrapper.mousedown(() => {
-            if (this.isDropDownOpen) {
+            if (this._isDropDownOpen) {
                 this.closeDropDown();
             } else if (this.editingMode === "editable") {
                 setTimeout(() => { // TODO remove this when Chrome bug is fixed. Chrome scrolls to the top of the page if we do this synchronously. Maybe this has something to do with https://code.google.com/p/chromium/issues/detail?id=342307 .
@@ -172,7 +172,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                     return;
                 } else if (e.which == keyCodes.tab) {
                     const highlightedEntry = this.listBox.getHighlightedEntry();
-                    if (this.isDropDownOpen && highlightedEntry) {
+                    if (this._isDropDownOpen && highlightedEntry) {
                         this.setSelectedEntry(highlightedEntry, true, e);
                     }
                 } else if (e.which == keyCodes.left_arrow || e.which == keyCodes.right_arrow) {
@@ -181,14 +181,14 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 
                 if (e.which == keyCodes.up_arrow || e.which == keyCodes.down_arrow) {
                     const direction = e.which == keyCodes.up_arrow ? -1 : 1;
-                    if (this.isDropDownOpen) {
+                    if (this._isDropDownOpen) {
                         this.listBox.highlightNextEntry(direction);
                     } else {
                         this.openDropDown();
                         this.query(direction);
                     }
                     return false; // some browsers move the caret to the beginning on up key
-                } else if (this.isDropDownOpen && e.which == keyCodes.enter) {
+                } else if (this._isDropDownOpen && e.which == keyCodes.enter) {
                     e.preventDefault(); // do not submit form
                     this.setSelectedEntry(this.listBox.getHighlightedEntry(), true, e);
                     this.closeDropDown();
@@ -351,7 +351,7 @@ export class TrivialUnitBox<U> implements TrivialComponent {
                 }
                 this.listBox.highlightNextEntry(highlightDirection);
 
-                if (this.isDropDownOpen) {
+                if (this._isDropDownOpen) {
                     this.openDropDown(); // only for repositioning!
                 }
             });
@@ -428,13 +428,13 @@ export class TrivialUnitBox<U> implements TrivialComponent {
     public openDropDown() {
         this.$unitBox.addClass("open");
         this.repositionDropDown();
-        this.isDropDownOpen = true;
+        this._isDropDownOpen = true;
     }
 
     public closeDropDown() {
         this.$unitBox.removeClass("open");
         this.$dropDown.hide();
-        this.isDropDownOpen = false;
+        this._isDropDownOpen = false;
     }
 
     private updateOriginalInputValue() {
@@ -523,7 +523,11 @@ export class TrivialUnitBox<U> implements TrivialComponent {
 		this.updateOriginalInputValue();
 	}
 
-    public destroy() {
+	public isDropDownOpen(): boolean {
+		return this._isDropDownOpen;
+	}
+
+	public destroy() {
         this.$originalInput.removeClass('tr-original-input').insertBefore(this.$unitBox);
         this.$unitBox.remove();
         this.$dropDown.remove();
