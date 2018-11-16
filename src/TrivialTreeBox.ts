@@ -278,8 +278,17 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		}
 
 		if (!entry.isLeaf()) {
-			const $childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
-				.appendTo($outerEntryWrapper);
+			this.create$ChildrenWrapper(entry);
+		}
+		this.setNodeExpanded(entry, entry.expanded, false);
+		return $outerEntryWrapper;
+	}
+
+	private create$ChildrenWrapper(entry: EntryWrapper<E>): JQuery {
+		let $childrenWrapper = entry.$element.find('>.tr-tree-entry-children-wrapper');
+		if ($childrenWrapper[0] == null) {
+			$childrenWrapper = $('<div class="tr-tree-entry-children-wrapper"></div>')
+				.appendTo(entry.$element);
 			if (entry.children != null) {
 				if (entry.expanded) {
 					for (let i = 0; i < entry.children.length; i++) {
@@ -287,11 +296,10 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 					}
 				}
 			} else {
-				$childrenWrapper.hide().append(this.config.spinnerTemplate).fadeIn();
+				$childrenWrapper.hide().append(this.config.spinnerTemplate);
 			}
 		}
-		this.setNodeExpanded(entry, entry.expanded, false);
-		return $outerEntryWrapper;
+		return $childrenWrapper;
 	}
 
 	private setNodeExpanded(node: EntryWrapper<E>, expanded: boolean, animate: boolean) {
@@ -358,7 +366,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 
 	private renderChildren(node: EntryWrapper<E>) {
 		const $childrenWrapper = node.$element.find('> .tr-tree-entry-children-wrapper');
-		$childrenWrapper.empty();
+		$childrenWrapper[0].innerHTML = ''; // remove the spinner!
 		if (node.children && node.children.length > 0) {
 			node.children.forEach(child => {
 				child.render().appendTo($childrenWrapper);
@@ -625,7 +633,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		}
 	}
 
-	public updateChildren(parentNodeId: string, children: E[]) {
+	public updateChildren(parentNodeId: string | number, children: E[]) {
 		const node = this.findEntryById(parentNodeId);
 		if (node) {
 			this.setChildren(node, children);
@@ -647,7 +655,7 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		oldNode.$element.remove();
 	};
 
-	public removeNode(nodeId: string) {
+	public removeNode(nodeId: string | number) {
 		const childNode = this.findEntryById(nodeId);
 		if (childNode) {
 			const parentNode = childNode.parent;
@@ -660,22 +668,29 @@ export class TrivialTreeBox<E> implements TrivialComponent {
 		}
 	};
 
-	// TODO "refreshNode(nodeId, updateExpandedState: boolean, updateChildren: boolean)" which will update the node (and optionally the children) cache and display
-	// TODO "refreshChildren(nodeId, updateExpandedState: boolean)" which will call the children method again to update its cache and display!
-
 	public addNode(parentNodeId: number | string, node: E) {
 		const parentNode = this.findEntryById(parentNodeId);
-		if (parentNode.isLeaf()) {
-			console.error('The parent node is a leaf node, so you cannot add children to it!'); // TODO change this! (see above)
-		}
 		if (parentNode.children == null) {
 			parentNode.children = [];
 		}
 		let newEntryWrapper = this.createEntryWrapper(node, parentNode);
+		let $childrenWrapper = this.create$ChildrenWrapper(parentNode);
+		if (parentNode.children.length === 0) {
+			$childrenWrapper[0].innerHTML = ''; // remove the spinner!
+		}
 		parentNode.children.push(newEntryWrapper);
-		newEntryWrapper.render().appendTo(parentNode.$element.find('>.tr-tree-entry-children-wrapper'));
+		newEntryWrapper.render().appendTo($childrenWrapper);
 		parentNode.$element.addClass('has-children');
 	};
+
+	public addOrUpdateNode(parentNodeId: number | string, node: E) {
+		let existingNode = this.findEntryById(this.config.idFunction(node));
+		if (existingNode != null) {
+			this.updateNode(node);
+		} else {
+			this.addNode(parentNodeId, node);
+		}
+	}
 
 	public destroy() {
 		this.$componentWrapper.remove();

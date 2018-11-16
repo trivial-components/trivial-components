@@ -320,13 +320,17 @@ export class TrivialTree<E> implements TrivialComponent{
         this.treeBox.updateNode(node)
     };
 
-    public removeNode(nodeId: string) {
+    public removeNode(nodeId: string | number) {
         this.treeBox.removeNode(nodeId)
     };
 
-    public addNode(parentNodeId: number, node: E) {
+    public addNode(parentNodeId: string | number, node: E) {
         this.treeBox.addNode(parentNodeId, node)
     };
+
+    public addOrUpdateNode(parentNodeId: string | number, node: E) {
+        this.treeBox.addOrUpdateNode(parentNodeId, node);
+    }
 
     public selectNodeById(nodeId: any) {
         this.treeBox.setSelectedEntryById(nodeId);
