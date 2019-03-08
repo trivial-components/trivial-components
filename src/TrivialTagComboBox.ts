@@ -386,7 +386,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
                         } else {
                             const tagToBeRemoved = this.selectedEntries[this.$editor.index() + (e.which == keyCodes.backspace ? -1 : 0)];
                             if (tagToBeRemoved) {
-                                this.removeTag(tagToBeRemoved, e);
+                                this.removeTag(tagToBeRemoved, true, e);
                                 this.closeDropDown();
                             }
                         }
@@ -583,14 +583,16 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
     }
 
-    private removeTag(tagToBeRemoved: E, originalEvent?: Event) {
+    private removeTag(tagToBeRemoved: E, fireChangeEvent: boolean = false, originalEvent?: Event) {
         const index = this.selectedEntries.indexOf(tagToBeRemoved);
         if (index > -1) {
             this.selectedEntries.splice(index, 1);
         }
         (tagToBeRemoved as any)._trEntryElement.remove();
         this.$originalInput.val(this.config.inputValueFunction(this.getSelectedEntries()));
-        this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
+        if (fireChangeEvent) {
+            this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
+        }
     }
 
     private query(highlightDirection?: HighlightDirection) {
@@ -656,7 +658,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         tag._trEntryElement = $tagWrapper;
 
         $entry.find('.tr-remove-button').click((e) => {
-            this.removeTag(tag);
+            this.removeTag(tag, true, e);
             return false;
         });
 
@@ -770,7 +772,7 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
     public setSelectedEntries(entries: E[], forceAcceptance?: boolean) {
         this.selectedEntries
             .slice() // copy the array as it gets changed during the forEach loop
-            .forEach((e) => this.removeTag(e));
+            .forEach((e) => this.removeTag(e, false));
         if (entries) {
             for (let i = 0; i < entries.length; i++) {
                 this.addSelectedEntry(entries[i], false, null, forceAcceptance);
