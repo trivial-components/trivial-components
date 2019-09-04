@@ -32,7 +32,7 @@
 
   .tr-unitbox-editor,
   .tr-unitbox-selected-entry-and-trigger-wrapper {
-    min-height: @tr-input-min-height - 2px; // IE 11 does not stretch items correctly if the (min-)height is defined by the containing element
+    min-height: calc(~"@{tr-input-min-height}" - 2px); // IE 11 does not stretch items correctly if the (min-)height is defined by the containing element
   }
 
   .tr-unitbox-selected-entry-and-trigger-wrapper {
