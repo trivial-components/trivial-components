@@ -669,7 +669,6 @@ export class TrivialTagComboBox<E> implements TrivialComponent {
         }
 
         this.$editor.text("");
-        this.focus();
 
         if (this.config.tagCompleteDecider(entry) && fireEvent) {
             this.fireChangeEvents(this.getSelectedEntries(), originalEvent);
