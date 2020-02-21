@@ -519,17 +519,23 @@ export class TrivialComboBox<E> implements TrivialComponent {
     }
 
     private showEditor() {
-        let $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
-        if ($editorArea.length === 0) {
-            $editorArea = this.$selectedEntryWrapper;
-        }
-	    this.$editor.css({
+        let $editorArea = this.getEditorArea();
+        this.$editor.css({
 		    "width": Math.min($editorArea[0].offsetWidth, this.$trigger.is(':visible') ? this.$trigger[0].offsetLeft - $editorArea[0].offsetLeft : 99999999) + "px", // prevent the editor from surpassing the trigger!
 		    "height": ($editorArea[0].offsetHeight) + "px"
 	    });
 	    place(this.$editor[0], "top left")
 		    .to($editorArea[0], "top left");
         this.isEditorVisible = true;
+	    $editorArea.css("visibility", "hidden");
+    }
+
+    private getEditorArea() {
+        let $editorArea = this.$selectedEntryWrapper.find(".tr-editor-area");
+        if ($editorArea.length === 0) {
+            $editorArea = this.$selectedEntryWrapper;
+        }
+        return $editorArea;
     }
 
     private editorContainsFreeText() {
@@ -539,6 +545,7 @@ export class TrivialComboBox<E> implements TrivialComponent {
     private hideEditor() {
         this.$editor.width(0).height(0);
         this.isEditorVisible = false;
+        this.getEditorArea().css("visibility", "visible");
     }
 
     private repositionDropDown() {
