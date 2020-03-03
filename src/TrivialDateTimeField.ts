@@ -397,7 +397,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	}
 
 	private isDropDownNeeded() {
-		return this.config.editingMode == 'editable';
+		return this.editingMode == 'editable';
 	}
 
 	private setDropDownMode(mode: Mode) {
