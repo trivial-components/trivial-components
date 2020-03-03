@@ -137,7 +137,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	private autoCompleteTimeoutId = -1;
 	private doNoAutoCompleteBecauseBackspaceWasPressed = false;
 	private calendarBoxInitialized = false;
-	private dropdownNeeded: boolean;
+	private editingMode: string;
 
 	private dropDownMode = Mode.MODE_CALENDAR;
 
@@ -149,6 +149,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	private $dateEditor: JQuery;
 	private $timeIconWrapper: JQuery;
 	private $timeEditor: JQuery;
+	private $dropDownTargetElement: JQuery;
 
 	private $dateListBoxWrapper: JQuery;
 	private $timeListBoxWrapper: JQuery;
@@ -181,7 +182,6 @@ export class TrivialDateTimeField implements TrivialComponent {
             </div>
             <div class="tr-trigger"><span class="tr-trigger-icon"></span></div>
         </div>`)
-			.addClass(this.config.editingMode)
 			.insertAfter(this.$originalInput);
 
 		let $editorWrapper = this.$dateTimeField.find('.tr-editor-wrapper').appendTo(this.$dateTimeField);
@@ -234,6 +234,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 			}
 		});
 
+		this.$dropDownTargetElement = $("body");
 		this.$dropDown = $(`<div class="tr-dropdown">
             <div class="date-listbox"></div>
             <div class="time-listbox"></div>
@@ -242,10 +243,8 @@ export class TrivialDateTimeField implements TrivialComponent {
 			.scroll(() => {
 				return false;
 			});
-		this.dropdownNeeded = this.config.editingMode == 'editable';
-		if (this.dropdownNeeded) {
-			this.$dropDown.appendTo("body");
-		}
+
+		this.setEditingMode(this.config.editingMode);
 
 		this.$dateListBoxWrapper = this.$dropDown.find('.date-listbox');
 		this.dateListBox = new TrivialTreeBox<DateComboBoxEntry>(this.$dateListBoxWrapper, {
@@ -395,6 +394,10 @@ export class TrivialDateTimeField implements TrivialComponent {
 			favorPastDates: this.config.favorPastDates
 		});
 		this.timeSuggestionEngine = new TrivialTimeSuggestionEngine();
+	}
+
+	private isDropDownNeeded() {
+		return this.config.editingMode == 'editable';
 	}
 
 	private setDropDownMode(mode: Mode) {
@@ -553,7 +556,7 @@ export class TrivialDateTimeField implements TrivialComponent {
 	}
 
 	public openDropDown() {
-		if (this.dropdownNeeded) {
+		if (this.$dropDown != null) {
 			this.$dateTimeField.addClass("open");
 			this.$dropDown.show();
 			this.repositionDropDown();
@@ -620,6 +623,23 @@ export class TrivialDateTimeField implements TrivialComponent {
 
 		if (this._isDropDownOpen) {
 			this.openDropDown(); // only for repositioning!
+		}
+	}
+
+	public setEditingMode(newEditingMode: EditingMode) {
+		this.editingMode = newEditingMode;
+		this.$dateTimeField.removeClass("editable readonly disabled").addClass(this.editingMode);
+
+		if (newEditingMode == "editable") {
+			this.$dateEditor[0].setAttribute("contenteditable", "");
+			this.$timeEditor[0].setAttribute("contenteditable", "");
+		} else {
+			this.$dateEditor[0].removeAttribute("contenteditable");
+			this.$timeEditor[0].removeAttribute("contenteditable");
+		}
+
+		if (this.isDropDownNeeded()) {
+			this.$dropDown.appendTo(this.$dropDownTargetElement);
 		}
 	}
 
